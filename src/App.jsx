@@ -4,8 +4,8 @@ import { Tldraw, createTLStore, defaultShapeUtils, exportToBlob, toRichText } fr
 import "tldraw/tldraw.css";
 import { FLOW } from "./flow.js";
 
-function nowId(prefix = "id") {
-  return `${prefix}_${Math.random().toString(16).slice(2)}_${Date.now()}`;
+function nowId() {
+  return `shape:${Math.random().toString(16).slice(2)}_${Date.now()}`;
 }
 
 function buildRevealText(path) {
@@ -40,21 +40,21 @@ export default function App() {
     if (path.length === 1) {
       editor.createShapes([
         {
-          id: nowId("box"),
+          id: nowId(),
           type: "geo",
           x: 140,
           y: 120,
           props: { geo: "rectangle", w: 280, h: 90, richText: toRichText("Reality\n(what’s happening)" }
         },
         {
-          id: nowId("box"),
+          id: nowId(),
           type: "geo",
           x: 520,
           y: 120,
           props: { geo: "rectangle", w: 280, h: 90, richText: toRichText("Desired\n(what you want)" }
         },
         {
-          id: nowId("arrow"),
+          id: nowId(),
           type: "arrow",
           x: 420,
           y: 165,
@@ -90,7 +90,7 @@ export default function App() {
 
     editor.createShapes([
       {
-        id: nowId("note"),
+        id: nowId(),
         type: "geo",
         x,
         y,
