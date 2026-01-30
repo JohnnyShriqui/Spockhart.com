@@ -1,6 +1,6 @@
 import React, { useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Tldraw, createTLStore, defaultShapeUtils, exportToBlob } from "tldraw";
+import { Tldraw, createTLStore, defaultShapeUtils, exportToBlob, toRichText } from "tldraw";
 import "tldraw/tldraw.css";
 import { FLOW } from "./flow.js";
 
@@ -44,14 +44,14 @@ export default function App() {
           type: "geo",
           x: 140,
           y: 120,
-          props: { geo: "rectangle", w: 280, h: 90, text: "Reality\n(what’s happening)" }
+          props: { geo: "rectangle", w: 280, h: 90, richText: toRichText("Reality\n(what’s happening)" }
         },
         {
           id: nowId("box"),
           type: "geo",
           x: 520,
           y: 120,
-          props: { geo: "rectangle", w: 280, h: 90, text: "Desired\n(what you want)" }
+          props: { geo: "rectangle", w: 280, h: 90, richText: toRichText("Desired\n(what you want)" }
         },
         {
           id: nowId("arrow"),
@@ -94,7 +94,7 @@ export default function App() {
         type: "geo",
         x,
         y,
-        props: { geo: "rectangle", w: 280, h: 110, text }
+        props: { geo: "rectangle", w: 280, h: 110, richText }
       }
     ]);
 
