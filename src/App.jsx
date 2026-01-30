@@ -94,7 +94,7 @@ export default function App() {
         type: "geo",
         x,
         y,
-        props: { geo: "rectangle", w: 280, h: 110, richText }
+       props: { geo: "rectangle", w: 280, h: 110, richText: toRichText(text) }
       }
     ]);
 
