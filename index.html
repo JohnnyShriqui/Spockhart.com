@@ -143,21 +143,51 @@
     animation: slideIn 0.7s ease-out 0.95s forwards;
   }
 
-  .cta-area a {
+  .cta-btn {
     font-family: 'Source Sans 3', sans-serif;
     font-size: 0.9rem;
     font-weight: 500;
     color: #f0f3f7;
     background: #1b2a3d;
-    text-decoration: none;
+    border: none;
+    cursor: pointer;
     padding: 0.85rem 2.2rem;
     border-radius: 4px;
     transition: all 0.3s ease;
     letter-spacing: 0.02em;
   }
 
-  .cta-area a:hover {
+  .cta-btn:hover {
     background: #2c4a6a;
+  }
+
+  .contact-info {
+    display: none;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .contact-info.visible {
+    display: flex;
+  }
+
+  .contact-info span {
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 400;
+    color: #1b2a3d;
+    letter-spacing: 0.01em;
+  }
+
+  .contact-info a {
+    color: #2c5f8a;
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.3s ease;
+  }
+
+  .contact-info a:hover {
+    border-bottom-color: #2c5f8a;
   }
 
   .location-text {
@@ -202,10 +232,9 @@
       <p class="challenge-line">Every nonprofit faces the same fundamental challenge: unlimited demand on limited resources.</p>
       <p class="hero-line">We exist to close that gap.</p>
       <div class="cta-area">
-        <a href="mailto:Jshriqui1@gmail.com">Get in touch</a>
+        <button class="cta-btn" onclick="document.querySelector('.contact-info').classList.add('visible'); this.style.display='none';">Get in touch</button>
+        <div class="contact-info">
+          <span><a href="mailto:John@spockhart.com">John@spockhart.com</a></span>
+        </div>
         <span class="location-text">Toronto, Canada</span>
-      </div>
-    </div>
-  </div>
-</body>
-</html>
+      <
