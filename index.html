@@ -1,1 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spockhart</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Source+Sans+3:wght@300;400;500;600&display=swap');
 
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #f0f3f7;
+    color: #1b2a3d;
+    font-family: 'Source Sans 3', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Top bar */
+  .top-bar {
+    width: 100%;
+    background: #1b2a3d;
+    padding: 0.7rem 4rem;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #8aa4be;
+    text-align: center;
+    z-index: 10;
+    opacity: 0;
+    animation: fadeIn 0.5s ease-out 0.1s forwards;
+  }
+
+  /* Ambient shapes */
+  .shape {
+    position: fixed;
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .shape-1 {
+    width: 600px; height: 600px;
+    top: -18%; right: -12%;
+    background: radial-gradient(circle, #b8cce0 0%, transparent 70%);
+    opacity: 0.5;
+  }
+  .shape-2 {
+    width: 450px; height: 450px;
+    bottom: -12%; left: -8%;
+    background: radial-gradient(circle, #a3bcd4 0%, transparent 70%);
+    opacity: 0.35;
+  }
+  .shape-3 {
+    width: 300px; height: 300px;
+    top: 40%; left: 60%;
+    background: radial-gradient(circle, #c5d5e4 0%, transparent 70%);
+    opacity: 0.25;
+  }
+
+  .main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 4rem;
+    padding-left: 8vw;
+    position: relative;
+    z-index: 1;
+  }
+
+  .container {
+    max-width: 900px;
+  }
+
+  .logo-text {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(3rem, 7vw, 4.5rem);
+    font-weight: 700;
+    color: #1b2a3d;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 0.8rem;
+    opacity: 0;
+    animation: slideIn 0.7s ease-out 0.2s forwards;
+  }
+
+  .subtitle {
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #3d6a8e;
+    margin-bottom: 2.5rem;
+    opacity: 0;
+    animation: slideIn 0.7s ease-out 0.4s forwards;
+  }
+
+  .divider {
+    width: 48px;
+    height: 2px;
+    background: linear-gradient(90deg, #2c5f8a, #4a8aba);
+    margin-bottom: 2.5rem;
+    border-radius: 1px;
+    opacity: 0;
+    animation: slideIn 0.7s ease-out 0.55s forwards;
+  }
+
+  .challenge-line {
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: clamp(1rem, 1.9vw, 1.15rem);
+    font-weight: 400;
+    line-height: 1.7;
+    color: #4a5d72;
+    white-space: nowrap;
+    margin-bottom: 0.6rem;
+    opacity: 0;
+    animation: slideIn 0.7s ease-out 0.65s forwards;
+  }
+
+  .hero-line {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(1.4rem, 3vw, 1.8rem);
+    font-weight: 600;
+    line-height: 1.4;
+    color: #1b2a3d;
+    margin-bottom: 3rem;
+    opacity: 0;
+    animation: slideIn 0.7s ease-out 0.8s forwards;
+  }
+
+  .cta-area {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    opacity: 0;
+    animation: slideIn 0.7s ease-out 0.95s forwards;
+  }
+
+  .cta-area a {
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #f0f3f7;
+    background: #1b2a3d;
+    text-decoration: none;
+    padding: 0.85rem 2.2rem;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    letter-spacing: 0.02em;
+  }
+
+  .cta-area a:hover {
+    background: #2c4a6a;
+  }
+
+  .location-text {
+    font-size: 0.82rem;
+    font-weight: 400;
+    color: #6a8099;
+    letter-spacing: 0.02em;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @media (max-width: 768px) {
+    .main {
+      padding: 3rem 2rem;
+    }
+    .challenge-line {
+      white-space: normal;
+    }
+  }
+</style>
+</head>
+<body>
+  <div class="top-bar">Full site coming soon</div>
+
+  <div class="shape shape-1"></div>
+  <div class="shape shape-2"></div>
+  <div class="shape shape-3"></div>
+
+  <div class="main">
+    <div class="container">
+      <h1 class="logo-text">SPOCKHART</h1>
+      <p class="subtitle">The engineering firm for nonprofits</p>
+      <div class="divider"></div>
+      <p class="challenge-line">Every nonprofit faces the same fundamental challenge: unlimited demand on limited resources.</p>
+      <p class="hero-line">We exist to close that gap.</p>
+      <div class="cta-area">
+        <a href="mailto:Jshriqui1@gmail.com">Get in touch</a>
+        <span class="location-text">Toronto, Ontario</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
