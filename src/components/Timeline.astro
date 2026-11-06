@@ -46,10 +46,17 @@ const phases = [
   },
 ];
 const ticks = [0, 14, 30, 60, 90, 120];
+/* Seconds in the looping walk-through when each phase is "on" (not to scale) */
+const windows = [
+  [0.6, 2.8],
+  [2.8, 5.0],
+  [5.0, 7.8],
+  [7.8, 10.2],
+];
 const pct = (d: number) => `${(d / SCALE) * 100}%`;
 ---
 
-<div class:list={['timeline', { compact }]} data-reveal>
+<div class:list={['timeline', { compact }]} data-reveal data-scene data-loop="12" data-still="11" style="--loop:12;--still:11">
   <div class="scale" aria-hidden="true">
     <div class="scale-track">
       <div class="axis"></div>
@@ -77,16 +84,21 @@ const pct = (d: number) => `${(d / SCALE) * 100}%`;
     <div class="scale-tail">
       <span class="seg-label">Yours to run</span>
     </div>
+    <div class="scale-cover"></div>
+    <div class="scale-now"><i></i></div>
   </div>
 
   <ol class="phases" data-reveal="stagger">
     {
       phases.map((p, i) => (
-        <li class={`phase phase-${i + 1}`}>
+        <li class={`phase phase-${i + 1}`} style={`--a:${windows[i][0]};--b:${windows[i][1]}`}>
           <p class="phase-meta">
             <span class="tabular">{p.n}</span>
             <span aria-hidden="true">·</span>
             {p.when}
+            <span class="phase-done" aria-hidden="true">
+              <svg viewBox="0 0 16 16"><path d="M4 8.5l2.6 2.6L12 5.6" /></svg>
+            </span>
           </p>
           <h3>{p.name}</h3>
           {!compact && <p class="phase-body">{p.body}</p>}
@@ -100,11 +112,52 @@ const pct = (d: number) => `${(d / SCALE) * 100}%`;
   .timeline { display: grid; gap: var(--s-7); }
 
   .scale {
+    --track: 86;
+    --tail: 14;
+    /* Where the walk-through marker is, as a percentage of the scale (phases are not to scale in time) */
+    --pos: calc(
+      (var(--track) * 0.11667 * clamp(0, (var(--t) - 0.6) / 2.2, 1) +
+        var(--track) * 0.13333 * clamp(0, (var(--t) - 2.8) / 2.2, 1) +
+        var(--track) * 0.75 * clamp(0, (var(--t) - 5) / 2.8, 1) +
+        var(--tail) * clamp(0, (var(--t) - 7.8) / 2.4, 1)) * 1%
+    );
+    position: relative;
     display: grid;
     grid-template-columns: minmax(0, 86fr) minmax(0, 14fr);
     padding-top: 2.6rem;
     padding-bottom: 2rem;
   }
+  .timeline { --t: var(--still, 11); }
+  /* Everything to the right of the marker is still ahead */
+  .scale-cover {
+    position: absolute;
+    top: 2.6rem;
+    height: 44px;
+    left: var(--pos);
+    right: 0;
+    background: rgb(228 234 241 / 0.72);
+    pointer-events: none;
+  }
+  .scale-now {
+    position: absolute;
+    top: calc(2.6rem - 12px);
+    height: calc(44px + 24px);
+    left: var(--pos);
+    width: 0;
+    opacity: clamp(0, (var(--loop) - 0.4 - var(--t)) * 3, 1);
+    pointer-events: none;
+  }
+  .scale-now::before { content: ''; position: absolute; left: -1px; top: 0; bottom: 0; width: 2px; background: var(--ink); border-radius: 1px; }
+  .scale-now i {
+    position: absolute;
+    left: -8px;
+    top: -9px;
+    width: 16px;
+    height: 18px;
+    background: var(--ink);
+    clip-path: var(--hex);
+  }
+  .scale-now i::after { content: ''; position: absolute; inset: 5px 4px; background: var(--paper); clip-path: var(--hex); }
   .scale-track { position: relative; height: 44px; }
   .axis {
     position: absolute;
@@ -205,16 +258,46 @@ const pct = (d: number) => `${(d / SCALE) * 100}%`;
     gap: var(--s-5);
   }
   .phase {
+    /* on: this phase is the one the marker is in. done: it has been passed. */
+    --on: calc(clamp(0, (var(--t) - var(--a)) * 5, 1) * clamp(0, (var(--b) - var(--t)) * 5, 1));
+    --run: clamp(0, (var(--t) - var(--a)) / (var(--b) - var(--a)), 1);
+    --reset: clamp(0, (var(--loop) - 0.4 - var(--t)) * 3, 1);
     position: relative;
     display: grid;
     gap: var(--s-2);
     align-content: start;
     padding: var(--s-5);
-    border: 1px solid var(--rule);
+    border: 1px solid rgb(44 95 138 / calc(0.14 + 0.5 * var(--on)));
     border-radius: var(--radius-lg);
     background: var(--surface);
     overflow: hidden;
+    transform: translateY(calc(var(--on) * -6px));
+    box-shadow: 0 26px 44px -30px rgb(27 42 61 / calc(0.6 * var(--on)));
   }
+  /* Time running through the phase */
+  .phase::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 3px;
+    background: var(--accent-soft);
+    transform-origin: left center;
+    transform: scaleX(calc(var(--run) * var(--reset)));
+  }
+  .phase-done {
+    margin-left: auto;
+    display: grid;
+    place-items: center;
+    width: 18px;
+    height: 20px;
+    background: var(--accent);
+    clip-path: var(--hex);
+    opacity: calc(clamp(0, (var(--t) - var(--b)) * 5, 1) * var(--reset));
+    transform: scale(calc(0.6 + 0.4 * clamp(0, (var(--t) - var(--b)) * 4, 1)));
+  }
+  .phase-done svg { width: 12px; height: 12px; fill: none; stroke: #fff; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
   /* Each card carries its segment's colour from the chart above */
   .phase::before { content: ''; position: absolute; inset: 0 0 auto; height: 4px; background: var(--seg); }
   .phase-1 { --seg: var(--mist-1); }
@@ -223,6 +306,7 @@ const pct = (d: number) => `${(d / SCALE) * 100}%`;
   .phase-4 { --seg: repeating-linear-gradient(90deg, var(--rule-2) 0 6px, transparent 6px 10px); }
   .phase-meta {
     display: flex;
+    align-items: center;
     gap: 0.4rem;
     font-size: 0.75rem;
     font-weight: 600;
@@ -234,20 +318,16 @@ const pct = (d: number) => `${(d / SCALE) * 100}%`;
   .phase-body { color: var(--ink-2); font-size: 1rem; line-height: 1.55; }
   .compact { gap: var(--s-6); }
 
-  @supports (animation-timeline: view()) {
-    @media (prefers-reduced-motion: no-preference) {
-      .seg { animation: grow linear both; animation-timeline: view(); animation-range: entry 10% cover 38%; }
-      .seg-2 { animation-range: entry 18% cover 42%; }
-      .seg-3 { animation-range: entry 26% cover 48%; }
-      @keyframes grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
-    }
+  @media (prefers-reduced-motion: no-preference) {
+    .scale-now i { animation: now-pulse 1.6s ease-in-out infinite; }
+    @keyframes now-pulse { 50% { transform: scale(1.18); } }
   }
 
   @media (max-width: 900px) {
     .phases { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
   @media (max-width: 640px) {
-    .scale { grid-template-columns: minmax(0, 72fr) minmax(0, 28fr); }
+    .scale { --track: 72; --tail: 28; grid-template-columns: minmax(0, 72fr) minmax(0, 28fr); }
     .scale-tail { padding-inline: 0.5rem; }
     .scale-tail .seg-label { font-size: 0.75rem; }
     .seg-label { display: none; }
@@ -256,3 +336,9 @@ const pct = (d: number) => `${(d / SCALE) * 100}%`;
     .phases { grid-template-columns: minmax(0, 1fr); }
   }
 </style>
+
+<script>
+  import { initScenes } from '../scripts/scenes';
+  initScenes();
+  document.addEventListener('spockhart:view', initScenes);
+</script>

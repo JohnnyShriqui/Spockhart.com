@@ -4,7 +4,7 @@ summary: Building out a consulting firm's digital services practice across digit
 client: A consulting firm
 sector: Digital transformation & commercial growth
 scope: Practice development, business development and delivery
-order: 4
+order: 5
 metrics:
   - value: '~$150K → ~$1M'
     label: Practice revenue in under a year

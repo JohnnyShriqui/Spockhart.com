@@ -20,9 +20,9 @@ Requires Node 22 or newer.
 | Tagline, email, city, legal name, form endpoint, LinkedIn | `src/config/site.ts` |
 | Navigation and footer links | `src/config/site.ts` |
 | Advisory board on the About page (names, titles, photos) | `src/data/advisors.ts`, photos in `public/advisors/` |
-| Team experience case studies | `src/content/work/*.md` (one file per project) |
+| Case studies on the Work page | `src/content/work/*.md` (one file per project; `order` sets the order, `status: in-development` marks current work) |
 | Calculator inputs, defaults and formula | `src/lib/calc.ts` |
-| Engagement phases and timeline | `src/components/Timeline.astro` |
+| Engagement phases and the animated timeline | `src/components/Timeline.astro` |
 | Common problems on the home page | `src/components/Problems.astro` (list), `src/components/LeakyBucket.astro` (graphic) |
 | Case study graphics (live before and after) | `src/components/ResultVisual.astro`, timing engine in `src/scripts/scenes.ts`, `src/components/Honeycomb.astro` |
 | Colors, type and spacing | `src/styles/global.css` (tokens at the top) |
@@ -32,7 +32,7 @@ Pages are in `src/pages/`. The URL matches the file path.
 
 ### Adding a case study
 
-Copy any file in `src/content/work/`, rename it (the file name becomes the URL), and edit the front matter. Use `kind: spockhart` for Spockhart client work; it gets its own section on the Work page. Never put a client name in a team-experience entry.
+Copy any file in `src/content/work/`, rename it, and edit the front matter. The body is a few `## Heading` sections of plain paragraphs; they appear as columns when a visitor opens the project's details on /work/. Each project needs a graphic in `src/components/ResultVisual.astro` (keyed by the file name) and can get a hexagon in `src/components/Honeycomb.astro`. Never put a client name in a case study.
 
 ## Contact form
 

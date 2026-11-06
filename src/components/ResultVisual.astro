@@ -1,7 +1,7 @@
 ---
 /**
  * A live before-and-after window for each team-experience project, keyed by the
- * case study's file name. Used on /work/ and at the top of each case study.
+ * case study's file name. Used beside each project on /work/.
  *
  * Each window is a looping scene driven by src/scripts/scenes.ts: the script
  * writes the time in seconds to --t and the styles below turn it into motion.
@@ -31,28 +31,40 @@ const hopSeq = [0, 2, 0, 1, 2, 3, 1, 0, 2, 3, 2, 1, 0];
 const hopArcs = Array.from(
   new Set(hopSeq.slice(1).map((b, i) => [Math.min(hopSeq[i], b), Math.max(hopSeq[i], b)].join('-'))),
 ).map((k) => k.split('-').map(Number));
-const runs = [
-  [0.3, 2.3],
-  [3.4, 5.4],
-  [6.5, 8.5],
-];
+const runs = [[0.3, 2.3]];
 
-/* Production floor: a tangled route and a straight one */
-const tangle = [
-  [33, 31],
-  [193, 61],
-  [43, 131],
-  [133, 21],
-  [213, 141],
-  [83, 81],
-  [153, 121],
+/* Production floor: the old layout sent work back and forth across the aisle between stations
+   placed out of process order. Points are the route; `stop` marks a station. */
+const floorStations = [
+  [188, 30],
+  [52, 122],
+  [84, 30],
+  [164, 122],
+  [32, 30],
+  [208, 122],
+  [136, 30],
 ];
-const tangleD = 'M' + tangle.map((p) => p.join(' ')).join(' L');
-const segLens = tangle.slice(1).map((p, i) => Math.hypot(p[0] - tangle[i][0], p[1] - tangle[i][1]));
+const lanes = [66, 82, 70, 86, 74, 78];
+const route: { x: number; y: number; stop?: boolean }[] = [];
+floorStations.forEach(([x, y], k) => {
+  const edge = y < 76 ? y + 9 : y - 9;
+  if (k > 0) {
+    const [px, py] = floorStations[k - 1];
+    const lane = lanes[k - 1];
+    route.push({ x: px, y: lane }, { x, y: lane });
+  }
+  route.push({ x, y: edge, stop: true });
+  // leave the station back toward the aisle for the next leg
+});
+const tangleD = 'M' + route.map((p) => `${p.x} ${p.y}`).join(' L');
+const segLens = route.slice(1).map((p, i) => Math.hypot(p.x - route[i].x, p.y - route[i].y));
 const total = segLens.reduce((a, b) => a + b, 0);
-const tangleStops = [0, ...segLens.map((_, i) => segLens.slice(0, i + 1).reduce((a, b) => a + b, 0) / total)]
+const tangleStops = route
+  .map((p, i) => (p.stop ? segLens.slice(0, i).reduce((a, b) => a + b, 0) / total : -1))
+  .filter((f) => f >= 0)
   .map((f) => f.toFixed(4))
   .join(' ');
+const tangle = floorStations;
 
 /* Supply chain: suppliers, their scores, and where each lands when ranked */
 const hq = [150, 128];
@@ -93,14 +105,14 @@ const person = 'M2.8 4.2a3.2 3.2 0 1 0 6.4 0a3.2 3.2 0 1 0 -6.4 0zM0.6 16c0-3.6 
       <>
         <div class="win">
           <div class="win-bar" aria-hidden="true"><span class="win-dots"><i /><i /><i /></span><span>Assessing one new project</span></div>
-          <div class="scene" data-scene data-loop="10" data-still="9.3" style="--loop:10;--still:9.3">
+          <div class="scene" data-scene data-loop="12" data-still="11.3" style="--loop:12;--still:11.3">
             <div class="lane">
               <div class="lane-head">
                 <span class="tag">Before</span>
                 <span class="readout tabular">
-                  <span data-count="0.2 1, 8.4 12" data-fmt="Month {}">Month 12</span><span class="ap" style="--a:8.4">+</span>{' '}
+                  <span data-count="0.3 1, 11.1 12" data-fmt="Month {}">Month 12</span><span class="ap" style="--a:11.1">+</span>{' '}
                   <span class="sep">·</span>{' '}
-                  <span data-count="0.2 8, 8.4 100" data-fmt="${}K">$100K</span><span class="ap" style="--a:8.4">+</span>
+                  <span data-count="0.3 8, 11.1 100" data-fmt="${}K">$100K</span><span class="ap" style="--a:11.1">+</span>
                 </span>
               </div>
               <div class="cells ends" aria-hidden="true">
@@ -110,19 +122,19 @@ const person = 'M2.8 4.2a3.2 3.2 0 1 0 6.4 0a3.2 3.2 0 1 0 -6.4 0zM0.6 16c0-3.6 
                   </span>
                 ))}
               </div>
-              <p class="lane-foot ends"><span class="ap" style="--a:8.4">One study, a year later.</span></p>
+              <p class="lane-foot ends"><span class="ap" style="--a:11.1">One study, a year later.</span></p>
             </div>
             <div class="lane">
               <div class="lane-head">
                 <span class="tag tag-hot">After</span>
                 <span class="readout readout-hot swap">
-                  <span class="dn" style="--d:0.75">Running</span>
-                  <span class="ap" style="--a:0.75">Minutes, not months</span>
+                  <span class="dn" style="--d:0.5">Running</span>
+                  <span class="ap" style="--a:0.5">Minutes, not months</span>
                 </span>
               </div>
               <div class="cells ends" aria-hidden="true">
                 {twelve.map((i) => (
-                  <span class="cell cell-hot" style={`--a:${(0.6 + i * 0.66).toFixed(2)}`}>
+                  <span class="cell cell-hot" style={`--a:${(0.4 + i * 0.14).toFixed(2)}`}>
                     <svg class="cell-doc pop" viewBox="0 0 14 15">
                       <path d={doc} />
                       <path d="M4.5 9l2 2 3.5-4" class="tick" />
@@ -130,7 +142,7 @@ const person = 'M2.8 4.2a3.2 3.2 0 1 0 6.4 0a3.2 3.2 0 1 0 -6.4 0zM0.6 16c0-3.6 
                   </span>
                 ))}
               </div>
-              <p class="lane-foot lane-foot-hot ends"><span class="ap" style="--a:1.4">Every opportunity, assessed.</span></p>
+              <p class="lane-foot lane-foot-hot ends"><span class="ap" style="--a:2.1">Every opportunity, assessed.</span></p>
             </div>
           </div>
         </div>
@@ -246,12 +258,13 @@ const person = 'M2.8 4.2a3.2 3.2 0 1 0 6.4 0a3.2 3.2 0 1 0 -6.4 0zM0.6 16c0-3.6 
               <svg class="pane-svg" viewBox="0 0 236 152" aria-hidden="true">
                 <rect x="1" y="1" width="234" height="150" rx="6" class="zone" />
                 <path id={`${id}-route`} d={tangleD} class="route" />
+                <path d="M1 76 H235" class="aisle" />
                 {tangle.map(([x, y]) => (
-                  <rect x={x - 13} y={y - 9} width="26" height="18" rx="3" class="station" />
+                  <rect x={x - 15} y={y - 9} width="30" height="18" rx="3" class="station" />
                 ))}
                 <g class="ends">
                   {[0, 0.34, 0.67].map((o) => (
-                    <g data-along={`#${id}-route`} data-speed="0.055" data-offset={o} data-stops={tangleStops} transform={`translate(${tangle[0][0]} ${tangle[0][1]})`}>
+                    <g data-along={`#${id}-route`} data-speed="0.05" data-offset={o} data-stops={tangleStops} transform={`translate(${tangle[0][0]} ${tangle[0][1] + 9})`}>
                       <rect x="-5" y="-5" width="10" height="10" rx="2" class="item" />
                     </g>
                   ))}
@@ -455,8 +468,8 @@ const person = 'M2.8 4.2a3.2 3.2 0 1 0 6.4 0a3.2 3.2 0 1 0 -6.4 0zM0.6 16c0-3.6 
         </div>
         <div class="rv-split">
           <div>
-            <span class="rv-k">Average monthly team sales</span>
-            <p class="rv-num rv-num-sm"><strong>~$316K</strong></p>
+            <span class="rv-k">Increase in average monthly team sales</span>
+            <p class="rv-num rv-num-sm"><strong>↑ $316K</strong></p>
           </div>
           <div>
             <span class="rv-k">Representatives, one system</span>
@@ -596,7 +609,7 @@ const person = 'M2.8 4.2a3.2 3.2 0 1 0 6.4 0a3.2 3.2 0 1 0 -6.4 0zM0.6 16c0-3.6 
       <>
         <div class="win">
           <div class="win-bar" aria-hidden="true"><span class="win-dots"><i /><i /><i /></span><span>Calculating commissions</span></div>
-          <div class="scene" data-scene data-loop="10" data-still="9.3" style="--loop:10;--still:9.3">
+          <div class="scene" data-scene data-loop="12" data-still="11.3" style="--loop:12;--still:11.3">
             <div class="lane">
               <div class="lane-head">
                 <span class="tag">Before</span>
@@ -604,7 +617,7 @@ const person = 'M2.8 4.2a3.2 3.2 0 1 0 6.4 0a3.2 3.2 0 1 0 -6.4 0zM0.6 16c0-3.6 
               </div>
               <div class="sheet ends" aria-hidden="true">
                 {Array.from({ length: 40 }, (_, k) => (
-                  <span class="sc" style={`--a:${(0.3 + k * 0.18).toFixed(2)}`} />
+                  <span class="sc" style={`--a:${(0.3 + k * 0.26).toFixed(2)}`} />
                 ))}
               </div>
             </div>
@@ -762,7 +775,7 @@ const person = 'M2.8 4.2a3.2 3.2 0 1 0 6.4 0a3.2 3.2 0 1 0 -6.4 0zM0.6 16c0-3.6 
     inset: 0;
     background: rgb(255 255 255 / 0.22);
     transform-origin: left center;
-    transform: scaleX(clamp(0, (var(--t) - 0.2 - var(--i) * 0.683) / 0.683, 1));
+    transform: scaleX(clamp(0, (var(--t) - 0.3 - var(--i) * 0.9) / 0.9, 1));
   }
   .cell-hot { display: grid; place-items: center; background: rgb(142 192 230 / calc(0.08 + 0.14 * clamp(0, (var(--t) - var(--a)) * 4, 1))); }
   .cell-doc { width: 58%; max-width: 16px; height: auto; overflow: visible; }
@@ -784,7 +797,8 @@ const person = 'M2.8 4.2a3.2 3.2 0 1 0 6.4 0a3.2 3.2 0 1 0 -6.4 0zM0.6 16c0-3.6 
 
   /* Production floor */
   .zone { fill: rgb(255 255 255 / 0.04); stroke: rgb(255 255 255 / 0.12); }
-  .route { fill: none; stroke: rgb(255 255 255 / 0.35); stroke-width: 1.4; stroke-dasharray: 4 5; }
+  .route { fill: none; stroke: rgb(255 255 255 / 0.32); stroke-width: 1.3; stroke-dasharray: 4 4; stroke-linejoin: round; }
+  .aisle { stroke: rgb(255 255 255 / 0.06); stroke-width: 30; }
   .station { fill: rgb(255 255 255 / 0.16); }
   .station-on { fill: rgb(142 192 230 / 0.35); }
   .flow { fill: none; stroke: rgb(255 255 255 / 0.55); stroke-width: 2; }
@@ -932,7 +946,7 @@ const person = 'M2.8 4.2a3.2 3.2 0 1 0 6.4 0a3.2 3.2 0 1 0 -6.4 0zM0.6 16c0-3.6 
     inset: -1px;
     border-radius: 2px;
     box-shadow: inset 0 0 0 1.5px #fff;
-    opacity: calc(clamp(0, (var(--t) - var(--a) + 0.18) * 12, 1) * clamp(0, (var(--a) - var(--t)) * 12, 1));
+    opacity: calc(clamp(0, (var(--t) - var(--a) + 0.26) * 12, 1) * clamp(0, (var(--a) - var(--t)) * 12, 1));
   }
   .sheet-hot .sc { background: rgb(142 192 230 / calc(0.08 + 0.72 * clamp(0, (var(--t) - var(--a)) * 10, 1))); }
   .sheet-hot .sc::after { display: none; }

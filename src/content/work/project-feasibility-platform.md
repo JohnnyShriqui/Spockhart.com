@@ -4,7 +4,7 @@ summary: An automated feasibility platform that turned a year-long, six-figure a
 client: A national general contractor
 sector: Construction & real estate
 scope: Platform engineering
-order: 1
+order: 2
 metrics:
   - value: 12+ months → Minutes
     label: Assessment turnaround

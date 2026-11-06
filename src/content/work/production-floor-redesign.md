@@ -4,7 +4,7 @@ summary: A redesigned staff and assembly layout and a new inspection process tha
 client: A contract packaging manufacturer
 sector: Manufacturing
 scope: Production layout and quality control
-order: 5
+order: 7
 metrics:
   - value: 3 days/week
     label: Average frequency of exceeding daily production targets

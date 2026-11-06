@@ -1,17 +1,17 @@
 ---
-title: 16 representatives. One performance system. $316K in average monthly sales.
-summary: A centralized performance tracking system that gave a 16-person sales team clear, consistent metrics. Team sales rose, with the team averaging about $316K a month.
+title: 16 representatives. One performance system. $316K increase in average monthly sales.
+summary: A centralized performance tracking system that gave a 16-person sales team clear, consistent metrics, followed by a $316K increase in average monthly team sales.
 client: A sales organization
 sector: Sales operations
 scope: Sales operations and performance tracking
-order: 3
+order: 4
 metrics:
   - value: 16 representatives
     label: Tracked through one centralized performance system
-  - value: ~$316K/month
-    label: Average monthly team sales
-  - value: ~$19.8K per rep
-    label: Average monthly sales per representative
+  - value: ↑ $316K/month
+    label: Increase in average monthly team sales
+  - value: One system
+    label: Clear, consistent metrics for every representative
 ---
 
 ## The situation
@@ -22,7 +22,7 @@ A sales organization had limited visibility into individual performance, making 
 
 We implemented a centralized performance tracking system that gave management clear, consistent metrics across all 16 representatives.
 
-Team sales increased after implementation, with the 16-person team averaging about $316K in sales a month.
+Following implementation, average monthly team sales increased by about $316K.
 
 ## The result
 

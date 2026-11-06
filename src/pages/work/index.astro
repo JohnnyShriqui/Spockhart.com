@@ -7,19 +7,31 @@ import ResultVisual from '../../components/ResultVisual.astro';
 import ClosingCTA from '../../components/ClosingCTA.astro';
 
 const all = (await getCollection('work')).sort((a, b) => a.data.order - b.data.order);
-const done = all.filter((e) => e.data.status === 'complete');
-const current = all.filter((e) => e.data.status === 'in-development');
+
+/**
+ * Case study bodies are short markdown: a few "## Heading" sections of plain
+ * paragraphs. They are shown as side-by-side columns in each project's details.
+ */
+const sectionsOf = (body = '') =>
+  body
+    .split(/^## /m)
+    .slice(1)
+    .map((chunk) => {
+      const [heading, ...rest] = chunk.split('\n');
+      const paras = rest
+        .join('\n')
+        .split(/\n\s*\n/)
+        .map((p) => p.replace(/\s+/g, ' ').trim())
+        .filter(Boolean);
+      return { heading: heading.trim(), paras };
+    });
 ---
 
 <Base
   title="Work"
   description="What the people behind Spockhart have delivered: platforms, marketplaces, sales systems, production floors and engineering prototypes. Client names withheld."
 >
-  <PageHero
-    eyebrow="Work"
-    title="Our team’s experience."
-    lead="Spockhart is a new firm. The people behind it are not."
-  >
+  <PageHero eyebrow="Work" title="Our team’s experience." lead="Spockhart is a new firm. The people behind it are not.">
     <p class="hero-more">
       Before Spockhart, our team led transformations, built technology, and solved operational problems inside some of North
       America’s largest organizations. These are a few examples of what we’ve delivered.
@@ -30,85 +42,136 @@ const current = all.filter((e) => e.data.status === 'in-development');
     <Honeycomb slot="figure" />
   </PageHero>
 
-  <section class="projects" aria-label="Projects">
+  <section class="projects" aria-label="Projects" data-projects>
     {
-      done.map((entry, i) => (
-        <article class:list={['project', { flip: i % 2 === 1, tint: i % 2 === 1 }]}>
-          <div class="wrap project-grid">
-            <div class="project-text" data-reveal>
-              <p class="project-meta">
-                <span class="tag">{entry.data.kind === 'spockhart' ? 'Spockhart client work' : 'Team experience'}</span>
-                <span>{entry.data.sector}</span>
-              </p>
-              <h2>
-                <a href={`/work/${entry.id}/`}>{entry.data.title}</a>
-              </h2>
-              <p class="project-summary">{entry.data.summary}</p>
-              <p class="project-client">{entry.data.client}</p>
-              <a class="arrow-link" href={`/work/${entry.id}/`}>
-                <span>Read the case study</span>
-                <span class="arr" aria-hidden="true">→</span>
-              </a>
-            </div>
-            <div class="project-visual" data-reveal>
-              <ResultVisual id={entry.id} />
-            </div>
-          </div>
-        </article>
-      ))
-    }
-  </section>
-
-  {
-    current.length > 0 && (
-      <section class="projects current" aria-labelledby="current-title">
-        <div class="wrap current-head" data-reveal>
-          <p class="eyebrow">Currently in development</p>
-          <h2 id="current-title">What our team is building now.</h2>
-        </div>
-        {current.map((entry) => (
-          <article class="project">
+      all.map((entry, i) => {
+        const d = entry.data;
+        const live = d.status === 'in-development';
+        const panelId = `${entry.id}-details`;
+        return (
+          <article id={entry.id} class:list={['project', { flip: i % 2 === 1, tint: i % 2 === 1 }]} data-project>
             <div class="wrap project-grid">
               <div class="project-text" data-reveal>
                 <p class="project-meta">
-                  <span class="tag tag-live">In development</span>
-                  <span>{entry.data.sector}</span>
+                  <span class:list={['tag', { 'tag-live': live }]}>{live ? 'In development' : 'Team experience'}</span>
+                  <span>{d.sector}</span>
                 </p>
-                <h2>
-                  <a href={`/work/${entry.id}/`}>{entry.data.title}</a>
-                </h2>
-                <p class="project-summary">{entry.data.summary}</p>
-                <p class="project-client">{entry.data.client}</p>
-                <a class="arrow-link" href={`/work/${entry.id}/`}>
-                  <span>Read more</span>
-                  <span class="arr" aria-hidden="true">→</span>
-                </a>
+                <h2>{d.title}</h2>
+                <p class="project-summary">{d.summary}</p>
+                <p class="project-client">{d.client}</p>
+                <button class="cs-toggle" type="button" aria-expanded="false" aria-controls={panelId} data-toggle>
+                  <span data-label>See the details</span>
+                  <svg viewBox="0 0 16 16" aria-hidden="true">
+                    <path d="M3.5 6l4.5 4.5L12.5 6" />
+                  </svg>
+                </button>
               </div>
               <div class="project-visual" data-reveal>
                 <ResultVisual id={entry.id} />
               </div>
             </div>
+
+            <div class="cs-panel" id={panelId} data-panel data-open="false" role="region" aria-label={`${d.title} details`}>
+              <div class="cs-panel-inner">
+                <div class="wrap">
+                  <div class="cs-card">
+                    <ul class="cs-metrics">
+                      {d.metrics.map((m) => (
+                        <li>
+                          <span class="cs-m-value">{m.value}</span>
+                          <span class="cs-m-label">{m.label}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <div class="cs-cols">
+                      {sectionsOf(entry.body).map((s) => (
+                        <div class="cs-col">
+                          <h3>{s.heading}</h3>
+                          {s.paras.map((p) => (
+                            <p>{p}</p>
+                          ))}
+                        </div>
+                      ))}
+                    </div>
+                    <p class="cs-foot">
+                      <span>
+                        {live
+                          ? 'Being built by a member of our team in a current role. Not a Spockhart engagement. Client name withheld.'
+                          : 'Led by a member of our team in a previous role. Not a Spockhart engagement. Client name withheld.'}
+                      </span>
+                      <span class="cs-scope">Scope: {d.scope}</span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </article>
-        ))}
-      </section>
-    )
-  }
+        );
+      })
+    }
+  </section>
+
+  <noscript>
+    <style>
+      .cs-panel { grid-template-rows: 1fr !important; }
+      .cs-panel-inner { visibility: visible !important; }
+      .cs-toggle { display: none !important; }
+    </style>
+  </noscript>
 
   <ClosingCTA title="Your operation could be next." />
 </Base>
 
+<script>
+  // Each project opens its details in place. A link to /work/#project-id opens that one.
+  function initProjects() {
+    const root = document.querySelector<HTMLElement>('[data-projects]');
+    if (!root || root.dataset.ready) return;
+    root.dataset.ready = '1';
+
+    const set = (project: HTMLElement, open: boolean) => {
+      const panel = project.querySelector<HTMLElement>('[data-panel]');
+      const toggle = project.querySelector<HTMLButtonElement>('[data-toggle]');
+      if (!panel || !toggle) return;
+      panel.dataset.open = String(open);
+      toggle.setAttribute('aria-expanded', String(open));
+      const label = toggle.querySelector('[data-label]');
+      if (label) label.textContent = open ? 'Hide the details' : 'See the details';
+    };
+
+    root.querySelectorAll<HTMLElement>('[data-project]').forEach((project) => {
+      project.querySelector('[data-toggle]')?.addEventListener('click', () => {
+        set(project, project.querySelector<HTMLElement>('[data-panel]')?.dataset.open !== 'true');
+      });
+    });
+
+    const fromHash = () => {
+      const id = decodeURIComponent(location.hash.slice(1));
+      const project = id ? root.querySelector<HTMLElement>(`[data-project][id="${CSS.escape(id)}"]`) : null;
+      if (!project) return;
+      set(project, true);
+      requestAnimationFrame(() => project.scrollIntoView({ block: 'start' }));
+    };
+    fromHash();
+    window.addEventListener('hashchange', fromHash);
+  }
+  initProjects();
+  document.addEventListener('spockhart:view', initProjects);
+</script>
+
 <style>
+  .hero-more { color: var(--ink-2); max-width: 56ch; }
   .disclosure {
-    display: inline-flex;
-    gap: 0.6rem;
-    align-items: baseline;
-    max-width: 52ch;
-    font-size: 0.875rem;
+    margin-top: var(--s-6);
+    max-width: 68ch;
+    font-size: 0.8125rem;
+    line-height: 1.5;
     color: var(--ink-3);
-    padding-left: 0.9rem;
+    padding-left: 0.85rem;
     border-left: 2px solid var(--accent-soft);
   }
-  .project { padding-block: clamp(4rem, 2.5rem + 5vw, 7rem); border-bottom: 1px solid var(--rule); }
+
+  .project { padding-block: clamp(4rem, 2.5rem + 5vw, 7rem); border-bottom: 1px solid var(--rule); scroll-margin-top: 72px; }
   .project.tint { background: var(--paper-2); }
   .project-grid {
     display: grid;
@@ -116,23 +179,83 @@ const current = all.filter((e) => e.data.status === 'in-development');
     gap: var(--s-8);
     align-items: center;
   }
+  /* Flipped rows swap sides but keep the graphic in the wider column */
+  .flip .project-grid { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); }
   .flip .project-text { order: 2; }
   .project-text { display: grid; gap: var(--s-4); justify-items: start; align-content: center; }
   .project-meta { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; font-size: 0.875rem; color: var(--ink-3); }
   .project-text h2 { font-size: var(--step-3); line-height: 1.1; max-width: 18ch; }
-  .hero-more { color: var(--ink-2); max-width: 54ch; }
-  .current { background: var(--paper-2); border-top: 1px solid var(--rule); }
-  .current-head { display: grid; gap: var(--s-2); padding-top: clamp(4rem, 2.5rem + 5vw, 6rem); }
-  .current-head h2 { font-size: var(--step-4); }
-  .current .project { border-bottom: 0; padding-top: var(--s-7); }
-  .tag-live { background: var(--accent-wash); color: var(--brand); border-color: transparent; }
-  .project-text h2 a { color: inherit; text-decoration: none; }
-  .project-text h2 a:hover { text-decoration: underline; text-decoration-thickness: 2px; text-decoration-color: var(--accent-soft); text-underline-offset: 6px; }
   .project-summary { color: var(--ink-2); font-size: var(--step-1); max-width: 44ch; }
   .project-client { font-size: 0.875rem; color: var(--ink-3); }
   .project-visual { min-width: 0; }
+  .tag-live { background: var(--accent-wash); color: var(--brand); border-color: transparent; }
+
+  .cs-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: var(--s-2);
+    padding: 0.6rem 1rem 0.6rem 1.1rem;
+    border: 1px solid var(--rule-2);
+    border-radius: 999px;
+    background: transparent;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--ink);
+    transition: background-color var(--dur) var(--ease), border-color var(--dur) var(--ease);
+  }
+  .cs-toggle:hover { background: var(--surface); border-color: var(--ink-3); }
+  .cs-toggle svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; transition: transform 400ms var(--ease-out); }
+  .cs-toggle[aria-expanded='true'] svg { transform: rotate(180deg); }
+
+  /* The details drop down beneath their project */
+  .cs-panel { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 550ms var(--ease-out); }
+  .cs-panel[data-open='true'] { grid-template-rows: 1fr; }
+  .cs-panel-inner { min-height: 0; overflow: hidden; }
+  .cs-panel[data-open='false'] .cs-panel-inner { visibility: hidden; transition: visibility 0s 550ms; }
+  .cs-card {
+    display: grid;
+    gap: var(--s-6);
+    margin-top: var(--s-7);
+    padding: clamp(1.25rem, 0.8rem + 2vw, 2.25rem);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+  }
+  .cs-metrics {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: var(--s-5);
+  }
+  .cs-metrics li { display: grid; gap: 0.3rem; align-content: start; padding-top: var(--s-3); border-top: 2px solid var(--ink); }
+  .cs-m-value {
+    font-family: var(--font-display);
+    font-size: clamp(1.375rem, 1.1rem + 0.9vw, 1.875rem);
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+    font-variant-numeric: lining-nums;
+  }
+  .cs-m-label { font-size: 0.875rem; color: var(--ink-2); line-height: 1.45; }
+  .cs-cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s-6); }
+  .cs-col { display: grid; gap: var(--s-2); align-content: start; }
+  .cs-col h3 { font-family: var(--font-body); font-size: 0.75rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); }
+  .cs-col p { color: var(--ink-2); font-size: 0.9875rem; line-height: 1.6; }
+  .cs-foot {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--s-2) var(--s-5);
+    padding-top: var(--s-4);
+    border-top: 1px solid var(--rule);
+    font-size: 0.8125rem;
+    color: var(--ink-3);
+  }
+
   @media (max-width: 960px) {
-    .project-grid { grid-template-columns: minmax(0, 1fr); gap: var(--s-6); }
+    .project-grid, .flip .project-grid { grid-template-columns: minmax(0, 1fr); gap: var(--s-6); }
     .flip .project-text { order: 0; }
+    .cs-cols { grid-template-columns: minmax(0, 1fr); gap: var(--s-5); }
   }
 </style>

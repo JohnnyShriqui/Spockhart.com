@@ -1,19 +1,21 @@
 ---
-/** Work page hero image: the headline results, each a hexagon linking to its case study. */
+/** Work page hero image: each project's headline result as a hexagon that opens its details below. */
 const cells = [
-  { value: 'Minutes', label: 'Project assessments, down from 12+ months', href: '/work/project-feasibility-platform/', tone: 'brand', x: 0, y: 0 },
-  { value: 'Weeks', label: 'Financing approvals, down from 6+ months', href: '/work/subcontractor-financing-marketplace/', tone: 'accent', x: 1, y: 0 },
-  { value: '$316K', label: 'Average monthly team sales, 16 reps', href: '/work/sales-performance-system/', tone: 'navy', x: 2, y: 0 },
-  { value: '$1M', label: 'Practice revenue, up from $150K', href: '/work/digital-practice-growth/', tone: 'mist', x: 0.5, y: 1 },
-  { value: '3 days', label: 'A week above production target', href: '/work/production-floor-redesign/', tone: 'brand', x: 1.5, y: 1 },
-  { value: '+83%', label: 'Potential cargo per trip', href: '/work/momentum-exchange-prototype/', tone: 'accent', x: 2.5, y: 1 },
+  { value: '$1.2B', label: 'Manufacturer’s commissions, automated', id: 'commission-automation', tone: 'navy', x: 0, y: 0 },
+  { value: '1yr → 30min', label: 'Project feasibility assessments', id: 'project-feasibility-platform', tone: 'brand', x: 1, y: 0, fs: 4.1 },
+  { value: '6mth → 3wk', label: 'Subcontractor financing approvals', id: 'subcontractor-financing-marketplace', tone: 'accent', x: 2, y: 0, fs: 4.1 },
+  { value: '↑ $316K', label: 'Average monthly sales, 16 reps', id: 'sales-performance-system', tone: 'mist', x: 0.5, y: 1 },
+  { value: '+$850K', label: 'Practice revenue in under a year', id: 'digital-practice-growth', tone: 'navy', x: 1.5, y: 1 },
+  { value: '183%', label: 'Cargo per trip on the same fuel', id: 'momentum-exchange-prototype', tone: 'accent', x: 0, y: 2 },
+  { value: 'SOP', label: 'Our floor redesign became the operating standard', id: 'production-floor-redesign', tone: 'brand', x: 1, y: 2 },
+  { value: 'Global', label: 'Supplier network mapped, scored and ranked', id: 'supply-chain-assessment', tone: 'mist', x: 2, y: 2 },
 ];
 ---
 
 <div class="comb">
   {
     cells.map((c, i) => (
-      <a href={c.href} class={`cell ${c.tone}`} style={`--x:${c.x};--y:${c.y};--i:${i}`}>
+      <a href={`/work/#${c.id}`} class={`cell ${c.tone}`} style={`--x:${c.x};--y:${c.y};--i:${i}${c.fs ? `;--fs:${c.fs}` : ''}`}>
         <span class="cell-value">{c.value}</span>
         <span class="cell-label">{c.label}</span>
       </a>
@@ -22,13 +24,13 @@ const cells = [
 </div>
 
 <style>
-  /* Pointy-top hexagons, 3 over 3 offset. Widths are in container units so text scales with the picture. */
+  /* Pointy-top hexagons in a 3-2-3 cluster. Widths are in container units so text scales with the picture. */
   .comb {
-    --w: 26.8;
-    --gap: 2.4;
+    --w: 31.6;
+    --gap: 2.6;
     position: relative;
     width: 100%;
-    aspect-ratio: 1 / 0.57;
+    aspect-ratio: 1 / 0.945;
     container-type: inline-size;
   }
   .cell {
@@ -55,7 +57,8 @@ const cells = [
   .mist { background: var(--mist-1); color: var(--navy); }
   .cell-value {
     font-family: var(--font-display);
-    font-size: clamp(1rem, 5.2cqw, 1.75rem);
+    font-size: clamp(0.875rem, calc(var(--fs, 5.4) * 1cqw), 1.875rem);
+    white-space: nowrap;
     line-height: 1;
     letter-spacing: -0.02em;
     text-wrap: balance;

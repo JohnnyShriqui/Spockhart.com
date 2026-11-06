@@ -4,7 +4,7 @@ summary: A first-of-its-kind financing marketplace, launched across the US and C
 client: A construction-sector client
 sector: Construction finance
 scope: Marketplace design and launch
-order: 2
+order: 3
 metrics:
   - value: 6+ months → Weeks
     label: Financing approval timelines
