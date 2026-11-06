@@ -280,9 +280,11 @@ a { color: inherit; }
 /* ---------- Page hero (interior pages) ---------- */
 .page-hero {
   padding-top: clamp(8.5rem, 6rem + 6vw, 11.5rem);
-  padding-bottom: clamp(3.5rem, 2.5rem + 3vw, 5.5rem);
+  padding-bottom: clamp(2.5rem, 1.75rem + 2vw, 3.75rem);
   border-bottom: 1px solid var(--rule);
 }
+/* The first section after a page hero starts closer to it */
+.page-hero + .section { padding-top: clamp(2.75rem, 1.75rem + 3vw, 4.5rem); }
 
 .page-hero h1 { max-width: 16ch; }
 .page-hero .lead { max-width: 58ch; }
