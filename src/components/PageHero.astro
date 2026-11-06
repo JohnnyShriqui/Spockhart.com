@@ -1,0 +1,50 @@
+---
+import Mist from './Mist.astro';
+interface Props {
+  eyebrow?: string;
+  title: string;
+  lead?: string;
+}
+const { eyebrow, title, lead } = Astro.props;
+const hasFigure = Astro.slots.has('figure');
+---
+
+<section class:list={['page-hero', { 'with-figure': hasFigure }]}>
+  <Mist />
+  <div class="wrap hero-layout">
+    <div class="hero-text">
+      {eyebrow && <p class="eyebrow load-in" style="--i:0">{eyebrow}</p>}
+      <h1 class="load-in" style="--i:1" set:html={title} />
+      <div class="accent-rule load-in" style="--i:2"></div>
+      {lead && <p class="lead load-in" style="--i:2">{lead}</p>}
+      {Astro.slots.has('default') && (
+        <div class="load-in hero-extra" style="--i:3">
+          <slot />
+        </div>
+      )}
+    </div>
+    {hasFigure && (
+      <div class="hero-figure load-fade">
+        <slot name="figure" />
+      </div>
+    )}
+  </div>
+</section>
+
+<style>
+  .page-hero { position: relative; overflow: hidden; isolation: isolate; }
+  .page-hero > .wrap { position: relative; z-index: 1; }
+  .hero-text { display: grid; gap: var(--s-5); }
+  .hero-extra { margin-top: var(--s-2); }
+  .with-figure .hero-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    gap: var(--s-7);
+    align-items: center;
+  }
+  .hero-figure { width: 100%; max-width: 480px; justify-self: end; }
+  @media (max-width: 960px) {
+    .with-figure .hero-layout { grid-template-columns: minmax(0, 1fr); }
+    .hero-figure { justify-self: start; max-width: 420px; }
+  }
+</style>

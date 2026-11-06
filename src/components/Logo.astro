@@ -1,0 +1,27 @@
+---
+/** Mark plus wordmark, as in the original logo. */
+import Mark from './Mark.astro';
+interface Props {
+  size?: number;
+  class?: string;
+}
+const { size = 24, class: className = '' } = Astro.props;
+---
+
+<span class:list={['logo', className]}>
+  <Mark size={size} />
+  <span class="wordmark">Spockhart</span>
+</span>
+
+<style>
+  .logo { display: inline-flex; align-items: center; gap: 0.8rem; color: var(--ink); }
+  .wordmark {
+    font-family: var(--font-wordmark);
+    font-weight: 400;
+    font-size: 0.95rem;
+    letter-spacing: 0.34em;
+    text-transform: uppercase;
+    line-height: 1;
+    margin-right: -0.34em;
+  }
+</style>

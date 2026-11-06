@@ -1,0 +1,54 @@
+---
+/**
+ * The Spockhart mark.
+ * tone: 'brand' (logo blue), 'ink' (navy) or 'current' (inherits --mark, white on navy bands).
+ * assemble: the two halves slide together on load. tilt: follows the pointer slightly (scripts/marks.ts).
+ */
+import { VIEWBOX, upperPath, lowerPath } from '../lib/logo';
+
+interface Props {
+  size?: number | string;
+  tone?: 'brand' | 'ink' | 'current';
+  assemble?: boolean;
+  tilt?: boolean;
+  class?: string;
+  title?: string;
+}
+const { size = 28, tone = 'current', assemble = false, tilt = false, class: className = '', title } = Astro.props;
+const dim = typeof size === 'number' ? `${size}px` : size;
+---
+
+<svg
+  class:list={['mark', `mark-${tone}`, className, { 'mark-assemble': assemble, 'mark-tilt': tilt }]}
+  viewBox={VIEWBOX}
+  style={`width:${dim};height:auto`}
+  role={title ? 'img' : undefined}
+  aria-label={title}
+  aria-hidden={title ? undefined : 'true'}
+  focusable="false"
+>
+  {title && <title>{title}</title>}
+  <path class="mark-upper" d={upperPath} />
+  <path class="mark-lower" d={lowerPath} />
+</svg>
+
+<style>
+  .mark { display: block; overflow: visible; fill: var(--mark); }
+  .mark-brand { fill: var(--brand); }
+  .mark-ink { fill: var(--ink); }
+  .mark-current { fill: var(--mark); }
+  .mark path { transform-box: view-box; transform-origin: center; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .mark-assemble .mark-upper { animation: upper-in 1300ms cubic-bezier(0.16, 1, 0.3, 1) 150ms both; }
+    .mark-assemble .mark-lower { animation: lower-in 1300ms cubic-bezier(0.16, 1, 0.3, 1) 150ms both; }
+    @keyframes upper-in {
+      from { opacity: 0; transform: translate(-9%, -7%); }
+      to { opacity: 1; transform: none; }
+    }
+    @keyframes lower-in {
+      from { opacity: 0; transform: translate(9%, 7%); }
+      to { opacity: 1; transform: none; }
+    }
+  }
+</style>

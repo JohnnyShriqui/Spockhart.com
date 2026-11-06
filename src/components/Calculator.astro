@@ -1,0 +1,280 @@
+---
+/**
+ * Time calculator. Three inputs; the result leads with what tedious, repetitive tasks cost a year,
+ * then the hours behind it, how much of each work week it takes, and how many full-time people
+ * it adds up to. Runs entirely in the browser. Model and defaults: src/lib/calc.ts.
+ */
+import { inputs, compute, describeDays, iconScale, WEEKS_PER_YEAR, type Values } from '../lib/calc';
+
+const start = Object.fromEntries(inputs.map((f) => [f.key, f.value])) as Values;
+const r = compute(start);
+const money = (n: number) =>
+  new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD', maximumFractionDigits: 0 }).format(n);
+const num = (n: number) => Math.round(n).toLocaleString('en-CA');
+const fmt = (format: string, v: number) => (format === 'money' ? `$${v}` : format === 'hours' ? `${v} h` : String(v));
+
+const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+const lostDays = start.hours / 8;
+const dayFill = (i: number) => Math.max(0, Math.min(1, lostDays - (4 - i)));
+
+const scale = iconScale(start.people);
+const fteIcons = r.fte / scale.per;
+const iconFill = (i: number) => Math.max(0, Math.min(1, fteIcons - i));
+---
+
+<section id="calculator" class="calc-section" aria-labelledby="calc-title">
+  <div class="wrap">
+    <div class="calc" data-calc>
+      <div class="calc-left">
+        <div class="calc-head">
+          <p class="eyebrow">Calculator</p>
+          <h2 id="calc-title">How much time is your team losing to tedious, repetitive tasks?</h2>
+        </div>
+
+        <form class="calc-inputs" data-calc-form onsubmit="return false" aria-label="Calculator inputs">
+          {
+            inputs.map((f) => (
+              <div class="slider-field">
+                <div class="slider-head">
+                  <label for={`in-${f.key}`}>
+                    {f.label}
+                    <span class="slider-hint">{f.hint}</span>
+                  </label>
+                  <output for={`in-${f.key}`} class="tabular" data-display={f.key}>
+                    {fmt(f.format, f.value)}
+                  </output>
+                </div>
+                <input
+                  type="range"
+                  id={`in-${f.key}`}
+                  name={f.key}
+                  min={f.min}
+                  max={f.max}
+                  step={f.step}
+                  value={f.value}
+                  data-format={f.format}
+                  style={`--p:${((f.value - f.min) / (f.max - f.min)) * 100}%`}
+                />
+              </div>
+            ))
+          }
+        </form>
+        <p class="calc-method">People × hours a week × {WEEKS_PER_YEAR} working weeks × hourly cost.</p>
+      </div>
+
+      <div class="calc-right">
+        <p class="r-label">Every year, tedious, repetitive tasks cost you</p>
+        <p class="r-big tabular"><span data-out="cost">{money(r.cost)}</span></p>
+        <p class="r-sub">
+          in wages, across <strong><span class="tabular" data-out="hours">{num(r.hours)}</span> hours</strong> of manual,
+          repetitive work.
+        </p>
+
+        <div class="r-viz">
+          <p class="r-line">
+            Each person loses <strong data-out="days">{describeDays(start.hours)}</strong> of every work week.
+          </p>
+          <div class="week" aria-hidden="true">
+            {
+              days.map((d, i) => (
+                <span class="day" style={`--f:${dayFill(i)}`}>
+                  <span class="day-fill" />
+                  <span class="day-name">{d}</span>
+                </span>
+              ))
+            }
+          </div>
+        </div>
+
+        <div class="r-viz">
+          <p class="r-line">
+            That adds up to <strong><span class="tabular" data-out="fte">{r.fte.toFixed(1)}</span> full-time people</strong> doing
+            nothing else.
+          </p>
+          <div class="team" aria-hidden="true" data-team>
+            {
+              Array.from({ length: scale.icons }, (_, i) => (
+                <span class="person" style={`--f:${iconFill(i)}`}>
+                  <svg viewBox="0 0 12 16"><circle cx="6" cy="4" r="3.2" /><path d="M0.6 16c0-3.6 2.4-6.2 5.4-6.2s5.4 2.6 5.4 6.2z" /></svg>
+                  <svg class="person-fill" viewBox="0 0 12 16"><circle cx="6" cy="4" r="3.2" /><path d="M0.6 16c0-3.6 2.4-6.2 5.4-6.2s5.4 2.6 5.4 6.2z" /></svg>
+                </span>
+              ))
+            }
+          </div>
+          <p class="team-key" data-team-key hidden={scale.per === 1}>Each figure is {scale.per} people</p>
+        </div>
+
+        <a class="btn btn-on-brand" href="/contact/" data-calc-cta>Get that time back <span class="arr" aria-hidden="true">→</span></a>
+        <p class="visually-hidden" aria-live="polite" data-calc-summary></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { initCalculator } from '../scripts/calculator';
+  initCalculator();
+</script>
+
+<style>
+  .calc-section {
+    padding-block: clamp(2.5rem, 1.5rem + 3vw, 4rem);
+    scroll-margin-top: 64px;
+  }
+  .calc {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: var(--surface);
+    box-shadow: 0 30px 60px -40px rgb(27 42 61 / 0.35);
+  }
+
+  /* Inputs */
+  .calc-left { display: grid; gap: var(--s-5); align-content: start; padding: clamp(1.5rem, 1rem + 2vw, 2.5rem); }
+  .calc-head { display: grid; gap: var(--s-2); }
+  .calc-head h2 { font-size: clamp(1.625rem, 1.3rem + 1.1vw, 2.125rem); line-height: 1.1; max-width: 18ch; }
+  .calc-intro { color: var(--ink-2); }
+  .calc-inputs { display: grid; gap: var(--s-5); }
+  .slider-field { display: grid; gap: 0.35rem; }
+  .slider-head { display: flex; justify-content: space-between; align-items: flex-end; gap: var(--s-4); }
+  .slider-head label { font-weight: 600; font-size: 0.975rem; line-height: 1.3; }
+  .slider-hint { display: block; font-weight: 400; font-size: 0.8125rem; color: var(--ink-3); margin-top: 0.1rem; }
+  .slider-head output {
+    font-family: var(--font-display);
+    font-size: 1.625rem;
+    font-weight: 500;
+    line-height: 1;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+  .calc-method { font-size: 0.8125rem; color: var(--ink-3); }
+
+  input[type='range'] {
+    --p: 50%;
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 26px;
+    background: transparent;
+    cursor: pointer;
+  }
+  input[type='range']:focus { outline: none; }
+  input[type='range']::-webkit-slider-runnable-track {
+    height: 4px;
+    border-radius: 4px;
+    background: linear-gradient(to right, var(--accent) 0 var(--p), var(--rule) var(--p) 100%);
+  }
+  input[type='range']::-moz-range-track { height: 4px; border-radius: 4px; background: var(--rule); }
+  input[type='range']::-moz-range-progress { height: 4px; border-radius: 4px; background: var(--accent); }
+  input[type='range']::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 22px;
+    height: 22px;
+    margin-top: -9px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 2px solid var(--accent);
+    box-shadow: 0 2px 6px rgb(27 42 61 / 0.18);
+    transition: transform 200ms var(--ease), box-shadow 200ms var(--ease);
+  }
+  input[type='range']::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: var(--surface); border: 2px solid var(--accent); }
+  input[type='range']:hover::-webkit-slider-thumb { transform: scale(1.1); }
+  input[type='range']:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 6px var(--accent-wash); }
+  input[type='range']:active::-webkit-slider-thumb { transform: scale(1.18); }
+
+  /* Result */
+  .calc-right {
+    position: relative;
+    display: grid;
+    gap: var(--s-4);
+    align-content: start;
+    padding: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+    background: var(--brand);
+    color: #fff;
+    overflow: hidden;
+    isolation: isolate;
+    container-type: inline-size;
+  }
+  .calc-right::before {
+    content: '';
+    position: absolute;
+    width: 520px;
+    height: 520px;
+    right: -220px;
+    top: -260px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgb(184 204 224 / 0.22), transparent 70%);
+    z-index: -1;
+  }
+  .r-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #bcd6ec;
+  }
+  .r-big {
+    font-family: var(--font-display);
+    /* Long dollar figures shrink to fit the panel */
+    font-size: min(clamp(3.25rem, 2.2rem + 4vw, 5.25rem), 14cqi);
+    font-weight: 450;
+    white-space: nowrap;
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    margin-top: calc(var(--s-2) * -1);
+  }
+  .r-unit { font-size: 0.42em; letter-spacing: -0.01em; font-weight: 400; color: #d9e6f2; }
+  .r-sub { color: #d9e6f2; font-size: 1.0625rem; margin-top: calc(var(--s-3) * -1); }
+  .r-sub strong { color: #fff; font-weight: 600; }
+
+  .r-viz { display: grid; gap: 0.6rem; padding-top: var(--s-4); border-top: 1px solid rgb(255 255 255 / 0.16); }
+  .r-line { font-size: 0.975rem; color: #d9e6f2; }
+  .r-line strong { color: #fff; font-weight: 600; }
+
+  .week { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+  .day {
+    --f: 0;
+    position: relative;
+    height: 38px;
+    border-radius: 4px;
+    background: rgb(255 255 255 / 0.1);
+    overflow: hidden;
+    display: grid;
+    place-items: center;
+  }
+  .day-fill {
+    position: absolute;
+    inset: 0;
+    background: #8ec0e6;
+    transform-origin: right center;
+    transform: scaleX(var(--f));
+    transition: transform 450ms var(--ease-out);
+  }
+  .day-name { position: relative; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.06em; color: #fff; mix-blend-mode: normal; }
+
+  .team { display: flex; flex-wrap: wrap; gap: 6px 5px; }
+  .person { --f: 0; position: relative; width: 19px; height: 25px; }
+  .person svg { position: absolute; inset: 0; width: 100%; height: 100%; fill: rgb(255 255 255 / 0.2); }
+  .person .person-fill { fill: #8ec0e6; clip-path: inset(0 calc((1 - var(--f)) * 100%) 0 0); transition: clip-path 450ms var(--ease-out); }
+  .team-key { font-size: 0.75rem; color: #bcd6ec; }
+
+  .btn-on-brand { justify-self: start; margin-top: var(--s-2); background: #fff; color: var(--brand); border-color: #fff; }
+  .btn-on-brand:hover { background: var(--paper); border-color: var(--paper); }
+
+  @media (max-width: 960px) {
+    .calc { grid-template-columns: minmax(0, 1fr); }
+  }
+  /* On phones, keep the big number close to the sliders so both fit on screen */
+  @media (max-width: 640px) {
+    .calc-left { gap: var(--s-4); padding: var(--s-5) var(--s-4) var(--s-4); }
+    .calc-head h2 { font-size: 1.5rem; }
+    .calc-intro, .slider-hint, .calc-method { display: none; }
+    .calc-inputs { gap: var(--s-3); }
+    .slider-head output { font-size: 1.375rem; }
+    .calc-right { padding: var(--s-5) var(--s-4); gap: var(--s-3); }
+    .r-big { font-size: min(3.25rem, 14cqi); }
+    .person { width: 15px; height: 20px; }
+  }
+</style>

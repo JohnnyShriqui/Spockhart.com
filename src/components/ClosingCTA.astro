@@ -1,0 +1,45 @@
+---
+import CopyEmail from './CopyEmail.astro';
+
+interface Props {
+  title?: string;
+  body?: string;
+  primary?: { label: string; href: string };
+}
+const {
+  title = 'Tell us what is slowing you down.',
+  body = 'A 30-minute conversation about how work actually gets done in your organization. No pitch deck. We start on your real problem.',
+  primary = { label: 'Start a conversation', href: '/contact/' },
+} = Astro.props;
+---
+
+<section class="closing section">
+  <div class="wrap closing-inner" data-reveal>
+    <div class="closing-copy">
+      <h2>{title}</h2>
+      <p>{body}</p>
+    </div>
+    <div class="closing-actions">
+      <a class="btn" href={primary.href}>{primary.label} <span class="arr" aria-hidden="true">→</span></a>
+      <CopyEmail />
+    </div>
+  </div>
+</section>
+
+<style>
+  .closing { border-top: 1px solid var(--rule); }
+  .closing-inner {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: var(--s-6) var(--s-8);
+    align-items: end;
+  }
+  .closing-copy { display: grid; gap: var(--s-4); }
+  .closing-copy h2 { max-width: 14ch; }
+  .closing-copy p { color: var(--ink-2); font-size: var(--step-1); max-width: 46ch; }
+  .closing-actions { display: flex; flex-wrap: wrap; gap: var(--s-3); justify-content: flex-end; align-items: center; }
+  @media (max-width: 860px) {
+    .closing-inner { grid-template-columns: minmax(0, 1fr); }
+    .closing-actions { justify-content: flex-start; }
+  }
+</style>

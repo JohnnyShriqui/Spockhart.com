@@ -1,0 +1,84 @@
+---
+import type { Advisor } from '../data/advisors';
+import { initials } from '../lib/format';
+interface Props {
+  advisor: Advisor;
+  compact?: boolean;
+}
+const { advisor, compact = false } = Astro.props;
+---
+
+<article class:list={['advisor', { compact }]}>
+  <div class="portrait">
+    {
+      advisor.photo ? (
+        <img src={advisor.photo} alt={`Portrait of ${advisor.name}`} width="600" height="600" loading="lazy" decoding="async" />
+      ) : (
+        <svg viewBox="0 0 120 120" aria-hidden="true" class="monogram">
+          <path class="mono-frame" d="M60 6 106.8 33 106.8 87 60 114 13.2 87 13.2 33Z" />
+          <path class="mono-facet" d="M60 6 106.8 33 60 60 13.2 33Z" />
+          <path class="mono-lines" d="M60 60V114M60 60 106.8 33M60 60 13.2 33" />
+          <text x="60" y="60" dominant-baseline="central" text-anchor="middle">{initials(advisor.name)}</text>
+        </svg>
+      )
+    }
+  </div>
+  <div class="advisor-text">
+    <h3>{advisor.name}</h3>
+    <p class="advisor-title">{advisor.title}</p>
+    {!compact && <p class="advisor-focus"><span>Advises on</span>{advisor.focus}</p>}
+    {
+      advisor.linkedin && !compact && (
+        <a class="arrow-link small" href={advisor.linkedin} target="_blank" rel="noopener">
+          <span>LinkedIn</span>
+          <span class="arr" aria-hidden="true">↗</span>
+        </a>
+      )
+    }
+  </div>
+</article>
+
+<style>
+  .advisor { display: grid; gap: var(--s-4); align-content: start; }
+  .portrait {
+    aspect-ratio: 1;
+    max-width: 100%;
+    border-radius: var(--radius-lg);
+    background: var(--paper-2);
+    border: 1px solid var(--rule);
+    overflow: hidden;
+    display: grid;
+    place-items: center;
+  }
+  .portrait img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(0.15); }
+  .monogram { width: 62%; height: auto; overflow: visible; transition: transform 900ms var(--ease-out); }
+  .advisor:hover .monogram { transform: rotate(60deg); }
+  .advisor:hover .monogram text { transform: rotate(-60deg); }
+  .mono-frame { fill: none; stroke: var(--rule-2); stroke-width: 1; }
+  .mono-facet { fill: var(--accent-wash); }
+  .mono-lines { stroke: var(--rule); stroke-width: 0.75; fill: none; }
+  .monogram text {
+    font-family: var(--font-display);
+    font-size: 30px;
+    font-weight: 500;
+    fill: var(--ink);
+    letter-spacing: 0.02em;
+    transform-origin: 60px 60px;
+    transition: transform 900ms var(--ease-out);
+  }
+  .advisor-text { display: grid; gap: 0.3rem; }
+  .advisor h3 { font-size: var(--step-1); font-weight: 550; }
+  .advisor-title { color: var(--ink-2); font-size: 0.9375rem; }
+  .advisor-focus { margin-top: var(--s-2); font-size: 0.9375rem; color: var(--ink); }
+  .advisor-focus span {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.15rem;
+  }
+  .compact h3 { font-size: 1.0625rem; }
+  .compact .advisor-title { font-size: 0.875rem; }
+</style>

@@ -1,0 +1,237 @@
+---
+/**
+ * Six places time and money leak most often, beside the leaky bucket.
+ * Each problem pairs with the outcome we deliver. Hovering one plugs its leak.
+ */
+import LeakyBucket from './LeakyBucket.astro';
+import Mark from './Mark.astro';
+
+const problems = [
+  {
+    key: 'invoicing',
+    name: 'Invoicing',
+    problem: 'Invoices prepared manually, details copied from spreadsheets, and payments chased one at a time.',
+    fix: 'Approved work becomes an invoice. Reminders go out automatically.',
+    side: 'left',
+    y: 214,
+    icon: 'M7 3h7l4 4v14H7zM14 3v4h4M12.5 10v8M14.5 11.3c-.4-.6-1.1-.9-2-.9-1.2 0-2 .6-2 1.5 0 2 4 1.1 4 3.1 0 .9-.9 1.5-2 1.5-.9 0-1.7-.4-2.1-1',
+  },
+  {
+    key: 'data-entry',
+    name: 'Data entry',
+    problem: 'The same client, donor, or project details entered into multiple platforms.',
+    fix: 'Enter information once. It updates across the tools your team uses.',
+    side: 'right',
+    y: 238,
+    icon: 'M8 4h10a2 2 0 0 1 2 2v10M4 8h10a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zM7 13h6M7 16h4',
+  },
+  {
+    key: 'reporting',
+    name: 'Reporting',
+    problem: 'Hours spent pulling numbers from different spreadsheets before every meeting.',
+    fix: 'A live dashboard brings your key numbers together automatically.',
+    side: 'left',
+    y: 272,
+    icon: 'M4 20h16M7 16v-4M12 16V8M17 16v-7M7 8.5l5-3.5 5 3',
+  },
+  {
+    key: 'followups',
+    name: 'Follow-ups',
+    problem: 'Leads, outstanding payments, applications, and important requests waiting for someone to follow up.',
+    fix: 'Every outstanding item gets an owner, a reminder, and a next step.',
+    side: 'right',
+    y: 298,
+    icon: 'M3 7l9 6 9-6M3 7v10a1 1 0 0 0 1 1h9M3 7a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v6M16 18h5M19 16l2 2-2 2',
+  },
+  {
+    key: 'scheduling',
+    name: 'Scheduling',
+    problem: 'Endless emails coordinating availability, appointments, and meetings.',
+    fix: 'People book directly into available times. Confirmations go out automatically.',
+    side: 'left',
+    y: 330,
+    icon: 'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4M8 14h2M12 14h2M16 14h0M8 17h2M12 17h2',
+  },
+  {
+    key: 'reconciliation',
+    name: 'Reconciliation',
+    problem: 'Receipts, transactions, records, and spreadsheets manually checked against one another.',
+    fix: 'Transactions are matched, exceptions flagged, and records kept up to date.',
+    side: 'right',
+    y: 352,
+    icon: 'M3.5 4h6v16h-6zM14.5 4h6v16h-6zM9.5 9h5M13 7.5l1.5 1.5-1.5 1.5M14.5 15h-5M11 13.5L9.5 15l1.5 1.5',
+  },
+] as const;
+---
+
+<section class="problems-section" aria-labelledby="problems-title" data-problems>
+  <div class="wrap p-layout">
+    <div class="p-side">
+      <div class="p-head" data-reveal>
+        <p class="eyebrow">What we fix most often</p>
+        <h2 id="problems-title">Sound familiar?</h2>
+        <p class="p-sub">The work matters. The manual processes around it shouldn’t take over.</p>
+      </div>
+      <div class="p-figure" data-reveal>
+        <LeakyBucket leaks={problems.map(({ key, name, side, y }) => ({ key, label: name, side, y }))} />
+      </div>
+    </div>
+
+    <div class="p-main">
+      <ul class="p-list" data-reveal="stagger">
+        {
+          problems.map((p, i) => (
+            <li class="p-row" data-leak-key={p.key} tabindex="0">
+              <span class="p-badge" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d={p.icon} />
+                </svg>
+              </span>
+              <div class="p-problem">
+                <p class="p-num">Problem {String(i + 1).padStart(2, '0')}</p>
+                <h3>{p.name}</h3>
+                <p>{p.problem}</p>
+              </div>
+              <p class="p-fix">
+                <span class="p-fix-tag">
+                  <Mark size={14} tone="current" />
+                  Fix
+                </span>
+                <span class="p-arrow" aria-hidden="true">→</span>
+                <span class="p-fix-text">{p.fix}</span>
+              </p>
+            </li>
+          ))
+        }
+      </ul>
+      <a class="arrow-link p-more" href="/approach/"><span>How we fix it</span><span class="arr" aria-hidden="true">→</span></a>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Hovering or focusing a problem plugs its leak in the bucket.
+  function initProblems() {
+    document.querySelectorAll<HTMLElement>('[data-problems]').forEach((section) => {
+      if (section.dataset.ready) return;
+      section.dataset.ready = '1';
+      const leaks = new Map<string, Element>();
+      section.querySelectorAll('[data-leak]').forEach((g) => leaks.set((g as HTMLElement).dataset.leak!, g));
+      const set = (key: string | null) => {
+        leaks.forEach((g, k) => g.classList.toggle('is-fixed', k === key));
+        section.querySelectorAll<HTMLElement>('[data-leak-key]').forEach((row) => row.classList.toggle('is-active', row.dataset.leakKey === key));
+      };
+      section.querySelectorAll<HTMLElement>('[data-leak-key]').forEach((row) => {
+        const key = row.dataset.leakKey!;
+        row.addEventListener('pointerenter', () => set(key));
+        row.addEventListener('pointerleave', () => set(null));
+        row.addEventListener('focus', () => set(key));
+        row.addEventListener('blur', () => set(null));
+      });
+    });
+  }
+  initProblems();
+  document.addEventListener('spockhart:view', initProblems);
+</script>
+
+<style>
+  .problems-section { padding-block: clamp(3rem, 2rem + 3vw, 5rem); background: var(--paper-2); overflow: hidden; }
+  .p-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: clamp(2rem, 1rem + 4vw, 4.5rem);
+    align-items: start;
+  }
+  .p-side { display: grid; gap: var(--s-6); position: sticky; top: 104px; }
+  .p-head { display: grid; gap: var(--s-2); }
+  .p-head h2 { font-size: var(--step-4); }
+  .p-sub { color: var(--ink-2); font-size: var(--step-1); }
+  .p-figure { display: grid; justify-items: center; }
+
+  .p-main { display: grid; gap: var(--s-5); }
+  .p-list { list-style: none; padding: 0; display: grid; gap: var(--s-3); }
+  .p-row {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) minmax(0, 0.95fr);
+    gap: var(--s-4) var(--s-5);
+    align-items: center;
+    padding: var(--s-4) var(--s-5);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    outline: none;
+    transition: border-color 300ms var(--ease), transform 400ms var(--ease-out), box-shadow 400ms var(--ease);
+  }
+  .p-row:hover, .p-row.is-active, .p-row:focus-visible {
+    border-color: var(--rule-2);
+    transform: translateX(-4px);
+    box-shadow: 0 16px 32px -26px rgb(27 42 61 / 0.5);
+  }
+  .p-row:focus-visible { outline: 2px solid var(--accent-soft); outline-offset: 2px; }
+
+  .p-badge { position: relative; display: grid; place-items: center; width: 42px; height: 48px; }
+  .p-badge::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    clip-path: var(--hex);
+    background: var(--ink);
+    transition: background-color 300ms var(--ease), transform 600ms var(--ease-out);
+  }
+  .p-row.is-active .p-badge::before { background: var(--brand); transform: rotate(180deg); }
+  .p-badge svg { position: relative; width: 22px; height: 22px; fill: none; stroke: #fff; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+
+  .p-problem { display: grid; gap: 0.1rem; }
+  .p-problem h3 { font-size: 1.1875rem; line-height: 1.2; }
+  .p-problem p { color: var(--ink-2); font-size: 0.9375rem; line-height: 1.45; }
+  .p-problem .p-num { font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); line-height: 1.2; }
+
+  .p-fix {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 0.5rem;
+    padding-left: var(--s-5);
+    border-left: 1px solid var(--rule);
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 0.9375rem;
+    line-height: 1.35;
+  }
+  .p-fix-tag {
+    --mark: currentColor;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.2rem 0.55rem 0.2rem 0.45rem;
+    border-radius: 999px;
+    background: var(--accent-wash);
+    color: var(--brand);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .p-arrow { color: var(--accent-soft); transition: transform var(--dur) var(--ease); }
+  .p-row.is-active .p-arrow { transform: translateX(3px); }
+  .p-fix-text { flex-basis: 100%; color: var(--ink); font-family: var(--font-display); font-weight: 500; font-size: 1rem; line-height: 1.35; }
+  .p-more { justify-self: start; }
+
+  @media (max-width: 1100px) {
+    .p-row { grid-template-columns: auto minmax(0, 1fr); }
+    .p-fix { grid-column: 2; display: block; padding-left: 0; border-left: 0; }
+    .p-fix-tag { vertical-align: 0.12em; margin-right: 0.3rem; }
+    .p-arrow { margin-right: 0.3rem; }
+  }
+  @media (max-width: 900px) {
+    .p-layout { grid-template-columns: minmax(0, 1fr); }
+    .p-side { position: static; }
+    .p-figure { max-width: 440px; margin-inline: auto; width: 100%; }
+  }
+  @media (max-width: 560px) {
+    .p-row { padding: var(--s-4); gap: var(--s-2) var(--s-4); }
+    .p-row:hover, .p-row.is-active { transform: none; }
+    .p-badge { width: 36px; height: 41px; }
+    .p-badge svg { width: 19px; height: 19px; }
+  }
+</style>

@@ -1,0 +1,73 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import ClosingCTA from '../components/ClosingCTA.astro';
+import { site } from '../config/site';
+
+const practices = [
+  {
+    title: 'Confidential by default',
+    body: 'We sign a mutual non-disclosure agreement before we see anything about your operation.',
+  },
+  {
+    title: 'Your systems first',
+    body: 'Wherever we can, we build inside the tools and accounts you already own, so your data stays in your environment.',
+  },
+  {
+    title: 'Only the access we need',
+    body: 'We ask for the narrowest access a task requires, and every account and key we use is removed when the engagement ends.',
+  },
+  {
+    title: 'No training on your data',
+    body: 'Your data is never used to train AI models. We tell you which AI services will touch your data before they do, and use them under terms that exclude training on customer data.',
+  },
+  {
+    title: 'You own everything',
+    body: 'All code, data, documentation, credentials and accounts we create belong to you from the first day.',
+  },
+  {
+    title: 'Canadian privacy law',
+    body: 'We handle personal information in line with Canada’s federal privacy law (PIPEDA) and with your own policies and obligations.',
+  },
+];
+---
+
+<Base title="Security and data" description="How Spockhart handles client systems and data: confidentiality, least access, no AI training on your data, and full ownership.">
+  <PageHero
+    eyebrow="Security and data"
+    title="Your data stays yours."
+    lead="We work inside your systems and with your information. These are the commitments we make before we start."
+  />
+  <section class="section">
+    <div class="wrap">
+      <ul class="practices grid-3" data-reveal="stagger">
+        {
+          practices.map((p) => (
+            <li>
+              <svg viewBox="0 0 20 20" aria-hidden="true">
+                <path d="M10 1 17.8 5.5 17.8 14.5 10 19 2.2 14.5 2.2 5.5Z" fill="none" stroke="currentColor" stroke-width="1.1" />
+                <path d="M6.5 10.2 9 12.6l4.6-5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+              <h2>{p.title}</h2>
+              <p>{p.body}</p>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="sec-note" data-reveal>
+        Security questionnaire or a specific requirement? Email <a class="link" href={`mailto:${site.email}`}>{site.email}</a> and we will
+        answer it in writing.
+      </p>
+    </div>
+  </section>
+  <ClosingCTA />
+</Base>
+
+<style>
+  .practices { list-style: none; padding: 0; row-gap: var(--s-7); }
+  .practices li { display: grid; gap: var(--s-3); align-content: start; padding-top: var(--s-5); border-top: 1px solid var(--rule); }
+  .practices svg { width: 22px; height: 22px; color: var(--accent-soft); }
+  .practices h2 { font-size: var(--step-2); }
+  .practices p { color: var(--ink-2); }
+  .sec-note { margin-top: var(--s-8); color: var(--ink-2); max-width: 60ch; }
+</style>

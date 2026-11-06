@@ -1,0 +1,8 @@
+{
+  "name": "Spockhart",
+  "short_name": "Spockhart",
+  "icons": [{ "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }],
+  "theme_color": "#1f4d6f",
+  "background_color": "#f0f3f7",
+  "display": "browser"
+}

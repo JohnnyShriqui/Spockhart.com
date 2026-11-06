@@ -1,0 +1,49 @@
+---
+import Document from '../layouts/Document.astro';
+import { site } from '../config/site';
+---
+
+<Document
+  title="Terms of use"
+  eyebrow="Legal"
+  lead="The terms that apply when you use this website."
+  description="Terms of use for spockhart.com."
+  updated="November 5, 2026"
+>
+  <h2>Using this website</h2>
+  <p>By using spockhart.com, you agree to these terms. If you do not agree, please do not use the site.</p>
+
+  <h2>No professional advice</h2>
+  <p>
+    The content on this website, including case studies and the calculator, is general information. It is not professional,
+    financial or legal advice, and it does not create a client relationship. Calculator results are estimates based on the figures
+    you enter.
+  </p>
+
+  <h2>Our content</h2>
+  <p>
+    The text, design, graphics and code of this website belong to {site.legalName} unless stated otherwise. You may share links to
+    any page. Please do not copy or republish our content without permission.
+  </p>
+
+  <h2>Team experience</h2>
+  <p>
+    Projects described as team experience were delivered by members of our team in prior roles at other organizations. They are
+    not engagements performed by Spockhart, and client names are withheld.
+  </p>
+
+  <h2>Links to other websites</h2>
+  <p>We are not responsible for the content or practices of websites we link to.</p>
+
+  <h2>Limitation of liability</h2>
+  <p>
+    This website is provided as is. To the extent the law allows, {site.legalName} is not liable for any loss arising from your use
+    of it or reliance on its content.
+  </p>
+
+  <h2>Governing law</h2>
+  <p>These terms are governed by the laws of the Province of {site.region} and the federal laws of {site.country} that apply there.</p>
+
+  <h2>Contact</h2>
+  <p>Questions about these terms can be sent to <a href={`mailto:${site.email}`}>{site.email}</a>.</p>
+</Document>

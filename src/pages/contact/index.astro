@@ -1,0 +1,186 @@
+---
+import Base from '../../layouts/Base.astro';
+import CopyEmail from '../../components/CopyEmail.astro';
+import { site } from '../../config/site';
+
+const steps = [
+  { title: 'We reply', body: `Within ${site.offer.replyWithin}, from a person, not a sequence.` },
+  { title: 'A 30-minute call', body: 'About how work actually gets done in your organization, and where the time goes.' },
+  { title: 'A proposal for the diagnosis', body: 'If it is a fit, a short, fixed-scope plan for the first two weeks.' },
+];
+---
+
+<Base title="Contact" description="Start a conversation with Spockhart. Tell us what is slowing your team down and we will reply within one business day.">
+  <section class="contact">
+    <div class="wrap contact-grid">
+      <div class="contact-intro">
+        <p class="eyebrow load-in" style="--i:0">Contact</p>
+        <h1 class="load-in" style="--i:1">Start a conversation.</h1>
+        <p class="lead load-in" style="--i:2">Tell us what is slowing your team down. We reply within {site.offer.replyWithin}.</p>
+
+        <div class="load-in contact-direct" style="--i:3">
+          <p class="label">Prefer email?</p>
+          <CopyEmail />
+          <p class="small muted">{site.city}, {site.country}</p>
+        </div>
+
+        <ol class="next-steps load-in" style="--i:4" aria-label="What happens next">
+          {
+            steps.map((s, i) => (
+              <li>
+                <span class="n tabular">{i + 1}</span>
+                <div>
+                  <p class="s-title">{s.title}</p>
+                  <p class="s-body">{s.body}</p>
+                </div>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+
+      <div class="contact-form-wrap load-in" style="--i:2">
+        <form class="contact-form" data-contact-form data-endpoint={site.formEndpoint} novalidate>
+          <div class="row-2">
+            <div class="field">
+              <label for="cf-name">Name</label>
+              <input class="input" id="cf-name" name="name" autocomplete="name" required />
+            </div>
+            <div class="field">
+              <label for="cf-email">Work email</label>
+              <input class="input" id="cf-email" name="email" type="email" autocomplete="email" required />
+            </div>
+          </div>
+          <div class="row-2">
+            <div class="field">
+              <label for="cf-org">Organization</label>
+              <input class="input" id="cf-org" name="organization" autocomplete="organization" required />
+            </div>
+            <div class="field">
+              <label for="cf-role">Your role <span class="optional">Optional</span></label>
+              <input class="input" id="cf-role" name="role" autocomplete="organization-title" />
+            </div>
+          </div>
+          <div class="row-2">
+            <div class="field">
+              <label for="cf-type">Type of organization</label>
+              <select class="select" id="cf-type" name="type">
+                <option value="Company">Company</option>
+                <option value="Nonprofit">Nonprofit</option>
+                <option value="Public sector">Public sector</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="cf-size">Team size</label>
+              <select class="select" id="cf-size" name="size">
+                <option value="1-10">1 to 10</option>
+                <option value="11-50" selected>11 to 50</option>
+                <option value="51-200">51 to 200</option>
+                <option value="201-1000">201 to 1,000</option>
+                <option value="1000+">More than 1,000</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label for="cf-message">What is slowing your team down?</label>
+            <textarea class="textarea" id="cf-message" name="message" required aria-describedby="cf-message-hint"></textarea>
+            <p class="hint" id="cf-message-hint">A few sentences is plenty. The task your team complains about most is a good place to start.</p>
+          </div>
+          <input type="text" name="_gotcha" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
+          <div class="form-foot">
+            <button class="btn" type="submit" data-submit>
+              <span data-submit-label>Send</span> <span class="arr" aria-hidden="true">→</span>
+            </button>
+            <p class="small muted">We use your details only to reply. See our <a class="link" href="/privacy/">privacy policy</a>.</p>
+          </div>
+          <p class="form-error" role="alert" data-form-error hidden></p>
+        </form>
+
+        <div class="compose" data-compose hidden>
+          <p class="eyebrow">Almost there</p>
+          <h2>Send this to {site.email}</h2>
+          <p class="muted">Your message is ready. Send it from your email and we will reply within {site.offer.replyWithin}.</p>
+          <pre class="compose-body" data-compose-body></pre>
+          <div class="btn-row">
+            <a class="btn" data-compose-mail href={`mailto:${site.email}`}>Open in email <span class="arr" aria-hidden="true">→</span></a>
+            <button class="btn btn-ghost" type="button" data-compose-copy>Copy message</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  import { initContactForm } from '../../scripts/contact';
+  initContactForm();
+</script>
+
+<style>
+  .contact {
+    padding-top: clamp(8.5rem, 6rem + 6vw, 11.5rem);
+    padding-bottom: var(--section);
+  }
+  .contact-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: var(--s-8);
+    align-items: start;
+  }
+  .contact-intro { display: grid; gap: var(--s-5); align-content: start; }
+  .contact-intro h1 { font-size: var(--step-5); max-width: 9ch; }
+  .contact-direct { display: grid; gap: var(--s-3); justify-items: start; margin-top: var(--s-4); }
+  .label { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); }
+  .next-steps { list-style: none; padding: 0; margin-top: var(--s-6); border-top: 1px solid var(--rule); }
+  .next-steps li {
+    display: grid;
+    grid-template-columns: 2rem minmax(0, 1fr);
+    gap: var(--s-3);
+    padding-block: var(--s-4);
+    border-bottom: 1px solid var(--rule);
+  }
+  .n { font-family: var(--font-display); font-size: 1.25rem; color: var(--accent); line-height: 1.3; }
+  .s-title { font-weight: 600; }
+  .s-body { color: var(--ink-2); font-size: 0.9375rem; }
+
+  .contact-form-wrap {
+    padding: clamp(1.5rem, 1rem + 2.5vw, 3rem);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+  }
+  .contact-form { display: grid; gap: var(--s-5); }
+  .row-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-5); }
+  .optional { font-weight: 400; color: var(--ink-3); margin-left: 0.35rem; font-size: 0.8125rem; }
+  .hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+  .form-foot { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-4); }
+  .form-foot .small { max-width: 34ch; }
+  .form-error { color: #b4483c; font-size: 0.9375rem; }
+  .btn[aria-busy='true'] { opacity: 0.7; pointer-events: none; }
+
+  .compose { display: grid; gap: var(--s-4); }
+  .compose h2 { font-size: var(--step-3); }
+  .compose-body {
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    padding: var(--s-4);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    background: var(--paper);
+    color: var(--ink);
+    max-height: 22rem;
+    overflow: auto;
+  }
+
+  @media (max-width: 960px) {
+    .contact-grid { grid-template-columns: minmax(0, 1fr); gap: var(--s-7); }
+    .next-steps { margin-top: var(--s-3); }
+  }
+  @media (max-width: 560px) {
+    .row-2 { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>

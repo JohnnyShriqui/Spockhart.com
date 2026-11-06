@@ -1,0 +1,69 @@
+---
+/**
+ * Shows the email address as selectable text with a copy button.
+ * The address is always visible, so it works where mailto links do not.
+ */
+import { site } from '../config/site';
+interface Props {
+  onNavy?: boolean;
+  class?: string;
+}
+const { onNavy = false, class: className = '' } = Astro.props;
+---
+
+<span class:list={['copy-email', className, { 'on-navy': onNavy }]} data-copy-email>
+  <a class="copy-address" href={`mailto:${site.email}`}>{site.email}</a>
+  <button type="button" class="copy-btn" data-copy={site.email} aria-label={`Copy ${site.email}`}>
+    <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" class="ic-copy">
+      <rect x="5" y="5" width="8.5" height="8.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.3"></rect>
+      <path d="M3.5 10.5h-.5A1.5 1.5 0 0 1 1.5 9V3A1.5 1.5 0 0 1 3 1.5h6A1.5 1.5 0 0 1 10.5 3v.5" fill="none" stroke="currentColor" stroke-width="1.3"></path>
+    </svg>
+    <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" class="ic-done">
+      <path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+    </svg>
+    <span class="copy-status" role="status" aria-live="polite"></span>
+  </button>
+</span>
+
+<style>
+  .copy-email {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem 0.35rem 0.35rem 0.9rem;
+    border: 1px solid var(--rule-2);
+    border-radius: var(--radius);
+    font-size: 0.95rem;
+    color: var(--ink);
+    max-width: 100%;
+  }
+  .copy-email.on-navy { border-color: var(--navy-rule); color: var(--on-navy); }
+  .copy-address {
+    color: inherit;
+    text-decoration: none;
+    user-select: all;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+  }
+  .copy-btn {
+    position: relative;
+    display: inline-grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    border: 0;
+    border-radius: 4px;
+    background: transparent;
+    color: inherit;
+    opacity: 0.75;
+    transition: opacity var(--dur) var(--ease), background-color var(--dur) var(--ease);
+  }
+  .copy-btn:hover { opacity: 1; background: color-mix(in oklab, currentColor 10%, transparent); }
+  .copy-btn svg { grid-area: 1 / 1; transition: opacity 200ms var(--ease), transform 300ms var(--ease-out); }
+  .ic-done { opacity: 0; transform: scale(0.6); }
+  .is-copied .ic-copy { opacity: 0; transform: scale(0.6); }
+  .is-copied .ic-done { opacity: 1; transform: none; }
+  .copy-status { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+</style>

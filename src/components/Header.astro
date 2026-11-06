@@ -1,0 +1,213 @@
+---
+import Logo from './Logo.astro';
+import { primaryNav, site } from '../config/site';
+
+const path = Astro.url.pathname;
+const isCurrent = (href: string) => (href === '/' ? path === '/' : path.startsWith(href));
+---
+
+<header class="site-header" data-header>
+  <div class="wrap header-inner">
+    <a class="brand" href="/" aria-label={`${site.name}, home`}>
+      <Logo size={26} />
+    </a>
+
+    <nav class="nav" aria-label="Primary">
+      <ul>
+        {
+          primaryNav.map((item) => (
+            <li>
+              <a href={item.href} aria-current={isCurrent(item.href) ? 'page' : undefined}>
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a class="btn btn-sm header-cta" href="/contact/">Start a conversation</a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-nav" data-menu-toggle>
+        <span class="menu-label">Menu</span>
+        <span class="menu-icon" aria-hidden="true"><i></i><i></i></span>
+      </button>
+    </div>
+  </div>
+
+  <div class="mobile-nav" id="mobile-nav" hidden data-mobile-nav>
+    <nav aria-label="Mobile">
+      <ul>
+        {
+          primaryNav.map((item, i) => (
+            <li style={`--i:${i}`}>
+              <a href={item.href} aria-current={isCurrent(item.href) ? 'page' : undefined}>
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+        <li style={`--i:${primaryNav.length}`}>
+          <a href="/contact/" aria-current={isCurrent('/contact/') ? 'page' : undefined}>Contact</a>
+        </li>
+      </ul>
+      <p class="mobile-meta">
+        <span>{site.email}</span>
+        <span>{site.city}, {site.country}</span>
+      </p>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: fixed;
+    top: env(safe-area-inset-top, 0px);
+    left: 0;
+    right: 0;
+    z-index: 50;
+    transition: background-color 300ms var(--ease), box-shadow 300ms var(--ease), backdrop-filter 300ms var(--ease);
+  }
+  .site-header.is-scrolled,
+  .site-header.is-open {
+    background: var(--header-bg);
+    -webkit-backdrop-filter: saturate(1.4) blur(14px);
+    backdrop-filter: saturate(1.4) blur(14px);
+    box-shadow: 0 1px 0 var(--rule);
+  }
+  /* backdrop-filter would make the header the containing block for the fixed menu panel */
+  .site-header.is-open {
+    background: var(--paper);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-5);
+    height: 76px;
+    transition: height 300ms var(--ease);
+  }
+  .is-scrolled .header-inner { height: 64px; }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    text-decoration: none;
+    color: var(--ink);
+    flex: none;
+  }
+  .brand :global(.mark) { transition: transform 900ms var(--ease-out); }
+  .brand:hover :global(.mark) { transform: rotate(180deg); }
+
+  .nav ul {
+    display: flex;
+    gap: clamp(1.25rem, 0.5rem + 1.6vw, 2.25rem);
+    list-style: none;
+    padding: 0;
+  }
+  .nav a {
+    position: relative;
+    display: inline-block;
+    padding-block: 0.4rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--ink-2);
+    text-decoration: none;
+    transition: color var(--dur) var(--ease);
+  }
+  .nav a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background: var(--accent-soft);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 360ms var(--ease);
+  }
+  .nav a:hover { color: var(--ink); }
+  .nav a:hover::after { transform: scaleX(1); transform-origin: left; }
+  .nav a[aria-current='page'] { color: var(--ink); }
+  .nav a[aria-current='page']::after { transform: scaleX(1); }
+
+  .header-actions { display: flex; align-items: center; gap: var(--s-3); }
+
+  .menu-toggle {
+    display: none;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.55rem 0.2rem 0.55rem 0.6rem;
+    border: 0;
+    background: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--ink);
+  }
+  .menu-icon { position: relative; width: 22px; height: 12px; display: inline-block; }
+  .menu-icon i {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1.5px;
+    background: currentColor;
+    transition: transform 360ms var(--ease), top 360ms var(--ease);
+  }
+  .menu-icon i:first-child { top: 2px; }
+  .menu-icon i:last-child { top: 9px; }
+  .is-open .menu-icon i:first-child { top: 5.5px; transform: rotate(45deg); }
+  .is-open .menu-icon i:last-child { top: 5.5px; transform: rotate(-45deg); }
+
+  .mobile-nav {
+    position: fixed;
+    top: calc(64px + env(safe-area-inset-top, 0px));
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--paper);
+    overflow-y: auto;
+    padding-block: var(--s-6) calc(var(--s-7) + env(safe-area-inset-bottom, 0px));
+    padding-left: max(var(--gutter), env(safe-area-inset-left, 0px));
+    padding-right: max(var(--gutter), env(safe-area-inset-right, 0px));
+  }
+  .mobile-nav ul { list-style: none; padding: 0; display: grid; }
+  .mobile-nav li {
+    border-bottom: 1px solid var(--rule);
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 400ms var(--ease-out), transform 500ms var(--ease-out);
+    transition-delay: calc(var(--i) * 40ms + 60ms);
+  }
+  .is-open .mobile-nav li { opacity: 1; transform: none; }
+  .mobile-nav a {
+    display: block;
+    padding-block: 1rem;
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    letter-spacing: -0.01em;
+    text-decoration: none;
+    color: var(--ink);
+  }
+  .mobile-nav a[aria-current='page'] { color: var(--accent); }
+  .mobile-meta {
+    margin-top: var(--s-6);
+    display: grid;
+    gap: 0.25rem;
+    color: var(--ink-3);
+    font-size: 0.9rem;
+  }
+
+  @media (max-width: 900px) {
+    .nav, .header-cta { display: none; }
+    .menu-toggle { display: inline-flex; }
+    .header-inner { height: 64px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .mobile-nav li { opacity: 1; transform: none; }
+  }
+</style>

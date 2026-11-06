@@ -1,0 +1,258 @@
+---
+/**
+ * The engagement on a day scale. Phases and their spans live here.
+ */
+import { site } from '../config/site';
+
+interface Props {
+  /** Scale and phase names only, for the home page. */
+  compact?: boolean;
+}
+const { compact = false } = Astro.props;
+
+const SCALE = 120; // days covered by the scale (the four-month minimum)
+const phases = [
+  {
+    n: '01',
+    name: 'Diagnose',
+    when: 'Weeks 1 to 2',
+    start: 0,
+    end: 14,
+    body: 'We work alongside your team to map how work gets done, uncover bottlenecks and duplication, and identify where better processes and technology can make the biggest difference.',
+  },
+  {
+    n: '02',
+    name: 'Prototype',
+    when: `By day ${site.offer.prototypeDays}`,
+    start: 14,
+    end: site.offer.prototypeDays,
+    body: 'A working prototype that demonstrates the proposed solution, built around your team’s actual workflows and requirements.',
+  },
+  {
+    n: '03',
+    name: 'Build and embed',
+    when: `Months 2 to ${site.offer.minimumMonths}`,
+    start: site.offer.prototypeDays,
+    end: SCALE,
+    body: 'We harden it, connect it to your systems and train the people who will own it.',
+  },
+  {
+    n: '04',
+    name: 'Hand over',
+    when: `Month ${site.offer.minimumMonths}`,
+    start: SCALE,
+    end: null,
+    body: 'Everything we built is yours: documented, running and owned by your team.',
+  },
+];
+const ticks = [0, 14, 30, 60, 90, 120];
+const pct = (d: number) => `${(d / SCALE) * 100}%`;
+---
+
+<div class:list={['timeline', { compact }]} data-reveal>
+  <div class="scale" aria-hidden="true">
+    <div class="scale-track">
+      <div class="axis"></div>
+      {
+        phases
+          .filter((p) => p.end !== null)
+          .map((p, i) => (
+            <div class={`seg seg-${i + 1}`} style={`left:${pct(p.start)};width:${pct((p.end as number) - p.start)}`}>
+              <span class="seg-label">{p.name}</span>
+            </div>
+          ))
+      }
+      <div class="milestone" style={`left:${pct(site.offer.prototypeDays)}`}>
+        <span class="milestone-dot"></span>
+        <span class="milestone-label">Working prototype</span>
+      </div>
+      {
+        ticks.map((t) => (
+          <span class="tick" style={`left:${pct(t)}`}>
+            <span>Day {t}</span>
+          </span>
+        ))
+      }
+    </div>
+    <div class="scale-tail">
+      <span class="seg-label">Yours to run</span>
+    </div>
+  </div>
+
+  <ol class="phases" data-reveal="stagger">
+    {
+      phases.map((p, i) => (
+        <li class={`phase phase-${i + 1}`}>
+          <p class="phase-meta">
+            <span class="tabular">{p.n}</span>
+            <span aria-hidden="true">·</span>
+            {p.when}
+          </p>
+          <h3>{p.name}</h3>
+          {!compact && <p class="phase-body">{p.body}</p>}
+        </li>
+      ))
+    }
+  </ol>
+</div>
+
+<style>
+  .timeline { display: grid; gap: var(--s-7); }
+
+  .scale {
+    display: grid;
+    grid-template-columns: minmax(0, 86fr) minmax(0, 14fr);
+    padding-top: 2.6rem;
+    padding-bottom: 2rem;
+  }
+  .scale-track { position: relative; height: 44px; }
+  .axis {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -10px;
+    height: 1px;
+    background: var(--rule-2);
+  }
+  .seg {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    border-right: 2px solid var(--paper);
+    display: flex;
+    align-items: center;
+    padding-inline: 0.75rem;
+    overflow: hidden;
+    transform-origin: left center;
+  }
+  .seg-1 { background: var(--mist-1); }
+  .seg-2 { background: var(--accent); }
+  .seg-3 { background: var(--brand); }
+  .seg-label {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: #ffffff;
+    white-space: nowrap;
+  }
+  .seg-1 .seg-label { color: var(--navy); }
+  .scale-tail {
+    position: relative;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    padding-inline: 0.75rem;
+    border: 1px dashed var(--rule-2);
+    border-left: 0;
+    border-radius: 0 var(--radius) var(--radius) 0;
+    background: repeating-linear-gradient(-45deg, transparent 0 6px, var(--accent-wash) 6px 7px);
+  }
+  .scale-tail .seg-label { color: var(--ink-2); }
+
+  .tick {
+    position: absolute;
+    bottom: -16px;
+    width: 1px;
+    height: 7px;
+    background: var(--rule-2);
+  }
+  .tick span {
+    position: absolute;
+    top: 12px;
+    left: 0;
+    transform: translateX(-50%);
+    font-size: 0.75rem;
+    color: var(--ink-3);
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+  .tick:first-of-type span { transform: none; }
+
+  .milestone { position: absolute; top: -2.4rem; bottom: 0; width: 0; }
+  .milestone::before {
+    content: '';
+    position: absolute;
+    left: -0.5px;
+    top: 1.35rem;
+    bottom: -4px;
+    width: 1px;
+    background: var(--accent-soft);
+  }
+  .milestone-dot {
+    position: absolute;
+    left: -6px;
+    top: 1rem;
+    width: 12px;
+    height: 12px;
+    background: var(--accent-soft);
+    clip-path: var(--hex);
+  }
+  .milestone-label {
+    position: absolute;
+    left: 12px;
+    top: 0.65rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--accent);
+    white-space: nowrap;
+  }
+
+  .phases {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--s-5);
+  }
+  .phase {
+    position: relative;
+    display: grid;
+    gap: var(--s-2);
+    align-content: start;
+    padding: var(--s-5);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    overflow: hidden;
+  }
+  /* Each card carries its segment's colour from the chart above */
+  .phase::before { content: ''; position: absolute; inset: 0 0 auto; height: 4px; background: var(--seg); }
+  .phase-1 { --seg: var(--mist-1); }
+  .phase-2 { --seg: var(--accent); }
+  .phase-3 { --seg: var(--brand); }
+  .phase-4 { --seg: repeating-linear-gradient(90deg, var(--rule-2) 0 6px, transparent 6px 10px); }
+  .phase-meta {
+    display: flex;
+    gap: 0.4rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .phase h3 { font-size: 1.5rem; line-height: 1.15; }
+  .phase-body { color: var(--ink-2); font-size: 1rem; line-height: 1.55; }
+  .compact { gap: var(--s-6); }
+
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .seg { animation: grow linear both; animation-timeline: view(); animation-range: entry 10% cover 38%; }
+      .seg-2 { animation-range: entry 18% cover 42%; }
+      .seg-3 { animation-range: entry 26% cover 48%; }
+      @keyframes grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+    }
+  }
+
+  @media (max-width: 900px) {
+    .phases { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 640px) {
+    .scale { grid-template-columns: minmax(0, 72fr) minmax(0, 28fr); }
+    .scale-tail { padding-inline: 0.5rem; }
+    .scale-tail .seg-label { font-size: 0.75rem; }
+    .seg-label { display: none; }
+    .scale-tail .seg-label { display: inline; }
+    .tick:not(:first-of-type):not(:nth-of-type(3)):not(:last-of-type) span { display: none; }
+    .phases { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>

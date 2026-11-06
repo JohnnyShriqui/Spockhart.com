@@ -1,0 +1,967 @@
+---
+/**
+ * A live before-and-after window for each team-experience project, keyed by the
+ * case study's file name. Used on /work/ and at the top of each case study.
+ *
+ * Each window is a looping scene driven by src/scripts/scenes.ts: the script
+ * writes the time in seconds to --t and the styles below turn it into motion.
+ * Inline --a / --d / --i values are the moments things appear, leave, or start.
+ * Without JavaScript, or with reduced motion, a scene rests on its finished frame.
+ */
+interface Props {
+  id: string;
+  class?: string;
+}
+const { id, class: className = '' } = Astro.props;
+
+const twelve = Array.from({ length: 12 }, (_, i) => i);
+const hex = (cx: number, cy: number, r: number) =>
+  [0, 1, 2, 3, 4, 5]
+    .map((k) => {
+      const a = (Math.PI / 3) * k - Math.PI / 2;
+      return `${(cx + Math.cos(a) * r).toFixed(1)},${(cy + Math.sin(a) * r).toFixed(1)}`;
+    })
+    .join(' ');
+
+/* Financing: the old back-and-forth and the new straight line */
+const parties = ['Subcontractor', 'Contractor', 'Lender', 'Legal'];
+const steps = ['Apply', 'Review', 'Approve', 'Funded'];
+const nodeX = [55, 165, 275, 385];
+const hopSeq = [0, 2, 0, 1, 2, 3, 1, 0, 2, 3, 2, 1, 0];
+const hopArcs = Array.from(
+  new Set(hopSeq.slice(1).map((b, i) => [Math.min(hopSeq[i], b), Math.max(hopSeq[i], b)].join('-'))),
+).map((k) => k.split('-').map(Number));
+const runs = [
+  [0.3, 2.3],
+  [3.4, 5.4],
+  [6.5, 8.5],
+];
+
+/* Production floor: a tangled route and a straight one */
+const tangle = [
+  [33, 31],
+  [193, 61],
+  [43, 131],
+  [133, 21],
+  [213, 141],
+  [83, 81],
+  [153, 121],
+];
+const tangleD = 'M' + tangle.map((p) => p.join(' ')).join(' L');
+const segLens = tangle.slice(1).map((p, i) => Math.hypot(p[0] - tangle[i][0], p[1] - tangle[i][1]));
+const total = segLens.reduce((a, b) => a + b, 0);
+const tangleStops = [0, ...segLens.map((_, i) => segLens.slice(0, i + 1).reduce((a, b) => a + b, 0) / total)]
+  .map((f) => f.toFixed(4))
+  .join(' ');
+
+/* Supply chain: suppliers, their scores, and where each lands when ranked */
+const hq = [150, 128];
+const suppliers = [
+  { x: 48, y: 62, s: 0.92 },
+  { x: 118, y: 36, s: 0.41 },
+  { x: 224, y: 58, s: 0.74 },
+  { x: 262, y: 132, s: 0.33 },
+  { x: 214, y: 208, s: 0.85 },
+  { x: 116, y: 214, s: 0.52 },
+  { x: 40, y: 168, s: 0.63 },
+  { x: 56, y: 112, s: 0.28 },
+].map((p, i, all) => {
+  const rank = all.filter((q) => q.s > p.s).length;
+  return { ...p, i, rank, ty: 46 + rank * 25, len: Math.hypot(p.x - hq[0], p.y - hq[1]) - 16 };
+});
+
+/* Sales: rep values at 0 s, 3.5 s and 7 s (an illustration, not real figures) */
+const reps = [
+  [0.3, 0.62, 0.92],
+  [0.56, 0.6, 0.71],
+  [0.42, 0.8, 0.86],
+  [0.64, 0.68, 0.79],
+  [0.2, 0.46, 0.66],
+  [0.36, 0.42, 0.58],
+];
+// Sixteen reps, four by four; a few of them wondering where they stand
+const people = Array.from({ length: 16 }, (_, i) => [30 + (i % 4) * 58, 30 + Math.floor(i / 4) * 34]);
+const asking = new Set([1, 4, 6, 9, 11, 14]);
+
+const doc = 'M2 0h7l3 3v12H2zM9 0v3h3';
+const person = 'M2.8 4.2a3.2 3.2 0 1 0 6.4 0a3.2 3.2 0 1 0 -6.4 0zM0.6 16c0-3.6 2.4-6.2 5.4-6.2s5.4 2.6 5.4 6.2z';
+---
+
+<figure class:list={['rv', className]} data-rv>
+  {
+    id === 'project-feasibility-platform' && (
+      <>
+        <div class="win">
+          <div class="win-bar" aria-hidden="true"><span class="win-dots"><i /><i /><i /></span><span>Assessing one new project</span></div>
+          <div class="scene" data-scene data-loop="10" data-still="9.3" style="--loop:10;--still:9.3">
+            <div class="lane">
+              <div class="lane-head">
+                <span class="tag">Before</span>
+                <span class="readout tabular">
+                  <span data-count="0.2 1, 8.4 12" data-fmt="Month {}">Month 12</span><span class="ap" style="--a:8.4">+</span>{' '}
+                  <span class="sep">·</span>{' '}
+                  <span data-count="0.2 8, 8.4 100" data-fmt="${}K">$100K</span><span class="ap" style="--a:8.4">+</span>
+                </span>
+              </div>
+              <div class="cells ends" aria-hidden="true">
+                {twelve.map((i) => (
+                  <span class="cell" style={`--i:${i}`}>
+                    <span class="cell-fill" />
+                  </span>
+                ))}
+              </div>
+              <p class="lane-foot ends"><span class="ap" style="--a:8.4">One study, a year later.</span></p>
+            </div>
+            <div class="lane">
+              <div class="lane-head">
+                <span class="tag tag-hot">After</span>
+                <span class="readout readout-hot swap">
+                  <span class="dn" style="--d:0.75">Running</span>
+                  <span class="ap" style="--a:0.75">Minutes, not months</span>
+                </span>
+              </div>
+              <div class="cells ends" aria-hidden="true">
+                {twelve.map((i) => (
+                  <span class="cell cell-hot" style={`--a:${(0.6 + i * 0.66).toFixed(2)}`}>
+                    <svg class="cell-doc pop" viewBox="0 0 14 15">
+                      <path d={doc} />
+                      <path d="M4.5 9l2 2 3.5-4" class="tick" />
+                    </svg>
+                  </span>
+                ))}
+              </div>
+              <p class="lane-foot lane-foot-hot ends"><span class="ap" style="--a:1.4">Every opportunity, assessed.</span></p>
+            </div>
+          </div>
+        </div>
+        <div class="rv-split">
+          <div>
+            <span class="rv-k">Cost per assessment</span>
+            <p class="rv-num"><s>$100K+</s> <strong>$0</strong></p>
+          </div>
+          <div>
+            <span class="rv-k">$5M government technology grant</span>
+            <p class="rv-num"><strong>#1</strong> <small>nationally</small></p>
+          </div>
+        </div>
+      </>
+    )
+  }
+
+  {
+    id === 'subcontractor-financing-marketplace' && (
+      <>
+        <div class="win">
+          <div class="win-bar" aria-hidden="true"><span class="win-dots"><i /><i /><i /></span><span>Getting a subcontractor financed</span></div>
+          <div class="scene" data-scene data-loop="10" data-still="9.2" style="--loop:10;--still:9.2">
+            <div class="lane">
+              <div class="lane-head">
+                <span class="tag">Before</span>
+                <span class="readout tabular">
+                  <span data-count="0.25 1, 8.4 26" data-fmt="Week {}">Week 26</span><span class="ap" style="--a:8.4">+, still waiting</span>
+                </span>
+              </div>
+              <svg class="lane-svg" viewBox="0 0 440 98" aria-hidden="true">
+                {hopArcs.map(([a, b]) => (
+                  <path
+                    d={`M${nodeX[a]} 50 Q${(nodeX[a] + nodeX[b]) / 2} ${50 - (nodeX[b] - nodeX[a]) * 0.36} ${nodeX[b]} 50`}
+                    class="arc"
+                  />
+                ))}
+                {nodeX.map((x, i) => (
+                  <g>
+                    <polygon points={hex(x, 50, 14)} class="node" />
+                    <text x={x} y="90" class="node-label" text-anchor="middle">{parties[i]}</text>
+                  </g>
+                ))}
+                <g class="ends">
+                  <g data-hops={nodeX.join(' ')} data-seq={hopSeq.join(' ')} data-y="50" data-hop="0.68" data-start="0.25" data-lift="0.18" transform="translate(55 50)">
+                    <path d={doc} transform="translate(-9 -11) scale(1.3)" class="doc-dim" />
+                  </g>
+                </g>
+              </svg>
+            </div>
+            <div class="lane">
+              <div class="lane-head">
+                <span class="tag tag-hot">After</span>
+                <span class="readout readout-hot swap">
+                  <span class="dn" style="--d:2.3">In review</span>
+                  <span class="ap" style="--a:2.3">Approved in weeks</span>
+                </span>
+              </div>
+              <svg class="lane-svg" viewBox="0 0 440 98" aria-hidden="true">
+                <path d={`M${nodeX[0]} 50 H${nodeX[3]}`} class="pipe" />
+                <g class="ends">
+                  <path d={`M${nodeX[0]} 50 H${nodeX[3]}`} class="pipe-on grow" style="--a:0.3;--b:2.3" />
+                </g>
+                {nodeX.map((x, i) => (
+                  <g>
+                    <polygon points={hex(x, 50, 14)} class="node" />
+                    <g class="ends">
+                      <g class="pop" style={`--a:${(0.3 + i * 0.667).toFixed(2)}`}>
+                        <polygon points={hex(x, 50, 14)} class="node-on" />
+                        <path d={`M${x - 5} 50l3.5 3.5 6.5-7`} class="node-tick" />
+                      </g>
+                    </g>
+                    <text x={x} y="90" class="node-label node-label-hot" text-anchor="middle">{steps[i]}</text>
+                  </g>
+                ))}
+                {runs.map(([a, b]) => (
+                  <g class="ap" style={`--a:${a - 0.05}`}>
+                    <g class="dn" style={`--d:${b + 0.15}`}>
+                      <g data-move={`${nodeX[0]} 50 ${nodeX[3]} 50 ${a} ${b}`} transform={`translate(${nodeX[0]} 50)`}>
+                        <path d={doc} transform="translate(-9 -36) scale(1.3)" class="doc-hot" />
+                      </g>
+                    </g>
+                  </g>
+                ))}
+              </svg>
+            </div>
+          </div>
+        </div>
+        <div class="rv-split">
+          <div>
+            <span class="rv-k">Launched in 2 countries</span>
+            <p class="rv-num rv-num-sm"><strong>US + Canada</strong></p>
+          </div>
+          <div>
+            <span class="rv-k">In its market</span>
+            <p class="rv-num"><strong>First</strong> <small>of its kind</small></p>
+          </div>
+        </div>
+      </>
+    )
+  }
+
+  {
+    id === 'production-floor-redesign' && (
+      <>
+        <div class="win">
+          <div class="win-bar" aria-hidden="true"><span class="win-dots"><i /><i /><i /></span><span>One shift on the production floor</span></div>
+          <div class="scene panes" data-scene data-loop="8" data-still="7.4" style="--loop:8;--still:7.4">
+            <div class="lane">
+              <div class="lane-head">
+                <span class="tag">Before</span>
+              </div>
+              <svg class="pane-svg" viewBox="0 0 236 152" aria-hidden="true">
+                <rect x="1" y="1" width="234" height="150" rx="6" class="zone" />
+                <path id={`${id}-route`} d={tangleD} class="route" />
+                {tangle.map(([x, y]) => (
+                  <rect x={x - 13} y={y - 9} width="26" height="18" rx="3" class="station" />
+                ))}
+                <g class="ends">
+                  {[0, 0.34, 0.67].map((o) => (
+                    <g data-along={`#${id}-route`} data-speed="0.055" data-offset={o} data-stops={tangleStops} transform={`translate(${tangle[0][0]} ${tangle[0][1]})`}>
+                      <rect x="-5" y="-5" width="10" height="10" rx="2" class="item" />
+                    </g>
+                  ))}
+                </g>
+              </svg>
+              <div class="meter" aria-hidden="true">
+                <span class="meter-k">Output</span>
+                <span class="meter-track">
+                  <span class="meter-fill ends" style="--max:0.56;--dur:7.4" />
+                  <span class="meter-target"><i>Target</i></span>
+                </span>
+              </div>
+            </div>
+            <div class="lane">
+              <div class="lane-head">
+                <span class="tag tag-hot">After</span>
+                <span class="readout readout-hot swap">
+                  <span class="dn" style="--d:4.7">Straight through</span>
+                  <span class="ap" style="--a:4.7">Above target</span>
+                </span>
+              </div>
+              <svg class="pane-svg" viewBox="0 0 236 152" aria-hidden="true">
+                <rect x="1" y="1" width="234" height="150" rx="6" class="zone" />
+                <path id={`${id}-line`} d="M16 76 H220" class="flow" />
+                {[72, 106, 140, 174].map((x) => (
+                  <rect x={x - 13} y="67" width="26" height="18" rx="3" class="station station-on" />
+                ))}
+                <g class="ends">
+                  {[0, 1, 2, 3, 4, 5].map((k) => (
+                    <g data-along={`#${id}-line`} data-speed="0.3" data-offset={(k / 6).toFixed(3)} transform="translate(16 76)">
+                      <rect x="-5" y="-5" width="10" height="10" rx="2" class="item item-hot" />
+                    </g>
+                  ))}
+                </g>
+                <polygon points={hex(34, 76, 13)} class="check" />
+                <path d="M29 76l3.5 3.5 6-6.5" class="check-tick" />
+                <polygon points={hex(204, 76, 13)} class="check" />
+                <path d="M199 76l3.5 3.5 6-6.5" class="check-tick" />
+                <text x="34" y="110" class="node-label" text-anchor="middle">Inbound</text>
+                <text x="204" y="110" class="node-label" text-anchor="middle">Finished</text>
+                <text x="34" y="123" class="node-label" text-anchor="middle">check</text>
+                <text x="204" y="123" class="node-label" text-anchor="middle">check</text>
+              </svg>
+              <div class="meter" aria-hidden="true">
+                <span class="meter-k">Output</span>
+                <span class="meter-track">
+                  <span class="meter-fill meter-fill-hot ends" style="--max:1;--dur:5.8" />
+                  <span class="meter-target"><i>Target</i></span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="rv-split">
+          <div>
+            <span class="rv-k">Above daily production target</span>
+            <p class="rv-num rv-num-sm"><strong>3 days</strong> <small>a week</small></p>
+          </div>
+          <div>
+            <span class="rv-k">The new layout, adopted permanently</span>
+            <p class="rv-num rv-num-sm"><strong>Standard</strong> <small>procedure</small></p>
+          </div>
+        </div>
+      </>
+    )
+  }
+
+  {
+    id === 'supply-chain-assessment' && (
+      <div class="win">
+        <div class="win-bar" aria-hidden="true"><span class="win-dots"><i /><i /><i /></span><span>A global supplier network, assessed</span></div>
+        <div class="scene" data-scene data-loop="11" data-still="10.3" style="--loop:11;--still:10.3">
+          <div class="lane">
+            <div class="lane-head stages" aria-hidden="true">
+              {[
+                ['Map', 0, 3.4],
+                ['Score', 3.4, 6.4],
+                ['Rank', 6.4, 11],
+              ].map(([name, a, b], k) => (
+                <span class="stage" style={`--a:${a};--b:${b}`}>
+                  <span class="stage-on" />
+                  <span class="stage-n">{k + 1}</span>
+                  {name}
+                </span>
+              ))}
+            </div>
+            <svg class="chain-svg" viewBox="0 0 520 250" aria-hidden="true">
+              <text x="0" y="12" class="corner">Scattered processes</text>
+              <text x="320" y="12" class="corner corner-hot ap" style="--a:7.2">Ranked priorities</text>
+              <g class="ghost" style="--d:6.8">
+                {suppliers.map((p) => (
+                  <path
+                    d={`M${hq[0]} ${hq[1]} L${p.x} ${p.y}`}
+                    class="link"
+                    style={`--len:${(p.len + 16).toFixed(1)};--a:${(0.3 + p.i * 0.24).toFixed(2)}`}
+                  />
+                ))}
+                {suppliers.map((p) => (
+                  <circle cx={p.x} cy={p.y} r="6" class="site pop" style={`--a:${(0.3 + p.i * 0.24 + 0.35).toFixed(2)}`} />
+                ))}
+                <polygon points={hex(hq[0], hq[1], 16)} class="hq pop" style="--a:0.1" />
+                <text x={hq[0]} y={hq[1] + 4} class="hq-label pop" style="--a:0.1" text-anchor="middle">HQ</text>
+              </g>
+              <g class="ends">
+                {suppliers.map((p) => (
+                  <>
+                    <rect
+                      x="380"
+                      y={p.ty - 5}
+                      width={(p.s * 128).toFixed(1)}
+                      height="10"
+                      rx="2"
+                      class:list={['bar', 'grow', { 'bar-hot': p.rank < 3 }]}
+                      style={`--a:${(7.6 + p.rank * 0.08).toFixed(2)};--b:${(8.3 + p.rank * 0.08).toFixed(2)}`}
+                    />
+                    <text x="338" y={p.ty + 4} class:list={['rank-n', 'ap', { 'rank-hot': p.rank < 3 }]} style={`--a:${(7.5 + p.rank * 0.08).toFixed(2)}`} text-anchor="end">
+                      {p.rank + 1}
+                    </text>
+                  </>
+                ))}
+                {suppliers.map((p) => (
+                  <g
+                    data-move={`${p.x} ${p.y} 358 ${p.ty} ${(6.5 + p.rank * 0.06).toFixed(2)} ${(7.6 + p.rank * 0.06).toFixed(2)}`}
+                    transform={`translate(${p.x} ${p.y})`}
+                  >
+                    <g class="pop" style={`--a:${(0.3 + p.i * 0.24 + 0.35).toFixed(2)}`}>
+                      <circle r="12" class="ring-base" />
+                      <circle
+                        r="12"
+                        class:list={['ring', { 'ring-hot': p.rank < 3 }]}
+                        style={`--s:${p.s};--a:${(3.6 + p.i * 0.16).toFixed(2)}`}
+                        transform="rotate(-90)"
+                      />
+                      <circle r="6" class:list={['site', { 'site-hot': p.rank < 3 }]} />
+                    </g>
+                  </g>
+                ))}
+              </g>
+            </svg>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  {
+    id === 'sales-performance-system' && (
+      <>
+        <div class="win">
+          <div class="win-bar" aria-hidden="true"><span class="win-dots"><i /><i /><i /></span><span>Running the sales team</span></div>
+          <div class="scene panes" data-scene data-loop="10" data-still="9.2" style="--loop:10;--still:9.2">
+            <div class="lane">
+              <div class="lane-head">
+                <span class="tag">Before</span>
+                <span class="readout">Limited visibility</span>
+              </div>
+              <svg class="pane-svg" viewBox="0 0 236 152" aria-hidden="true">
+                {people.map(([x, y], i) => (
+                  <g transform={`translate(${x} ${y})`}>
+                    <path d={person} transform="translate(-7.8 -8) scale(1.3)" class="rep" />
+                    {asking.has(i) && (
+                      <g class="bubble" style={`--i:${i}`}>
+                        <circle cx="12" cy="-10" r="7" class="bubble-c" />
+                        <text x="12" y="-7" class="bubble-q" text-anchor="middle">?</text>
+                      </g>
+                    )}
+                  </g>
+                ))}
+              </svg>
+              <div class="spark">
+                <span class="meter-k">Team sales</span>
+                <svg viewBox="0 0 236 40" aria-hidden="true">
+                  <path d="M0 26 L30 29 L60 23 L90 28 L120 24 L150 29 L180 25 L210 28 L236 26" class="flat" />
+                </svg>
+              </div>
+            </div>
+            <div class="lane">
+              <div class="lane-head">
+                <span class="tag tag-hot">After</span>
+                <span class="readout readout-hot">Every rep, tracked</span>
+              </div>
+              <ul class="board" data-board data-times="0 3.5 7" aria-hidden="true">
+                {reps.map((v, i) => (
+                  <li data-vals={v.join(' ')} style={`--v:${v[2]};--rank:${[...reps].sort((a, b) => b[2] - a[2]).indexOf(v)}`}>
+                    <svg viewBox="0 0 12 16"><path d={person} /></svg>
+                    <span class="board-track"><span class="board-fill" /></span>
+                  </li>
+                ))}
+              </ul>
+              <div class="spark">
+                <span class="meter-k">Team sales</span>
+                <svg viewBox="0 0 236 40" aria-hidden="true">
+                  <path id={`${id}-trend`} d="M0 34 C40 33 70 30 100 24 S170 9 236 5" class="trend" style="--a:0.3;--b:7.3" />
+                  <g data-along={`#${id}-trend`} data-keys="0.3 0, 7.3 1" transform="translate(236 5)">
+                    <circle r="3.5" class="trend-dot" />
+                  </g>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="rv-split">
+          <div>
+            <span class="rv-k">Average monthly team sales</span>
+            <p class="rv-num rv-num-sm"><strong>~$316K</strong></p>
+          </div>
+          <div>
+            <span class="rv-k">Representatives, one system</span>
+            <p class="rv-num rv-num-sm"><strong>16</strong> <small>tracked</small></p>
+          </div>
+        </div>
+        <p class="rv-note">Individual rep bars are illustrative.</p>
+      </>
+    )
+  }
+  {
+    id === 'digital-practice-growth' && (
+      <>
+        <div class="win">
+          <div class="win-bar" aria-hidden="true"><span class="win-dots"><i /><i /><i /></span><span>Practice revenue, first year</span></div>
+          <div class="scene" data-scene data-loop="9" data-still="8.3" style="--loop:9;--still:8.3">
+            <div class="lane">
+              <div class="lane-head">
+                <span class="tag">Before</span>
+                <span class="readout tabular">~$150K</span>
+              </div>
+              <div class="rev-track" aria-hidden="true"><span class="rev-fill" style="--w:0.15" /></div>
+              <p class="lane-foot">Traditional advisory work</p>
+            </div>
+            <div class="lane">
+              <div class="lane-head">
+                <span class="tag tag-hot">After</span>
+                <span class="readout readout-hot tabular swap">
+                  <span class="dn" style="--d:7.05"><span data-count="0.4 150, 7 990" data-fmt="~${}K">~$990K</span></span>
+                  <span class="ap" style="--a:7.05">~$1M</span>
+                </span>
+              </div>
+              <div class="rev-track ends" aria-hidden="true">
+                <span class="rev-fill rev-grow" />
+                <span class="rev-ticks">{twelve.map(() => <i />)}</span>
+              </div>
+              <ul class="chips ends" aria-hidden="true">
+                {['Digital twins', 'Analytics', 'Transformation platforms', 'Enterprise clients'].map((c, k) => (
+                  <li class="chip pop" style={`--a:${(1.4 + k * 1.5).toFixed(1)}`}>{c}</li>
+                ))}
+              </ul>
+              <p class="lane-foot lane-foot-hot ends"><span class="ap" style="--a:7.05">In under a year.</span></p>
+            </div>
+          </div>
+        </div>
+        <div class="rv-split">
+          <div>
+            <span class="rv-k">Practice revenue in under a year</span>
+            <p class="rv-num rv-num-sm"><s>~$150K</s> <strong>~$1M</strong></p>
+          </div>
+          <div>
+            <span class="rv-k">Digital twins, analytics, platforms</span>
+            <p class="rv-num rv-num-sm"><strong>New</strong> <small>capabilities</small></p>
+          </div>
+        </div>
+      </>
+    )
+  }
+
+  {
+    id === 'momentum-exchange-prototype' && (
+      <>
+        <div class="win">
+          <div class="win-bar" aria-hidden="true"><span class="win-dots"><i /><i /><i /></span><span>Moving cargo, one trip</span></div>
+          <div class="scene" data-scene data-loop="9" data-still="8.3" style="--loop:9;--still:8.3">
+            <div class="lane">
+              <div class="lane-head">
+                <span class="tag">Before</span>
+                <span class="readout tabular">100% payload</span>
+              </div>
+              <svg class="lane-svg" viewBox="0 0 440 60" aria-hidden="true">
+                <path d="M20 46 H420" class="track" />
+                <g class="ends">
+                  <g data-move="24 40 330 40 0.4 7.6" transform="translate(24 40)">
+                    <rect x="0" y="-6" width="80" height="12" rx="6" class="pod" />
+                    {[0, 1, 2, 3, 4, 5].map((k) => (
+                      <rect x={5 + k * 12.4} y="-19" width="10" height="11" rx="1.5" class="crate" />
+                    ))}
+                  </g>
+                </g>
+              </svg>
+              <div class="meter" aria-hidden="true">
+                <span class="meter-k">Fuel</span>
+                <span class="meter-track"><span class="fuel ends" /></span>
+              </div>
+            </div>
+            <div class="lane">
+              <div class="lane-head">
+                <span class="tag tag-hot">After</span>
+                <span class="readout readout-hot tabular">
+                  <span data-count="0.4 100, 1.8 183" data-fmt="{}% payload">183% payload</span>
+                </span>
+              </div>
+              <svg class="lane-svg" viewBox="0 0 440 60" aria-hidden="true">
+                <path d="M84 46 H420" class="track" />
+                <g transform="translate(40 34)">
+                  <circle r="5" class="hub" />
+                  <g class="spin">
+                    <path d="M-28 0 H28" class="arm" />
+                    <circle cx="-28" r="4" class="arm-end" />
+                    <circle cx="28" r="4" class="arm-end" />
+                  </g>
+                </g>
+                <g class="ends">
+                  <g data-move="84 40 274 40 1.2 7.6" transform="translate(84 40)">
+                    <rect x="0" y="-6" width="142" height="12" rx="6" class="pod pod-hot" />
+                    {Array.from({ length: 11 }, (_, k) => (
+                      <rect x={5 + k * 12.4} y="-19" width="10" height="11" rx="1.5" class="crate crate-hot pop" style={`--a:${(0.4 + k * 0.12).toFixed(2)}`} />
+                    ))}
+                  </g>
+                </g>
+              </svg>
+              <div class="meter" aria-hidden="true">
+                <span class="meter-k">Fuel</span>
+                <span class="meter-track"><span class="fuel fuel-hot ends" /></span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="rv-split">
+          <div>
+            <span class="rv-k">Tracking precision of the prototype</span>
+            <p class="rv-num rv-num-sm"><strong>5mm</strong></p>
+          </div>
+          <div>
+            <span class="rv-k">After testing and redesign</span>
+            <p class="rv-num rv-num-sm"><strong>7x</strong> <small>more accurate</small></p>
+          </div>
+        </div>
+        <p class="rv-note">Illustration of the concept. Same fuel, up to 83% more cargo per trip.</p>
+      </>
+    )
+  }
+
+  {
+    id === 'commission-automation' && (
+      <>
+        <div class="win">
+          <div class="win-bar" aria-hidden="true"><span class="win-dots"><i /><i /><i /></span><span>Calculating commissions</span></div>
+          <div class="scene" data-scene data-loop="10" data-still="9.3" style="--loop:10;--still:9.3">
+            <div class="lane">
+              <div class="lane-head">
+                <span class="tag">Before</span>
+                <span class="readout">Manual spreadsheets</span>
+              </div>
+              <div class="sheet ends" aria-hidden="true">
+                {Array.from({ length: 40 }, (_, k) => (
+                  <span class="sc" style={`--a:${(0.3 + k * 0.18).toFixed(2)}`} />
+                ))}
+              </div>
+            </div>
+            <div class="lane">
+              <div class="lane-head">
+                <span class="tag tag-hot">After</span>
+                <span class="readout readout-hot swap">
+                  <span class="dn" style="--d:1.2">Calculating</span>
+                  <span class="ap" style="--a:1.2">Done, and auditable</span>
+                </span>
+              </div>
+              <div class="sheet sheet-hot ends" aria-hidden="true">
+                {Array.from({ length: 40 }, (_, k) => (
+                  <span class="sc" style={`--a:${(0.3 + k * 0.02).toFixed(2)}`} />
+                ))}
+              </div>
+              <p class="lane-foot lane-foot-hot ends"><span class="ap" style="--a:1.3">Every rep, every plan, calculated the same way.</span></p>
+            </div>
+          </div>
+        </div>
+        <div class="rv-split">
+          <div>
+            <span class="rv-k">Commission calculations</span>
+            <p class="rv-num rv-num-sm"><s>Excel</s> <strong>Automated</strong></p>
+          </div>
+          <div>
+            <span class="rv-k">Scheduled go-live</span>
+            <p class="rv-num rv-num-sm"><strong>January 2027</strong></p>
+          </div>
+        </div>
+      </>
+    )
+  }
+</figure>
+
+<script>
+  import { initScenes } from '../scripts/scenes';
+  initScenes();
+  document.addEventListener('spockhart:view', initScenes);
+</script>
+
+<style>
+  .rv {
+    position: relative;
+    display: grid;
+    gap: var(--s-5);
+    align-content: start;
+    margin: 0;
+    padding: clamp(1rem, 0.6rem + 1.6vw, 2rem);
+    border-radius: var(--radius-lg);
+    background: var(--brand);
+    color: #fff;
+    overflow: hidden;
+    isolation: isolate;
+    --hot: #8ec0e6;
+    --dim: rgb(255 255 255 / 0.2);
+    --soft: #d9e6f2;
+    --muted: #9fb6cb;
+  }
+  .rv::before {
+    content: '';
+    position: absolute;
+    width: 460px;
+    height: 460px;
+    right: -200px;
+    top: -220px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgb(184 204 224 / 0.2), transparent 70%);
+    z-index: -1;
+  }
+
+  /* ---------- The window ---------- */
+  .win {
+    border-radius: 10px;
+    background: #173f5c;
+    border: 1px solid rgb(255 255 255 / 0.12);
+    box-shadow: 0 24px 48px -28px rgb(4 18 30 / 0.7);
+    overflow: hidden;
+  }
+  .win-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.55rem 0.9rem;
+    background: #133650;
+    border-bottom: 1px solid rgb(255 255 255 / 0.08);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+  }
+  .win-dots { display: flex; gap: 5px; }
+  .win-dots i { width: 8px; height: 8px; border-radius: 50%; background: rgb(255 255 255 / 0.18); }
+
+  /* ---------- Scene timing helpers ---------- */
+  .scene { --t: var(--still, 0); display: grid; }
+  .ap { opacity: clamp(0, (var(--t) - var(--a, 0)) * 6, 1); }
+  .ghost { opacity: calc(0.28 + 0.72 * clamp(0, (var(--d) - var(--t)) * 3, 1)); }
+  .dn { opacity: clamp(0, (var(--d) - var(--t)) * 6, 1); }
+  /* Everything that moves fades out just before the loop restarts */
+  .ends { opacity: clamp(0, (var(--loop) - 0.3 - var(--t)) * 5, 1); }
+  .pop {
+    opacity: clamp(0, (var(--t) - var(--a)) * 6, 1);
+    transform: scale(calc(0.4 + 0.6 * clamp(0, (var(--t) - var(--a)) * 5, 1)));
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+  .grow {
+    transform: scaleX(clamp(0, (var(--t) - var(--a)) / (var(--b) - var(--a)), 1));
+    transform-box: fill-box;
+    transform-origin: left center;
+  }
+  .swap { display: inline-grid; justify-items: end; }
+  .swap > * { grid-area: 1 / 1; }
+
+  /* ---------- Lanes ---------- */
+  .lane { display: grid; gap: 0.75rem; align-content: start; padding: 1rem 1.1rem 1.1rem; min-width: 0; }
+  .lane + .lane { border-top: 1px solid rgb(255 255 255 / 0.08); }
+  .panes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  /* Keep meters and sparklines level across the two panes */
+  .panes .lane { grid-template-rows: auto 1fr auto; }
+  .panes .lane + .lane { border-top: 0; border-left: 1px solid rgb(255 255 255 / 0.08); }
+  .lane-head { display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; min-height: 1.75rem; }
+  .tag {
+    flex: none;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.1);
+    color: var(--muted);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .tag-hot { background: var(--hot); color: var(--brand); }
+  .readout {
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    line-height: 1.1;
+    color: var(--muted);
+    font-variant-numeric: lining-nums tabular-nums;
+    text-align: right;
+    white-space: nowrap;
+  }
+  .readout-hot { color: #fff; font-weight: 550; }
+  .sep { opacity: 0.6; }
+  .lane-foot { font-size: 0.8125rem; color: var(--muted); min-height: 1.2em; }
+  .lane-foot-hot { color: var(--soft); }
+
+  /* Feasibility: twelve months vs twelve finished assessments */
+  .cells { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 4px; }
+  .cell { position: relative; height: 34px; border-radius: 3px; background: rgb(255 255 255 / 0.06); overflow: hidden; }
+  .cell-fill {
+    position: absolute;
+    inset: 0;
+    background: rgb(255 255 255 / 0.22);
+    transform-origin: left center;
+    transform: scaleX(clamp(0, (var(--t) - 0.2 - var(--i) * 0.683) / 0.683, 1));
+  }
+  .cell-hot { display: grid; place-items: center; background: rgb(142 192 230 / calc(0.08 + 0.14 * clamp(0, (var(--t) - var(--a)) * 4, 1))); }
+  .cell-doc { width: 58%; max-width: 16px; height: auto; overflow: visible; }
+  .cell-doc path { fill: var(--hot); }
+  .cell-doc .tick { fill: none; stroke: var(--brand); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* Shared SVG pieces */
+  .lane-svg, .pane-svg, .chain-svg { width: 100%; height: auto; overflow: visible; }
+  .node { fill: #21506f; stroke: rgb(255 255 255 / 0.3); stroke-width: 1.2; }
+  .node-on { fill: var(--hot); }
+  .node-tick { fill: none; stroke: var(--brand); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+  .node-label { font-family: var(--font-body); font-size: 12px; fill: var(--muted); }
+  .node-label-hot { fill: var(--soft); }
+  .arc { fill: none; stroke: rgb(255 255 255 / 0.18); stroke-width: 1.2; stroke-dasharray: 3 5; }
+  .doc-dim { fill: #e3ecf4; }
+  .doc-hot { fill: #fff; }
+  .pipe { fill: none; stroke: rgb(255 255 255 / 0.15); stroke-width: 3; stroke-linecap: round; }
+  .pipe-on { fill: none; stroke: var(--hot); stroke-width: 3; stroke-linecap: round; }
+
+  /* Production floor */
+  .zone { fill: rgb(255 255 255 / 0.04); stroke: rgb(255 255 255 / 0.12); }
+  .route { fill: none; stroke: rgb(255 255 255 / 0.35); stroke-width: 1.4; stroke-dasharray: 4 5; }
+  .station { fill: rgb(255 255 255 / 0.16); }
+  .station-on { fill: rgb(142 192 230 / 0.35); }
+  .flow { fill: none; stroke: rgb(255 255 255 / 0.55); stroke-width: 2; }
+  .item { fill: #c3d3e2; }
+  .item-hot { fill: #fff; }
+  .check { fill: var(--hot); }
+  .check-tick { fill: none; stroke: var(--brand); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+  .meter { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.6rem; align-items: center; }
+  .meter-k { font-size: 0.75rem; color: var(--muted); }
+  .meter-track { position: relative; height: 10px; border-radius: 5px; background: rgb(255 255 255 / 0.08); }
+  .meter-fill {
+    position: absolute;
+    inset: 0;
+    border-radius: 5px;
+    background: rgb(255 255 255 / 0.3);
+    transform-origin: left center;
+    transform: scaleX(calc(var(--max) * clamp(0, var(--t) / var(--dur), 1)));
+  }
+  .meter-fill-hot { background: var(--hot); }
+  .meter-target { position: absolute; left: 80%; top: -5px; bottom: -5px; width: 2px; background: #fff; border-radius: 1px; }
+  .meter-target i { position: absolute; bottom: calc(100% + 2px); left: 50%; transform: translateX(-50%); font-style: normal; font-size: 0.625rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+  .panes .meter { margin-top: 0.75rem; }
+
+  /* Supply chain */
+  .stages { justify-content: flex-start; gap: 0.5rem; }
+  .stage {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.25rem 0.7rem 0.25rem 0.3rem;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.08);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--soft);
+    isolation: isolate;
+  }
+  .stage-on {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: rgb(142 192 230 / 0.32);
+    box-shadow: inset 0 0 0 1px var(--hot);
+    z-index: -1;
+    opacity: calc(clamp(0, (var(--t) - var(--a)) * 6, 1) * clamp(0, (var(--b) - var(--t)) * 6, 1));
+  }
+  .stage-n { display: grid; place-items: center; width: 1.25rem; height: 1.25rem; border-radius: 50%; background: rgb(255 255 255 / 0.14); font-size: 0.6875rem; }
+  .corner { font-family: var(--font-body); font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; fill: var(--muted); }
+  .corner-hot { fill: var(--hot); }
+  .link {
+    fill: none;
+    stroke: rgb(255 255 255 / 0.3);
+    stroke-width: 1.2;
+    stroke-dasharray: calc(var(--len) * 1px) calc(var(--len) * 1px);
+    stroke-dashoffset: calc(var(--len) * 1px * (1 - clamp(0, (var(--t) - var(--a)) * 2, 1)));
+  }
+  .hq { fill: var(--soft); }
+  .hq-label { font-family: var(--font-body); font-size: 10px; font-weight: 700; fill: var(--brand); }
+  .ring-base { fill: none; stroke: rgb(255 255 255 / 0.1); stroke-width: 3; }
+  .ring {
+    fill: none;
+    stroke: var(--soft);
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-dasharray: calc(var(--s) * 75.4px * clamp(0, (var(--t) - var(--a)) / 0.9, 1)) 100px;
+  }
+  .ring-hot { stroke: var(--hot); }
+  .site { fill: #c3d3e2; }
+  .site-hot { fill: #fff; }
+  .bar { fill: rgb(255 255 255 / 0.28); }
+  .bar-hot { fill: var(--hot); }
+  .rank-n { font-family: var(--font-body); font-size: 12px; font-weight: 700; fill: var(--muted); }
+  .rank-hot { fill: #fff; }
+
+  /* Sales */
+  .rep { fill: rgb(255 255 255 / 0.35); }
+  .bubble-c { fill: rgb(255 255 255 / 0.12); stroke: rgb(255 255 255 / 0.3); }
+  .bubble-q { font-family: var(--font-display); font-size: 12px; font-weight: 600; fill: var(--soft); }
+  .board { list-style: none; padding: 0; position: relative; height: calc(6 * 26px); }
+  .board li {
+    position: absolute;
+    inset: 0 0 auto;
+    display: grid;
+    grid-template-columns: 12px minmax(0, 1fr);
+    gap: 10px;
+    align-items: center;
+    height: 20px;
+    transform: translateY(calc(var(--rank) * 26px));
+    transition: transform 700ms var(--ease-out);
+  }
+  .board svg { width: 12px; height: 16px; fill: rgb(255 255 255 / 0.55); }
+  .board-track { position: relative; height: 12px; border-radius: 3px; background: rgb(255 255 255 / 0.06); }
+  .board-fill { position: absolute; inset: 0; border-radius: 3px; background: rgb(255 255 255 / 0.3); transform-origin: left center; transform: scaleX(var(--v)); }
+  .board li[data-rank='0'] .board-fill { background: var(--hot); }
+  .board li[data-rank='0'] svg { fill: #fff; }
+  .spark { display: grid; gap: 0.25rem; margin-top: 0.5rem; }
+  .spark svg { width: 100%; height: auto; overflow: visible; }
+  .flat { fill: none; stroke: rgb(255 255 255 / 0.35); stroke-width: 2; stroke-dasharray: 4 5; stroke-linejoin: round; }
+  .trend {
+    fill: none;
+    stroke: var(--hot);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-dasharray: 260px 260px;
+    stroke-dashoffset: calc(260px * (1 - clamp(0, (var(--t) - var(--a)) / (var(--b) - var(--a)), 1)));
+  }
+  .trend-dot { fill: #fff; }
+
+  /* Revenue growth */
+  .rev-track { position: relative; height: 30px; border-radius: 4px; background: rgb(255 255 255 / 0.06); overflow: hidden; }
+  .rev-fill { position: absolute; inset: 0; border-radius: 4px; background: rgb(255 255 255 / 0.24); transform-origin: left center; transform: scaleX(var(--w)); }
+  .rev-grow { background: var(--hot); transform: scaleX(calc(0.15 + 0.85 * clamp(0, (var(--t) - 0.4) / 6.6, 1))); }
+  .rev-ticks { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(12, 1fr); }
+  .rev-ticks i { border-right: 1px solid rgb(23 63 92 / 0.45); }
+  .rev-ticks i:last-child { border-right: 0; }
+  .chips { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 0.4rem; min-height: 1.6rem; }
+  .chip { padding: 0.2rem 0.6rem; border-radius: 999px; background: rgb(142 192 230 / 0.18); box-shadow: inset 0 0 0 1px rgb(142 192 230 / 0.5); font-size: 0.75rem; font-weight: 600; color: var(--soft); }
+
+  /* Cargo */
+  .track { fill: none; stroke: rgb(255 255 255 / 0.2); stroke-width: 1.5; stroke-dasharray: 3 6; }
+  .pod { fill: rgb(255 255 255 / 0.3); }
+  .pod-hot { fill: #fff; }
+  .crate { fill: rgb(255 255 255 / 0.22); }
+  .crate-hot { fill: var(--hot); }
+  .hub { fill: var(--soft); }
+  .arm { stroke: var(--soft); stroke-width: 2; stroke-linecap: round; }
+  .arm-end { fill: var(--hot); }
+  .spin { transform: rotate(calc(var(--t) * 160deg)); }
+  .fuel { position: absolute; inset: 0; border-radius: 5px; background: rgb(255 255 255 / 0.3); transform-origin: left center; transform: scaleX(calc(1 - 0.9 * clamp(0, (var(--t) - 0.4) / 7.2, 1))); }
+  .fuel-hot { background: var(--hot); }
+
+  /* Commissions */
+  .sheet { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 3px; }
+  .sc {
+    position: relative;
+    height: 16px;
+    border-radius: 2px;
+    background: rgb(255 255 255 / calc(0.05 + 0.17 * clamp(0, (var(--t) - var(--a)) * 8, 1)));
+  }
+  /* The cell being typed into */
+  .sc::after {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: 2px;
+    box-shadow: inset 0 0 0 1.5px #fff;
+    opacity: calc(clamp(0, (var(--t) - var(--a) + 0.18) * 12, 1) * clamp(0, (var(--a) - var(--t)) * 12, 1));
+  }
+  .sheet-hot .sc { background: rgb(142 192 230 / calc(0.08 + 0.72 * clamp(0, (var(--t) - var(--a)) * 10, 1))); }
+  .sheet-hot .sc::after { display: none; }
+
+  /* ---------- Stats under the window ---------- */
+  .rv-k { font-size: 0.8125rem; color: var(--soft); }
+  .rv-split { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-4); }
+  .rv-split > div { display: grid; gap: 0.2rem; }
+  .rv-num { font-family: var(--font-display); font-size: clamp(1.75rem, 1.3rem + 1.4vw, 2.5rem); line-height: 1.05; letter-spacing: -0.02em; font-variant-numeric: lining-nums; }
+  .rv-num-sm { font-size: clamp(1.375rem, 1.1rem + 0.9vw, 1.875rem); white-space: nowrap; }
+  .rv-num s { color: var(--soft); text-decoration-thickness: 2px; font-size: 0.7em; margin-right: 0.2em; }
+  .rv-num small { font-family: var(--font-body); font-size: 0.875rem; letter-spacing: 0; color: var(--soft); }
+  .rv-note { font-size: 0.75rem; color: #bcd6ec; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .bubble { animation: bob 2.4s ease-in-out infinite; animation-delay: calc(var(--i) * -0.4s); }
+    @keyframes bob { 50% { transform: translateY(-3px); opacity: 0.6; } }
+  }
+
+  @media (max-width: 560px) {
+    .panes { grid-template-columns: minmax(0, 1fr); }
+    .panes .lane + .lane { border-left: 0; border-top: 1px solid rgb(255 255 255 / 0.08); }
+    .lane { padding: 0.85rem 0.9rem 1rem; }
+    .readout { font-size: 1rem; }
+    .cells { gap: 3px; }
+    .cell { height: 28px; }
+    .rv-split { grid-template-columns: minmax(0, 1fr); }
+    .lane-svg .node-label { font-size: 17px; }
+    .chain-svg .corner, .chain-svg .rank-n { font-size: 19px; }
+    .stage { font-size: 0.75rem; padding-right: 0.55rem; }
+  }
+</style>

@@ -1,0 +1,176 @@
+---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import WorkCard from '../../components/WorkCard.astro';
+import ResultVisual from '../../components/ResultVisual.astro';
+import Mist from '../../components/Mist.astro';
+import ClosingCTA from '../../components/ClosingCTA.astro';
+
+export async function getStaticPaths() {
+  const entries = (await getCollection('work')).sort((a, b) => a.data.order - b.data.order);
+  return entries.map((entry, i) => ({
+    params: { slug: entry.id },
+    props: { entry, next: entries[(i + 1) % entries.length] },
+  }));
+}
+
+interface Props {
+  entry: CollectionEntry<'work'>;
+  next: CollectionEntry<'work'>;
+}
+const { entry, next } = Astro.props;
+const { Content } = await render(entry);
+const d = entry.data;
+const isExperience = d.kind === 'team-experience';
+const inDevelopment = d.status === 'in-development';
+---
+
+<Base title={d.title} description={d.summary} ogType="article">
+  <article>
+    <header class="cs-hero">
+      <Mist />
+      <div class="wrap cs-hero-grid">
+      <div class="cs-hero-inner">
+        <nav class="crumbs load-in" aria-label="Breadcrumb" style="--i:0">
+          <a href="/work/">Work</a>
+          <span aria-hidden="true">/</span>
+          <span>{inDevelopment ? 'In development' : isExperience ? 'Team experience' : 'Client work'}</span>
+        </nav>
+        <h1 class="load-in" style="--i:1">{d.title}</h1>
+        <p class="lead load-in" style="--i:2">{d.summary}</p>
+        <dl class="facts load-in" style="--i:3">
+          <div><dt>Client</dt><dd>{d.client}</dd></div>
+          <div><dt>Sector</dt><dd>{d.sector}</dd></div>
+          <div><dt>Scope</dt><dd>{d.scope}</dd></div>
+        </dl>
+      </div>
+      <div class="cs-visual load-fade">
+        <ResultVisual id={entry.id} />
+      </div>
+      </div>
+    </header>
+
+    {
+      isExperience && (
+        <div class="wrap">
+          <p class="cs-note">
+            <span class="tag">{inDevelopment ? 'In development' : 'Team experience'}</span>
+            {inDevelopment
+              ? 'Being built by a member of our team in a current role. Not a Spockhart engagement. Client name withheld.'
+              : 'Led by a member of our team in a previous role, before Spockhart. Not a Spockhart engagement. Client name withheld.'}
+          </p>
+        </div>
+      )
+    }
+
+    <section class="cs-metrics-section" aria-label="Results">
+      <div class="wrap">
+        <ul class="metrics" data-reveal="stagger" style={`--n:${d.metrics.length}`}>
+          {d.metrics.map((m) => (
+            <li>
+              <span class="m-value">{m.value}</span>
+              <span class="m-label">{m.label}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    <section class="section cs-body-section">
+      <div class="wrap cs-body">
+        <div class="prose" data-reveal>
+          <Content />
+        </div>
+      </div>
+    </section>
+  </article>
+
+  <section class="section band-recessed" aria-labelledby="next-title">
+    <div class="wrap next-grid">
+      <div class="stack">
+        <p class="eyebrow">Next</p>
+        <h2 id="next-title" class="next-title">More from our team.</h2>
+        <a class="arrow-link" href="/work/"><span>All work</span><span class="arr" aria-hidden="true">→</span></a>
+      </div>
+      <div class="next-card">
+        <WorkCard entry={next} />
+      </div>
+    </div>
+  </section>
+
+  <ClosingCTA />
+</Base>
+
+<style>
+  .cs-hero {
+    padding-top: clamp(8.5rem, 6rem + 6vw, 11.5rem);
+    padding-bottom: clamp(3rem, 2rem + 3vw, 4.5rem);
+    border-bottom: 1px solid var(--rule);
+  }
+  .cs-hero { position: relative; overflow: hidden; isolation: isolate; }
+  .cs-hero > .wrap { position: relative; z-index: 1; }
+  .cs-hero-grid { display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 6fr); gap: var(--s-7); align-items: center; }
+  .cs-hero-inner { display: grid; gap: var(--s-5); }
+  .cs-hero h1 { font-size: clamp(2.125rem, 1.6rem + 2vw, 3.25rem); max-width: 20ch; }
+  .cs-visual { min-width: 0; }
+  .crumbs { display: flex; gap: 0.6rem; font-size: 0.875rem; color: var(--ink-3); }
+  .crumbs a { color: var(--ink-2); text-decoration: none; }
+  .crumbs a:hover { color: var(--ink); text-decoration: underline; text-decoration-color: var(--accent-soft); text-underline-offset: 3px; }
+  .facts {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--s-4);
+    margin-top: var(--s-3);
+    padding-top: var(--s-5);
+    border-top: 1px solid var(--rule);
+    max-width: 900px;
+  }
+  .facts dt { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); }
+  .facts dd { margin-top: 0.3rem; font-weight: 500; }
+  .cs-note {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 0.9rem;
+    padding-block: var(--s-4);
+    border-bottom: 1px solid var(--rule);
+    font-size: 0.9375rem;
+    color: var(--ink-2);
+  }
+  .metrics {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(var(--n, 3), minmax(0, 1fr));
+    gap: var(--s-6);
+  }
+  .cs-metrics-section { padding-top: clamp(2.5rem, 1.5rem + 3vw, 4rem); }
+  .metrics li { display: grid; gap: var(--s-2); padding-top: var(--s-4); border-top: 1px solid var(--ink); align-content: start; }
+  .m-value {
+    font-family: var(--font-display);
+    font-size: clamp(1.625rem, 1.2rem + 1.3vw, 2.375rem);
+    font-weight: 450;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    font-variant-numeric: lining-nums;
+  }
+  .m-label { color: var(--ink-2); max-width: 30ch; }
+  .cs-body-section { padding-top: clamp(2.5rem, 1.5rem + 3vw, 4rem); }
+  .cs-body { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 9fr); }
+  .cs-body .prose { grid-column: 2; }
+  .next-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: var(--s-7); align-items: start; }
+  .next-title { font-size: var(--step-3); }
+  .next-card { display: grid; }
+  @media (max-width: 960px) {
+    .cs-hero-grid { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (max-width: 1080px) {
+    .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 860px) {
+    .facts, .metrics { grid-template-columns: minmax(0, 1fr); }
+    .cs-body { grid-template-columns: minmax(0, 1fr); }
+    .cs-body .prose { grid-column: 1; }
+    .next-grid { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>

@@ -1,0 +1,27 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import Timeline from '../components/Timeline.astro';
+import { site } from '../config/site';
+---
+
+<Base
+  title="Approach"
+  description={`How Spockhart works: embedded with your team, a working prototype in ${site.offer.prototypeDays} days, and systems you own.`}
+>
+  <PageHero
+    eyebrow="Approach"
+    title="Embedded from day one."
+    lead={`Every engagement runs the same way. We work inside your team, prove value with a working prototype in ${site.offer.prototypeDays} days, then build it out and hand it over.`}
+  />
+
+  <section class="section band-recessed" aria-labelledby="engagement-title">
+    <div class="wrap">
+      <div class="section-head" data-reveal>
+        <p class="eyebrow">The engagement</p>
+        <h2 id="engagement-title">Four phases.</h2>
+      </div>
+      <Timeline />
+    </div>
+  </section>
+</Base>

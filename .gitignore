@@ -1,3 +1,5 @@
 node_modules
 dist
+portable
+.astro
 .DS_Store

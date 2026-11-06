@@ -1,0 +1,30 @@
+---
+import Document from '../layouts/Document.astro';
+import { site } from '../config/site';
+---
+
+<Document
+  title="Accessibility"
+  eyebrow="Trust"
+  lead="We want everyone to be able to use this website, including people who use assistive technology."
+  description="Spockhart's accessibility commitment for spockhart.com."
+  updated="November 5, 2026"
+>
+  <h2>Our standard</h2>
+  <p>We design and build this website to meet the Web Content Accessibility Guidelines (WCAG) 2.1 at level AA.</p>
+
+  <h2>What that means in practice</h2>
+  <ul>
+    <li>Every page can be used with a keyboard alone, with a visible focus indicator.</li>
+    <li>Text meets AA contrast requirements.</li>
+    <li>Pages use proper headings, landmarks and labels so screen readers can navigate them.</li>
+    <li>Animation is subtle and turns off when your device is set to reduce motion.</li>
+    <li>Layouts reflow to a single column on small screens and when text is enlarged.</li>
+  </ul>
+
+  <h2>Tell us what is not working</h2>
+  <p>
+    If something on this site is hard to use, email <a href={`mailto:${site.email}`}>{site.email}</a> with the page and what happened.
+    We will reply within {site.offer.replyWithin} and fix what we can.
+  </p>
+</Document>
