@@ -61,7 +61,7 @@ const {
 <style>
   .photo-band { --overlap: clamp(3rem, 1.5rem + 5vw, 6rem); padding-block: clamp(2.5rem, 1.5rem + 3vw, 4.5rem) clamp(2.5rem, 1.5rem + 3vw, 4rem);
   }
-  :global(.section) + .photo-band { padding-top: 0; }
+  :global(.section) + .photo-band { padding-top: 0; margin-top: calc(var(--section) * -0.5); }
   .band { position: relative; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); padding-bottom: var(--overlap); }
   .band-media { position: relative; grid-column: 1 / -1; grid-row: 1; }
   .band-card {
