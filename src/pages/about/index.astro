@@ -5,6 +5,8 @@ import AdvisorCard from '../../components/AdvisorCard.astro';
 import ClosingCTA from '../../components/ClosingCTA.astro';
 import { advisors } from '../../data/advisors';
 import { site } from '../../config/site';
+import Photo from '../../components/Photo.astro';
+import { aboutPhotos, team } from '../../data/photos';
 ---
 
 <Base title="About" description="Spockhart is a Toronto engineering firm that takes tedious, repetitive tasks out of how organizations run.">
@@ -14,13 +16,17 @@ import { site } from '../../config/site';
     lead="Spockhart is a Toronto engineering firm built on a simple idea: the careful engineering that makes large organizations run well should be working for everyone else too."
   />
 
+  <section class="lead-photo" aria-label="The team at work">
+    <div class="wrap" data-reveal>
+      <Photo {...aboutPhotos.wide} ratio="21 / 9" sizes="(min-width: 1240px) 1240px, 100vw" eager />
+    </div>
+  </section>
+
   <section class="section" aria-labelledby="story-title">
-    <div class="wrap split">
-      <div class="split-head" data-reveal>
+    <div class="wrap story-grid">
+      <div class="story" data-reveal>
         <p class="eyebrow">Why we started</p>
         <h2 id="story-title">The same problem, everywhere we looked.</h2>
-      </div>
-      <div class="story" data-reveal>
         <p class="lead">
           Our team spent years building systems for large organizations: platforms, marketplaces, even hardware for space. Outside
           of work, we volunteered and gave to causes we care about.
@@ -32,6 +38,50 @@ import { site } from '../../config/site';
         </p>
         <blockquote>We started Spockhart to fix it.</blockquote>
       </div>
+      <div class="story-photo" data-reveal>
+        <Photo {...aboutPhotos.story} ratio="4 / 5" sizes="(min-width: 1000px) 40vw, 100vw" />
+      </div>
+    </div>
+  </section>
+
+  <section class="section band-recessed" aria-labelledby="work-title">
+    <div class="wrap">
+      <div class="section-head" data-reveal>
+        <p class="eyebrow">How we work</p>
+        <h2 id="work-title">In the room, not behind a slide deck.</h2>
+        <p>
+          We spend our time where the work happens: on the floor, at the whiteboard, and next to the people who will run what we
+          build.
+        </p>
+      </div>
+      <div class="mosaic" data-reveal="stagger">
+        <Photo {...aboutPhotos.floor} ratio="4 / 3" caption="On the floor with your team" class="m-big" sizes="(min-width: 1000px) 60vw, 100vw" />
+        <Photo {...aboutPhotos.map} ratio="3 / 2" caption="Mapping how the work really flows" sizes="(min-width: 1000px) 35vw, 100vw" />
+        <Photo {...aboutPhotos.training} ratio="3 / 2" caption="Training the people who will own it" sizes="(min-width: 1000px) 35vw, 100vw" />
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="team-title">
+    <div class="wrap">
+      <div class="section-head" data-reveal>
+        <p class="eyebrow">The team</p>
+        <h2 id="team-title">The people you’ll work with.</h2>
+      </div>
+      <ul class="team" data-reveal="stagger">
+        {
+          team.map((m) => (
+            <li>
+              <Photo {...m.photo} ratio="4 / 5" sizes="(min-width: 1000px) 30vw, 100vw" />
+              <div class="member">
+                <h3>{m.name}</h3>
+                <p class="member-role">{m.role}</p>
+                <p class="member-line">{m.line}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
     </div>
   </section>
 
@@ -58,10 +108,13 @@ import { site } from '../../config/site';
 </Base>
 
 <style>
-  .story { display: grid; gap: var(--s-5); max-width: 64ch; }
-  .story p:not(.lead) { color: var(--ink-2); }
+  .lead-photo { padding-top: var(--s-7); }
+  .story-grid { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--s-8); align-items: center; }
+  .story { display: grid; gap: var(--s-5); max-width: 62ch; }
+  .story h2 { font-size: var(--step-4); }
+  .story p:not(.lead):not(.eyebrow) { color: var(--ink-2); }
   .story blockquote {
-    margin-top: var(--s-3);
+    margin-top: var(--s-2);
     padding-left: var(--s-5);
     border-left: 2px solid var(--accent-soft);
     font-family: var(--font-display);
@@ -70,5 +123,22 @@ import { site } from '../../config/site';
     letter-spacing: -0.01em;
     color: var(--ink);
   }
+  .mosaic { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); grid-template-rows: auto auto; gap: var(--s-5); }
+  .mosaic :global(.m-big) { grid-row: span 2; }
+  .mosaic :global(.m-big .photo-img), .mosaic :global(.m-big .photo-ph) { height: 100%; aspect-ratio: auto; min-height: 100%; }
+  .team { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s-6); }
+  .member { display: grid; gap: 0.15rem; margin-top: var(--s-4); }
+  .member h3 { font-size: var(--step-2); }
+  .member-role { font-size: 0.8125rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); }
+  .member-line { color: var(--ink-2); margin-top: var(--s-2); }
   .board { row-gap: var(--s-7); }
+  @media (max-width: 900px) {
+    .story-grid, .mosaic { grid-template-columns: minmax(0, 1fr); gap: var(--s-6); }
+    .mosaic :global(.m-big) { grid-row: auto; }
+    .mosaic :global(.m-big .photo-img), .mosaic :global(.m-big .photo-ph) { aspect-ratio: 4 / 3; height: auto; }
+    .team { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (min-width: 600px) and (max-width: 900px) {
+    .team { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
 </style>
