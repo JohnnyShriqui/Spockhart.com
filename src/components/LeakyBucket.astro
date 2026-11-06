@@ -12,8 +12,10 @@ interface Leak {
 }
 interface Props {
   leaks: Leak[];
+  /** Label on the pipe, e.g. 'Revenue in' or 'Donations in' */
+  inflow?: string;
 }
-const { leaks } = Astro.props;
+const { leaks, inflow = 'Revenue in' } = Astro.props;
 
 // Bucket geometry (viewBox 0 0 520 470)
 const CX = 249;
@@ -69,7 +71,7 @@ const jets = leaks.map((l) => {
     <text x={CX} y="462" class="bk-cap" text-anchor="middle">Lost to tedious, repetitive tasks</text>
 
     <!-- Revenue pipe -->
-    <text x="30" y="14" class="bk-cap">Revenue in</text>
+    <text x="30" y="14" class="bk-cap">{inflow}</text>
     <path d={`M30 26 H${CX - 11} A22 22 0 0 1 ${CX + 11} 48 V80 H${CX - 11} V52 A4 4 0 0 0 ${CX - 15} 48 H30 Z`} class="bk-pipe" />
     <rect x="24" y="20" width="10" height="34" rx="2" class="bk-pipe" />
     <rect x={CX - 15} y="74" width="30" height="8" rx="2" class="bk-pipe" />

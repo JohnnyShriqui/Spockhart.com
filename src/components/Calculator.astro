@@ -6,6 +6,22 @@
  */
 import { inputs, compute, describeDays, iconScale, WEEKS_PER_YEAR, type Values } from '../lib/calc';
 
+interface Props {
+  title?: string;
+  resultLabel?: string;
+  /** Words around the hours figure under the big number */
+  hoursBefore?: string;
+  hoursAfter?: string;
+  cta?: string;
+}
+const {
+  title = 'How much time is your team losing to tedious, repetitive tasks?',
+  resultLabel = 'Every year, tedious, repetitive tasks cost you',
+  hoursBefore = 'in wages, across',
+  hoursAfter = 'of manual, repetitive work.',
+  cta = 'Get that time back',
+} = Astro.props;
+
 const start = Object.fromEntries(inputs.map((f) => [f.key, f.value])) as Values;
 const r = compute(start);
 const money = (n: number) =>
@@ -28,7 +44,7 @@ const iconFill = (i: number) => Math.max(0, Math.min(1, fteIcons - i));
       <div class="calc-left">
         <div class="calc-head">
           <p class="eyebrow">Calculator</p>
-          <h2 id="calc-title">How much time is your team losing to tedious, repetitive tasks?</h2>
+          <h2 id="calc-title">{title}</h2>
         </div>
 
         <form class="calc-inputs" data-calc-form onsubmit="return false" aria-label="Calculator inputs">
@@ -63,11 +79,10 @@ const iconFill = (i: number) => Math.max(0, Math.min(1, fteIcons - i));
       </div>
 
       <div class="calc-right">
-        <p class="r-label">Every year, tedious, repetitive tasks cost you</p>
+        <p class="r-label">{resultLabel}</p>
         <p class="r-big tabular"><span data-out="cost">{money(r.cost)}</span></p>
         <p class="r-sub">
-          in wages, across <strong><span class="tabular" data-out="hours">{num(r.hours)}</span> hours</strong> of manual,
-          repetitive work.
+          {hoursBefore} <strong><span class="tabular" data-out="hours">{num(r.hours)}</span> hours</strong> {hoursAfter}
         </p>
 
         <div class="r-viz">
@@ -104,7 +119,7 @@ const iconFill = (i: number) => Math.max(0, Math.min(1, fteIcons - i));
           <p class="team-key" data-team-key hidden={scale.per === 1}>Each figure is {scale.per} people</p>
         </div>
 
-        <a class="btn btn-on-brand" href="/contact/" data-calc-cta>Get that time back <span class="arr" aria-hidden="true">→</span></a>
+        <a class="btn btn-on-brand" href="/contact/" data-calc-cta>{cta} <span class="arr" aria-hidden="true">→</span></a>
         <p class="visually-hidden" aria-live="polite" data-calc-summary></p>
       </div>
     </div>

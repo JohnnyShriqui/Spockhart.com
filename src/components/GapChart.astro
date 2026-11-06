@@ -1,0 +1,82 @@
+---
+/**
+ * Nonprofits hero image: demand keeps rising while resources stay flat, and the
+ * gap between them grows. Then capacity added with Spockhart closes most of it.
+ * An illustration, not data. Plays on a loop through scripts/scenes.ts.
+ */
+const demand = 'M40 262 C180 236 320 154 460 66';
+const resources = 'M40 292 C180 289 320 283 460 276';
+const withUs = 'M40 292 C190 285 300 180 460 100';
+const back = 'L460 276 C320 283 180 289 40 292 Z';
+---
+
+<figure class="gap" aria-label="Illustration: demand on a nonprofit rises while resources stay flat; Spockhart closes the gap.">
+  <svg viewBox="0 0 480 360" class="scene" data-scene data-loop="10" data-still="9" style="--loop:10;--still:9">
+    <defs>
+      <pattern id="gap-hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+        <rect width="8" height="8" fill="rgb(74 138 186 / 0.07)" />
+        <path d="M0 0V8" stroke="rgb(74 138 186 / 0.35)" stroke-width="1.5" />
+      </pattern>
+    </defs>
+
+    <path d="M40 30 V320 H466" class="axis" />
+    <text x="466" y="342" class="axis-label" text-anchor="end">Time</text>
+
+    <g class="ends">
+      <path d={`${demand} ${back}`} class="gap-area fade" style="--a:1.8;--b:2.5" />
+      <path d={`${withUs} ${back}`} class="closed-area" style="--a:3.2;--b:5.4" />
+
+      <path d={resources} pathLength="100" class="line line-res draw" style="--a:0.4;--b:1.8" />
+      <path d={demand} pathLength="100" class="line line-demand draw" style="--a:0.2;--b:1.8" />
+      <path d={withUs} pathLength="100" class="line line-us draw" style="--a:3.2;--b:5.4" />
+
+      <circle cx="460" cy="66" r="5" class="dot-demand fade" style="--a:1.7;--b:2" />
+      <circle cx="460" cy="276" r="5" class="dot-res fade" style="--a:1.7;--b:2" />
+      <circle cx="460" cy="100" r="5.5" class="dot-us fade" style="--a:5.3;--b:5.6" />
+
+      <text x="452" y="50" class="label label-demand fade" text-anchor="end" style="--a:1.6;--b:2.1">Demand</text>
+      <text x="452" y="304" class="label label-res fade" text-anchor="end" style="--a:1.6;--b:2.1">Resources</text>
+      <text x="440" y="214" class="label label-us fade" text-anchor="end" style="--a:5.2;--b:5.8">With Spockhart</text>
+      <text x="300" y="232" class="label label-gap gap-word" text-anchor="middle">The gap</text>
+    </g>
+  </svg>
+</figure>
+
+<script>
+  import { initScenes } from '../scripts/scenes';
+  initScenes();
+  document.addEventListener('spockhart:view', initScenes);
+</script>
+
+<style>
+  .gap { margin: 0; width: 100%; }
+  .gap svg { width: 100%; height: auto; overflow: visible; --t: var(--still, 9); }
+  .axis { fill: none; stroke: var(--rule-2); stroke-width: 1.2; }
+  .axis-label { font-family: var(--font-body); font-size: 12px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; fill: var(--ink-3); }
+
+  .line { fill: none; stroke-linecap: round; stroke-dasharray: 100 100; }
+  .line-demand { stroke: var(--ink); stroke-width: 3; }
+  .line-res { stroke: var(--ink-3); stroke-width: 2.5; }
+  .line-us { stroke: var(--accent); stroke-width: 3.5; }
+  .gap-area { fill: url(#gap-hatch); }
+  /* The added capacity fills in behind the line as it draws */
+  .closed-area {
+    fill: rgb(74 138 186 / 0.3);
+    clip-path: inset(0 calc((1 - clamp(0, (var(--t) - var(--a)) / (var(--b) - var(--a)), 1)) * 100%) 0 0);
+  }
+  .dot-demand { fill: var(--ink); }
+  .dot-res { fill: var(--ink-3); }
+  .dot-us { fill: var(--accent); stroke: var(--paper); stroke-width: 2; }
+
+  .label { font-family: var(--font-body); font-size: 15px; font-weight: 600; }
+  .label-demand { fill: var(--ink); }
+  .label-res { fill: var(--ink-3); }
+  .label-us { fill: var(--accent); }
+  .label-gap { font-family: var(--font-display); font-size: 22px; font-weight: 500; fill: var(--accent); }
+
+  /* Timing, driven by --t (seconds into the loop) */
+  .draw { stroke-dashoffset: calc(100 * (1 - clamp(0, (var(--t) - var(--a)) / (var(--b) - var(--a)), 1))); }
+  .fade { opacity: clamp(0, (var(--t) - var(--a)) / (var(--b) - var(--a)), 1); }
+  .gap-word { opacity: calc(clamp(0, (var(--t) - 2) * 3, 1) * clamp(0, (4 - var(--t)) * 2.5, 1)); }
+  .ends { opacity: clamp(0, (var(--loop) - 0.3 - var(--t)) * 4, 1); }
+</style>

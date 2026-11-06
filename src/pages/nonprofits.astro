@@ -1,0 +1,210 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import GapChart from '../components/GapChart.astro';
+import Problems, { type Problem } from '../components/Problems.astro';
+import Calculator from '../components/Calculator.astro';
+import ClosingCTA from '../components/ClosingCTA.astro';
+import Mark from '../components/Mark.astro';
+import { site } from '../config/site';
+
+const problems: Problem[] = [
+  {
+    key: 'receipting',
+    name: 'Receipting',
+    short: 'Receipts',
+    problem: 'Tax receipts prepared and sent one donation at a time.',
+    fix: 'Every gift receipted and thanked the day it arrives.',
+    side: 'left',
+    y: 214,
+    icon: 'M6 3h12v18l-2-1.5-2 1.5-2-1.5-2 1.5-2-1.5L6 21zM9 8h6M9 11h6M9 14h4',
+  },
+  {
+    key: 'grants',
+    name: 'Grant reporting',
+    short: 'Grants',
+    problem: 'Days rebuilding the same numbers for every funder’s report.',
+    fix: 'Funder reports pull from the data you already keep.',
+    side: 'right',
+    y: 238,
+    icon: 'M7 3h7l4 4v14H7zM14 3v4h4M10 17v-3M12.5 17v-5M15 17v-2',
+  },
+  {
+    key: 'volunteers',
+    name: 'Volunteer scheduling',
+    short: 'Volunteers',
+    problem: 'Shifts filled through group texts, spreadsheets and last-minute calls.',
+    fix: 'Volunteers claim open shifts. Reminders go out on their own.',
+    side: 'left',
+    y: 272,
+    icon: 'M8.5 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM2.5 20c0-3.3 2.7-6 6-6s6 2.7 6 6M16 11a2.5 2.5 0 1 0 0-5M17 14c2.6.4 4.5 2.8 4.5 5.5',
+  },
+  {
+    key: 'intake',
+    name: 'Intake tracking',
+    short: 'Intake',
+    problem: 'Client intake on paper forms and scattered spreadsheets.',
+    fix: 'Every person tracked from first contact to outcome.',
+    side: 'right',
+    y: 298,
+    icon: 'M8 4h8v3H8zM6 5.5H5v15h14v-15h-1M8.5 11h7M8.5 14.5h7M8.5 18h4',
+  },
+  {
+    key: 'donors',
+    name: 'Donor follow-ups',
+    short: 'Donors',
+    problem: 'Pledges, lapsed donors and thank-yous waiting on someone to remember.',
+    fix: 'Every donor gets the right follow-up at the right time.',
+    side: 'left',
+    y: 330,
+    icon: 'M3 7l9 6 9-6M3 7v10a1 1 0 0 0 1 1h9M3 7a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v6M16 18h5M19 16l2 2-2 2',
+  },
+  {
+    key: 'impact',
+    name: 'Impact reporting',
+    short: 'Impact',
+    problem: 'A scramble through spreadsheets before every board meeting.',
+    fix: 'Impact numbers that are current whenever the board asks.',
+    side: 'right',
+    y: 352,
+    icon: 'M4 20h16M7 16v-4M12 16V8M17 16v-7M7 8.5l5-3.5 5 3',
+  },
+];
+
+const outcomes = [
+  {
+    title: 'More mission per dollar',
+    body: 'Staff hours move from paperwork back to programs, so the same budget delivers more.',
+  },
+  {
+    title: 'Cleaner proof of impact',
+    body: 'Funder and board reporting built from data you already collect, ready when someone asks.',
+  },
+  {
+    title: 'Systems that outlast us',
+    body: 'Documented, owned by your team, and running without heroics after we hand over.',
+  },
+];
+---
+
+<Base
+  title="Nonprofits"
+  description="Every nonprofit faces the same fundamental challenge: unlimited demand on limited resources. Spockhart closes that gap by taking tedious, repetitive tasks off your team."
+>
+  <PageHero
+    eyebrow="Nonprofits"
+    title="Engineering nonprofit impact."
+    lead="Every nonprofit faces the same fundamental challenge: unlimited demand on limited resources. We exist to close that gap."
+  >
+    <div class="btn-row">
+      <a class="btn" href="/contact/">Start a conversation <span class="arr" aria-hidden="true">→</span></a>
+    </div>
+    <GapChart slot="figure" />
+  </PageHero>
+
+  <Problems
+    items={problems}
+    inflow="Donations in"
+    eyebrow="Where the time goes"
+    more={{ label: 'How an engagement works', href: '/approach/' }}
+  />
+
+  <Calculator
+    title="How many hours could go back to your mission?"
+    resultLabel="Every year, tedious, repetitive tasks take"
+    hoursBefore="in staff time, across"
+    hoursAfter="that could go to your programs."
+    cta="Put that time back into the mission"
+  />
+
+  <section class="section" aria-labelledby="outcomes-title">
+    <div class="wrap">
+      <div class="section-head" data-reveal>
+        <p class="eyebrow">What changes</p>
+        <h2 id="outcomes-title">The same team, with time for the mission.</h2>
+      </div>
+      <ul class="outcomes" data-reveal="stagger">
+        {
+          outcomes.map((o) => (
+            <li>
+              <span class="o-mark" aria-hidden="true">
+                <Mark size={18} tone="current" />
+              </span>
+              <h3>{o.title}</h3>
+              <p>{o.body}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="section band-recessed standard" aria-labelledby="standard-title">
+    <div class="wrap standard-grid">
+      <div class="stack" data-reveal>
+        <p class="eyebrow">How it works</p>
+        <h2 id="standard-title">A full engagement, built to pay for itself.</h2>
+      </div>
+      <div class="standard-copy" data-reveal>
+        <p class="lead">
+          Nonprofit engagements run exactly like every Spockhart engagement: the same team, the same four phases, and a working
+          prototype within {site.offer.prototypeDays} days.
+        </p>
+        <p>
+          Each one is scoped to pay for itself in staff time returned to your mission, and everything we build is yours to keep.
+        </p>
+        <a class="arrow-link" href="/approach/"><span>See the four phases</span><span class="arr" aria-hidden="true">→</span></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section board" aria-labelledby="board-title">
+    <div class="wrap board-inner" data-reveal>
+      <div class="board-mark" aria-hidden="true"><Mark size={44} tone="brand" /></div>
+      <div class="board-copy">
+        <h2 id="board-title">On a nonprofit board?</h2>
+        <p>
+          Board members often see where time and money go before anyone else does. Introduce us to the team, and we will start
+          with one conversation about how the work actually gets done.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <ClosingCTA
+    title="Let’s close the gap."
+    body="Tell us where your team’s time goes. We’ll show you how much of it could go back to the mission."
+  />
+</Base>
+
+<style>
+  .outcomes { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s-5); }
+  .outcomes li {
+    --mark: #fff;
+    display: grid;
+    gap: var(--s-2);
+    align-content: start;
+    padding: var(--s-5);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+  }
+  .o-mark { display: grid; place-items: center; width: 40px; height: 46px; margin-bottom: var(--s-2); background: var(--brand); clip-path: var(--hex); }
+  .outcomes h3 { font-size: 1.375rem; }
+  .outcomes p { color: var(--ink-2); }
+
+  .standard-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: var(--s-7); align-items: start; }
+  .standard-copy { display: grid; gap: var(--s-4); justify-items: start; max-width: 60ch; }
+  .standard-copy p:not(.lead) { color: var(--ink-2); }
+
+  .board { padding-block: var(--s-8); }
+  .board-inner { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--s-5); align-items: start; max-width: 860px; }
+  .board-copy { display: grid; gap: var(--s-2); }
+  .board-copy h2 { font-size: var(--step-3); }
+  .board-copy p { color: var(--ink-2); font-size: var(--step-1); max-width: 60ch; }
+
+  @media (max-width: 900px) {
+    .outcomes { grid-template-columns: minmax(0, 1fr); }
+    .standard-grid { grid-template-columns: minmax(0, 1fr); gap: var(--s-4); }
+  }
+</style>

@@ -6,7 +6,28 @@
 import LeakyBucket from './LeakyBucket.astro';
 import Mark from './Mark.astro';
 
-const problems = [
+export interface Problem {
+  key: string;
+  name: string;
+  problem: string;
+  fix: string;
+  side: 'left' | 'right';
+  /** Height of this leak on the bucket (between about 200 and 360) */
+  y: number;
+  /** 24x24 stroke icon path */
+  icon: string;
+  /** Shorter name for the bucket label, when the full name is long */
+  short?: string;
+}
+
+interface Props {
+  items?: readonly Problem[];
+  inflow?: string;
+  eyebrow?: string;
+  more?: { label: string; href: string };
+}
+
+const defaultProblems = [
   {
     key: 'invoicing',
     name: 'Invoicing',
@@ -62,17 +83,24 @@ const problems = [
     icon: 'M3.5 4h6v16h-6zM14.5 4h6v16h-6zM9.5 9h5M13 7.5l1.5 1.5-1.5 1.5M14.5 15h-5M11 13.5L9.5 15l1.5 1.5',
   },
 ] as const;
+
+const {
+  items: problems = defaultProblems,
+  inflow = 'Revenue in',
+  eyebrow = 'What we fix most often',
+  more = { label: 'How we fix it', href: '/approach/' },
+} = Astro.props;
 ---
 
 <section class="problems-section" aria-labelledby="problems-title" data-problems>
   <div class="wrap p-layout">
     <div class="p-side">
       <div class="p-head" data-reveal>
-        <p class="eyebrow">What we fix most often</p>
+        <p class="eyebrow">{eyebrow}</p>
         <h2 id="problems-title">Sound familiar?</h2>
       </div>
       <div class="p-figure" data-reveal>
-        <LeakyBucket leaks={problems.map(({ key, name, side, y }) => ({ key, label: name, side, y }))} />
+        <LeakyBucket inflow={inflow} leaks={problems.map((p) => ({ key: p.key, label: ('short' in p && p.short) || p.name, side: p.side, y: p.y }))} />
       </div>
     </div>
 
@@ -103,7 +131,7 @@ const problems = [
           ))
         }
       </ul>
-      <a class="arrow-link p-more" href="/approach/"><span>How we fix it</span><span class="arr" aria-hidden="true">→</span></a>
+      <a class="arrow-link p-more" href={more.href}><span>{more.label}</span><span class="arr" aria-hidden="true">→</span></a>
     </div>
   </div>
 </section>
@@ -134,7 +162,7 @@ const problems = [
 </script>
 
 <style>
-  .problems-section { padding-block: clamp(3rem, 2rem + 3vw, 5rem); background: var(--paper-2); overflow: hidden; }
+  .problems-section { padding-block: clamp(3rem, 2rem + 3vw, 5rem); background: var(--paper-2); overflow: clip; }
   .p-layout {
     display: grid;
     grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
