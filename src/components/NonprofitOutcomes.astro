@@ -1,0 +1,431 @@
+---
+/**
+ * Nonprofits page: what changes, as three small live graphics. They play one at a
+ * time, left to right; hovering a card plays that one. Timing runs on
+ * scripts/scenes.ts (each card is a scene; the list is the group).
+ * Names, roles and numbers in the graphics are illustrations, not client data.
+ */
+import Mark from './Mark.astro';
+
+const roles = ['program coordinator', 'development manager', 'volunteer lead', 'executive director'];
+
+/* One week: hours spent on paperwork shrink, hours on programs grow (illustrative) */
+const segments = [
+  { k: 'receipts', from: 5, to: 1 },
+  { k: 'reports', from: 6, to: 1 },
+  { k: 'scheduling', from: 4, to: 1 },
+  { k: 'entry', from: 5, to: 1 },
+  { k: 'programs', from: 20, to: 36 },
+];
+
+/* Impact reports for different kinds of organization (illustrative) */
+const reports = [
+  {
+    kind: 'Food bank',
+    rows: [
+      ['Families served', 1248],
+      ['Meals provided', 18400],
+      ['Volunteer hours', 3120],
+    ],
+  },
+  {
+    kind: 'Shelter',
+    rows: [
+      ['People housed', 312],
+      ['Nights of shelter', 9860],
+      ['Case plans completed', 274],
+    ],
+  },
+  {
+    kind: 'Youth program',
+    rows: [
+      ['Students mentored', 640],
+      ['Sessions delivered', 5200],
+      ['Volunteer hours', 4150],
+    ],
+  },
+  {
+    kind: 'Health charity',
+    rows: [
+      ['Patients supported', 2150],
+      ['Rides to treatment', 4300],
+      ['Volunteer hours', 6800],
+    ],
+  },
+] as const;
+const bars = [0.42, 0.55, 0.5, 0.68, 0.74, 0.9];
+
+const steps = ['Donations', 'Records', 'Receipts', 'Reports'];
+const stepX = [34, 122, 210, 298];
+const hex = (cx: number, cy: number, r: number) =>
+  [0, 1, 2, 3, 4, 5]
+    .map((k) => {
+      const a = (Math.PI / 3) * k - Math.PI / 2;
+      return `${(cx + Math.cos(a) * r).toFixed(1)},${(cy + Math.sin(a) * r).toFixed(1)}`;
+    })
+    .join(' ');
+const fmt = (n: number) => n.toLocaleString('en-CA');
+---
+
+<section class="section" aria-labelledby="outcomes-title">
+  <div class="wrap">
+    <div class="section-head" data-reveal>
+      <p class="eyebrow">What changes</p>
+      <h2 id="outcomes-title">The same team, with more time for the mission.</h2>
+    </div>
+
+    <ul class="outcomes" data-scene-group data-reveal="stagger">
+      <!-- 1. Hours move from paperwork to programs -->
+      <li class="o-card" data-scene data-loop="6.5" data-still="6.2" style="--loop:6.5;--still:6.2">
+        <div class="o-viz" aria-hidden="true">
+          <div class="w-head">
+            <span class="w-avatar"><svg viewBox="0 0 12 16"><path d="M2.8 4.2a3.2 3.2 0 1 0 6.4 0a3.2 3.2 0 1 0 -6.4 0zM0.6 16c0-3.6 2.4-6.2 5.4-6.2s5.4 2.6 5.4 6.2z" /></svg></span>
+            <span class="w-who">
+              One week for your{' '}
+              <span class="cycle" data-cycle>{roles.map((r, i) => <b class:list={{ on: i === 0 }}>{r}</b>)}</span>
+            </span>
+          </div>
+          <div class="w-bar">
+            {segments.map((s) => <span class={`w-seg w-${s.k}`} style={`--g0:${s.from};--g1:${s.to}`} />)}
+          </div>
+          <div class="w-axis"><span>0</span><span>40 hours</span></div>
+          <div class="w-legend">
+            <span class="w-row">
+              <i class="sw sw-paper" />Receipts, reports, scheduling, data entry
+              <b class="tabular" data-count="1.2 20, 4.2 4" data-fmt="{} hrs">4 hrs</b>
+            </span>
+            <span class="w-row w-row-hot">
+              <i class="sw sw-prog" />Programs and the people you serve
+              <b class="tabular" data-count="1.2 20, 4.2 36" data-fmt="{} hrs">36 hrs</b>
+            </span>
+          </div>
+          <p class="o-foot ap" style="--a:4.5">
+            <svg viewBox="0 0 16 16"><path d="M4 8.5l2.6 2.6L12 5.6" /></svg>Same team. Same budget.
+          </p>
+        </div>
+        <h3>More mission per dollar</h3>
+        <p>Staff hours move from paperwork back to programs, so the same budget delivers more.</p>
+      </li>
+
+      <!-- 2. A report that builds itself from data already collected -->
+      <li class="o-card" data-scene data-loop="7" data-still="6.6" style="--loop:7;--still:6.6">
+        <div class="o-viz r-viz" aria-hidden="true">
+          <ul class="r-src">
+            {['Intake', 'Donations', 'Volunteers'].map((s, i) => (
+              <li class="pop" style={`--a:${(0.2 + i * 0.15).toFixed(2)}`}>{s}</li>
+            ))}
+          </ul>
+          <svg class="r-flow" viewBox="0 0 36 120" preserveAspectRatio="none">
+            {[20, 60, 100].map((y) => (
+              <path d={`M0 ${y} C18 ${y} 18 60 36 60`} class="r-pipe" />
+            ))}
+          </svg>
+          <div class="r-report">
+            <div class="r-top">
+              <span class="r-title">Impact report</span>
+              <span class="cycle r-kind" data-cycle>{reports.map((r, i) => <span class:list={{ on: i === 0 }}>{r.kind}</span>)}</span>
+            </div>
+            <div class="cycle" data-cycle>
+              {reports.map((r, i) => (
+                <dl class:list={['r-rows', { on: i === 0 }]}>
+                  {r.rows.map(([label, n], j) => (
+                    <div class="r-row ap" style={`--a:${(0.9 + j * 0.7).toFixed(1)}`}>
+                      <dt>{label}</dt>
+                      <dd class="tabular" data-count={`${(0.9 + j * 0.7).toFixed(1)} 0, ${(1.7 + j * 0.7).toFixed(1)} ${n}`} data-fmt="{}">
+                        {fmt(n)}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+              ))}
+            </div>
+            <div class="r-bars">
+              {bars.map((h, i) => <i style={`--h:${h};--a:${(3 + i * 0.1).toFixed(1)}`} />)}
+            </div>
+            <div class="r-out">
+              <span class="r-stamp pop" style="--a:4.1">
+                <svg viewBox="0 0 16 16"><path d="M4 8.5l2.6 2.6L12 5.6" /></svg>Ready
+              </span>
+              <span class="r-to pop" style="--a:4.5">To the board</span>
+              <span class="r-to pop" style="--a:4.8">To funders</span>
+            </div>
+          </div>
+        </div>
+        <h3>Cleaner proof of impact</h3>
+        <p>Funder and board reporting built from data you already collect, ready when someone asks.</p>
+      </li>
+
+      <!-- 3. Handed over, documented, still running months later -->
+      <li class="o-card" data-scene data-loop="7" data-still="6.6" style="--loop:7;--still:6.6">
+        <div class="o-viz h-viz" aria-hidden="true">
+          <svg class="h-flow" viewBox="0 0 332 78">
+            <path d={`M${stepX[0]} 26 H${stepX[3]}`} class="h-line" />
+            <path d={`M${stepX[0]} 26 H${stepX[3]}`} class="h-pulse" />
+            {stepX.map((x, i) => (
+              <g>
+                <polygon points={hex(x, 26, 15)} class="h-node" />
+                <polygon points={hex(x, 26, 15)} class="h-node-on pop" style={`--a:${(0.3 + i * 0.3).toFixed(1)}`} />
+                <text x={x} y="68" class="h-label" text-anchor="middle">{steps[i]}</text>
+              </g>
+            ))}
+          </svg>
+          <div class="h-own">
+            <span class="h-chip h-ours dn" style="--d:2.9">
+              <span class="h-mark"><Mark size={12} tone="current" /></span>Built with Spockhart
+            </span>
+            <span class="h-chip h-team ap" style="--a:2.9">
+              <span class="h-faces">
+                {[0, 1, 2].map(() => (
+                  <i><svg viewBox="0 0 12 16"><path d="M2.8 4.2a3.2 3.2 0 1 0 6.4 0a3.2 3.2 0 1 0 -6.4 0zM0.6 16c0-3.6 2.4-6.2 5.4-6.2s5.4 2.6 5.4 6.2z" /></svg></i>
+                ))}
+              </span>
+              Owned by your team
+            </span>
+          </div>
+          <div class="h-status">
+            <span class="h-doc pop" style="--a:1.7">
+              <svg viewBox="0 0 14 16"><path d="M2 1h7l3 3v11H2zM9 1v3h3M4.5 8h5M4.5 10.5h5M4.5 13h3" /></svg>Documented
+            </span>
+            <span class="h-run">
+              <i class="h-dot" />Running
+              <span class="h-month tabular ap" style="--a:3.2">
+                &middot; <span data-count="3.2 1, 6.2 12" data-fmt="Month {}">Month 12</span>
+              </span>
+            </span>
+          </div>
+        </div>
+        <h3>Systems that outlast us</h3>
+        <p>Documented, owned by your team, and running without heroics after we hand over.</p>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<script>
+  import { initScenes } from '../scripts/scenes';
+  initScenes();
+  document.addEventListener('spockhart:view', initScenes);
+</script>
+
+<style>
+  .outcomes { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s-5); }
+
+  /* ---------- Cards and their timing ---------- */
+  .o-card {
+    --t: var(--still, 6);
+    --on: 0;
+    position: relative;
+    display: grid;
+    grid-template-rows: auto auto 1fr;
+    gap: var(--s-2);
+    align-content: start;
+    padding: var(--s-4) var(--s-4) var(--s-5);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    overflow: hidden;
+    cursor: default;
+    transition: transform 500ms var(--ease-out), box-shadow 500ms var(--ease), border-color 400ms var(--ease);
+  }
+  .o-card.is-active {
+    border-color: rgb(44 95 138 / 0.55);
+    transform: translateY(-6px);
+    box-shadow: 0 28px 48px -32px rgb(27 42 61 / 0.6);
+  }
+  /* Time running through the card that is playing */
+  .o-card::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 3px;
+    background: var(--accent-soft);
+    transform-origin: left center;
+    transform: scaleX(calc(var(--t) / var(--loop)));
+    opacity: 0;
+    transition: opacity 300ms var(--ease);
+  }
+  .o-card.is-playing::after { opacity: 1; }
+  .o-card h3 { font-size: 1.375rem; margin-top: var(--s-3); }
+  .o-card > p { color: var(--ink-2); }
+
+  .ap { opacity: clamp(0, (var(--t) - var(--a, 0)) * 6, 1); }
+  .dn { opacity: clamp(0, (var(--d) - var(--t)) * 6, 1); }
+  .pop {
+    opacity: clamp(0, (var(--t) - var(--a)) * 6, 1);
+    transform: scale(calc(0.6 + 0.4 * clamp(0, (var(--t) - var(--a)) * 5, 1)));
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+  .cycle > *:not(.on) { display: none; }
+
+  .o-viz {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: 0.6rem;
+    height: 214px;
+    padding: 0.9rem 1rem;
+    border-radius: 6px;
+    background: var(--paper-2);
+    overflow: hidden;
+    font-size: 0.75rem;
+    color: var(--ink-2);
+  }
+  .o-foot {
+    position: absolute;
+    left: 1rem;
+    bottom: 0.8rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-weight: 600;
+    color: var(--accent);
+  }
+  .o-foot svg, .r-stamp svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* ---------- 1. The week ---------- */
+  .w-head { display: flex; align-items: center; gap: 0.55rem; }
+  .w-avatar { display: grid; place-items: center; width: 28px; height: 32px; background: var(--brand); clip-path: var(--hex); flex: none; }
+  .w-avatar svg { width: 11px; height: 14px; fill: #fff; }
+  .w-who { font-size: 0.8125rem; color: var(--ink-2); line-height: 1.25; }
+  .w-who b { color: var(--ink); font-weight: 600; }
+  .w-bar {
+    --p: clamp(0, (var(--t) - 1.2) / 3, 1);
+    --e: calc(var(--p) * var(--p) * (3 - 2 * var(--p)));
+    display: flex;
+    gap: 2px;
+    height: 34px;
+    margin-top: 0.35rem;
+    border-radius: 5px;
+    overflow: hidden;
+  }
+  .w-seg { flex-grow: calc(var(--g0) + (var(--g1) - var(--g0)) * var(--e)); flex-shrink: 1; flex-basis: 0; min-width: 3px; }
+  .w-receipts { background: #a9b8c9; }
+  .w-reports { background: #bccada; }
+  .w-scheduling { background: #a3b3c5; }
+  .w-entry { background: #c4d0dd; }
+  .w-programs { background: linear-gradient(90deg, var(--accent), var(--brand)); }
+  .w-axis { display: flex; justify-content: space-between; font-size: 0.6875rem; color: var(--ink-3); margin-top: -0.3rem; }
+  .w-legend { display: grid; gap: 0.35rem; }
+  .w-row { display: grid; grid-template-columns: 10px minmax(0, 1fr) auto; gap: 0.5rem; align-items: center; }
+  .w-row b { font-family: var(--font-display); font-size: 1rem; font-weight: 500; color: var(--ink-2); font-variant-numeric: lining-nums tabular-nums; }
+  .w-row-hot { color: var(--ink); font-weight: 600; }
+  .w-row-hot b { color: var(--brand); font-weight: 600; }
+  .sw { width: 10px; height: 10px; border-radius: 2px; }
+  .sw-paper { background: #a9b8c9; }
+  .sw-prog { background: var(--brand); }
+
+  /* ---------- 2. The impact report ---------- */
+  .r-viz { grid-template-columns: 74px 26px minmax(0, 1fr); align-items: center; gap: 0; }
+  .r-src { list-style: none; padding: 0; display: grid; gap: 14px; }
+  .r-src li {
+    padding: 0.3rem 0.4rem;
+    border-radius: 4px;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: var(--ink-2);
+    text-align: center;
+  }
+  .r-flow { width: 100%; height: 120px; overflow: visible; }
+  .r-pipe {
+    fill: none;
+    stroke: var(--accent-soft);
+    stroke-width: 1.6;
+    stroke-dasharray: 3 5;
+    stroke-dashoffset: calc(var(--t) * -24px);
+    opacity: calc(clamp(0, (var(--t) - 0.6) * 4, 1) * clamp(0, (4.2 - var(--t)) * 2, 1) * 0.9 + 0.1);
+  }
+  .r-report {
+    display: grid;
+    gap: 0.45rem;
+    padding: 0.6rem 0.7rem;
+    border-radius: 5px;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    box-shadow: 0 10px 20px -16px rgb(27 42 61 / 0.5);
+  }
+  .r-top { display: flex; justify-content: space-between; align-items: baseline; gap: 0.4rem; }
+  .r-title { font-family: var(--font-display); font-size: 0.875rem; font-weight: 600; color: var(--ink); }
+  .r-kind { font-size: 0.625rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); white-space: nowrap; }
+  .r-rows { display: grid; gap: 0.2rem; margin: 0; }
+  .r-row { display: flex; justify-content: space-between; gap: 0.4rem; padding-bottom: 0.2rem; border-bottom: 1px solid var(--rule); }
+  .r-row dt { font-size: 0.6875rem; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .r-row dd { margin: 0; font-family: var(--font-display); font-size: 0.8125rem; font-weight: 600; color: var(--ink); font-variant-numeric: lining-nums tabular-nums; }
+  .r-bars { display: flex; align-items: flex-end; gap: 3px; height: 26px; }
+  .r-bars i {
+    flex: 1;
+    height: calc(var(--h) * 100%);
+    border-radius: 2px 2px 0 0;
+    background: var(--accent-soft);
+    transform-origin: bottom center;
+    transform: scaleY(clamp(0, (var(--t) - var(--a)) * 2.5, 1));
+  }
+  .r-bars i:last-child { background: var(--brand); }
+  .r-out { display: flex; flex-wrap: wrap; gap: 0.3rem; align-items: center; }
+  .r-stamp { display: inline-flex; align-items: center; gap: 0.2rem; padding: 0.1rem 0.45rem 0.1rem 0.3rem; border-radius: 999px; background: var(--brand); color: #fff; font-size: 0.625rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+  .r-stamp svg { width: 11px; height: 11px; }
+  .r-to { padding: 0.1rem 0.45rem; border-radius: 999px; background: var(--accent-wash); color: var(--brand); font-size: 0.625rem; font-weight: 600; }
+
+  /* ---------- 3. The handover ---------- */
+  .h-viz { gap: 0.75rem; }
+  .h-flow { width: 100%; height: auto; overflow: visible; }
+  .h-line { fill: none; stroke: var(--rule-2); stroke-width: 2; }
+  .h-pulse {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-dasharray: 2 14;
+    stroke-dashoffset: calc(var(--t) * -32px);
+    opacity: clamp(0, (var(--t) - 1.4) * 3, 1);
+  }
+  .h-node { fill: var(--surface); stroke: var(--rule-2); stroke-width: 1.5; }
+  .h-node-on { fill: var(--brand); }
+  .h-label { font-family: var(--font-body); font-size: 11px; font-weight: 600; fill: var(--ink-2); }
+  .h-own { position: relative; height: 30px; }
+  .h-chip {
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    height: 30px;
+    padding: 0 0.75rem 0 0.35rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .h-ours { --mark: #fff; background: var(--ink); color: #fff; }
+  .h-mark { display: grid; place-items: center; width: 22px; height: 22px; }
+  .h-team { background: var(--surface); border: 1px solid var(--rule-2); color: var(--ink); }
+  .h-faces { display: flex; }
+  .h-faces i { display: grid; place-items: center; width: 22px; height: 22px; margin-right: -6px; border-radius: 50%; background: var(--accent); border: 2px solid var(--surface); }
+  .h-faces i:nth-child(2) { background: var(--brand); }
+  .h-faces i:nth-child(3) { background: var(--accent-soft); margin-right: 0.15rem; }
+  .h-faces svg { width: 8px; height: 11px; fill: #fff; }
+  .h-status { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0.4rem; }
+  .h-doc { display: inline-flex; align-items: center; gap: 0.35rem; font-weight: 600; color: var(--ink-2); }
+  .h-doc svg { width: 12px; height: 14px; fill: none; stroke: var(--accent); stroke-width: 1.4; stroke-linejoin: round; }
+  .h-run { display: inline-flex; align-items: center; gap: 0.35rem; font-weight: 600; color: var(--ink); }
+  .h-dot { width: 8px; height: 8px; border-radius: 50%; background: #3f9a6b; box-shadow: 0 0 0 0 rgb(63 154 107 / 0.5); }
+  .h-month { color: var(--ink-2); font-weight: 500; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .h-dot { animation: run-pulse 1.8s ease-out infinite; }
+    @keyframes run-pulse { 70% { box-shadow: 0 0 0 6px rgb(63 154 107 / 0); } 100% { box-shadow: 0 0 0 0 rgb(63 154 107 / 0); } }
+  }
+
+  @media (max-width: 1100px) and (min-width: 901px) {
+    .r-viz { grid-template-columns: 64px 18px minmax(0, 1fr); padding-inline: 0.7rem; }
+  }
+  @media (max-width: 900px) {
+    .outcomes { grid-template-columns: minmax(0, 1fr); }
+    .o-viz { height: 210px; }
+  }
+</style>

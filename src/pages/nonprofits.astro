@@ -3,22 +3,9 @@ import Base from '../layouts/Base.astro';
 import PageHero from '../components/PageHero.astro';
 import GapChart from '../components/GapChart.astro';
 import ClosingCTA from '../components/ClosingCTA.astro';
-import Mark from '../components/Mark.astro';
+import NonprofitOutcomes from '../components/NonprofitOutcomes.astro';
 
-const outcomes = [
-  {
-    title: 'More mission per dollar',
-    body: 'Staff hours move from paperwork back to programs, so the same budget delivers more.',
-  },
-  {
-    title: 'Cleaner proof of impact',
-    body: 'Funder and board reporting built from data you already collect, ready when someone asks.',
-  },
-  {
-    title: 'Systems that outlast us',
-    body: 'Documented, owned by your team, and running without heroics after we hand over.',
-  },
-];
+
 ---
 
 <Base
@@ -36,51 +23,10 @@ const outcomes = [
     <GapChart slot="figure" />
   </PageHero>
 
-  <section class="section" aria-labelledby="outcomes-title">
-    <div class="wrap">
-      <div class="section-head" data-reveal>
-        <p class="eyebrow">What changes</p>
-        <h2 id="outcomes-title">The same team, with time for the mission.</h2>
-      </div>
-      <ul class="outcomes" data-reveal="stagger">
-        {
-          outcomes.map((o) => (
-            <li>
-              <span class="o-mark" aria-hidden="true">
-                <Mark size={18} tone="current" />
-              </span>
-              <h3>{o.title}</h3>
-              <p>{o.body}</p>
-            </li>
-          ))
-        }
-      </ul>
-    </div>
-  </section>
+  <NonprofitOutcomes />
 
   <ClosingCTA
     title="Let’s close the gap."
     body="Tell us where your team’s time goes. We’ll show you how much of it could go back to the mission."
   />
 </Base>
-
-<style>
-  .outcomes { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s-5); }
-  .outcomes li {
-    --mark: #fff;
-    display: grid;
-    gap: var(--s-2);
-    align-content: start;
-    padding: var(--s-5);
-    border: 1px solid var(--rule);
-    border-radius: var(--radius-lg);
-    background: var(--surface);
-  }
-  .o-mark { display: grid; place-items: center; width: 40px; height: 46px; margin-bottom: var(--s-2); background: var(--brand); clip-path: var(--hex); }
-  .outcomes h3 { font-size: 1.375rem; }
-  .outcomes p { color: var(--ink-2); }
-
-  @media (max-width: 900px) {
-    .outcomes { grid-template-columns: minmax(0, 1fr); }
-  }
-</style>

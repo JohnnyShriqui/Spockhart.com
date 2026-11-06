@@ -142,50 +142,196 @@ function boards(scene: HTMLElement): Update[] {
 }
 
 const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+const canAnimate = () => !reduce.matches && 'IntersectionObserver' in window;
 
-function initScene(scene: HTMLElement) {
-  if (scene.dataset.sceneReady) return;
-  scene.dataset.sceneReady = '1';
+interface Controller {
+  /** Start from the beginning. `once` plays a single loop, rests, then calls onDone. */
+  play(opts?: { once?: boolean; onDone?: () => void }): void;
+  /** Carry on from where it was. */
+  resume(): void;
+  pause(): void;
+  /** Stop and rest on the finished frame. */
+  stop(): void;
+}
+const controllers = new WeakMap<HTMLElement, Controller>();
+
+/* [data-cycle] holds alternatives (roles, kinds of organization); one shows per loop. */
+function cyclers(scene: HTMLElement) {
+  const sets = Array.from(scene.querySelectorAll<HTMLElement>('[data-cycle]'));
+  let n = 0;
+  return () => {
+    n++;
+    for (const set of sets) {
+      const items = Array.from(set.children);
+      items.forEach((el, i) => el.classList.toggle('on', i === n % items.length));
+    }
+  };
+}
+
+function makeController(scene: HTMLElement): Controller {
   const loop = Number(scene.dataset.loop ?? 8);
   const still = Number(scene.dataset.still ?? loop * 0.9);
   const updates = [...counters(scene), ...followers(scene), ...hoppers(scene), ...movers(scene), ...boards(scene)];
+  const nextVariant = cyclers(scene);
   const apply = (t: number) => {
     scene.style.setProperty('--t', t.toFixed(3));
     for (const u of updates) u(t);
   };
 
-  if (reduce.matches || !('IntersectionObserver' in window)) {
-    apply(still);
-    return;
-  }
-
   let raf = 0;
   let elapsed = 0;
   let last = 0;
+  let lap = 0;
+  let once = false;
+  let onDone: (() => void) | undefined;
+
+  const halt = () => {
+    cancelAnimationFrame(raf);
+    raf = 0;
+  };
+  const stop = () => {
+    halt();
+    scene.classList.remove('is-playing');
+    apply(still);
+  };
   const frame = (now: number) => {
     if (last) elapsed += Math.min(0.1, (now - last) / 1000);
     last = now;
+    if (once && elapsed >= loop) {
+      stop();
+      onDone?.();
+      return;
+    }
+    const thisLap = Math.floor(elapsed / loop);
+    if (thisLap !== lap) {
+      lap = thisLap;
+      nextVariant();
+    }
     // data-hold pins a scene to one moment (used when checking the graphics).
     const hold = scene.dataset.hold;
     apply(hold ? Number(hold) : elapsed % loop);
     raf = requestAnimationFrame(frame);
   };
-  apply(0);
+
+  apply(canAnimate() ? 0 : still);
+  return {
+    play(opts = {}) {
+      halt();
+      once = Boolean(opts.once);
+      onDone = opts.onDone;
+      elapsed = 0;
+      last = 0;
+      lap = 0;
+      scene.classList.add('is-playing');
+      raf = requestAnimationFrame(frame);
+    },
+    resume() {
+      if (raf) return;
+      last = 0;
+      raf = requestAnimationFrame(frame);
+    },
+    pause: halt,
+    stop,
+  };
+}
+
+function initScene(scene: HTMLElement) {
+  if (scene.dataset.sceneReady) return;
+  scene.dataset.sceneReady = '1';
+  const ctrl = makeController(scene);
+  controllers.set(scene, ctrl);
+  // Scenes inside a group are played one at a time by the group (below).
+  if (!canAnimate() || scene.closest('[data-scene-group]')) {
+    if (scene.closest('[data-scene-group]') && canAnimate()) ctrl.stop();
+    return;
+  }
   new IntersectionObserver(
     (entries) => {
-      const visible = entries.some((e) => e.isIntersecting);
-      if (visible && !raf) {
-        last = 0;
-        raf = requestAnimationFrame(frame);
-      } else if (!visible && raf) {
-        cancelAnimationFrame(raf);
-        raf = 0;
-      }
+      if (entries.some((e) => e.isIntersecting)) ctrl.resume();
+      else ctrl.pause();
     },
     { threshold: 0.25 },
   ).observe(scene);
 }
 
+/**
+ * [data-scene-group]: its scenes play one at a time, in order, each for one loop.
+ * Hovering (or tapping) a scene plays that one instead until the pointer leaves.
+ * Scenes that are not playing rest on their finished frame.
+ */
+function initGroup(group: HTMLElement) {
+  if (group.dataset.groupReady || !canAnimate()) return;
+  group.dataset.groupReady = '1';
+  const scenes = Array.from(group.querySelectorAll<HTMLElement>('[data-scene]'));
+  const ctrls = scenes.map((s) => controllers.get(s)!);
+  let index = 0;
+  let hovered = -1;
+  let visible = false;
+  let timer = 0;
+  let running = false;
+
+  const mark = (k: number) => scenes.forEach((s, i) => s.classList.toggle('is-active', i === k));
+  const next = () => {
+    if (!visible || hovered >= 0) return;
+    const k = index;
+    running = true;
+    mark(k);
+    ctrls[k].play({
+      once: true,
+      onDone: () => {
+        running = false;
+        mark(-1);
+        index = (k + 1) % scenes.length;
+        timer = window.setTimeout(next, 450);
+      },
+    });
+  };
+  const halt = () => {
+    window.clearTimeout(timer);
+    ctrls.forEach((c) => c.stop());
+    running = false;
+    mark(-1);
+  };
+
+  new IntersectionObserver(
+    (entries) => {
+      visible = entries.some((e) => e.isIntersecting);
+      if (visible && !running && hovered < 0) next();
+      if (!visible) {
+        halt();
+        hovered = -1;
+      }
+    },
+    { threshold: 0.35 },
+  ).observe(group);
+
+  scenes.forEach((scene, k) => {
+    // Touch has no hover: a tap jumps the sequence to that scene.
+    scene.addEventListener('pointerup', (e) => {
+      if (e.pointerType === 'mouse') return;
+      halt();
+      hovered = -1;
+      index = k;
+      next();
+    });
+    scene.addEventListener('pointerenter', (e) => {
+      if (e.pointerType !== 'mouse' || hovered === k) return;
+      halt();
+      hovered = k;
+      mark(k);
+      ctrls[k].play();
+    });
+    scene.addEventListener('pointerleave', (e) => {
+      if (e.pointerType !== 'mouse' || hovered !== k) return;
+      hovered = -1;
+      halt();
+      index = (k + 1) % scenes.length;
+      timer = window.setTimeout(next, 450);
+    });
+  });
+}
+
 export function initScenes() {
   document.querySelectorAll<HTMLElement>('[data-scene]').forEach(initScene);
+  document.querySelectorAll<HTMLElement>('[data-scene-group]').forEach(initGroup);
 }
