@@ -37,8 +37,8 @@ export type NavItem = { label: string; href: string };
 export const primaryNav: NavItem[] = [
   { label: 'Approach', href: '/approach/' },
   { label: 'Our Work', href: '/work/' },
-  { label: 'About', href: '/about/' },
   { label: 'Nonprofits', href: '/nonprofits/' },
+  { label: 'About', href: '/about/' },
 ];
 
 export const footerNav: { heading: string; items: NavItem[] }[] = [
@@ -53,8 +53,8 @@ export const footerNav: { heading: string; items: NavItem[] }[] = [
   {
     heading: 'Company',
     items: [
-      { label: 'About', href: '/about/' },
       { label: 'Nonprofits', href: '/nonprofits/' },
+      { label: 'About', href: '/about/' },
       { label: 'Contact', href: '/contact/' },
     ],
   },

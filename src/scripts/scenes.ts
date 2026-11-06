@@ -209,7 +209,10 @@ function makeController(scene: HTMLElement): Controller {
     }
     // data-hold pins a scene to one moment (used when checking the graphics).
     const hold = scene.dataset.hold;
-    apply(hold ? Number(hold) : elapsed % loop);
+    const t = hold ? Number(hold) : elapsed % loop;
+    apply(t);
+    // Lets things outside the scene follow along (the Approach timeline marker).
+    scene.dispatchEvent(new CustomEvent('scene:frame', { detail: { t, loop } }));
     raf = requestAnimationFrame(frame);
   };
 
