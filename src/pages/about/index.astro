@@ -18,7 +18,7 @@ import { aboutPhotos, team } from '../../data/photos';
 
   <section class="lead-photo" aria-label="The team at work">
     <div class="wrap" data-reveal>
-      <Photo {...aboutPhotos.wide} ratio="21 / 9" sizes="(min-width: 1240px) 1240px, 100vw" eager />
+      <Photo {...aboutPhotos.wide} ratio="21 / 9" sizes="(min-width: 1240px) 1240px, 100vw" eager parallax />
     </div>
   </section>
 
@@ -122,10 +122,12 @@ import { aboutPhotos, team } from '../../data/photos';
     line-height: 1.2;
     letter-spacing: -0.01em;
     color: var(--ink);
+    text-wrap: balance;
   }
   .mosaic { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); grid-template-rows: auto auto; gap: var(--s-5); }
   .mosaic :global(.m-big) { grid-row: span 2; }
-  .mosaic :global(.m-big .photo-img), .mosaic :global(.m-big .photo-ph) { height: 100%; aspect-ratio: auto; min-height: 100%; }
+  .mosaic :global(.m-big) { grid-template-rows: minmax(0, 1fr) auto; }
+  .mosaic :global(.m-big .photo-frame) { height: 100%; aspect-ratio: auto; }
   .team { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s-6); }
   .member { display: grid; gap: 0.15rem; margin-top: var(--s-4); }
   .member h3 { font-size: var(--step-2); }
@@ -135,7 +137,7 @@ import { aboutPhotos, team } from '../../data/photos';
   @media (max-width: 900px) {
     .story-grid, .mosaic { grid-template-columns: minmax(0, 1fr); gap: var(--s-6); }
     .mosaic :global(.m-big) { grid-row: auto; }
-    .mosaic :global(.m-big .photo-img), .mosaic :global(.m-big .photo-ph) { aspect-ratio: 4 / 3; height: auto; }
+    .mosaic :global(.m-big .photo-frame) { aspect-ratio: 4 / 3; height: auto; }
     .team { grid-template-columns: minmax(0, 1fr); }
   }
   @media (min-width: 600px) and (max-width: 900px) {

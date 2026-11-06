@@ -1,0 +1,132 @@
+---
+/**
+ * A wide photo with a card of text set over its lower edge, and an optional
+ * sticky note pinned to the picture.
+ */
+import Photo from './Photo.astro';
+import type { PhotoSlot } from '../data/photos';
+
+interface Props {
+  photo: PhotoSlot;
+  eyebrow?: string;
+  title: string;
+  body?: string;
+  /** Which side the card sits on */
+  side?: 'left' | 'right';
+  /** Short handwritten-style note pinned to the photo */
+  note?: string;
+  /** Where the note sits, as CSS left/top percentages */
+  notePos?: { x: string; y: string };
+  ratio?: string;
+  id?: string;
+  class?: string;
+}
+const {
+  photo,
+  eyebrow,
+  title,
+  body,
+  side = 'left',
+  note,
+  notePos = { x: '5%', y: '9%' },
+  ratio = '2 / 1',
+  id = `band-${title.toLowerCase().replace(/[^a-z]+/g, '-').slice(0, 24)}`,
+  class: className = '',
+} = Astro.props;
+---
+
+<section class:list={['photo-band', `side-${side}`, className]} aria-labelledby={id}>
+  <div class="wrap">
+    <div class="band">
+      <div class="band-media">
+        <Photo {...photo} ratio={ratio} parallax sizes="(min-width: 1240px) 1240px, 100vw" />
+        {
+          note && (
+            <p class="sticky" style={`--x:${notePos.x};--y:${notePos.y}`} aria-hidden="true" data-reveal>
+              <span>{note}</span>
+            </p>
+          )
+        }
+      </div>
+      <div class="band-card" data-reveal>
+        {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+        <h2 id={id}>{title}</h2>
+        {body && <p class="band-body">{body}</p>}
+        <slot />
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .photo-band { --overlap: clamp(3rem, 1.5rem + 5vw, 6rem); padding-block: clamp(2.5rem, 1.5rem + 3vw, 4.5rem) clamp(2.5rem, 1.5rem + 3vw, 4rem);
+  }
+  :global(.section) + .photo-band { padding-top: 0; }
+  .band { position: relative; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); padding-bottom: var(--overlap); }
+  .band-media { position: relative; grid-column: 1 / -1; grid-row: 1; }
+  .band-card {
+    position: relative;
+    z-index: 2;
+    grid-row: 1;
+    grid-column: 1 / span 6;
+    align-self: end;
+    margin: 0 0 calc(var(--overlap) * -1) clamp(1rem, 4%, 3rem);
+    display: grid;
+    gap: var(--s-4);
+    padding: clamp(1.5rem, 1rem + 2vw, 2.75rem);
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 30px 60px -30px rgb(27 42 61 / 0.35), 0 2px 6px rgb(27 42 61 / 0.04);
+  }
+  .side-right .band-card { grid-column: 7 / -1; margin: 0 clamp(1rem, 4%, 3rem) calc(var(--overlap) * -1) 0; }
+  .band-card h2 { font-size: var(--step-4); line-height: 1.05; max-width: 15ch; }
+  .band-body { color: var(--ink-2); font-size: var(--step-1); max-width: 44ch; }
+
+  /* A sticky note, pinned at an angle to the picture */
+  .sticky {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    z-index: 1;
+    width: clamp(8.5rem, 6rem + 6vw, 11.5rem);
+    aspect-ratio: 1;
+    display: grid;
+    place-items: center;
+    padding: 1rem;
+    background:
+      linear-gradient(160deg, rgb(255 255 255 / 0.5), transparent 40%),
+      linear-gradient(180deg, #d4ebf1, #c2e0e9);
+    border-radius: 2px 2px 3px 14px / 2px 2px 3px 6px;
+    box-shadow: 0 1px 1px rgb(27 42 61 / 0.08), 0 14px 22px -10px rgb(27 42 61 / 0.4);
+    transform: rotate(-4deg);
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: clamp(1rem, 0.85rem + 0.5vw, 1.3rem);
+    line-height: 1.2;
+    color: var(--ink);
+    text-align: center;
+  }
+  .sticky span { max-width: 9ch; }
+  @keyframes stick {
+    0% { opacity: 0; transform: translate3d(0, -18px, 0) rotate(-12deg) scale(1.06); }
+    60% { opacity: 1; }
+    100% { opacity: 1; transform: rotate(-4deg); }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .sticky:global(.reveal-in) { animation: stick 900ms var(--ease-out) 650ms both; }
+  }
+
+  @media (max-width: 860px) {
+    .photo-band { --overlap: 0px; }
+    .band-card,
+    .side-right .band-card {
+      grid-row: 2;
+      grid-column: 1 / -1;
+      margin: calc(var(--s-7) * -1) var(--s-4) 0;
+    }
+    .band-card h2 { font-size: var(--step-3); }
+    .band-media :global(.photo-frame) { aspect-ratio: 4 / 3; }
+    .sticky { width: 7.25rem; padding: 0.7rem; font-size: 0.95rem; }
+  }
+</style>

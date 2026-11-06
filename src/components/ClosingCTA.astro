@@ -1,20 +1,32 @@
 ---
 import CopyEmail from './CopyEmail.astro';
+import Photo from './Photo.astro';
+import type { PhotoSlot } from '../data/photos';
 
 interface Props {
   title?: string;
   body?: string;
   primary?: { label: string; href: string };
+  /** Optional photo shown beside the invitation */
+  photo?: PhotoSlot;
 }
 const {
   title = 'Tell us what is slowing you down.',
   body = 'A 30-minute conversation about how work actually gets done in your organization. No pitch deck. We start on your real problem.',
   primary = { label: 'Start a conversation', href: '/contact/' },
+  photo,
 } = Astro.props;
 ---
 
-<section class="closing section">
+<section class:list={['closing section', { 'with-photo': photo }]}>
   <div class="wrap closing-inner" data-reveal>
+    {
+      photo && (
+        <div class="closing-photo">
+          <Photo {...photo} ratio="4 / 3" sizes="(min-width: 1000px) 40vw, 100vw" />
+        </div>
+      )
+    }
     <div class="closing-copy">
       <h2>{title}</h2>
       <p>{body}</p>
@@ -38,8 +50,24 @@ const {
   .closing-copy h2 { max-width: 14ch; }
   .closing-copy p { color: var(--ink-2); font-size: var(--step-1); max-width: 46ch; }
   .closing-actions { display: flex; flex-wrap: wrap; gap: var(--s-3); justify-content: flex-end; align-items: center; }
+
+  /* With a photo: picture on the left, the invitation beside it */
+  .with-photo .closing-inner {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    grid-template-rows: 1fr auto auto 1fr;
+    gap: 0 var(--s-8);
+    align-items: start;
+  }
+  .with-photo .closing-photo { grid-column: 1; grid-row: 1 / -1; }
+  .with-photo .closing-copy { grid-column: 2; grid-row: 2; }
+  .with-photo .closing-actions { grid-column: 2; grid-row: 3; justify-content: flex-start; margin-top: var(--s-6); }
+
   @media (max-width: 860px) {
-    .closing-inner { grid-template-columns: minmax(0, 1fr); }
+    .closing-inner,
+    .with-photo .closing-inner { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; gap: var(--s-6); }
+    .with-photo .closing-photo,
+    .with-photo .closing-copy,
+    .with-photo .closing-actions { grid-column: 1; grid-row: auto; margin-top: 0; }
     .closing-actions { justify-content: flex-start; }
   }
 </style>

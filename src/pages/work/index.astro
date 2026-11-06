@@ -5,6 +5,8 @@ import PageHero from '../../components/PageHero.astro';
 import Honeycomb from '../../components/Honeycomb.astro';
 import ResultVisual from '../../components/ResultVisual.astro';
 import ClosingCTA from '../../components/ClosingCTA.astro';
+import PhotoBand from '../../components/PhotoBand.astro';
+import { photos } from '../../data/photos';
 
 const all = (await getCollection('work')).sort((a, b) => a.data.order - b.data.order);
 
@@ -118,6 +120,13 @@ const sectionsOf = (body = '') =>
       .cs-toggle { display: none !important; }
     </style>
   </noscript>
+
+  <PhotoBand
+    photo={photos.workSession}
+    eyebrow="Behind the numbers"
+    title="Every result started at a table like this."
+    body="Each project began the same way: sitting with the people closest to the problem until we understood exactly where the time and money were going."
+  />
 
   <ClosingCTA title="Your operation could be next." />
 </Base>

@@ -4,6 +4,8 @@ import PageHero from '../components/PageHero.astro';
 import GapChart from '../components/GapChart.astro';
 import ClosingCTA from '../components/ClosingCTA.astro';
 import NonprofitOutcomes from '../components/NonprofitOutcomes.astro';
+import PhotoBand from '../components/PhotoBand.astro';
+import { photos } from '../data/photos';
 
 
 ---
@@ -24,6 +26,14 @@ import NonprofitOutcomes from '../components/NonprofitOutcomes.astro';
   </PageHero>
 
   <NonprofitOutcomes />
+
+  <PhotoBand
+    photo={photos.npMission}
+    side="right"
+    eyebrow="Where the time goes"
+    title="Every hour back goes to the people you serve."
+    body="The hours we take off receipts, reports and spreadsheets go back where they belong: into programs, clients and community."
+  />
 
   <ClosingCTA
     title="Let’s close the gap."

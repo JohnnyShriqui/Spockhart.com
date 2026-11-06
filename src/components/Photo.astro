@@ -1,7 +1,7 @@
 ---
 /**
- * A real photo, optimised by Astro. Until a photo is supplied, it shows a
- * labelled placeholder describing the shot that belongs there.
+ * A photo, optimised by Astro, with the site's frame, grade and reveal.
+ * Until a photo is supplied it shows a labelled placeholder describing the shot.
  * Photos live in src/assets/photos/ and are wired up in src/data/photos.ts.
  */
 import { Image } from 'astro:assets';
@@ -11,7 +11,7 @@ interface Props {
   src?: ImageMetadata;
   alt: string;
   /** What the shot should be, shown on the placeholder */
-  brief: string;
+  brief?: string;
   /** Aspect ratio, e.g. '4 / 3' */
   ratio?: string;
   caption?: string;
@@ -19,61 +19,122 @@ interface Props {
   sizes?: string;
   class?: string;
   eager?: boolean;
+  /** Drift gently as the page scrolls */
+  parallax?: boolean;
+  /** Where to anchor the crop, e.g. '50% 30%' */
+  focus?: string;
 }
-const { src, alt, brief, ratio = '4 / 3', caption, sizes = '(min-width: 1000px) 50vw, 100vw', class: className = '', eager = false } = Astro.props;
+const {
+  src,
+  alt,
+  brief = '',
+  ratio = '4 / 3',
+  caption,
+  sizes = '(min-width: 1000px) 50vw, 100vw',
+  class: className = '',
+  eager = false,
+  parallax = false,
+  focus = '50% 50%',
+} = Astro.props;
 ---
 
-<figure class:list={['photo', className]} style={`--ratio:${ratio}`}>
-  {
-    src ? (
-      <Image
-        src={src}
-        alt={alt}
-        widths={[480, 800, 1200, 1600, 2000]}
-        sizes={sizes}
-        loading={eager ? 'eager' : 'lazy'}
-        decoding="async"
-        class="photo-img"
-      />
-    ) : (
-      <div class="photo-ph" role="img" aria-label={`Photo to come: ${brief}`}>
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M4 8h3l1.6-2.4h6.8L17 8h3v11H4z" />
-          <circle cx="12" cy="13.2" r="3.4" />
-        </svg>
-        <span class="ph-tag">Photo to come</span>
-        <span class="ph-brief">{brief}</span>
-      </div>
-    )
-  }
+<figure class:list={['photo', className, { parallax }]} style={`--ratio:${ratio};--focus:${focus}`}>
+  <div class="photo-frame" data-reveal={eager ? undefined : 'photo'}>
+    {
+      src ? (
+        <Image
+          src={src}
+          alt={alt}
+          widths={[480, 800, 1200, 1600, 2000, 2400].filter((w) => w <= src.width)}
+          sizes={sizes}
+          loading={eager ? 'eager' : 'lazy'}
+          decoding="async"
+          class="photo-img"
+        />
+      ) : (
+        <div class="photo-ph" role="img" aria-label={`Photo to come: ${brief}`}>
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 8h3l1.6-2.4h6.8L17 8h3v11H4z" />
+            <circle cx="12" cy="13.2" r="3.4" />
+          </svg>
+          <span class="ph-tag">Photo to come</span>
+          <span class="ph-brief">{brief}</span>
+        </div>
+      )
+    }
+  </div>
   {caption && <figcaption>{caption}</figcaption>}
 </figure>
 
 <style>
-  .photo { margin: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.6rem; min-width: 0; }
-  .photo-img, .photo-ph {
-    display: block;
-    width: 100%;
+  .photo { margin: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.65rem; min-width: 0; }
+  .photo-frame {
+    position: relative;
     aspect-ratio: var(--ratio);
-    object-fit: cover;
+    overflow: hidden;
     border-radius: var(--radius-lg);
     background: var(--paper-2);
+    isolation: isolate;
+  }
+  /* A whisper of the page's blue over every photo, so they sit in one palette */
+  .photo-frame::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(180deg, rgb(31 77 111 / 0) 55%, rgb(31 77 111 / 0.1));
+    box-shadow: inset 0 0 0 1px rgb(27 42 61 / 0.06);
+    pointer-events: none;
+  }
+  .photo-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: var(--focus);
   }
   .photo-ph {
     display: grid;
     place-content: center;
     justify-items: center;
     gap: 0.45rem;
+    height: 100%;
     padding: var(--s-5);
     text-align: center;
     background:
       radial-gradient(120% 90% at 20% 15%, rgb(255 255 255 / 0.55), transparent 60%),
       linear-gradient(140deg, #c9d7e5, #a9bfd5 60%, #98b1ca);
-    box-shadow: inset 0 0 0 1px rgb(27 42 61 / 0.08);
     color: var(--ink);
   }
   .photo-ph svg { width: 30px; height: 30px; fill: none; stroke: var(--brand); stroke-width: 1.4; stroke-linejoin: round; opacity: 0.8; }
   .ph-tag { font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--brand); }
   .ph-brief { max-width: 34ch; font-size: 0.875rem; line-height: 1.45; color: var(--ink-2); }
-  figcaption { font-size: 0.8125rem; color: var(--ink-3); }
+  figcaption { font-size: 0.8125rem; color: var(--ink-3); padding-left: 0.1rem; }
+
+  @keyframes photo-open {
+    from { clip-path: inset(7% 5% 7% 5% round 14px); }
+    to { clip-path: inset(0 0 0 0 round 8px); }
+  }
+  @keyframes photo-settle {
+    from { transform: scale(1.1); }
+    to { transform: scale(1); }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .photo-frame:global(.reveal-in) { animation: photo-open 1300ms var(--ease-out) both; }
+    .photo-frame:global(.reveal-in) .photo-img { animation: photo-settle 1800ms var(--ease-out) both; }
+
+    /* Large photos drift a little against the scroll */
+    @supports (animation-timeline: view()) {
+      @keyframes drift {
+        from { transform: translate3d(0, -5%, 0) scale(1.12); }
+        to { transform: translate3d(0, 5%, 0) scale(1.12); }
+      }
+      .parallax .photo-img,
+      .parallax .photo-frame:global(.reveal-in) .photo-img {
+        animation: drift linear both;
+        animation-timeline: view();
+        animation-range: cover 0% cover 100%;
+      }
+    }
+  }
 </style>

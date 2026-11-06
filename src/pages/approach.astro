@@ -4,6 +4,8 @@ import PageHero from '../components/PageHero.astro';
 import Timeline from '../components/Timeline.astro';
 import ClosingCTA from '../components/ClosingCTA.astro';
 import { site } from '../config/site';
+import Photo from '../components/Photo.astro';
+import { photos } from '../data/photos';
 ---
 
 <Base
@@ -14,7 +16,16 @@ import { site } from '../config/site';
     eyebrow="Approach"
     title="Embedded from day one."
     lead={`Every engagement runs the same way. We work inside your team, prove value with a working prototype in ${site.offer.prototypeDays} days, then build it out and hand it over.`}
-  />
+  >
+    <div slot="figure" class="hero-photo">
+      <Photo {...photos.approachBoard} ratio="1 / 1" sizes="(min-width: 1000px) 480px, 100vw" eager />
+      <div class="hero-chip" aria-hidden="true">
+        <span class="chip-k">Week 1</span>
+        <span class="chip-v">Diagnose</span>
+        <span class="chip-bar"><i class="on"></i><i></i><i></i><i></i></span>
+      </div>
+    </div>
+  </PageHero>
 
   <section class="section band-recessed" aria-labelledby="engagement-title">
     <div class="wrap">
@@ -30,5 +41,32 @@ import { site } from '../config/site';
     title="Results in 30 days starts here."
     body="Tell us where work slows down. We’ll walk you through what the diagnosis and first prototype would look like for your team."
     primary={{ label: 'Plan the first 30 days', href: '/contact/' }}
+    photo={photos.approachLaptop}
   />
 </Base>
+
+<style>
+  .hero-photo { position: relative; }
+  .hero-chip {
+    position: absolute;
+    left: calc(var(--s-6) * -1);
+    bottom: var(--s-6);
+    display: grid;
+    grid-template-columns: auto auto;
+    align-items: baseline;
+    gap: 0.15rem 0.6rem;
+    padding: 0.85rem 1.1rem 0.95rem;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 22px 44px -22px rgb(27 42 61 / 0.4);
+  }
+  .chip-k { font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); }
+  .chip-v { font-family: var(--font-display); font-size: 1.25rem; line-height: 1; color: var(--ink); }
+  .chip-bar { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(4, 2.1rem); gap: 4px; margin-top: 0.55rem; }
+  .chip-bar i { height: 4px; border-radius: 2px; background: var(--rule); }
+  .chip-bar i.on { background: var(--accent-soft); }
+  @media (max-width: 960px) {
+    .hero-chip { left: var(--s-4); bottom: var(--s-4); }
+  }
+</style>

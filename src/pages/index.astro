@@ -5,6 +5,8 @@ import Mist from '../components/Mist.astro';
 import Calculator from '../components/Calculator.astro';
 import Problems from '../components/Problems.astro';
 import ClosingCTA from '../components/ClosingCTA.astro';
+import PhotoBand from '../components/PhotoBand.astro';
+import { photos } from '../data/photos';
 import { site } from '../config/site';
 import { hexPath } from '../lib/logo';
 
@@ -39,12 +41,20 @@ import { hexPath } from '../lib/logo';
 
   </section>
 
+  <PhotoBand
+    photo={photos.homeTable}
+    eyebrow="How we work"
+    title="We sit with the people doing the work."
+    body="Before we build anything, we sit down with your team and map how the work really moves: every hand-off, every re-key, every follow-up. Then we build the fix around the people who will use it."
+    note="Where does the time actually go?"
+    notePos={{ x: '4%', y: '8%' }}
+  />
 
   <Problems />
 
   <Calculator />
 
-  <ClosingCTA />
+  <ClosingCTA photo={photos.homeTalk} />
 </Base>
 
 <style>
