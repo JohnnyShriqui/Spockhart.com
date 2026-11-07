@@ -1,8 +1,10 @@
 ---
 /**
- * Six places time and money leak most often. Each problem is one sentence, marked up
- * like an edit: the problem words are crossed out in red and the fix is typed in blue.
+ * Six places time and money leak most often, beside the leaky bucket.
+ * Each problem is one sentence, marked up like an edit: the problem words are crossed
+ * out in red and the fix is typed in blue. Hovering one plugs its leak.
  */
+import LeakyBucket from './LeakyBucket.astro';
 
 /** Plain text, or [crossed out, written in]; leave the second empty to just cross out */
 type Segment = string | readonly [string, string];
@@ -11,12 +13,19 @@ export interface Problem {
   key: string;
   name: string;
   line: readonly Segment[];
+  side: 'left' | 'right';
+  /** Height of this leak on the bucket (between about 200 and 360) */
+  y: number;
   /** 24x24 stroke icon path */
   icon: string;
+  /** Shorter name for the bucket label, when the full name is long */
+  short?: string;
 }
 
 interface Props {
   items?: readonly Problem[];
+  inflow?: string;
+  eyebrow?: string;
   more?: { label: string; href: string };
 }
 
@@ -25,116 +34,197 @@ const defaultProblems = [
     key: 'invoicing',
     name: 'Invoicing',
     line: ['I create every invoice ', ['manually', 'automatically'], ' and ', ['chase', 'track'], ' each payment ', ['one by one', 'in one place'], '.'],
+    side: 'left',
+    y: 214,
     icon: 'M7 3h7l4 4v14H7zM14 3v4h4M12.5 10v8M14.5 11.3c-.4-.6-1.1-.9-2-.9-1.2 0-2 .6-2 1.5 0 2 4 1.1 4 3.1 0 .9-.9 1.5-2 1.5-.9 0-1.7-.4-2.1-1',
   },
   {
     key: 'data-entry',
     name: 'Data entry',
     line: ['I type the same details ', ['into every system', 'once'], ' and ', ['update them manually', 'they sync everywhere'], '.'],
+    side: 'right',
+    y: 238,
     icon: 'M8 4h10a2 2 0 0 1 2 2v10M4 8h10a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zM7 13h6M7 16h4',
   },
   {
     key: 'reporting',
     name: 'Reporting',
     line: ['My reports are ', ['built by hand', 'updated automatically'], ' from ', ['different spreadsheets', 'one live dashboard'], '.'],
+    side: 'left',
+    y: 272,
     icon: 'M4 20h16M7 16v-4M12 16V8M17 16v-7M7 8.5l5-3.5 5 3',
   },
   {
     key: 'followups',
     name: 'Follow-ups',
     line: ['I ', ['lose track of', 'never miss'], ' leads, payments, and requests ', ['that slip through the cracks', ''], '.'],
+    side: 'right',
+    y: 298,
     icon: 'M3 7l9 6 9-6M3 7v10a1 1 0 0 0 1 1h9M3 7a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v6M16 18h5M19 16l2 2-2 2',
   },
   {
     key: 'scheduling',
     name: 'Scheduling',
     line: ['I ', ['email back and forth', 'send one link'], ' to find a time, then ', ['confirm every meeting manually', 'bookings confirm automatically'], '.'],
+    side: 'left',
+    y: 330,
     icon: 'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4M8 14h2M12 14h2M16 14h0M8 17h2M12 17h2',
   },
   {
     key: 'reconciliation',
     name: 'Reconciliation',
     line: ['I ', ['manually', 'automatically'], ' match every transaction and ', ['check each line', 'only review what gets flagged'], '.'],
+    side: 'right',
+    y: 352,
     icon: 'M3.5 4h6v16h-6zM14.5 4h6v16h-6zM9.5 9h5M13 7.5l1.5 1.5-1.5 1.5M14.5 15h-5M11 13.5L9.5 15l1.5 1.5',
   },
 ] as const;
 
-const { items: problems = defaultProblems, more = { label: 'How we fix it', href: '/approach/' } } = Astro.props;
+const {
+  items: problems = defaultProblems,
+  inflow = 'Revenue in',
+  eyebrow = 'What we fix most often',
+  more = { label: 'How we fix it', href: '/approach/' },
+} = Astro.props;
 ---
 
-<section class="problems-section" aria-labelledby="problems-title">
-  <div class="wrap">
-    <div class="p-head" data-reveal>
-      <h2 id="problems-title">Stop losing time and money to tedious, repetitive tasks.</h2>
+<section class="problems-section" aria-labelledby="problems-title" data-problems>
+  <div class="wrap p-layout">
+    <div class="p-side">
+      <div class="p-head" data-reveal>
+        <h2 id="problems-title">Stop losing time and money to tedious, repetitive tasks.</h2>
+      </div>
+      <div class="p-figure" data-reveal>
+        <LeakyBucket inflow={inflow} leaks={problems.map((p) => ({ key: p.key, label: ('short' in p && p.short) || p.name, side: p.side, y: p.y }))} />
+      </div>
     </div>
-    <ul class="p-list" data-reveal="stagger">
-      {
-        problems.map((p) => (
-          <li class="p-row">
-            <span class="p-badge" aria-hidden="true">
-              <svg viewBox="0 0 24 24">
-                <path d={p.icon} />
-              </svg>
-            </span>
-            <div class="p-body">
-              <h3>{p.name}</h3>
-              <p class="p-line">
-                <span class="p-warn" aria-hidden="true">
-                  <svg viewBox="0 0 16 16">
-                    <path d="M7.13 2.04a1 1 0 0 1 1.74 0l6.01 10.46a1 1 0 0 1-.87 1.5H1.99a1 1 0 0 1-.87-1.5z" />
-                    <path class="p-warn-mark" d="M8 6.1v3.5M8 11.75v.01" />
-                  </svg>
-                </span>
-                <span class="p-text">
-                  {p.line.map((seg) =>
-                    typeof seg === 'string' ? (
-                      seg
-                    ) : (
-                      <>
-                        <del>{seg[0]}</del>
-                        {seg[1] && ' '}
-                        {seg[1] && <ins>{seg[1]}</ins>}
-                      </>
-                    ),
-                  )}
-                </span>
-              </p>
-            </div>
-          </li>
-        ))
-      }
-    </ul>
-    <a class="arrow-link p-more" href={more.href}><span>{more.label}</span><span class="arr" aria-hidden="true">→</span></a>
+
+    <div class="p-main">
+      <ul class="p-list" data-reveal="stagger">
+        {
+          problems.map((p) => (
+            <li class="p-row" data-leak-key={p.key} tabindex="0">
+              <span class="p-badge" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d={p.icon} />
+                </svg>
+              </span>
+              <div class="p-body">
+                <h3>{p.name}</h3>
+                <p class="p-line">
+                  <span class="p-warn" aria-hidden="true">
+                    <svg viewBox="0 0 16 16">
+                      <path d="M7.13 2.04a1 1 0 0 1 1.74 0l6.01 10.46a1 1 0 0 1-.87 1.5H1.99a1 1 0 0 1-.87-1.5z" />
+                      <path class="p-warn-mark" d="M8 6.1v3.5M8 11.75v.01" />
+                    </svg>
+                  </span>
+                  <span class="p-text">
+                    {p.line.map((seg) =>
+                      typeof seg === 'string' ? (
+                        seg
+                      ) : (
+                        <>
+                          <del>{seg[0]}</del>
+                          {seg[1] && ' '}
+                          {seg[1] && <ins>{seg[1]}</ins>}
+                        </>
+                      ),
+                    )}
+                  </span>
+                </p>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+      <a class="arrow-link p-more" href={more.href}><span>{more.label}</span><span class="arr" aria-hidden="true">→</span></a>
+    </div>
   </div>
 </section>
 
-<style>
-  .problems-section { padding-block: clamp(3rem, 2rem + 3vw, 5rem); background: var(--paper-2); }
-  .p-head { margin-bottom: var(--s-6); }
-  .p-head h2 { font-size: var(--step-4); max-width: 22ch; }
+<script>
+  // With a mouse, hovering or focusing a problem plugs its leak in the bucket.
+  // On touch screens the list is plain: nothing to tap, nothing that moves.
+  function initProblems() {
+    const mouse = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    document.querySelectorAll<HTMLElement>('[data-problems]').forEach((section) => {
+      if (section.dataset.ready) return;
+      section.dataset.ready = '1';
+      if (!mouse) {
+        section.querySelectorAll<HTMLElement>('[data-leak-key]').forEach((row) => row.removeAttribute('tabindex'));
+        return;
+      }
+      const leaks = new Map<string, Element>();
+      section.querySelectorAll('[data-leak]').forEach((g) => leaks.set((g as HTMLElement).dataset.leak!, g));
+      const set = (key: string | null) => {
+        leaks.forEach((g, k) => g.classList.toggle('is-fixed', k === key));
+        section.querySelectorAll<HTMLElement>('[data-leak-key]').forEach((row) => row.classList.toggle('is-active', row.dataset.leakKey === key));
+      };
+      section.querySelectorAll<HTMLElement>('[data-leak-key]').forEach((row) => {
+        const key = row.dataset.leakKey!;
+        row.addEventListener('pointerenter', () => set(key));
+        row.addEventListener('pointerleave', () => set(null));
+        row.addEventListener('focus', () => set(key));
+        row.addEventListener('blur', () => set(null));
+      });
+    });
+  }
+  initProblems();
+  document.addEventListener('spockhart:view', initProblems);
+</script>
 
-  /* Two columns of cards on laptops, one on phones */
-  .p-list { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-3); }
+<style>
+  .problems-section { padding-block: clamp(3rem, 2rem + 3vw, 5rem); background: var(--paper-2); overflow: clip; }
+  .p-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: clamp(2rem, 1rem + 4vw, 4.5rem);
+    align-items: start;
+  }
+  .p-side { display: grid; gap: var(--s-6); position: sticky; top: 104px; }
+  .p-head { display: grid; gap: var(--s-2); }
+  .p-head h2 { font-size: clamp(2rem, 1.55rem + 1.5vw, 3rem); max-width: 16ch; }
+  .p-figure { display: grid; justify-items: center; }
+
+  .p-main { display: grid; gap: var(--s-5); }
+  .p-list { list-style: none; padding: 0; display: grid; gap: var(--s-2); }
   .p-row {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
     gap: 0 1.1rem;
     align-items: center;
-    padding: 1rem var(--s-5) 1.05rem var(--s-4);
+    padding: 0.95rem var(--s-5) 1rem var(--s-4);
     border: 1px solid var(--rule);
     border-radius: var(--radius-lg);
     background: var(--surface);
+    outline: none;
+    transition: border-color 300ms var(--ease), transform 400ms var(--ease-out), box-shadow 400ms var(--ease);
   }
+  .p-row:hover, .p-row.is-active, .p-row:focus-visible {
+    border-color: var(--rule-2);
+    transform: translateX(-4px);
+    box-shadow: 0 16px 32px -26px rgb(27 42 61 / 0.5);
+  }
+  .p-row:focus-visible { outline: 2px solid var(--accent-soft); outline-offset: 2px; }
+
   .p-badge { position: relative; display: grid; place-items: center; width: 38px; height: 43px; }
-  .p-badge::before { content: ''; position: absolute; inset: 0; clip-path: var(--hex); background: var(--ink); }
+  .p-badge::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    clip-path: var(--hex);
+    background: var(--ink);
+    transition: background-color 300ms var(--ease), transform 600ms var(--ease-out);
+  }
+  .p-row.is-active .p-badge::before { background: var(--brand); transform: rotate(180deg); }
   .p-badge svg { position: relative; width: 19px; height: 19px; fill: none; stroke: #fff; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
 
-  .p-body { display: grid; gap: 0.2rem; min-width: 0; }
+  .p-body { display: grid; gap: 0.15rem; min-width: 0; }
   .p-body h3 { font-size: 1.0625rem; line-height: 1.3; }
 
   /* The sentence, edited: a red warning, the problem crossed out in red, the fix typed in blue */
-  .p-line { display: flex; align-items: flex-start; gap: 0.5rem; color: var(--ink-2); font-size: 1rem; line-height: 1.55; }
-  .p-warn { display: inline-flex; flex: none; margin-top: 0.25rem; color: var(--warn); }
+  .p-line { display: flex; align-items: flex-start; gap: 0.5rem; color: var(--ink-2); font-size: 1rem; line-height: 1.65; }
+  .p-warn { display: inline-flex; flex: none; margin-top: 0.3rem; color: var(--warn); }
   .p-warn svg { width: 15px; height: 15px; fill: currentColor; }
   .p-warn-mark { fill: none; stroke: #fff; stroke-width: 1.7; stroke-linecap: round; }
   .p-text { min-width: 0; }
@@ -145,24 +235,62 @@ const { items: problems = defaultProblems, more = { label: 'How we fix it', href
     text-decoration-thickness: 2px;
   }
   .p-line ins { color: var(--accent); font-weight: 600; text-decoration: none; }
-  .p-more { display: inline-flex; margin-top: var(--s-5); }
-
+  /* Laptops: each crossed-out phrase and each fix stays in one piece */
   @media (min-width: 901px) {
     .p-line del, .p-line ins { white-space: nowrap; }
   }
-  @media (max-width: 1100px) {
-    .p-list { grid-template-columns: minmax(0, 1fr); }
+  .p-more { justify-self: start; }
+
+  /* Laptops: the list runs exactly as tall as the heading and bucket beside it, its rows
+     sharing the height evenly; the link sits underneath */
+  @media (min-width: 901px) {
+    .p-layout { grid-template-rows: auto auto; align-items: stretch; row-gap: var(--s-5); }
+    .p-side { grid-column: 1; grid-row: 1; position: static; gap: var(--s-7); align-content: space-between; }
+    .p-main { display: contents; }
+    .p-list { grid-column: 2; grid-row: 1; grid-auto-rows: 1fr; }
+    .p-more { grid-column: 2; grid-row: 2; }
+    .p-row { padding: 0.7rem var(--s-5) 0.75rem var(--s-4); }
+    .p-line { line-height: 1.55; }
   }
-  /* Phones: the list as one card */
+  /* Small laptops: the sentences wrap more and the list outgrows the bucket, so the bucket
+     stays with its heading instead of dropping to the bottom */
+  @media (min-width: 901px) and (max-width: 1180px) {
+    .p-side { align-content: start; }
+  }
+
+  /* Phones and small tablets: a smaller bucket, and the list as one card */
   @media (max-width: 900px) {
-    .p-head h2 { font-size: clamp(2rem, 1.55rem + 1.5vw, 3rem); max-width: 18ch; }
-    .p-list { gap: 0; border: 1px solid var(--rule); border-radius: var(--radius-lg); background: var(--surface); overflow: hidden; }
-    .p-row { gap: 0 0.85rem; align-items: start; padding: 0.85rem var(--s-4) 0.9rem; border: 0; border-radius: 0; background: none; }
+    .p-layout { grid-template-columns: minmax(0, 1fr); gap: var(--s-6); }
+    .p-side { position: static; gap: var(--s-6); }
+    .p-head h2 { max-width: 18ch; }
+    .p-figure { max-width: 300px; margin-inline: auto; width: 100%; }
+    .p-list {
+      gap: 0;
+      border: 1px solid var(--rule);
+      border-radius: var(--radius-lg);
+      background: var(--surface);
+      overflow: hidden;
+    }
+    .p-row,
+    .p-row:hover,
+    .p-row.is-active,
+    .p-row:focus-visible {
+      gap: 0 0.85rem;
+      align-items: start;
+      padding: 0.85rem var(--s-4) 0.9rem;
+      border: 0;
+      border-radius: 0;
+      background: none;
+      box-shadow: none;
+      transform: none;
+      transition: none;
+    }
     .p-row + .p-row { border-top: 1px solid var(--rule); }
     .p-badge { width: 30px; height: 34px; margin-top: 0.1rem; }
     .p-badge svg { width: 16px; height: 16px; }
-    .p-line { font-size: 0.9375rem; gap: 0.4rem; }
-    .p-warn { margin-top: 0.22rem; }
+    .p-row.is-active .p-badge::before { background: var(--ink); transform: none; }
+    .p-line { font-size: 0.9375rem; line-height: 1.6; gap: 0.4rem; }
+    .p-warn { margin-top: 0.28rem; }
     .p-warn svg { width: 14px; height: 14px; }
   }
 </style>

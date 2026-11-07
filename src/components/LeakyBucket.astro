@@ -1,0 +1,187 @@
+---
+/**
+ * The leaky bucket: revenue pours in, tedious, repetitive tasks leak it out. Each leak is one of
+ * the problems listed beside it (keys match Problems.astro). Hovering a problem
+ * plugs its leak. Decorative; the list carries the content.
+ */
+interface Leak {
+  key: string;
+  label: string;
+  side: 'left' | 'right';
+  y: number;
+}
+interface Props {
+  leaks: Leak[];
+  /** Label on the pipe, e.g. 'Revenue in' or 'Donations in' */
+  inflow?: string;
+}
+const { leaks, inflow = 'Revenue in' } = Astro.props;
+
+// Bucket geometry (viewBox 0 0 520 448)
+const CX = 249;
+const TOP = 130;
+const BOTTOM = 372;
+const TOP_HALF = 112;
+const BOTTOM_HALF = 87;
+const WATER = 182;
+const GROUND = 432;
+const slope = (TOP_HALF - BOTTOM_HALF) / (BOTTOM - TOP);
+const halfAt = (y: number) => TOP_HALF - (y - TOP) * slope;
+const edge = (side: 'left' | 'right', y: number) => CX + (side === 'left' ? -1 : 1) * halfAt(y);
+
+const body = `M${CX - TOP_HALF} ${TOP} L${CX - BOTTOM_HALF} ${BOTTOM} A${BOTTOM_HALF} 14 0 0 0 ${CX + BOTTOM_HALF} ${BOTTOM} L${CX + TOP_HALF} ${TOP} A${TOP_HALF} 18 0 0 1 ${CX - TOP_HALF} ${TOP} Z`;
+const hoop = (y: number, ry: number) => {
+  const h = halfAt(y);
+  return `M${CX - h} ${y} A${h} ${ry} 0 0 0 ${CX + h} ${y}`;
+};
+const waterHalf = halfAt(WATER);
+
+const jets = leaks.map((l) => {
+  const dir = l.side === 'left' ? -1 : 1;
+  const x0 = edge(l.side, l.y);
+  // Higher holes throw farther here so the streams nest instead of crossing.
+  const reach = 26 + (BOTTOM - l.y) * 0.27;
+  const x1 = x0 + dir * reach;
+  const path = `M${x0.toFixed(1)} ${l.y} Q${(x0 + dir * reach * 0.55).toFixed(1)} ${l.y} ${x1.toFixed(1)} ${GROUND - 4}`;
+  // A hairline crack running from the hole across the wall
+  const crack = `M${x0.toFixed(1)} ${l.y} l${(-dir * 4).toFixed(1)} -3 l${(-dir * 2).toFixed(1)} -6 l${(-dir * 5).toFixed(1)} -3 l${(-dir * 2).toFixed(1)} -7 M${x0.toFixed(1)} ${l.y} l${(-dir * 5).toFixed(1)} 4 l${(-dir * 1).toFixed(1)} 5`;
+  const labelX = l.side === 'left' ? 86 : 412;
+  return { ...l, x0, x1, path, crack, labelX, anchor: l.side === 'left' ? 'end' : 'start' };
+});
+---
+
+<figure class="bucket" data-bucket aria-hidden="true">
+  <svg viewBox="0 0 520 448" class="bucket-svg">
+    <defs>
+      <linearGradient id="bk-water" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#9ccbec" />
+        <stop offset="1" stop-color="#4a8aba" />
+      </linearGradient>
+      <linearGradient id="bk-glass" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#fff" stop-opacity="0.5" />
+        <stop offset="0.35" stop-color="#fff" stop-opacity="0.12" />
+        <stop offset="0.8" stop-color="#fff" stop-opacity="0.04" />
+        <stop offset="1" stop-color="#fff" stop-opacity="0.3" />
+      </linearGradient>
+      <clipPath id="bk-body"><path d={body} /></clipPath>
+    </defs>
+
+    <!-- Puddle of everything lost -->
+    <ellipse cx={CX} cy={GROUND} rx="214" ry="11" class="bk-puddle" />
+
+    <!-- Revenue pipe -->
+    <text x="24" y="10" class="bk-cap">{inflow}</text>
+    <path d={`M30 26 H${CX - 11} A22 22 0 0 1 ${CX + 11} 48 V80 H${CX - 11} V52 A4 4 0 0 0 ${CX - 15} 48 H30 Z`} class="bk-pipe" />
+    <rect x="24" y="20" width="10" height="34" rx="2" class="bk-pipe" />
+    <rect x={CX - 15} y="74" width="30" height="8" rx="2" class="bk-pipe" />
+    <path d={`M40 31 H${CX - 12}`} class="bk-pipe-shine" />
+
+    <!-- Inside of the bucket -->
+    <ellipse cx={CX} cy={TOP} rx={TOP_HALF} ry="18" class="bk-inside" />
+
+    <!-- Water -->
+    <g clip-path="url(#bk-body)">
+      <rect x={CX - TOP_HALF} y={WATER} width={TOP_HALF * 2} height={BOTTOM - WATER + 20} fill="url(#bk-water)" />
+    </g>
+    <ellipse cx={CX} cy={WATER} rx={waterHalf} ry="16" class="bk-surface" />
+
+    <!-- Inflow -->
+    <path d={`M${CX} 82 V${WATER}`} class="bk-stream" />
+    <path d={`M${CX} 82 V${WATER}`} class="bk-stream-flow" />
+    <ellipse cx={CX} cy={WATER} rx="18" ry="4" class="bk-ripple" />
+    <ellipse cx={CX} cy={WATER} rx="18" ry="4" class="bk-ripple bk-ripple-2" />
+
+    <!-- Bucket shell -->
+    <path d={body} class="bk-shell" />
+    <path d={hoop(152, 17)} class="bk-hoop" />
+    <path d={hoop(338, 15)} class="bk-hoop" />
+    <path d={`M${CX - TOP_HALF} ${TOP} A${TOP_HALF} 18 0 0 0 ${CX + TOP_HALF} ${TOP}`} class="bk-lip" />
+    <ellipse cx={CX} cy={TOP} rx={TOP_HALF} ry="18" class="bk-rim" />
+
+    <!-- Leaks -->
+    {
+      jets.map((j) => (
+        <g class="leak" data-leak={j.key}>
+          <path d={j.crack} class="leak-crack" />
+          <path d={j.path} class="leak-jet" />
+          <path d={j.path} class="leak-flow" />
+          <ellipse cx={j.x1} cy={GROUND - 2} rx="9" ry="2.5" class="leak-splash" />
+          <ellipse cx={j.x0} cy={j.y} rx="3" ry="4.5" class="leak-hole" />
+          <polygon
+            class="leak-patch"
+            points={[0, 1, 2, 3, 4, 5]
+              .map((k) => {
+                const a = (Math.PI / 3) * k - Math.PI / 2;
+                return `${(j.x0 + Math.cos(a) * 9).toFixed(1)},${(j.y + Math.sin(a) * 9).toFixed(1)}`;
+              })
+              .join(' ')}
+          />
+          <text x={j.labelX} y={j.y + 4} class="leak-label" text-anchor={j.anchor}>
+            {j.label}
+          </text>
+        </g>
+      ))
+    }
+  </svg>
+</figure>
+
+<style>
+  .bucket { margin: 0; width: 100%; max-width: 480px; }
+  .bucket-svg { width: 100%; height: auto; overflow: visible; }
+
+  /* What goes in and what is lost: large enough to read at a glance */
+  .bk-cap { font-family: var(--font-body); font-size: 21px; font-weight: 700; letter-spacing: 0.01em; fill: var(--ink); }
+  .bk-pipe { fill: var(--ink); }
+  .bk-pipe-shine { stroke: #3a5068; stroke-width: 2; stroke-linecap: round; fill: none; }
+  .bk-inside { fill: #c9d6e3; }
+  .bk-surface { fill: #b7d9f0; }
+  .bk-stream { stroke: #6aa6d4; stroke-width: 12; stroke-linecap: round; fill: none; }
+  .bk-stream-flow { stroke: rgb(255 255 255 / 0.55); stroke-width: 3; stroke-dasharray: 5 13; stroke-linecap: round; fill: none; }
+  .bk-ripple { fill: none; stroke: #fff; stroke-width: 1.5; opacity: 0; transform-box: fill-box; transform-origin: center; }
+  .bk-shell { fill: url(#bk-glass); stroke: var(--ink); stroke-width: 2.5; stroke-linejoin: round; }
+  .bk-hoop { fill: none; stroke: var(--ink); stroke-width: 1.5; opacity: 0.3; }
+  .bk-lip { fill: none; stroke: var(--ink); stroke-width: 5; stroke-linecap: round; }
+  .bk-rim { fill: none; stroke: var(--ink); stroke-width: 2.5; }
+  .bk-puddle { fill: rgb(74 138 186 / 0.2); }
+
+  .leak-crack { fill: none; stroke: var(--ink); stroke-width: 1.2; stroke-linecap: round; stroke-linejoin: round; opacity: 0.6; }
+  .leak-hole { fill: var(--ink); }
+  .leak-jet { fill: none; stroke: #4a8aba; stroke-width: 3.5; stroke-linecap: round; }
+  .leak-flow { fill: none; stroke: #cfe5f5; stroke-width: 1.6; stroke-linecap: round; stroke-dasharray: 4 14; }
+  .leak-splash { fill: none; stroke: #4a8aba; stroke-width: 1.2; opacity: 0.7; transform-box: fill-box; transform-origin: center; }
+  .leak-patch { fill: var(--brand); stroke: #fff; stroke-width: 2; opacity: 0; transform-box: fill-box; transform-origin: center; transform: scale(0.3); }
+  .leak-label { font-family: var(--font-body); font-size: 15px; font-weight: 600; fill: var(--ink-2); }
+  .leak-jet, .leak-flow, .leak-splash, .leak-crack { transition: opacity 400ms var(--ease); }
+  .leak-patch { transition: opacity 300ms var(--ease), transform 500ms var(--ease-out); }
+  .leak-label { transition: fill 300ms var(--ease); }
+
+  /* A problem in the list is hovered: its leak is plugged */
+  .leak.is-fixed .leak-jet,
+  .leak.is-fixed .leak-flow,
+  .leak.is-fixed .leak-splash,
+  .leak.is-fixed .leak-crack { opacity: 0; }
+  .leak.is-fixed .leak-patch { opacity: 1; transform: none; }
+  .leak.is-fixed .leak-label { fill: var(--accent); }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .bk-stream-flow { animation: bk-flow 700ms linear infinite; }
+    .leak-flow { animation: bk-flow 900ms linear infinite; }
+    .bk-ripple { animation: bk-ripple 1.6s var(--ease-out) infinite; }
+    .bk-ripple-2 { animation-delay: 0.8s; }
+    .leak-splash { animation: bk-splash 1.2s var(--ease-out) infinite; }
+    .leak:nth-of-type(2n) .leak-splash { animation-delay: 0.4s; }
+    .leak:nth-of-type(3n) .leak-splash { animation-delay: 0.8s; }
+    .bk-surface { animation: bk-bob 3.2s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+    @keyframes bk-flow { to { stroke-dashoffset: -18; } }
+    @keyframes bk-ripple { from { opacity: 0.9; transform: scale(0.4); } to { opacity: 0; transform: scale(2.6); } }
+    @keyframes bk-splash { from { opacity: 0.8; transform: scale(0.3); } to { opacity: 0; transform: scale(1.6); } }
+    @keyframes bk-bob { 50% { transform: scaleX(0.985) translateY(1px); } }
+  }
+
+  @media (max-width: 640px) {
+    .bk-cap { font-size: 27px; }
+  }
+  @media (max-width: 520px) {
+    .leak-label { font-size: 17px; }
+  }
+</style>
