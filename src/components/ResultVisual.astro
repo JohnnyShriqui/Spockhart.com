@@ -33,39 +33,6 @@ const hopArcs = Array.from(
 ).map((k) => k.split('-').map(Number));
 const runs = [[0.3, 2.3]];
 
-/* Production floor: the old layout sent work back and forth across the aisle between stations
-   placed out of process order. Points are the route; `stop` marks a station. */
-const floorStations = [
-  [188, 30],
-  [52, 122],
-  [84, 30],
-  [164, 122],
-  [32, 30],
-  [208, 122],
-  [136, 30],
-];
-const lanes = [66, 82, 70, 86, 74, 78];
-const route: { x: number; y: number; stop?: boolean }[] = [];
-floorStations.forEach(([x, y], k) => {
-  const edge = y < 76 ? y + 9 : y - 9;
-  if (k > 0) {
-    const [px, py] = floorStations[k - 1];
-    const lane = lanes[k - 1];
-    route.push({ x: px, y: lane }, { x, y: lane });
-  }
-  route.push({ x, y: edge, stop: true });
-  // leave the station back toward the aisle for the next leg
-});
-const tangleD = 'M' + route.map((p) => `${p.x} ${p.y}`).join(' L');
-const segLens = route.slice(1).map((p, i) => Math.hypot(p.x - route[i].x, p.y - route[i].y));
-const total = segLens.reduce((a, b) => a + b, 0);
-const tangleStops = route
-  .map((p, i) => (p.stop ? segLens.slice(0, i).reduce((a, b) => a + b, 0) / total : -1))
-  .filter((f) => f >= 0)
-  .map((f) => f.toFixed(4))
-  .join(' ');
-const tangle = floorStations;
-
 /* Supply chain: suppliers, their scores, and where each lands when ranked */
 const hq = [150, 128];
 const suppliers = [
@@ -79,8 +46,38 @@ const suppliers = [
   { x: 56, y: 112, s: 0.28 },
 ].map((p, i, all) => {
   const rank = all.filter((q) => q.s > p.s).length;
-  return { ...p, i, rank, ty: 46 + rank * 25, len: Math.hypot(p.x - hq[0], p.y - hq[1]) - 16 };
+  return { ...p, i, rank, ty: 40 + rank * 29, len: Math.hypot(p.x - hq[0], p.y - hq[1]) - 16 };
 });
+
+/* Practice growth: two charts on the same $0 to $1M scale. In the after chart the area under the
+   curve is stacked by service, so each new service fills in its own band as revenue climbs. */
+const gx = (m: number) => 6 + m * 18.8;
+const gy = (v: number) => 138 - (v / 1000) * 122;
+const ramp = (x: number) => Math.pow(Math.min(1, Math.max(0, x)), 1.25);
+const advisory = (m: number) => 150 + 7 * Math.sin((m * Math.PI) / 3);
+const services = [
+  { name: 'Digital twins', start: 1.5, max: 260, color: '#5f9acb' },
+  { name: 'Analytics', start: 3.5, max: 220, color: '#8ec0e6' },
+  { name: 'Transformation platforms', start: 5.5, max: 230, color: '#b6d6ef' },
+  { name: 'Enterprise clients', start: 7.5, max: 140, color: '#e1eef8' },
+];
+const steps12 = Array.from({ length: 49 }, (_, i) => i / 4);
+// Cumulative tops: layer 0 is advisory, each service stacks on the one below
+const layers = [advisory, ...services.map((sv) => (m: number) => sv.max * ramp((m - sv.start) / (12 - sv.start)))];
+const stackAt = (m: number) => layers.reduce<number[]>((acc, f) => [...acc, (acc[acc.length - 1] ?? 0) + f(m)], []);
+const stacks = steps12.map((m) => stackAt(m));
+const pts = (k: number) => steps12.map((m, i) => `${gx(m).toFixed(1)} ${gy(stacks[i][k]).toFixed(1)}`);
+const bandD = (k: number) => {
+  const top = pts(k);
+  const bottom = k === 0 ? [`${gx(12).toFixed(1)} ${gy(0)}`, `${gx(0).toFixed(1)} ${gy(0)}`] : pts(k - 1).reverse();
+  return `M${top.join(' L')} L${bottom.join(' L')}Z`;
+};
+const growthBands = layers.map((_, k) => bandD(k));
+const growthLine = `M${pts(layers.length - 1).join(' L')}`;
+const advisoryLine = `M${pts(0).join(' L')}`;
+const advisoryArea = growthBands[0];
+const growthTime = (m: number) => 0.4 + (6.6 * m) / 12;
+const growthCount = Array.from({ length: 13 }, (_, m) => `${growthTime(m).toFixed(2)} ${Math.min(990, Math.round(stackAt(m)[layers.length - 1]))}`).join(', ');
 
 /* Sales: rep values at 0 s, 3.5 s and 7 s (an illustration, not real figures) */
 const reps = [
@@ -246,93 +243,6 @@ const person = 'M2.8 4.2a3.2 3.2 0 1 0 6.4 0a3.2 3.2 0 1 0 -6.4 0zM0.6 16c0-3.6 
   }
 
   {
-    id === 'production-floor-redesign' && (
-      <>
-        <div class="win">
-          <div class="win-bar" aria-hidden="true"><span class="win-dots"><i /><i /><i /></span><span>One shift on the production floor</span></div>
-          <div class="scene panes" data-scene data-loop="8" data-still="7.4" style="--loop:8;--still:7.4">
-            <div class="lane">
-              <div class="lane-head">
-                <span class="tag">Before</span>
-              </div>
-              <svg class="pane-svg" viewBox="0 0 236 152" aria-hidden="true">
-                <rect x="1" y="1" width="234" height="150" rx="6" class="zone" />
-                <path id={`${id}-route`} d={tangleD} class="route" />
-                <path d="M1 76 H235" class="aisle" />
-                {tangle.map(([x, y]) => (
-                  <rect x={x - 15} y={y - 9} width="30" height="18" rx="3" class="station" />
-                ))}
-                <g class="ends">
-                  {[0, 0.34, 0.67].map((o) => (
-                    <g data-along={`#${id}-route`} data-speed="0.05" data-offset={o} data-stops={tangleStops} transform={`translate(${tangle[0][0]} ${tangle[0][1] + 9})`}>
-                      <rect x="-5" y="-5" width="10" height="10" rx="2" class="item" />
-                    </g>
-                  ))}
-                </g>
-              </svg>
-              <div class="meter" aria-hidden="true">
-                <span class="meter-k">Output</span>
-                <span class="meter-track">
-                  <span class="meter-fill ends" style="--max:0.56;--dur:7.4" />
-                  <span class="meter-target"><i>Target</i></span>
-                </span>
-              </div>
-            </div>
-            <div class="lane">
-              <div class="lane-head">
-                <span class="tag tag-hot">After</span>
-                <span class="readout readout-hot swap">
-                  <span class="dn" style="--d:4.7">Straight through</span>
-                  <span class="ap" style="--a:4.7">Above target</span>
-                </span>
-              </div>
-              <svg class="pane-svg" viewBox="0 0 236 152" aria-hidden="true">
-                <rect x="1" y="1" width="234" height="150" rx="6" class="zone" />
-                <path id={`${id}-line`} d="M16 76 H220" class="flow" />
-                {[72, 106, 140, 174].map((x) => (
-                  <rect x={x - 13} y="67" width="26" height="18" rx="3" class="station station-on" />
-                ))}
-                <g class="ends">
-                  {[0, 1, 2, 3, 4, 5].map((k) => (
-                    <g data-along={`#${id}-line`} data-speed="0.3" data-offset={(k / 6).toFixed(3)} transform="translate(16 76)">
-                      <rect x="-5" y="-5" width="10" height="10" rx="2" class="item item-hot" />
-                    </g>
-                  ))}
-                </g>
-                <polygon points={hex(34, 76, 13)} class="check" />
-                <path d="M29 76l3.5 3.5 6-6.5" class="check-tick" />
-                <polygon points={hex(204, 76, 13)} class="check" />
-                <path d="M199 76l3.5 3.5 6-6.5" class="check-tick" />
-                <text x="34" y="110" class="node-label" text-anchor="middle">Inbound</text>
-                <text x="204" y="110" class="node-label" text-anchor="middle">Finished</text>
-                <text x="34" y="123" class="node-label" text-anchor="middle">check</text>
-                <text x="204" y="123" class="node-label" text-anchor="middle">check</text>
-              </svg>
-              <div class="meter" aria-hidden="true">
-                <span class="meter-k">Output</span>
-                <span class="meter-track">
-                  <span class="meter-fill meter-fill-hot ends" style="--max:1;--dur:5.8" />
-                  <span class="meter-target"><i>Target</i></span>
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="rv-split">
-          <div>
-            <span class="rv-k">Above daily production target</span>
-            <p class="rv-num rv-num-sm"><strong>3 days</strong> <small>a week</small></p>
-          </div>
-          <div>
-            <span class="rv-k">The new layout, adopted permanently</span>
-            <p class="rv-num rv-num-sm"><strong>Standard</strong> <small>procedure</small></p>
-          </div>
-        </div>
-      </>
-    )
-  }
-
-  {
     id === 'supply-chain-assessment' && (
       <div class="win">
         <div class="win-bar" aria-hidden="true"><span class="win-dots"><i /><i /><i /></span><span>A global supplier network, assessed</span></div>
@@ -351,7 +261,7 @@ const person = 'M2.8 4.2a3.2 3.2 0 1 0 6.4 0a3.2 3.2 0 1 0 -6.4 0zM0.6 16c0-3.6 
                 </span>
               ))}
             </div>
-            <svg class="chain-svg" viewBox="0 0 520 250" aria-hidden="true">
+            <svg class="chain-svg" viewBox="0 0 520 258" aria-hidden="true">
               <text x="0" y="12" class="corner">Scattered processes</text>
               <text x="320" y="12" class="corner corner-hot ap" style="--a:7.2">Ranked priorities</text>
               <g class="ghost" style="--d:6.8">
@@ -485,34 +395,58 @@ const person = 'M2.8 4.2a3.2 3.2 0 1 0 6.4 0a3.2 3.2 0 1 0 -6.4 0zM0.6 16c0-3.6 
       <>
         <div class="win">
           <div class="win-bar" aria-hidden="true"><span class="win-dots"><i /><i /><i /></span><span>Practice revenue, first year</span></div>
-          <div class="scene" data-scene data-loop="9" data-still="8.3" style="--loop:9;--still:8.3">
+          <div class="scene panes" data-scene data-loop="9" data-still="8.3" style="--loop:9;--still:8.3">
             <div class="lane">
               <div class="lane-head">
                 <span class="tag">Before</span>
                 <span class="readout tabular">~$150K</span>
               </div>
-              <div class="rev-track" aria-hidden="true"><span class="rev-fill" style="--w:0.15" /></div>
+              <svg class="pane-svg growth" viewBox="0 0 236 152" aria-hidden="true">
+                {[250, 500, 750, 1000].map((v) => <path d={`M${gx(0)} ${gy(v)} H${gx(12)}`} class="grid" />)}
+                <text x={gx(0)} y={gy(1000) - 4} class="axis">$1M</text>
+                <text x={gx(0)} y={gy(500) - 4} class="axis">$500K</text>
+                <path d={`M${gx(0)} ${gy(0)} H${gx(12)}`} class="baseline" />
+                <g class="reveal ends" style="--a:0.4;--b:7">
+                  <rect x="0" y="0" width="236" height="152" fill="none" />
+                  <path d={advisoryArea} class="band-base" />
+                  <path d={advisoryLine} class="growth-line growth-line-dim" />
+                </g>
+                <text x={gx(0)} y="151" class="axis">Month 1</text>
+                <text x={gx(12)} y="151" class="axis" text-anchor="end">12</text>
+              </svg>
               <p class="lane-foot">Traditional advisory work</p>
             </div>
             <div class="lane">
               <div class="lane-head">
                 <span class="tag tag-hot">After</span>
                 <span class="readout readout-hot tabular swap">
-                  <span class="dn" style="--d:7.05"><span data-count="0.4 150, 7 990" data-fmt="~${}K">~$990K</span></span>
+                  <span class="dn" style="--d:7.05"><span data-count={growthCount} data-fmt="~${}K">~$990K</span></span>
                   <span class="ap" style="--a:7.05">~$1M</span>
                 </span>
               </div>
-              <div class="rev-track ends" aria-hidden="true">
-                <span class="rev-fill rev-grow" />
-                <span class="rev-ticks">{twelve.map(() => <i />)}</span>
-              </div>
-              <ul class="chips ends" aria-hidden="true">
-                {['Digital twins', 'Analytics', 'Transformation platforms', 'Enterprise clients'].map((c, k) => (
-                  <li class="chip pop" style={`--a:${(1.4 + k * 1.5).toFixed(1)}`}>{c}</li>
-                ))}
-              </ul>
+              <svg class="pane-svg growth" viewBox="0 0 236 152" aria-hidden="true">
+                {[250, 500, 750, 1000].map((v) => <path d={`M${gx(0)} ${gy(v)} H${gx(12)}`} class="grid" />)}
+                <text x={gx(0)} y={gy(1000) - 4} class="axis">$1M</text>
+                <text x={gx(0)} y={gy(500) - 4} class="axis">$500K</text>
+                <path d={`M${gx(0)} ${gy(0)} H${gx(12)}`} class="baseline" />
+                <g class="reveal ends" style="--a:0.4;--b:7">
+                  <rect x="0" y="0" width="236" height="152" fill="none" />
+                  {growthBands.map((d, k) => (
+                    <path d={d} class={k === 0 ? 'band-base' : 'band'} style={k > 0 ? `--c:${services[k - 1].color}` : undefined} />
+                  ))}
+                  <path d={growthLine} class="growth-line" />
+                </g>
+                <text x={gx(0)} y="151" class="axis">Month 1</text>
+                <text x={gx(12)} y="151" class="axis" text-anchor="end">12</text>
+              </svg>
               <p class="lane-foot lane-foot-hot ends"><span class="ap" style="--a:7.05">In under a year.</span></p>
             </div>
+            <ul class="chips legend ends" aria-hidden="true">
+              <li class="chip chip-base">Advisory</li>
+              {services.map((sv) => (
+                <li class="chip pop" style={`--a:${growthTime(sv.start + 0.2 * (12 - sv.start)).toFixed(2)};--c:${sv.color}`}>{sv.name}</li>
+              ))}
+            </ul>
           </div>
         </div>
         <div class="rv-split">
@@ -795,31 +729,10 @@ const person = 'M2.8 4.2a3.2 3.2 0 1 0 6.4 0a3.2 3.2 0 1 0 -6.4 0zM0.6 16c0-3.6 
   .pipe { fill: none; stroke: rgb(255 255 255 / 0.15); stroke-width: 3; stroke-linecap: round; }
   .pipe-on { fill: none; stroke: var(--hot); stroke-width: 3; stroke-linecap: round; }
 
-  /* Production floor */
-  .zone { fill: rgb(255 255 255 / 0.04); stroke: rgb(255 255 255 / 0.12); }
-  .route { fill: none; stroke: rgb(255 255 255 / 0.32); stroke-width: 1.3; stroke-dasharray: 4 4; stroke-linejoin: round; }
-  .aisle { stroke: rgb(255 255 255 / 0.06); stroke-width: 30; }
-  .station { fill: rgb(255 255 255 / 0.16); }
-  .station-on { fill: rgb(142 192 230 / 0.35); }
-  .flow { fill: none; stroke: rgb(255 255 255 / 0.55); stroke-width: 2; }
-  .item { fill: #c3d3e2; }
-  .item-hot { fill: #fff; }
-  .check { fill: var(--hot); }
-  .check-tick { fill: none; stroke: var(--brand); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+  /* Meters */
   .meter { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.6rem; align-items: center; }
   .meter-k { font-size: 0.75rem; color: var(--muted); }
   .meter-track { position: relative; height: 10px; border-radius: 5px; background: rgb(255 255 255 / 0.08); }
-  .meter-fill {
-    position: absolute;
-    inset: 0;
-    border-radius: 5px;
-    background: rgb(255 255 255 / 0.3);
-    transform-origin: left center;
-    transform: scaleX(calc(var(--max) * clamp(0, var(--t) / var(--dur), 1)));
-  }
-  .meter-fill-hot { background: var(--hot); }
-  .meter-target { position: absolute; left: 80%; top: -5px; bottom: -5px; width: 2px; background: #fff; border-radius: 1px; }
-  .meter-target i { position: absolute; bottom: calc(100% + 2px); left: 50%; transform: translateX(-50%); font-style: normal; font-size: 0.625rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
   .panes .meter { margin-top: 0.75rem; }
 
   /* Supply chain */
@@ -909,14 +822,19 @@ const person = 'M2.8 4.2a3.2 3.2 0 1 0 6.4 0a3.2 3.2 0 1 0 -6.4 0zM0.6 16c0-3.6 
   .trend-dot { fill: #fff; }
 
   /* Revenue growth */
-  .rev-track { position: relative; height: 30px; border-radius: 4px; background: rgb(255 255 255 / 0.06); overflow: hidden; }
-  .rev-fill { position: absolute; inset: 0; border-radius: 4px; background: rgb(255 255 255 / 0.24); transform-origin: left center; transform: scaleX(var(--w)); }
-  .rev-grow { background: var(--hot); transform: scaleX(calc(0.15 + 0.85 * clamp(0, (var(--t) - 0.4) / 6.6, 1))); }
-  .rev-ticks { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(12, 1fr); }
-  .rev-ticks i { border-right: 1px solid rgb(23 63 92 / 0.45); }
-  .rev-ticks i:last-child { border-right: 0; }
+  .growth .grid { stroke: rgb(255 255 255 / 0.07); stroke-width: 1; stroke-dasharray: 2 4; }
+  .growth .baseline { stroke: rgb(255 255 255 / 0.22); stroke-width: 1; }
+  .growth .axis { font-family: var(--font-body); font-size: 9.5px; fill: var(--muted); }
+  .reveal { clip-path: inset(0 calc((1 - clamp(0, (var(--t) - var(--a)) / (var(--b) - var(--a)), 1)) * 100%) 0 0); }
+  .band-base { fill: rgb(255 255 255 / 0.2); }
+  .band { fill: var(--c); fill-opacity: 0.9; }
+  .growth-line { fill: none; stroke: #fff; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+  .growth-line-dim { stroke: rgb(255 255 255 / 0.6); }
   .chips { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 0.4rem; min-height: 1.6rem; }
-  .chip { padding: 0.2rem 0.6rem; border-radius: 999px; background: rgb(142 192 230 / 0.18); box-shadow: inset 0 0 0 1px rgb(142 192 230 / 0.5); font-size: 0.75rem; font-weight: 600; color: var(--soft); }
+  .chip { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.2rem 0.6rem; border-radius: 999px; background: rgb(142 192 230 / 0.18); box-shadow: inset 0 0 0 1px rgb(142 192 230 / 0.5); font-size: 0.75rem; font-weight: 600; color: var(--soft); }
+  .chip::before { content: ''; width: 8px; height: 8px; border-radius: 2px; background: var(--c, rgb(255 255 255 / 0.3)); }
+  .chip-base { background: rgb(255 255 255 / 0.06); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.18); color: var(--muted); }
+  .legend { grid-column: 1 / -1; padding: 0.85rem 1.1rem 1.1rem; border-top: 1px solid rgb(255 255 255 / 0.08); }
 
   /* Cargo */
   .track { fill: none; stroke: rgb(255 255 255 / 0.2); stroke-width: 1.5; stroke-dasharray: 3 6; }

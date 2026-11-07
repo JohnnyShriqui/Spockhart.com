@@ -4,7 +4,7 @@ summary: Supplier processes mapped across a global network, assessed against Ind
 client: A global telecommunications equipment company
 sector: Supply chain & Industry 4.0
 scope: Process mapping and assessment platform
-order: 8
+order: 7
 metrics:
   - value: Global network
     label: Supplier processes mapped and assessed

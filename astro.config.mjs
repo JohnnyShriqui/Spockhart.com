@@ -18,7 +18,6 @@ export default defineConfig({
     '/work/sales-performance-system/': '/work/#sales-performance-system',
     '/work/digital-practice-growth/': '/work/#digital-practice-growth',
     '/work/momentum-exchange-prototype/': '/work/#momentum-exchange-prototype',
-    '/work/production-floor-redesign/': '/work/#production-floor-redesign',
     '/work/supply-chain-assessment/': '/work/#supply-chain-assessment',
   },
   prefetch: {
