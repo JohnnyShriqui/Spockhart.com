@@ -1,8 +1,7 @@
 ---
 /**
- * Nonprofits page: what changes, as three small live graphics. They play one at a
- * time, left to right; hovering a card plays that one. Timing runs on
- * scripts/scenes.ts (each card is a scene; the list is the group).
+ * Nonprofits page: what changes, as three small live graphics. Each one loops on
+ * its own while it is on screen. Timing runs on scripts/scenes.ts (each card is a scene).
  * Names, roles and numbers in the graphics are illustrations, not client data.
  */
 import Mark from './Mark.astro';
@@ -74,7 +73,7 @@ const fmt = (n: number) => n.toLocaleString('en-CA');
       <h2 id="outcomes-title">The same team, with more time for the mission.</h2>
     </div>
 
-    <ul class="outcomes" data-scene-group data-reveal="stagger">
+    <ul class="outcomes" data-reveal="stagger">
       <!-- 1. Hours move from paperwork to programs -->
       <li class="o-card" data-scene data-loop="6.5" data-still="6.2" style="--loop:6.5;--still:6.2">
         <div class="o-viz" aria-hidden="true">
@@ -234,29 +233,7 @@ const fmt = (n: number) => n.toLocaleString('en-CA');
     border-radius: var(--radius-lg);
     background: var(--surface);
     overflow: hidden;
-    cursor: default;
-    transition: transform 500ms var(--ease-out), box-shadow 500ms var(--ease), border-color 400ms var(--ease);
   }
-  .o-card.is-active {
-    border-color: rgb(44 95 138 / 0.55);
-    transform: translateY(-6px);
-    box-shadow: 0 28px 48px -32px rgb(27 42 61 / 0.6);
-  }
-  /* Time running through the card that is playing */
-  .o-card::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: 3px;
-    background: var(--accent-soft);
-    transform-origin: left center;
-    transform: scaleX(calc(var(--t) / var(--loop)));
-    opacity: 0;
-    transition: opacity 300ms var(--ease);
-  }
-  .o-card.is-playing::after { opacity: 1; }
   .o-text { display: grid; gap: var(--s-3); align-content: center; padding-right: var(--s-5); }
   .o-num { font-size: 0.8125rem; font-weight: 600; letter-spacing: 0.14em; color: var(--accent); }
   .o-text h3 { font-size: var(--step-3); line-height: 1.1; }

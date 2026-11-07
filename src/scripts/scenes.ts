@@ -259,7 +259,6 @@ function initScene(scene: HTMLElement) {
 
 /**
  * [data-scene-group]: its scenes play one at a time, in order, each for one loop.
- * Hovering (or tapping) a scene plays that one instead until the pointer leaves.
  * Scenes that are not playing rest on their finished frame.
  */
 function initGroup(group: HTMLElement) {
@@ -268,14 +267,13 @@ function initGroup(group: HTMLElement) {
   const scenes = Array.from(group.querySelectorAll<HTMLElement>('[data-scene]'));
   const ctrls = scenes.map((s) => controllers.get(s)!);
   let index = 0;
-  let hovered = -1;
   let visible = false;
   let timer = 0;
   let running = false;
 
   const mark = (k: number) => scenes.forEach((s, i) => s.classList.toggle('is-active', i === k));
   const next = () => {
-    if (!visible || hovered >= 0) return;
+    if (!visible) return;
     const k = index;
     running = true;
     mark(k);
@@ -299,39 +297,11 @@ function initGroup(group: HTMLElement) {
   new IntersectionObserver(
     (entries) => {
       visible = entries.some((e) => e.isIntersecting);
-      if (visible && !running && hovered < 0) next();
-      if (!visible) {
-        halt();
-        hovered = -1;
-      }
+      if (visible && !running) next();
+      if (!visible) halt();
     },
     { threshold: 0.35 },
   ).observe(group);
-
-  scenes.forEach((scene, k) => {
-    // Touch has no hover: a tap jumps the sequence to that scene.
-    scene.addEventListener('pointerup', (e) => {
-      if (e.pointerType === 'mouse') return;
-      halt();
-      hovered = -1;
-      index = k;
-      next();
-    });
-    scene.addEventListener('pointerenter', (e) => {
-      if (e.pointerType !== 'mouse' || hovered === k) return;
-      halt();
-      hovered = k;
-      mark(k);
-      ctrls[k].play();
-    });
-    scene.addEventListener('pointerleave', (e) => {
-      if (e.pointerType !== 'mouse' || hovered !== k) return;
-      hovered = -1;
-      halt();
-      index = (k + 1) % scenes.length;
-      timer = window.setTimeout(next, 450);
-    });
-  });
 }
 
 export function initScenes() {
