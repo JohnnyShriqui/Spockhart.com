@@ -6,12 +6,13 @@ interface Props {
   lead?: string;
   /** On phones, hide the lead and keep just the heading */
   terse?: boolean;
+  class?: string;
 }
-const { eyebrow, title, lead, terse = false } = Astro.props;
+const { eyebrow, title, lead, terse = false, class: className = '' } = Astro.props;
 const hasFigure = Astro.slots.has('figure');
 ---
 
-<section class:list={['page-hero', { 'with-figure': hasFigure, terse }]}>
+<section class:list={['page-hero', className, { 'with-figure': hasFigure, terse }]}>
   <Mist />
   <div class="wrap hero-layout">
     <div class="hero-text">

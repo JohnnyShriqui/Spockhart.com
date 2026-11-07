@@ -66,7 +66,7 @@ const hex = (cx: number, cy: number, r: number) =>
 const fmt = (n: number) => n.toLocaleString('en-CA');
 ---
 
-<section class="section" aria-labelledby="outcomes-title">
+<section class="section outcomes-section" aria-labelledby="outcomes-title">
   <div class="wrap">
     <div class="section-head" data-reveal>
       <p class="eyebrow">What changes</p>
@@ -430,8 +430,22 @@ const fmt = (n: number) => n.toLocaleString('en-CA');
     .r-viz { grid-template-columns: 62px 14px minmax(0, 1fr); padding-inline: 0.7rem; }
     .r-title { white-space: nowrap; }
   }
-  /* Phones: heading and graphic only */
+  /* Phones: heading and graphic only, each outcome a full-width band that alternates
+     in colour, like the projects on Our Work */
   @media (max-width: 640px) {
+    .outcomes-section { padding-bottom: 0; }
+    .outcomes-section .section-head { margin-bottom: var(--s-5); }
     .o-text p:not(.o-num) { display: none; }
+    .outcomes { gap: 0; margin-inline: calc(var(--gutter) * -1); }
+    .o-card {
+      padding: 2.5rem var(--gutter) 2.75rem;
+      border: 0;
+      border-radius: 0;
+      background: var(--paper-2);
+      box-shadow: none;
+    }
+    .o-card:nth-child(even) { background: var(--paper); }
+    .o-text { order: -1; }
+    .o-viz { background: var(--surface); box-shadow: inset 0 0 0 1px var(--rule); border-radius: var(--radius-lg); }
   }
 </style>

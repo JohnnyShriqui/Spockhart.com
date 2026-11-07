@@ -17,7 +17,7 @@ import { site } from '../config/site';
     lead={`Every engagement runs the same way. We work inside your team, prove value with a working prototype in ${site.offer.prototypeDays} days, then build it out and hand it over.`}
   />
 
-  <section class="section band-recessed" aria-labelledby="engagement-title">
+  <section class="section band-recessed engagement" aria-labelledby="engagement-title">
     <div class="wrap">
       <div class="section-head" data-reveal>
         <p class="eyebrow">The engagement</p>
@@ -34,3 +34,11 @@ import { site } from '../config/site';
     primary={{ label: 'Plan the first 30 days', href: '/contact/' }}
   />
 </Base>
+
+<style>
+  /* Phones: the bar sits right under the title; the phases run to the bottom of the section */
+  @media (max-width: 640px) {
+    .engagement { padding-bottom: 0; }
+    .engagement .section-head { margin-bottom: 0.25rem; }
+  }
+</style>

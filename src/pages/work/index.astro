@@ -31,7 +31,7 @@ const sectionsOf = (body = '') =>
   title="Our Work"
   description="What the people behind Spockhart have delivered: platforms, marketplaces, sales systems, production floors and engineering prototypes. Client names withheld."
 >
-  <PageHero terse eyebrow="Our Work" title="Our team’s experience." lead="Spockhart is a new firm. The people behind it are not.">
+  <PageHero terse class="work-hero" eyebrow="Our Work" title="Our team’s experience." lead="Spockhart is a new firm. The people behind it are not.">
     <p class="hero-more">
       Before Spockhart, our team led transformations, built technology, and solved operational problems inside some of North
       America’s largest organizations. These are a few examples of what we’ve delivered.
@@ -264,7 +264,10 @@ const sectionsOf = (body = '') =>
   /* Phones: each project is its tags, its heading, the details button and the graphic.
      The summary and the rest stay one tap away in the details. */
   @media (max-width: 640px) {
-    .hero-more, .disclosure, .project-summary, .project-client, .tag-live { display: none; }
+    .hero-more, .disclosure, .project-summary, .project-client, .project-meta .tag { display: none; }
+    /* The honeycomb sits closer to the title */
+    :global(.work-hero .hero-extra) { display: none; }
+    :global(.work-hero.with-figure .hero-layout) { gap: var(--s-4); }
     /* The details button sits under the graphic */
     .project-text { display: contents; }
     .project-meta, .project-text h2 { order: 0; }

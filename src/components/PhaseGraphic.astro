@@ -306,6 +306,12 @@ const tick = (x: number, y: number, s = 1) => `M${x - 3.5 * s} ${y}l${2.4 * s} $
     box-sizing: border-box;
   }
 
+  /* Phones: the phase is a full-width band, so the graphic sits in its own frame */
+  @media (max-width: 640px) {
+    .pg { margin: var(--s-4) 0 0; padding: 0; }
+    .pg svg { background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius-lg); padding: 10px 8px; }
+  }
+
   /* Timing helpers (--t comes from the phase card) */
   .ap { opacity: clamp(0, (var(--t) - var(--a, 0)) * 6, 1); }
   .pop {
