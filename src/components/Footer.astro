@@ -1,6 +1,5 @@
 ---
 import Logo from './Logo.astro';
-import CopyEmail from './CopyEmail.astro';
 import { footerNav, site } from '../config/site';
 
 const year = new Date().getFullYear();
@@ -11,10 +10,6 @@ const year = new Date().getFullYear();
     <div class="footer-statement">
       <Logo size={30} class="footer-logo" />
       <p class="footer-tagline">{site.tagline}</p>
-      <div class="btn-row">
-        <a class="btn btn-on-navy" href="/contact/">Start a conversation <span class="arr" aria-hidden="true">→</span></a>
-        <CopyEmail onNavy />
-      </div>
     </div>
 
     <nav class="footer-nav" aria-label="Footer">
