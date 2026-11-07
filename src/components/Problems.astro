@@ -33,7 +33,7 @@ const defaultProblems = [
   {
     key: 'invoicing',
     name: 'Invoicing',
-    line: ['Invoices created ', ['manually', 'automatically'], ', payments ', ['chased individually', 'tracked for you'], '.'],
+    line: ['I create every invoice ', ['manually', 'automatically'], ' and ', ['chase', 'track'], ' each payment ', ['one by one', 'in one place'], '.'],
     side: 'left',
     y: 214,
     icon: 'M7 3h7l4 4v14H7zM14 3v4h4M12.5 10v8M14.5 11.3c-.4-.6-1.1-.9-2-.9-1.2 0-2 .6-2 1.5 0 2 4 1.1 4 3.1 0 .9-.9 1.5-2 1.5-.9 0-1.7-.4-2.1-1',
@@ -41,7 +41,7 @@ const defaultProblems = [
   {
     key: 'data-entry',
     name: 'Data entry',
-    line: ['The same information entered ', ['across multiple systems', 'once, synced everywhere'], '.'],
+    line: ['I type the same details ', ['into every system', 'once'], ' and ', ['update them manually', 'they sync everywhere'], '.'],
     side: 'right',
     y: 238,
     icon: 'M8 4h10a2 2 0 0 1 2 2v10M4 8h10a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zM7 13h6M7 16h4',
@@ -49,7 +49,7 @@ const defaultProblems = [
   {
     key: 'reporting',
     name: 'Reporting',
-    line: [['Time spent gathering', 'Live'], ' numbers ', ['from different spreadsheets', 'in one dashboard'], '.'],
+    line: ['My reports are ', ['built by hand', 'updated automatically'], ' from ', ['different spreadsheets', 'one live dashboard'], '.'],
     side: 'left',
     y: 272,
     icon: 'M4 20h16M7 16v-4M12 16V8M17 16v-7M7 8.5l5-3.5 5 3',
@@ -57,7 +57,7 @@ const defaultProblems = [
   {
     key: 'followups',
     name: 'Follow-ups',
-    line: ['Leads, payments, and requests ', ['slipping through the cracks', 'tracked, assigned, and followed up'], '.'],
+    line: ['I ', ['lose track of', 'never miss'], ' leads, payments, and requests ', ['that slip through the cracks', 'because each one has an owner'], '.'],
     side: 'right',
     y: 298,
     icon: 'M3 7l9 6 9-6M3 7v10a1 1 0 0 0 1 1h9M3 7a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v6M16 18h5M19 16l2 2-2 2',
@@ -65,7 +65,7 @@ const defaultProblems = [
   {
     key: 'scheduling',
     name: 'Scheduling',
-    line: [['Endless emails', 'One booking link'], ' coordinating appointments and availability.'],
+    line: ['I ', ['email back and forth', 'send one link'], ' to find a time, then ', ['confirm every meeting manually', 'bookings confirm automatically'], '.'],
     side: 'left',
     y: 330,
     icon: 'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4M8 14h2M12 14h2M16 14h0M8 17h2M12 17h2',
@@ -73,7 +73,7 @@ const defaultProblems = [
   {
     key: 'reconciliation',
     name: 'Reconciliation',
-    line: ['Transactions and records ', ['compared line by line', 'matched automatically'], '.'],
+    line: ['I ', ['manually', 'automatically'], ' match every transaction and ', ['check each line', 'only review what gets flagged'], '.'],
     side: 'right',
     y: 352,
     icon: 'M3.5 4h6v16h-6zM14.5 4h6v16h-6zM9.5 9h5M13 7.5l1.5 1.5-1.5 1.5M14.5 15h-5M11 13.5L9.5 15l1.5 1.5',
@@ -252,10 +252,27 @@ const {
   }
   .p-more { justify-self: start; }
 
+  /* Laptops: the list runs exactly as tall as the heading and bucket beside it, its rows
+     sharing the height evenly; the link sits underneath */
+  @media (min-width: 901px) {
+    .p-layout { grid-template-rows: auto auto; align-items: stretch; row-gap: var(--s-5); }
+    .p-side { grid-column: 1; grid-row: 1; position: static; gap: var(--s-7); align-content: space-between; }
+    .p-main { display: contents; }
+    .p-list { grid-column: 2; grid-row: 1; grid-auto-rows: 1fr; }
+    .p-more { grid-column: 2; grid-row: 2; }
+    .p-row { padding: 0.7rem var(--s-5) 0.75rem var(--s-4); }
+    .p-line { line-height: 1.55; }
+  }
+  /* Small laptops: the sentences wrap more and the list outgrows the bucket, so the bucket
+     stays with its heading instead of dropping to the bottom */
+  @media (min-width: 901px) and (max-width: 1180px) {
+    .p-side { align-content: start; }
+  }
+
   /* Phones and small tablets: a smaller bucket, and the list as one card */
   @media (max-width: 900px) {
     .p-layout { grid-template-columns: minmax(0, 1fr); gap: var(--s-6); }
-    .p-side { position: static; gap: var(--s-4); }
+    .p-side { position: static; gap: var(--s-6); }
     .p-head h2 { max-width: 18ch; }
     .p-figure { max-width: 300px; margin-inline: auto; width: 100%; }
     .p-list {

@@ -15,7 +15,7 @@ interface Props {
   cta?: string;
 }
 const {
-  title = 'How much time is your team losing to tedious, repetitive tasks?',
+  title = 'How much time is your team losing?',
   resultLabel = 'Every year, tedious, repetitive tasks cost you',
   hoursBefore = 'in wages, across',
   hoursAfter = 'of manual, repetitive work.',
@@ -44,7 +44,7 @@ const iconFill = (i: number) => Math.max(0, Math.min(1, fteIcons - i));
       <div class="calc-left">
         <div class="calc-head">
           <p class="eyebrow">Calculator</p>
-          <h2 id="calc-title"><span class="t-desk">{title}</span><span class="t-mob">Waste calculator</span></h2>
+          <h2 id="calc-title">{title}</h2>
         </div>
 
         <form class="calc-inputs" data-calc-form onsubmit="return false" aria-label="Calculator inputs">
@@ -290,11 +290,12 @@ const iconFill = (i: number) => Math.max(0, Math.min(1, fteIcons - i));
   }
   .r-tiles { display: none; }
 
-  /* On phones: a short title, the three sliders, then the result as one big number,
+  /* On phones: the title, the three sliders with their descriptions, then the result as one big number,
      three small figures and a full-width button. */
   @media (max-width: 640px) {
     .calc-left { gap: 0.9rem; padding: 1.1rem 1rem 1rem; }
-    .calc-head .eyebrow, .calc-intro, .slider-hint { display: none; }
+    .calc-head .eyebrow, .calc-intro { display: none; }
+    .slider-hint { font-size: 0.75rem; line-height: 1.35; }
     .calc-head h2 { font-size: 1.375rem; line-height: 1.15; }
     .calc-method { font-size: 0.6875rem; }
     .calc-inputs { gap: 0.55rem; }
