@@ -1,91 +1,223 @@
 ---
+/**
+ * Contact. The form is one sentence with blanks; a brief beside it fills in live as the
+ * visitor types, with optional numbers from the time calculator. Logic: scripts/contact.ts.
+ */
 import Base from '../../layouts/Base.astro';
 import CopyEmail from '../../components/CopyEmail.astro';
 import { site } from '../../config/site';
+import { problems } from '../../data/problems';
+import { inputs } from '../../lib/calc';
+
+const kinds = [
+  { value: 'Company', label: 'a company' },
+  { value: 'Nonprofit', label: 'a nonprofit' },
+  { value: 'Public sector', label: 'a public sector team' },
+  { value: 'Other', label: 'an organization' },
+];
+const sizes = [
+  { value: '1-10', label: '1 to 10' },
+  { value: '11-50', label: '11 to 50', selected: true },
+  { value: '51-200', label: '51 to 200' },
+  { value: '201-1000', label: '201 to 1,000' },
+  { value: '1000+', label: 'over 1,000' },
+];
+const miniLabels: Record<string, string> = { people: 'People', hours: 'Hours each, every week', rate: 'Cost of an hour' };
+const rows = [
+  { key: 'from', label: 'From', empty: 'Your name and organization' },
+  { key: 'team', label: 'Team', empty: '' },
+  { key: 'problems', label: 'Slowing you down', empty: 'Pick what slows you down' },
+  { key: 'numbers', label: 'What it costs', empty: '' },
+  { key: 'email', label: 'Reply to', empty: 'Your work email' },
+];
+const hex = (r: number) =>
+  [0, 1, 2, 3, 4, 5]
+    .map((k) => {
+      const a = (Math.PI / 3) * k - Math.PI / 2;
+      return `${(11 + Math.cos(a) * r).toFixed(2)},${(11 + Math.sin(a) * r).toFixed(2)}`;
+    })
+    .join(' ');
+const fmtStart = (f: (typeof inputs)[number]) => (f.format === 'money' ? `$${f.value}` : f.format === 'hours' ? `${f.value} h` : `${f.value}`);
 ---
 
 <Base title="Contact" description="Start a conversation with Spockhart. Tell us what is slowing your team down and we will reply within one business day.">
   <section class="contact">
-    <div class="wrap contact-grid">
-      <div class="contact-intro">
-        <p class="eyebrow load-in" style="--i:0">Contact</p>
-        <h1 class="load-in" style="--i:1">Start a conversation.</h1>
-        <p class="lead load-in" style="--i:2">Tell us what is slowing your team down. We reply within {site.offer.replyWithin}.</p>
+    <div class="wrap">
+      <form class="contact-grid" data-contact-form data-endpoint={site.formEndpoint} novalidate>
+        <div class="contact-main">
+          <p class="eyebrow load-in" style="--i:0">Contact</p>
+          <h1 class="load-in" style="--i:1" data-contact-title>Start a conversation.</h1>
+          <p class="lead load-in" style="--i:2" data-contact-lead>Fill in the blanks. We reply within {site.offer.replyWithin}.</p>
 
-        <div class="load-in contact-direct" style="--i:3">
-          <p class="label">Prefer email?</p>
-          <CopyEmail />
-          <p class="small muted">{site.city}, {site.country}</p>
-        </div>
-      </div>
+          <div class="sentence load-in" style="--i:3">
+            <p>
+              Hi, I’m <label class="visually-hidden" for="cf-name">Your name</label><input
+                id="cf-name"
+                name="name"
+                class="blank"
+                placeholder="your name"
+                autocomplete="name"
+                required
+              /> from <label class="visually-hidden" for="cf-org">Your organization</label><input
+                id="cf-org"
+                name="organization"
+                class="blank"
+                placeholder="your organization"
+                autocomplete="organization"
+                required
+              />.
+            </p>
+            <p>
+              We’re <label class="visually-hidden" for="cf-type">Type of organization</label><select id="cf-type" name="type" class="blank blank-select">
+                {kinds.map((k) => <option value={k.value}>{k.label}</option>)}
+              </select> of <label class="visually-hidden" for="cf-size">Team size</label><select id="cf-size" name="size" class="blank blank-select">
+                {sizes.map((s) => <option value={s.value} selected={s.selected}>{s.label}</option>)}
+              </select> people.
+            </p>
+            <p id="problems-label">What slows us down most:</p>
+          </div>
 
-      <div class="contact-form-wrap load-in" style="--i:2">
-        <form class="contact-form" data-contact-form data-endpoint={site.formEndpoint} novalidate>
-          <div class="row-2">
-            <div class="field">
-              <label for="cf-name">Name</label>
-              <input class="input" id="cf-name" name="name" autocomplete="name" required />
-            </div>
-            <div class="field">
-              <label for="cf-email">Work email</label>
-              <input class="input" id="cf-email" name="email" type="email" autocomplete="email" required />
-            </div>
+          <fieldset class="picks load-in" style="--i:4" aria-labelledby="problems-label">
+            {
+              [...problems, { name: 'Something else', icon: 'M12 5v14M5 12h14' }].map((p) => (
+                <label class="pick">
+                  <input type="checkbox" name="problems" value={p.name} />
+                  <span>
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d={p.icon} />
+                    </svg>
+                    {p.name}
+                  </span>
+                </label>
+              ))
+            }
+          </fieldset>
+
+          <div class="more load-in" style="--i:5">
+            <label for="cf-message">Anything else we should know? <span class="optional">Optional</span></label>
+            <textarea
+              id="cf-message"
+              name="message"
+              rows="3"
+              placeholder="The task your team complains about most is a good place to start."
+            ></textarea>
           </div>
-          <div class="row-2">
-            <div class="field">
-              <label for="cf-org">Organization</label>
-              <input class="input" id="cf-org" name="organization" autocomplete="organization" required />
-            </div>
-            <div class="field">
-              <label for="cf-role">Your role <span class="optional">Optional</span></label>
-              <input class="input" id="cf-role" name="role" autocomplete="organization-title" />
-            </div>
+
+          <div class="sentence load-in" style="--i:6">
+            <p>
+              Reach me at <label class="visually-hidden" for="cf-email">Work email</label><input
+                id="cf-email"
+                name="email"
+                type="email"
+                class="blank"
+                placeholder="you@work.com"
+                autocomplete="email"
+                required
+              />.
+            </p>
           </div>
-          <div class="row-2">
-            <div class="field">
-              <label for="cf-type">Type of organization</label>
-              <select class="select" id="cf-type" name="type">
-                <option value="Company">Company</option>
-                <option value="Nonprofit">Nonprofit</option>
-                <option value="Public sector">Public sector</option>
-                <option value="Other">Other</option>
-              </select>
-            </div>
-            <div class="field">
-              <label for="cf-size">Team size</label>
-              <select class="select" id="cf-size" name="size">
-                <option value="1-10">1 to 10</option>
-                <option value="11-50" selected>11 to 50</option>
-                <option value="51-200">51 to 200</option>
-                <option value="201-1000">201 to 1,000</option>
-                <option value="1000+">More than 1,000</option>
-              </select>
-            </div>
-          </div>
-          <div class="field">
-            <label for="cf-message">What is slowing your team down?</label>
-            <textarea class="textarea" id="cf-message" name="message" required aria-describedby="cf-message-hint"></textarea>
-            <p class="hint" id="cf-message-hint">A few sentences is plenty. The task your team complains about most is a good place to start.</p>
-          </div>
+
           <input type="text" name="_gotcha" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
-          <div class="form-foot">
-            <button class="btn" type="submit" data-submit>
-              <span data-submit-label>Send</span> <span class="arr" aria-hidden="true">→</span>
-            </button>
-            <p class="small muted">We use your details only to reply. See our <a class="link" href="/privacy/">privacy policy</a>.</p>
-          </div>
-          <p class="form-error" role="alert" data-form-error hidden></p>
-        </form>
+          <input type="hidden" name="numbers" data-numbers-field />
+        </div>
 
-        <div class="compose" data-compose hidden>
-          <p class="eyebrow">Almost there</p>
-          <h2>Send this to {site.email}</h2>
-          <p class="muted">Your message is ready. Send it from your email and we will reply within {site.offer.replyWithin}.</p>
-          <pre class="compose-body" data-compose-body></pre>
-          <div class="btn-row">
-            <a class="btn" data-compose-mail href={`mailto:${site.email}`}>Open in email <span class="arr" aria-hidden="true">→</span></a>
-            <button class="btn btn-ghost" type="button" data-compose-copy>Copy message</button>
+        <aside class="brief-col load-in" style="--i:3">
+          <div class="brief" data-brief>
+            <div class="brief-head">
+              <span class="brief-title">Your brief</span>
+              <span class="brief-status" data-brief-status>Draft</span>
+            </div>
+            <div class="brief-progress" aria-hidden="true">
+              {rows.map((r) => <i data-seg={r.key} class:list={{ on: r.key === 'team' }} />)}
+            </div>
+
+            <ol class="brief-rows">
+              {
+                rows.map((r) => (
+                  <li class:list={['brow', { 'is-empty': r.key !== 'team', 'is-done': r.key === 'team' }]} data-row={r.key}>
+                    <svg class="bhex" viewBox="0 0 22 22" aria-hidden="true">
+                      <polygon points={hex(9.5)} class="bhex-line" />
+                      <polygon points={hex(9.5)} class="bhex-fill" />
+                      <path d="M7 11.3l2.6 2.6 5-5.4" class="bhex-tick" />
+                    </svg>
+                    <div class="brow-body">
+                      <span class="brow-k">{r.label}</span>
+                      {r.key === 'problems' ? (
+                        <span class="brow-v">
+                          <span class="brow-empty" data-empty>{r.empty}</span>
+                          <span class="btags" data-tags />
+                        </span>
+                      ) : r.key === 'numbers' ? (
+                        <div class="brow-v">
+                          <button type="button" class="add-numbers" data-add-numbers aria-expanded="false" aria-controls="brief-calc">
+                            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3v10M3 8h10" /></svg>
+                            Add your numbers <span>Optional</span>
+                          </button>
+                          <div class="bcalc" id="brief-calc" data-calc-panel hidden>
+                            <p class="calc-result">
+                              <span class="calc-big" data-calc-out="cost">$0</span> <span class="calc-unit">a year</span>
+                            </p>
+                            <p class="calc-sub">
+                              <span data-calc-out="hours">0</span> hours of tedious, repetitive tasks, about <span data-calc-out="fte">0</span> full-time people
+                            </p>
+                            {inputs.map((f) => (
+                              <div class="mini">
+                                <label for={`bc-${f.key}`}>{miniLabels[f.key]}</label>
+                                <output for={`bc-${f.key}`} data-mini-out={f.key}>{fmtStart(f)}</output>
+                                <input
+                                  type="range"
+                                  id={`bc-${f.key}`}
+                                  data-key={f.key}
+                                  data-format={f.format}
+                                  min={f.min}
+                                  max={f.max}
+                                  step={f.step}
+                                  value={f.value}
+                                />
+                              </div>
+                            ))}
+                            <button type="button" class="calc-remove" data-remove-numbers>Remove numbers</button>
+                          </div>
+                        </div>
+                      ) : (
+                        <span class="brow-v" data-v data-empty-text={r.empty}>{r.key === 'team' ? 'A company of 11 to 50 people' : r.empty}</span>
+                      )}
+                    </div>
+                  </li>
+                ))
+              }
+            </ol>
+
+            <div class="brief-foot">
+              <button class="btn btn-on-brand" type="submit" data-submit>
+                <span data-submit-label>Send brief</span> <span class="arr" aria-hidden="true">→</span>
+              </button>
+              <p class="brief-stamp">
+                <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.2" /><path d="M8 4.6V8l2.4 1.6" /></svg>
+                Reply within {site.offer.replyWithin}
+              </p>
+            </div>
+            <p class="form-error" role="alert" data-form-error hidden></p>
           </div>
+
+          <div class="direct">
+            <p class="label">Prefer email?</p>
+            <CopyEmail />
+            <p class="small muted">
+              {site.city}, {site.country}. We use your details only to reply. See our <a class="link" href="/privacy/">privacy policy</a>.
+            </p>
+          </div>
+        </aside>
+      </form>
+
+      <div class="compose" data-compose hidden>
+        <p class="eyebrow">Almost there</p>
+        <h2>Send this to {site.email}</h2>
+        <p class="muted">Your brief is ready. Send it from your email and we will reply within {site.offer.replyWithin}.</p>
+        <pre class="compose-body" data-compose-body></pre>
+        <div class="btn-row">
+          <a class="btn" data-compose-mail href={`mailto:${site.email}`}>Open in email <span class="arr" aria-hidden="true">→</span></a>
+          <button class="btn btn-ghost" type="button" data-compose-copy>Copy message</button>
         </div>
       </div>
     </div>
@@ -104,31 +236,289 @@ import { site } from '../../config/site';
   }
   .contact-grid {
     display: grid;
-    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
     gap: var(--s-8);
     align-items: start;
   }
-  .contact-intro { display: grid; gap: var(--s-5); align-content: start; }
-  .contact-intro h1 { font-size: var(--step-5); max-width: 9ch; }
-  .contact-direct { display: grid; gap: var(--s-3); justify-items: start; margin-top: var(--s-4); }
-  .label { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); }
+  .contact-main { display: grid; gap: var(--s-5); align-content: start; }
+  .contact-main h1 { font-size: var(--step-5); max-width: 11ch; }
+  .lead { margin-bottom: var(--s-3); }
 
-  .contact-form-wrap {
-    padding: clamp(1.5rem, 1rem + 2.5vw, 3rem);
+  /* ---------- The sentence ---------- */
+  .sentence { display: grid; gap: 0.35rem; }
+  .sentence p {
+    font-family: var(--font-display);
+    font-size: clamp(1.45rem, 1.15rem + 1vw, 2.05rem);
+    line-height: 1.5;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    text-wrap: pretty;
+  }
+  .blank {
+    max-width: 100%;
+    margin: 0 0.04em;
+    padding: 0 0.06em 0.02em;
+    font: inherit;
+    font-style: italic;
+    letter-spacing: inherit;
+    color: var(--accent);
+    background: transparent;
+    border: 0;
+    border-bottom: 2px solid var(--rule-2);
+    border-radius: 0;
+    outline: none;
+    vertical-align: baseline;
+    transition: border-color var(--dur) var(--ease), background-color var(--dur) var(--ease);
+  }
+  .blank::placeholder { color: var(--ink-3); opacity: 0.5; }
+  .blank:hover { border-bottom-color: var(--ink-3); }
+  .blank:focus { border-bottom-color: var(--accent); background: var(--accent-wash); }
+  .blank[aria-invalid='true'] { border-bottom-color: #b4483c; }
+  .blank-select {
+    appearance: none;
+    -webkit-appearance: none;
+    padding-right: 0.85em;
+    cursor: pointer;
+    background: no-repeat right 0.05em center / 0.5em url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%232c5f8a' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  }
+  .blank-select option { font-family: var(--font-body); font-style: normal; font-size: 1rem; color: var(--ink); }
+
+  /* ---------- What slows you down ---------- */
+  .picks { border: 0; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 0.6rem; }
+  .pick { position: relative; cursor: pointer; }
+  .pick input { position: absolute; left: 0; top: 0; width: 1px; height: 1px; opacity: 0; margin: 0; pointer-events: none; }
+  .pick span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.05rem 0.6rem 0.85rem;
+    border: 1px solid var(--rule-2);
+    border-radius: 999px;
+    background: var(--surface);
+    font-weight: 600;
+    font-size: 0.975rem;
+    color: var(--ink);
+    transition: background-color var(--dur) var(--ease), border-color var(--dur) var(--ease), color var(--dur) var(--ease), transform var(--dur) var(--ease);
+  }
+  .pick svg { width: 18px; height: 18px; fill: none; stroke: var(--accent); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: stroke var(--dur) var(--ease); }
+  .pick:hover span { border-color: var(--ink-3); }
+  .pick input:checked + span { background: var(--brand); border-color: var(--brand); color: #fff; }
+  .pick input:checked + span svg { stroke: var(--mist-1); }
+  .pick input:active + span { transform: scale(0.97); }
+  .pick input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .more { display: grid; gap: 0.45rem; margin-top: var(--s-2); }
+  .more label { font-size: 0.875rem; font-weight: 600; color: var(--ink-2); }
+  .optional { font-weight: 400; color: var(--ink-3); margin-left: 0.35rem; font-size: 0.8125rem; }
+  .more textarea {
+    min-height: 5.5rem;
+    padding: 0.85rem 1rem;
+    font: inherit;
+    font-size: 1.0625rem;
+    line-height: 1.55;
+    color: var(--ink);
+    background: var(--surface);
     border: 1px solid var(--rule);
     border-radius: var(--radius-lg);
-    background: var(--surface);
+    resize: vertical;
+    outline: none;
+    transition: border-color var(--dur) var(--ease);
   }
-  .contact-form { display: grid; gap: var(--s-5); }
-  .row-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-5); }
-  .optional { font-weight: 400; color: var(--ink-3); margin-left: 0.35rem; font-size: 0.8125rem; }
-  .hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
-  .form-foot { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-4); }
-  .form-foot .small { max-width: 34ch; }
-  .form-error { color: #b4483c; font-size: 0.9375rem; }
-  .btn[aria-busy='true'] { opacity: 0.7; pointer-events: none; }
+  .more textarea::placeholder { color: var(--ink-3); opacity: 0.8; }
+  .more textarea:focus { border-color: var(--accent); }
 
-  .compose { display: grid; gap: var(--s-4); }
+  .hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+
+  /* ---------- The brief ---------- */
+  .brief-col { position: sticky; top: 104px; display: grid; gap: var(--s-5); }
+  .brief {
+    position: relative;
+    display: grid;
+    gap: var(--s-4);
+    padding: clamp(1.4rem, 1rem + 1.5vw, 2rem);
+    border-radius: var(--radius-lg);
+    background: var(--brand);
+    color: #fff;
+    overflow: hidden;
+    isolation: isolate;
+    box-shadow: 0 30px 60px -36px rgb(27 42 61 / 0.55);
+  }
+  .brief::before {
+    content: '';
+    position: absolute;
+    width: 460px;
+    height: 460px;
+    right: -220px;
+    top: -240px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgb(184 204 224 / 0.22), transparent 70%);
+    z-index: -1;
+  }
+  .brief-head { display: flex; justify-content: space-between; align-items: center; gap: var(--s-3); }
+  .brief-title { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: #bcd6ec; }
+  .brief-status {
+    padding: 0.2rem 0.65rem;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.12);
+    color: #d9e6f2;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    transition: background-color 400ms var(--ease), color 400ms var(--ease);
+  }
+  .brief.is-ready .brief-status { background: #8ec0e6; color: var(--brand); }
+  .brief-progress { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; }
+  .brief-progress i { height: 4px; border-radius: 2px; background: rgb(255 255 255 / 0.14); transition: background-color 450ms var(--ease); }
+  .brief-progress i.on { background: #8ec0e6; }
+
+  .brief-rows { list-style: none; padding: 0; margin: 0; }
+  .brow {
+    display: grid;
+    grid-template-columns: 22px minmax(0, 1fr);
+    gap: 0.85rem;
+    align-items: start;
+    padding-block: 0.95rem;
+    border-top: 1px solid rgb(255 255 255 / 0.12);
+  }
+  .bhex { width: 22px; height: 22px; margin-top: 0.1rem; overflow: visible; }
+  .bhex-line { fill: none; stroke: rgb(255 255 255 / 0.32); stroke-width: 1.2; stroke-dasharray: 3 2.4; }
+  .bhex-fill, .bhex-tick {
+    transform-box: fill-box;
+    transform-origin: center;
+    transform: scale(0.4);
+    opacity: 0;
+    transition: transform 500ms var(--ease-out), opacity 300ms var(--ease);
+  }
+  .bhex-fill { fill: #8ec0e6; }
+  .bhex-tick { fill: none; stroke: var(--brand); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .brow.is-done .bhex-fill, .brow.is-done .bhex-tick { transform: none; opacity: 1; }
+  .brow.is-missing .bhex-line { stroke: #f2b8ae; stroke-dasharray: none; }
+  .brow-body { display: grid; gap: 0.3rem; min-width: 0; }
+  .brow-k { font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #bcd6ec; }
+  .brow-v {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    line-height: 1.25;
+    color: #fff;
+    overflow-wrap: anywhere;
+  }
+  .brow.is-empty .brow-v[data-v],
+  .brow-empty {
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    font-style: italic;
+    color: rgb(255 255 255 / 0.45);
+  }
+  .brow-empty[hidden] { display: none; }
+  .btags { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+  .btags :global(.btag) {
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    background: rgb(142 192 230 / 0.2);
+    box-shadow: inset 0 0 0 1px rgb(142 192 230 / 0.55);
+    font-family: var(--font-body);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #e6f0f8;
+  }
+  @keyframes tag-in {
+    from { opacity: 0; transform: translateY(4px) scale(0.85); }
+    to { opacity: 1; transform: none; }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .btags :global(.btag.is-new) { animation: tag-in 420ms var(--ease-out) both; }
+  }
+
+  /* Optional numbers */
+  .add-numbers {
+    justify-self: start;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-top: 0.1rem;
+    padding: 0.45rem 0.85rem 0.45rem 0.7rem;
+    border: 1px dashed rgb(255 255 255 / 0.4);
+    border-radius: 999px;
+    background: transparent;
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #fff;
+    transition: border-color var(--dur) var(--ease), background-color var(--dur) var(--ease);
+  }
+  .add-numbers:hover { border-color: #fff; background: rgb(255 255 255 / 0.06); }
+  .add-numbers svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; }
+  .add-numbers span { font-weight: 400; color: #bcd6ec; }
+  .add-numbers[hidden] { display: none; }
+  .bcalc { display: grid; gap: 0.65rem; font-family: var(--font-body); }
+  .bcalc[hidden] { display: none; }
+  .calc-result { font-family: var(--font-display); line-height: 1; }
+  .calc-big { font-size: 2rem; letter-spacing: -0.02em; font-variant-numeric: lining-nums tabular-nums; }
+  .calc-unit { font-family: var(--font-body); font-size: 0.875rem; color: #d9e6f2; }
+  .calc-sub { font-size: 0.8125rem; line-height: 1.45; color: #d9e6f2; }
+  .mini { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.2rem 0.75rem; align-items: baseline; }
+  .mini label { font-size: 0.8125rem; color: #d9e6f2; }
+  .mini output { font-family: var(--font-display); font-size: 1rem; color: #fff; font-variant-numeric: lining-nums tabular-nums; }
+  .mini input {
+    --p: 50%;
+    grid-column: 1 / -1;
+    width: 100%;
+    height: 18px;
+    margin: 0;
+    background: transparent;
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+  }
+  .mini input:focus { outline: none; }
+  .mini input::-webkit-slider-runnable-track {
+    height: 4px;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #8ec0e6 var(--p), rgb(255 255 255 / 0.2) var(--p));
+  }
+  .mini input::-moz-range-track { height: 4px; border-radius: 4px; background: rgb(255 255 255 / 0.2); }
+  .mini input::-moz-range-progress { height: 4px; border-radius: 4px; background: #8ec0e6; }
+  .mini input::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    margin-top: -6px;
+    border-radius: 50%;
+    background: #fff;
+    border: 0;
+    transition: transform var(--dur) var(--ease);
+  }
+  .mini input::-moz-range-thumb { width: 16px; height: 16px; border-radius: 50%; background: #fff; border: 0; }
+  .mini input:active::-webkit-slider-thumb { transform: scale(1.15); }
+  .mini input:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 5px rgb(142 192 230 / 0.35); }
+  .calc-remove {
+    justify-self: start;
+    padding: 0;
+    border: 0;
+    background: none;
+    font-size: 0.8125rem;
+    color: #bcd6ec;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .calc-remove:hover { color: #fff; }
+
+  .brief-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--s-3) var(--s-4); padding-top: var(--s-4); border-top: 1px solid rgb(255 255 255 / 0.12); }
+  .btn-on-brand { background: #fff; color: var(--brand); border-color: #fff; }
+  .btn-on-brand:hover { background: var(--paper); border-color: var(--paper); }
+  .btn[aria-busy='true'] { opacity: 0.7; pointer-events: none; }
+  .brief-stamp { display: inline-flex; align-items: center; gap: 0.45rem; font-size: 0.8125rem; color: #bcd6ec; }
+  .brief-stamp svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; }
+  .form-error { font-size: 0.875rem; color: #ffd8d0; }
+
+  .direct { display: grid; gap: var(--s-2); justify-items: start; padding-inline: 0.25rem; }
+  .label { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); }
+  .direct .small { max-width: 42ch; }
+
+  /* ---------- No form endpoint: hand the message to the visitor's email ---------- */
+  .compose { display: grid; gap: var(--s-4); max-width: 720px; }
+  .compose[hidden] { display: none; }
   .compose h2 { font-size: var(--step-3); }
   .compose-body {
     white-space: pre-wrap;
@@ -139,7 +529,7 @@ import { site } from '../../config/site';
     padding: var(--s-4);
     border: 1px solid var(--rule);
     border-radius: var(--radius);
-    background: var(--paper);
+    background: var(--surface);
     color: var(--ink);
     max-height: 22rem;
     overflow: auto;
@@ -147,8 +537,9 @@ import { site } from '../../config/site';
 
   @media (max-width: 960px) {
     .contact-grid { grid-template-columns: minmax(0, 1fr); gap: var(--s-7); }
-    }
+    .brief-col { position: static; }
+  }
   @media (max-width: 560px) {
-    .row-2 { grid-template-columns: minmax(0, 1fr); }
+    .pick span { padding: 0.5rem 0.85rem 0.5rem 0.7rem; font-size: 0.9375rem; }
   }
 </style>

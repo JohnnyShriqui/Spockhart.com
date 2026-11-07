@@ -97,8 +97,9 @@ export function initCalculator() {
     renderTeam(v.people, r.fte);
 
     if (cta) {
-      const estimate = `Our numbers: ${v.people} people spend about ${v.hours} hours a week each on manual work. That is ${int.format(r.hours)} hours and ${money.format(r.cost)} a year.`;
-      cta.href = `${cta.getAttribute('href')!.split('?')[0]}?${new URLSearchParams({ estimate }).toString()}`;
+      // The contact page opens with these numbers already in the brief.
+      const params = new URLSearchParams({ p: String(v.people), h: String(v.hours), r: String(v.rate) });
+      cta.href = `${cta.getAttribute('href')!.split('?')[0]}?${params.toString()}`;
     }
 
     window.clearTimeout(summaryTimer);
