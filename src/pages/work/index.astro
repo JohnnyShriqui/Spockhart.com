@@ -2,7 +2,6 @@
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import PageHero from '../../components/PageHero.astro';
-import Honeycomb from '../../components/Honeycomb.astro';
 import ResultVisual from '../../components/ResultVisual.astro';
 import ClosingCTA from '../../components/ClosingCTA.astro';
 
@@ -31,15 +30,12 @@ const sectionsOf = (body = '') =>
   title="Our Work"
   description="What the people behind Spockhart have delivered: platforms, marketplaces, sales systems, production floors and engineering prototypes. Client names withheld."
 >
-  <PageHero terse class="work-hero" eyebrow="Our Work" title="Our team’s experience." lead="Spockhart is a new firm. The people behind it are not.">
-    <p class="hero-more">
-      Before Spockhart, our team led transformations, built technology, and solved operational problems inside some of North
-      America’s largest organizations. These are a few examples of what we’ve delivered.
-    </p>
+  <PageHero class="work-hero" eyebrow="Our Work" title="Our team’s experience.">
     <p class="disclosure">
-      Projects were led by members of our team in previous roles. They were not Spockhart engagements. Client names withheld.
+      Spockhart is a new firm. The people behind it are not. Before Spockhart, our team led transformations, built technology and
+      solved operational problems inside some of North America’s largest organizations. These case studies come from our team’s
+      previous and current roles, not Spockhart engagements. Client names withheld.
     </p>
-    <Honeycomb slot="figure" />
   </PageHero>
 
   <section class="projects" aria-label="Projects" data-projects>
@@ -52,25 +48,17 @@ const sectionsOf = (body = '') =>
           <article id={entry.id} class:list={['project', { flip: i % 2 === 1, tint: i % 2 === 1 }]} data-project>
             <div class="wrap project-grid">
               <div class="project-text" data-reveal>
-                <p class="project-meta">
-                  <span class:list={['tag', { 'tag-live': live }]}>{live ? 'In development' : 'Team experience'}</span>
-                  <span>{d.sector}</span>
-                </p>
-                <h2>
-                  <span class:list={[{ 't-desk': d.mobileTitle }]}>{d.title}</span>
-                  {d.mobileTitle && <span class="t-mob">{d.mobileTitle}</span>}
-                </h2>
-                <p class="project-summary">{d.summary}</p>
-                <p class="project-client">{d.client}</p>
+                <p class="project-meta">{d.client}</p>
+                <h2>{d.title}</h2>
+              </div>
+              <div class="project-visual" data-reveal>
+                <ResultVisual id={entry.id} />
                 <button class="cs-toggle" type="button" aria-expanded="false" aria-controls={panelId} data-toggle>
                   <span data-label>See the details</span>
                   <svg viewBox="0 0 16 16" aria-hidden="true">
                     <path d="M3.5 6l4.5 4.5L12.5 6" />
                   </svg>
                 </button>
-              </div>
-              <div class="project-visual" data-reveal>
-                <ResultVisual id={entry.id} />
               </div>
             </div>
 
@@ -122,7 +110,7 @@ const sectionsOf = (body = '') =>
     </style>
   </noscript>
 
-  <ClosingCTA terse title="Your operation could be next." />
+  <ClosingCTA title="Your operation could be next." />
 </Base>
 
 <script>
@@ -163,14 +151,12 @@ const sectionsOf = (body = '') =>
 </script>
 
 <style>
-  .hero-more { color: var(--ink-2); max-width: 56ch; }
   .disclosure {
-    margin-top: var(--s-6);
-    max-width: 68ch;
-    font-size: 0.8125rem;
-    line-height: 1.5;
-    color: var(--ink-3);
-    padding-left: 0.85rem;
+    max-width: 70ch;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--ink-2);
+    padding-left: 0.95rem;
     border-left: 2px solid var(--accent-soft);
   }
 
@@ -186,18 +172,15 @@ const sectionsOf = (body = '') =>
   .flip .project-grid { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); }
   .flip .project-text { order: 2; }
   .project-text { display: grid; gap: var(--s-4); justify-items: start; align-content: center; }
-  .project-meta { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; font-size: 0.875rem; color: var(--ink-3); }
+  .project-meta { font-size: 0.875rem; font-weight: 600; color: var(--accent); }
   .project-text h2 { font-size: var(--step-3); line-height: 1.1; max-width: 18ch; }
-  .project-summary { color: var(--ink-2); font-size: var(--step-1); max-width: 44ch; }
-  .project-client { font-size: 0.875rem; color: var(--ink-3); }
-  .project-visual { min-width: 0; }
-  .tag-live { background: var(--accent-wash); color: var(--brand); border-color: transparent; }
+  .project-visual { min-width: 0; display: grid; gap: var(--s-4); justify-items: start; }
+  .project-visual > :global(.rv) { justify-self: stretch; }
 
   .cs-toggle {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    margin-top: var(--s-2);
     padding: 0.6rem 1rem 0.6rem 1.1rem;
     border: 1px solid var(--rule-2);
     border-radius: 999px;
@@ -264,21 +247,12 @@ const sectionsOf = (body = '') =>
   /* Phones: each project is its tags, its heading, the details button and the graphic.
      The summary and the rest stay one tap away in the details. */
   @media (max-width: 640px) {
-    .hero-more, .disclosure, .project-summary, .project-client, .project-meta .tag { display: none; }
-    /* Just the title: no honeycomb on phones */
-    :global(.work-hero .hero-extra),
-    :global(.work-hero .hero-figure) { display: none; }
-    /* The details button sits under the graphic */
-    .project-text { display: contents; }
-    .project-meta, .project-text h2 { order: 0; }
-    .project-visual { order: 1; margin-top: 0.25rem; }
-    .cs-toggle { order: 2; justify-self: start; }
+    /* Phones: just the title at the top */
+    :global(.work-hero .hero-extra) { display: none; }
     .project { padding-block: 2.5rem; }
     .project-grid, .flip .project-grid { gap: 0.65rem; }
     .project-meta { font-size: 0.8125rem; gap: 0.5rem; }
     .project-text h2 { font-size: 1.5rem; max-width: none; }
-    .project-summary { font-size: 1rem; line-height: 1.5; }
-    .project-client { font-size: 0.8125rem; }
     .cs-toggle { margin-top: 0.25rem; padding: 0.45rem 0.85rem 0.45rem 0.95rem; font-size: 0.875rem; }
     .cs-card { margin-top: var(--s-5); gap: var(--s-5); }
     .cs-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-4); }

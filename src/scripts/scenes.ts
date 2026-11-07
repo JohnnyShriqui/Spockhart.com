@@ -17,6 +17,9 @@
 
 type Update = (t: number) => void;
 
+/** How fast scene time runs against the clock. Below 1 slows every graphic down evenly. */
+const SPEED = 0.6;
+
 const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 const smooth = (x: number) => {
   const c = clamp01(x);
@@ -197,7 +200,7 @@ function makeController(scene: HTMLElement): Controller {
     apply(still);
   };
   const frame = (now: number) => {
-    if (last) elapsed += Math.min(0.1, (now - last) / 1000);
+    if (last) elapsed += Math.min(0.1, (now - last) / 1000) * SPEED;
     last = now;
     if (once && elapsed >= loop) {
       stop();
@@ -299,7 +302,7 @@ function initGroup(group: HTMLElement) {
         running = false;
         mark(-1);
         index = (k + 1) % scenes.length;
-        timer = window.setTimeout(next, 450);
+        timer = window.setTimeout(next, 700);
       },
     });
   };

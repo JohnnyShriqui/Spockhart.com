@@ -35,7 +35,7 @@ const defaultProblems = [
     brief: 'Made by hand, chased one by one',
     name: 'Invoicing',
     problem: 'Invoices prepared manually, details copied from spreadsheets, and payments chased one at a time.',
-    fix: 'Approved work becomes an invoice. Reminders go out automatically.',
+    fix: 'Automatically generate invoices, send them to clients, and track outstanding payments.',
     side: 'left',
     y: 214,
     icon: 'M7 3h7l4 4v14H7zM14 3v4h4M12.5 10v8M14.5 11.3c-.4-.6-1.1-.9-2-.9-1.2 0-2 .6-2 1.5 0 2 4 1.1 4 3.1 0 .9-.9 1.5-2 1.5-.9 0-1.7-.4-2.1-1',
@@ -45,7 +45,7 @@ const defaultProblems = [
     brief: 'The same details, typed twice',
     name: 'Data entry',
     problem: 'The same client, donor, or project details entered into multiple platforms.',
-    fix: 'Enter information once. It updates across the tools your team uses.',
+    fix: 'Enter information once and keep your connected systems up to date.',
     side: 'right',
     y: 238,
     icon: 'M8 4h10a2 2 0 0 1 2 2v10M4 8h10a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zM7 13h6M7 16h4',
@@ -55,7 +55,7 @@ const defaultProblems = [
     brief: 'Hours pulling numbers by hand',
     name: 'Reporting',
     problem: 'Hours spent pulling numbers from different spreadsheets before every meeting.',
-    fix: 'A live dashboard brings your key numbers together automatically.',
+    fix: 'Automatically collect data and generate reports in one dashboard.',
     side: 'left',
     y: 272,
     icon: 'M4 20h16M7 16v-4M12 16V8M17 16v-7M7 8.5l5-3.5 5 3',
@@ -65,7 +65,7 @@ const defaultProblems = [
     brief: 'Leads and payments left waiting',
     name: 'Follow-ups',
     problem: 'Leads, outstanding payments, applications, and important requests waiting for someone to follow up.',
-    fix: 'Every outstanding item gets an owner, a reminder, and a next step.',
+    fix: 'Track outstanding requests and automatically assign follow-ups.',
     side: 'right',
     y: 298,
     icon: 'M3 7l9 6 9-6M3 7v10a1 1 0 0 0 1 1h9M3 7a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v6M16 18h5M19 16l2 2-2 2',
@@ -75,7 +75,7 @@ const defaultProblems = [
     brief: 'Endless emails to find a time',
     name: 'Scheduling',
     problem: 'Endless emails coordinating availability, appointments, and meetings.',
-    fix: 'People book directly into available times. Confirmations go out automatically.',
+    fix: 'Let people schedule appointments without the back-and-forth emails.',
     side: 'left',
     y: 330,
     icon: 'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4M8 14h2M12 14h2M16 14h0M8 17h2M12 17h2',
@@ -85,7 +85,7 @@ const defaultProblems = [
     brief: 'Records checked line by line',
     name: 'Reconciliation',
     problem: 'Receipts, transactions, records, and spreadsheets manually checked against one another.',
-    fix: 'Transactions are matched, exceptions flagged, and records kept up to date.',
+    fix: 'Automatically match transactions and flag discrepancies for review.',
     side: 'right',
     y: 352,
     icon: 'M3.5 4h6v16h-6zM14.5 4h6v16h-6zM9.5 9h5M13 7.5l1.5 1.5-1.5 1.5M14.5 15h-5M11 13.5L9.5 15l1.5 1.5',
@@ -105,7 +105,7 @@ const {
     <div class="p-side">
       <div class="p-head" data-reveal>
         <p class="eyebrow">{eyebrow}</p>
-        <h2 id="problems-title"><span class="t-desk">Sound familiar?</span><span class="t-mob">Look familiar?</span></h2>
+        <h2 id="problems-title">Your company is leaking time and money.</h2>
       </div>
       <div class="p-figure" data-reveal>
         <LeakyBucket inflow={inflow} leaks={problems.map((p) => ({ key: p.key, label: ('short' in p && p.short) || p.name, side: p.side, y: p.y }))} />
@@ -125,7 +125,6 @@ const {
               <div class="p-problem">
                 <p class="p-num">Problem {String(i + 1).padStart(2, '0')}</p>
                 <h3>{p.name}</h3>
-                <p class="p-desc">{p.problem}</p>
                 <p class="p-brief">{('brief' in p && p.brief) || p.problem}</p>
               </div>
               <button class="p-toggle" type="button" aria-expanded="false" aria-controls={`fix-${p.key}`}>
@@ -282,7 +281,8 @@ const {
     .p-fix-tag { vertical-align: 0.12em; margin-right: 0.3rem; }
     .p-arrow { margin-right: 0.3rem; }
   }
-  .p-toggle, .p-brief { display: none; }
+  .p-toggle { display: none; }
+  .p-brief { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
   /* Phones and small tablets: a smaller bucket and a compact list. Each row shows the
      problem; tapping it opens the fix underneath. */
@@ -322,8 +322,6 @@ const {
     .p-problem .p-num { display: none; }
     .p-problem h3 { font-size: 1.0625rem; }
     .p-problem p { font-size: 0.875rem; line-height: 1.4; }
-    .p-problem .p-desc { display: none; }
-    .p-problem .p-brief { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
     .p-toggle {
       display: grid;

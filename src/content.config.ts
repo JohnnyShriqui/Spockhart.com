@@ -9,8 +9,6 @@ const work = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/work' }),
   schema: z.object({
     title: z.string(),
-    /** Optional shorter title shown on phones */
-    mobileTitle: z.string().optional(),
     summary: z.string(),
     client: z.string(),
     sector: z.string(),
