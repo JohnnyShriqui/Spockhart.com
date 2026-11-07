@@ -4,12 +4,14 @@ interface Props {
   eyebrow?: string;
   title: string;
   lead?: string;
+  /** On phones, hide the lead and keep just the heading */
+  terse?: boolean;
 }
-const { eyebrow, title, lead } = Astro.props;
+const { eyebrow, title, lead, terse = false } = Astro.props;
 const hasFigure = Astro.slots.has('figure');
 ---
 
-<section class:list={['page-hero', { 'with-figure': hasFigure }]}>
+<section class:list={['page-hero', { 'with-figure': hasFigure, terse }]}>
   <Mist />
   <div class="wrap hero-layout">
     <div class="hero-text">
@@ -43,6 +45,9 @@ const hasFigure = Astro.slots.has('figure');
     align-items: center;
   }
   .hero-figure { width: 100%; max-width: 480px; justify-self: end; }
+  @media (max-width: 640px) {
+    .terse .lead { display: none; }
+  }
   @media (max-width: 960px) {
     .with-figure .hero-layout { grid-template-columns: minmax(0, 1fr); }
     .hero-figure { justify-self: start; max-width: 420px; }

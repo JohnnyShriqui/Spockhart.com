@@ -430,4 +430,8 @@ const fmt = (n: number) => n.toLocaleString('en-CA');
     .r-viz { grid-template-columns: 62px 14px minmax(0, 1fr); padding-inline: 0.7rem; }
     .r-title { white-space: nowrap; }
   }
+  /* Phones: heading and graphic only */
+  @media (max-width: 640px) {
+    .o-text p:not(.o-num) { display: none; }
+  }
 </style>

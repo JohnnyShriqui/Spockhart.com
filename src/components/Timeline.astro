@@ -341,8 +341,10 @@ const pct = (d: number) => `${(d / SCALE) * 100}%`;
     .scale-cover, .scale-now { display: none; }
   }
 
-  /* Phones: the bar is too narrow for names, so each part is numbered and a key sits below */
+  /* Phones: the bar is too narrow for names, so each part is numbered and a key sits below.
+     Each phase keeps its heading and graphic; the description is left for larger screens. */
   @media (max-width: 640px) {
+    .phase-body { display: none; }
     .timeline { gap: var(--s-5); }
     .scale { --track: 72; --tail: 28; grid-template-columns: minmax(0, 72fr) minmax(0, 28fr); padding-bottom: 1.9rem; }
     .seg, .scale-tail { justify-content: center; padding-inline: 0; }
