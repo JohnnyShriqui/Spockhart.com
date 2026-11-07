@@ -1,7 +1,7 @@
 ---
-title: 16 representatives. One performance system. $316K increase in average monthly sales.
+title: '[+$316K] in average monthly sales, after putting [16 reps] on one performance system.'
 summary: A centralized performance tracking system that gave a 16-person sales team clear, consistent metrics, followed by a $316K increase in average monthly team sales.
-client: A sales organization
+client: A 16-representative sales team
 sector: Sales operations
 scope: Sales operations and performance tracking
 order: 4

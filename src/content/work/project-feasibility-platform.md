@@ -1,5 +1,5 @@
 ---
-title: From a year-long assessment to an answer in minutes.
+title: 'A [12-month, $100K+] assessment, now done [in minutes for $0].'
 summary: An automated feasibility platform that turned a year-long, six-figure assessment into an answer in minutes, and became a national contractor's North American lead-generation engine.
 client: A national general contractor
 sector: Construction & real estate

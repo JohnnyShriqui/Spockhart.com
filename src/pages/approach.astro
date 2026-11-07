@@ -36,6 +36,11 @@ import { site } from '../config/site';
 </Base>
 
 <style>
+  /* Laptops: the title sits close to the bar so the whole engagement fits on one screen */
+  @media (min-width: 901px) {
+    .engagement .section-head { gap: var(--s-2); margin-bottom: var(--s-5); }
+    .engagement .section-head h2 { font-size: var(--step-3); }
+  }
   /* Phones: the bar sits right under the title; the phases run to the bottom of the section */
   @media (max-width: 640px) {
     .engagement { padding-bottom: 0; }

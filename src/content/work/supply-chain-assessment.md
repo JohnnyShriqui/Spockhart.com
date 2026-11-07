@@ -1,5 +1,5 @@
 ---
-title: A global supplier network. One prioritized transformation roadmap.
+title: 'A [global supplier network], mapped, scored against [Industry 4.0] and ranked into one roadmap.'
 summary: Supplier processes mapped across a global network, assessed against Industry 4.0 best practice, and scored on a weighted platform that set the next year's improvement priorities.
 client: A global telecommunications equipment company
 sector: Supply chain & Industry 4.0

@@ -292,7 +292,7 @@ const tick = (x: number, y: number, s = 1) => `M${x - 3.5 * s} ${y}l${2.4 * s} $
 <style>
   /* Runs edge to edge along the bottom of the phase card */
   .pg {
-    margin: auto calc(var(--s-5) * -1) calc(var(--s-5) * -1);
+    margin: auto calc(var(--pad, var(--s-5)) * -1) calc(var(--pad, var(--s-5)) * -1);
     padding-top: var(--s-4);
   }
   .pg svg {
@@ -304,6 +304,11 @@ const tick = (x: number, y: number, s = 1) => `M${x - 3.5 * s} ${y}l${2.4 * s} $
     border-top: 1px solid var(--rule);
     padding: 8px 6px;
     box-sizing: border-box;
+  }
+  /* Laptops: a little shorter, so all four phases fit on one screen */
+  @media (min-width: 901px) {
+    .pg { padding-top: var(--s-3); }
+    .pg svg { max-height: 196px; }
   }
 
   /* Phones: the phase is a full-width band, so the graphic sits in its own frame */

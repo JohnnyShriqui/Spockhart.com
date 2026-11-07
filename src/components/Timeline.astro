@@ -102,7 +102,7 @@ const pct = (d: number) => `${(d / SCALE) * 100}%`;
     }
   </ol>
 
-  <ol class="phases" data-reveal="stagger" data-scene-group="(min-width: 901px)">
+  <ol class="phases" data-reveal="stagger" data-scene-group="(min-width: 901px)" data-rate="1.05" data-gap="350">
     {
       phases.map((p, i) => (
         <li
@@ -135,19 +135,22 @@ const pct = (d: number) => `${(d / SCALE) * 100}%`;
   .scale {
     --track: 86;
     --tail: 14;
+    /* Room above the bar for the milestone, and the bar's height */
+    --above: 2.6rem;
+    --bar: 44px;
     /* Where the marker is: set by the script below as phases play; rests at the end */
     --pos: 100%;
     position: relative;
     display: grid;
     grid-template-columns: minmax(0, 86fr) minmax(0, 14fr);
-    padding-top: 2.6rem;
+    padding-top: var(--above);
     padding-bottom: 2rem;
   }
   /* Everything to the right of the marker is still ahead */
   .scale-cover {
     position: absolute;
-    top: 2.6rem;
-    height: 44px;
+    top: var(--above);
+    height: var(--bar);
     left: var(--pos);
     right: 0;
     background: rgb(228 234 241 / 0.72);
@@ -155,8 +158,8 @@ const pct = (d: number) => `${(d / SCALE) * 100}%`;
   }
   .scale-now {
     position: absolute;
-    top: calc(2.6rem - 12px);
-    height: calc(44px + 24px);
+    top: calc(var(--above) - 12px);
+    height: calc(var(--bar) + 24px);
     left: var(--pos);
     width: 0;
     pointer-events: none;
@@ -173,7 +176,7 @@ const pct = (d: number) => `${(d / SCALE) * 100}%`;
     clip-path: var(--hex);
   }
   .scale-now i::after { content: ''; position: absolute; inset: 5px 4px; background: var(--paper); clip-path: var(--hex); }
-  .scale-track { position: relative; height: 44px; }
+  .scale-track { position: relative; height: var(--bar); }
   .axis {
     position: absolute;
     left: 0;
@@ -206,7 +209,7 @@ const pct = (d: number) => `${(d / SCALE) * 100}%`;
   .seg-1 .seg-label { color: var(--navy); }
   .scale-tail {
     position: relative;
-    height: 44px;
+    height: var(--bar);
     display: flex;
     align-items: center;
     padding-inline: 0.75rem;
@@ -274,11 +277,12 @@ const pct = (d: number) => `${(d / SCALE) * 100}%`;
   }
   .phase {
     --t: var(--still, 6);
+    --pad: var(--s-5);
     position: relative;
     display: flex;
     flex-direction: column;
     gap: var(--s-2);
-    padding: var(--s-5);
+    padding: var(--pad);
     border: 1px solid var(--rule);
     border-radius: var(--radius-lg);
     background: var(--surface);
@@ -325,6 +329,16 @@ const pct = (d: number) => `${(d / SCALE) * 100}%`;
   .phase h3 { font-size: 1.5rem; line-height: 1.15; }
   .phase-body { color: var(--ink-2); font-size: 1rem; line-height: 1.55; }
   .compact { gap: var(--s-6); }
+
+  /* Laptops: the title, the bar and all four phases fit on one screen */
+  @media (min-width: 901px) {
+    .timeline:not(.compact) { gap: var(--s-5); }
+    .timeline:not(.compact) .scale { --above: 2.2rem; --bar: 38px; padding-bottom: 1.7rem; }
+    .phases { gap: var(--s-4); }
+    .phase { --pad: 1.15rem; gap: 0.3rem; }
+    .phase h3 { font-size: 1.375rem; }
+    .phase-body { font-size: 0.9375rem; line-height: 1.5; }
+  }
 
   @media (prefers-reduced-motion: no-preference) {
     .scale-now i { animation: now-pulse 1.6s ease-in-out infinite; }

@@ -1,5 +1,5 @@
 ---
-title: Growing revenue from $150K to $1M.
+title: 'A digital practice grown [more than 6x] in under a year, from [$150K to $1M].'
 summary: Building out a consulting firm's digital services practice across digital twins, analytics and transformation platforms, from about $150K to $1M in revenue in under a year.
 client: A consulting firm
 sector: Digital transformation & commercial growth

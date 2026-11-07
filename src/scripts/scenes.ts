@@ -17,7 +17,8 @@
 
 type Update = (t: number) => void;
 
-/** How fast scene time runs against the clock. Below 1 slows every graphic down evenly. */
+/** How fast scene time runs against the clock. Below 1 slows every graphic down evenly.
+ *  A scene, or anything around it, can set its own pace with data-rate (the Approach phases do). */
 const SPEED = 0.6;
 
 const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
@@ -175,6 +176,7 @@ function cyclers(scene: HTMLElement) {
 
 function makeController(scene: HTMLElement): Controller {
   const loop = Number(scene.dataset.loop ?? 8);
+  const rate = Number(scene.closest<HTMLElement>('[data-rate]')?.dataset.rate ?? SPEED) || SPEED;
   const still = Number(scene.dataset.still ?? loop * 0.9);
   const updates = [...counters(scene), ...followers(scene), ...hoppers(scene), ...movers(scene), ...boards(scene)];
   const nextVariant = cyclers(scene);
@@ -200,7 +202,7 @@ function makeController(scene: HTMLElement): Controller {
     apply(still);
   };
   const frame = (now: number) => {
-    if (last) elapsed += Math.min(0.1, (now - last) / 1000) * SPEED;
+    if (last) elapsed += Math.min(0.1, (now - last) / 1000) * rate;
     last = now;
     if (once && elapsed >= loop) {
       stop();
@@ -282,6 +284,7 @@ function initGroup(group: HTMLElement) {
   group.dataset.groupReady = '1';
   const scenes = Array.from(group.querySelectorAll<HTMLElement>('[data-scene]'));
   const ctrls = scenes.map((s) => controllers.get(s)!);
+  const gap = Number(group.dataset.gap ?? 700);
   const mq = group.dataset.sceneGroup ? window.matchMedia(group.dataset.sceneGroup) : null;
   const sequenced = () => !mq || mq.matches;
   let index = 0;
@@ -302,7 +305,7 @@ function initGroup(group: HTMLElement) {
         running = false;
         mark(-1);
         index = (k + 1) % scenes.length;
-        timer = window.setTimeout(next, 700);
+        timer = window.setTimeout(next, gap);
       },
     });
   };

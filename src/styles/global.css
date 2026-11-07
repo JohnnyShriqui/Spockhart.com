@@ -69,6 +69,7 @@
   --accent-soft: #4a8aba;    /* decorative lines and fills */
   --accent-on-navy: #8ec0e6;
   --accent-wash: rgb(74 138 186 / 0.14);
+  --problem: #c0392b;        /* problems we fix (AA on light surfaces) */
   --mist-1: #b8cce0;         /* ambient shapes, from the original site */
   --mist-2: #a3bcd4;
   --mist-3: #c5d5e4;
@@ -106,6 +107,8 @@
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --dur: 240ms;
   --hex: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+  /* A stop-sign octagon, for problems */
+  --oct: polygon(29.3% 0, 70.7% 0, 100% 29.3%, 100% 70.7%, 70.7% 100%, 29.3% 100%, 0 70.7%, 0 29.3%);
 
   color-scheme: light;
 }

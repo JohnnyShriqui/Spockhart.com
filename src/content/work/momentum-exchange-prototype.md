@@ -1,5 +1,5 @@
 ---
-title: Making every delivery go further.
+title: 'A working prototype for up to [83% more cargo] per trip, delivered [ahead of schedule and under budget].'
 summary: A working engineering prototype of a momentum-exchange system that could carry up to 83% more cargo per trip, delivered ahead of schedule and under budget.
 client: An advanced engineering program
 sector: Advanced engineering
