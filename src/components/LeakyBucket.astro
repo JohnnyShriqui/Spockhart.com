@@ -48,31 +48,22 @@ const jets = leaks.map((l) => {
   const labelX = l.side === 'left' ? 86 : 412;
   return { ...l, x0, x1, path, crack, labelX, anchor: l.side === 'left' ? 'end' : 'start' };
 });
-
-// The phone drawing widens the frame so the bucket sits in the middle with room for
-// large labels on both sides. Its labels are HTML tags laid over the picture.
-const variants = [
-  { key: 'wide', viewBox: '0 0 520 470', labels: true },
-  { key: 'phone', viewBox: '-150 0 820 470', labels: false },
-];
 ---
 
 <figure class="bucket" data-bucket aria-hidden="true">
-  {
-    variants.map((v) => (
-  <svg viewBox={v.viewBox} class={`bucket-svg bk-${v.key}`}>
+  <svg viewBox="0 0 520 470" class="bucket-svg">
     <defs>
-      <linearGradient id={`bk-water-${v.key}`} x1="0" y1="0" x2="0" y2="1">
+      <linearGradient id="bk-water" x1="0" y1="0" x2="0" y2="1">
         <stop offset="0" stop-color="#9ccbec" />
         <stop offset="1" stop-color="#4a8aba" />
       </linearGradient>
-      <linearGradient id={`bk-glass-${v.key}`} x1="0" y1="0" x2="1" y2="0">
+      <linearGradient id="bk-glass" x1="0" y1="0" x2="1" y2="0">
         <stop offset="0" stop-color="#fff" stop-opacity="0.5" />
         <stop offset="0.35" stop-color="#fff" stop-opacity="0.12" />
         <stop offset="0.8" stop-color="#fff" stop-opacity="0.04" />
         <stop offset="1" stop-color="#fff" stop-opacity="0.3" />
       </linearGradient>
-      <clipPath id={`bk-body-${v.key}`}><path d={body} /></clipPath>
+      <clipPath id="bk-body"><path d={body} /></clipPath>
     </defs>
 
     <!-- Puddle of everything lost -->
@@ -90,8 +81,8 @@ const variants = [
     <ellipse cx={CX} cy={TOP} rx={TOP_HALF} ry="18" class="bk-inside" />
 
     <!-- Water -->
-    <g clip-path={`url(#bk-body-${v.key})`}>
-      <rect x={CX - TOP_HALF} y={WATER} width={TOP_HALF * 2} height={BOTTOM - WATER + 20} fill={`url(#bk-water-${v.key})`} />
+    <g clip-path="url(#bk-body)">
+      <rect x={CX - TOP_HALF} y={WATER} width={TOP_HALF * 2} height={BOTTOM - WATER + 20} fill="url(#bk-water)" />
     </g>
     <ellipse cx={CX} cy={WATER} rx={waterHalf} ry="16" class="bk-surface" />
 
@@ -102,7 +93,7 @@ const variants = [
     <ellipse cx={CX} cy={WATER} rx="18" ry="4" class="bk-ripple bk-ripple-2" />
 
     <!-- Bucket shell -->
-    <path d={body} class="bk-shell" fill={`url(#bk-glass-${v.key})`} />
+    <path d={body} class="bk-shell" />
     <path d={hoop(152, 17)} class="bk-hoop" />
     <path d={hoop(338, 15)} class="bk-hoop" />
     <path d={`M${CX - TOP_HALF} ${TOP} A${TOP_HALF} 18 0 0 0 ${CX + TOP_HALF} ${TOP}`} class="bk-lip" />
@@ -126,26 +117,13 @@ const variants = [
               })
               .join(' ')}
           />
-          {v.labels && (
-            <text x={j.labelX} y={j.y + 4} class="leak-label" text-anchor={j.anchor}>
-              {j.label}
-            </text>
-          )}
+          <text x={j.labelX} y={j.y + 4} class="leak-label" text-anchor={j.anchor}>
+            {j.label}
+          </text>
         </g>
       ))
     }
   </svg>
-    ))
-  }
-  <ul class="bk-tags">
-    {
-      jets.map((j) => (
-        <li class={`bk-tag bk-tag-${j.side}`} style={`top:${((j.y / 470) * 100).toFixed(2)}%`} data-leak={j.key}>
-          {j.label}
-        </li>
-      ))
-    }
-  </ul>
 </figure>
 
 <style>
@@ -160,7 +138,7 @@ const variants = [
   .bk-stream { stroke: #6aa6d4; stroke-width: 12; stroke-linecap: round; fill: none; }
   .bk-stream-flow { stroke: rgb(255 255 255 / 0.55); stroke-width: 3; stroke-dasharray: 5 13; stroke-linecap: round; fill: none; }
   .bk-ripple { fill: none; stroke: #fff; stroke-width: 1.5; opacity: 0; transform-box: fill-box; transform-origin: center; }
-  .bk-shell { stroke: var(--ink); stroke-width: 2.5; stroke-linejoin: round; }
+  .bk-shell { fill: url(#bk-glass); stroke: var(--ink); stroke-width: 2.5; stroke-linejoin: round; }
   .bk-hoop { fill: none; stroke: var(--ink); stroke-width: 1.5; opacity: 0.3; }
   .bk-lip { fill: none; stroke: var(--ink); stroke-width: 5; stroke-linecap: round; }
   .bk-rim { fill: none; stroke: var(--ink); stroke-width: 2.5; }
@@ -200,33 +178,7 @@ const variants = [
     @keyframes bk-bob { 50% { transform: scaleX(0.985) translateY(1px); } }
   }
 
-  .bucket { position: relative; }
-  .bk-phone, .bk-tags { display: none; }
-
-  /* Phones: the bucket in the middle, each leak named with a large tag beside its hole */
-  @media (max-width: 640px) {
-    .bucket { max-width: none; }
-    .bk-wide { display: none; }
-    .bk-phone { display: block; }
-    .bk-phone .bk-cap { font-size: 24px; letter-spacing: 0.12em; }
-    .bk-phone .leak-jet { stroke-width: 5; }
-    .bk-phone .leak-hole { transform: scale(1.4); transform-box: fill-box; transform-origin: center; }
-    .bk-tags { display: block; position: absolute; inset: 0; list-style: none; margin: 0; padding: 0; pointer-events: none; }
-    .bk-tag {
-      position: absolute;
-      transform: translateY(-50%);
-      padding: 0.24rem 0.6rem;
-      border-radius: 999px;
-      background: var(--ink);
-      color: #fff;
-      font-size: 0.8125rem;
-      font-weight: 600;
-      line-height: 1.1;
-      white-space: nowrap;
-      box-shadow: 0 6px 14px -8px rgb(27 42 61 / 0.6);
-    }
-    /* Left tags end just short of the left streams; right tags start just past the right ones */
-    .bk-tag-left { right: calc(100% - (62 + 150) / 820 * 100%); }
-    .bk-tag-right { left: calc((428 + 150) / 820 * 100%); }
+  @media (max-width: 520px) {
+    .leak-label { font-size: 17px; }
   }
 </style>

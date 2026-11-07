@@ -105,7 +105,7 @@ const {
     <div class="p-side">
       <div class="p-head" data-reveal>
         <p class="eyebrow">{eyebrow}</p>
-        <h2 id="problems-title"><span class="t-desk">Sound familiar?</span><span class="t-mob">What we fix</span></h2>
+        <h2 id="problems-title"><span class="t-desk">Sound familiar?</span><span class="t-mob">Look familiar?</span></h2>
       </div>
       <div class="p-figure" data-reveal>
         <LeakyBucket inflow={inflow} leaks={problems.map((p) => ({ key: p.key, label: ('short' in p && p.short) || p.name, side: p.side, y: p.y }))} />
@@ -174,9 +174,10 @@ const {
         section.querySelectorAll<HTMLElement>('[data-leak-key]').forEach((row) => row.removeAttribute('tabindex'));
         return;
       }
-      const leaks = Array.from(section.querySelectorAll<HTMLElement>('[data-leak]'));
+      const leaks = new Map<string, Element>();
+      section.querySelectorAll('[data-leak]').forEach((g) => leaks.set((g as HTMLElement).dataset.leak!, g));
       const set = (key: string | null) => {
-        leaks.forEach((g) => g.classList.toggle('is-fixed', g.dataset.leak === key));
+        leaks.forEach((g, k) => g.classList.toggle('is-fixed', k === key));
         section.querySelectorAll<HTMLElement>('[data-leak-key]').forEach((row) => row.classList.toggle('is-active', row.dataset.leakKey === key));
       };
       section.querySelectorAll<HTMLElement>('[data-leak-key]').forEach((row) => {
@@ -353,10 +354,5 @@ const {
     .p-fix-tag { padding: 0.1rem 0.45rem 0.1rem 0.35rem; margin-right: 0.35rem; vertical-align: 0.1em; font-size: 0.625rem; }
     .p-arrow { display: none; }
     .p-fix-text { display: inline; font-family: var(--font-body); font-weight: 500; font-size: 0.875rem; line-height: 1.45; color: var(--ink); }
-  }
-  /* Phones: a plain "What we fix" heading and a full-width bucket with large labels */
-  @media (max-width: 640px) {
-    .p-head .eyebrow { display: none; }
-    .p-figure { max-width: none; }
   }
 </style>
