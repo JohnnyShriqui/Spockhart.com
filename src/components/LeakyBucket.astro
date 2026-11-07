@@ -17,7 +17,7 @@ interface Props {
 }
 const { leaks, inflow = 'Revenue in' } = Astro.props;
 
-// Bucket geometry (viewBox 0 0 520 470)
+// Bucket geometry (viewBox 0 0 520 448)
 const CX = 249;
 const TOP = 130;
 const BOTTOM = 372;
@@ -51,7 +51,7 @@ const jets = leaks.map((l) => {
 ---
 
 <figure class="bucket" data-bucket aria-hidden="true">
-  <svg viewBox="0 0 520 470" class="bucket-svg">
+  <svg viewBox="0 0 520 448" class="bucket-svg">
     <defs>
       <linearGradient id="bk-water" x1="0" y1="0" x2="0" y2="1">
         <stop offset="0" stop-color="#9ccbec" />
@@ -68,7 +68,6 @@ const jets = leaks.map((l) => {
 
     <!-- Puddle of everything lost -->
     <ellipse cx={CX} cy={GROUND} rx="214" ry="11" class="bk-puddle" />
-    <text x={CX} y="464" class="bk-cap bk-cap-loss" text-anchor="middle">Lost to tedious, repetitive tasks</text>
 
     <!-- Revenue pipe -->
     <text x="24" y="10" class="bk-cap">{inflow}</text>
@@ -132,7 +131,6 @@ const jets = leaks.map((l) => {
 
   /* What goes in and what is lost: large enough to read at a glance */
   .bk-cap { font-family: var(--font-body); font-size: 21px; font-weight: 700; letter-spacing: 0.01em; fill: var(--ink); }
-  .bk-cap-loss { fill: var(--accent); }
   .bk-pipe { fill: var(--ink); }
   .bk-pipe-shine { stroke: #3a5068; stroke-width: 2; stroke-linecap: round; fill: none; }
   .bk-inside { fill: #c9d6e3; }
