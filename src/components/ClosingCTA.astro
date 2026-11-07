@@ -30,22 +30,15 @@ const {
 </section>
 
 <style>
-  .closing { border-top: 1px solid var(--rule); }
-  .closing-inner {
-    display: grid;
-    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-    gap: var(--s-6) var(--s-8);
-    align-items: end;
-  }
+  /* Heading, a line of context, then the buttons directly underneath */
+  .closing { border-top: 1px solid var(--rule); padding-block: clamp(3.5rem, 2.25rem + 4vw, 6rem); }
+  .closing-inner { display: grid; gap: var(--s-6); justify-items: start; }
   .closing-copy { display: grid; gap: var(--s-4); }
-  .closing-copy h2 { max-width: 14ch; }
-  .closing-copy p { color: var(--ink-2); font-size: var(--step-1); max-width: 46ch; }
-  .closing-actions { display: flex; flex-wrap: wrap; gap: var(--s-3); justify-content: flex-end; align-items: center; }
+  .closing-copy h2 { max-width: 18ch; }
+  .closing-copy p { color: var(--ink-2); font-size: var(--step-1); max-width: 52ch; }
+  .closing-actions { display: flex; flex-wrap: wrap; gap: var(--s-3); align-items: center; }
   @media (max-width: 640px) {
     .terse .closing-copy p { display: none; }
-  }
-  @media (max-width: 860px) {
-    .closing-inner { grid-template-columns: minmax(0, 1fr); }
-    .closing-actions { justify-content: flex-start; }
+    .closing-inner { gap: var(--s-5); }
   }
 </style>

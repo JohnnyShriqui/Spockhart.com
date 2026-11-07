@@ -104,8 +104,7 @@ const {
   <div class="wrap p-layout">
     <div class="p-side">
       <div class="p-head" data-reveal>
-        <p class="eyebrow">{eyebrow}</p>
-        <h2 id="problems-title">Your company is leaking time and money.</h2>
+        <h2 id="problems-title">What we fix most often.</h2>
       </div>
       <div class="p-figure" data-reveal>
         <LeakyBucket inflow={inflow} leaks={problems.map((p) => ({ key: p.key, label: ('short' in p && p.short) || p.name, side: p.side, y: p.y }))} />
@@ -354,5 +353,45 @@ const {
     .p-fix-tag { padding: 0.1rem 0.45rem 0.1rem 0.35rem; margin-right: 0.35rem; vertical-align: 0.1em; font-size: 0.625rem; }
     .p-arrow { display: none; }
     .p-fix-text { display: inline; font-family: var(--font-body); font-weight: 500; font-size: 0.875rem; line-height: 1.45; color: var(--ink); }
+  }
+  /* Larger screens: each problem on one line, its fix on the line below */
+  @media (min-width: 901px) {
+    .p-list { gap: var(--s-2); }
+    .p-row {
+      grid-template-columns: auto minmax(0, 1fr);
+      grid-template-rows: auto auto;
+      gap: 0.25rem var(--s-4);
+      align-items: center;
+      padding: 0.75rem var(--s-5) 0.75rem var(--s-4);
+    }
+    .p-badge { grid-row: 1 / 3; width: 38px; height: 43px; }
+    .p-badge svg { width: 19px; height: 19px; }
+    .p-problem { display: flex; align-items: baseline; gap: 0.7rem; min-width: 0; white-space: nowrap; }
+    .p-problem .p-num, .p-problem .p-desc { display: none; }
+    .p-problem h3 { flex: none; font-size: 1.0625rem; }
+    .p-problem .p-brief { display: block; min-width: 0; overflow: hidden; text-overflow: ellipsis; font-size: 0.9375rem; }
+    .p-fix {
+      grid-column: 2;
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: center;
+      gap: 0.5rem;
+      min-width: 0;
+      padding-left: 0;
+      border-left: 0;
+      white-space: nowrap;
+    }
+    .p-fix-tag { flex: none; margin: 0; vertical-align: 0; }
+    .p-arrow { flex: none; margin: 0; }
+    .p-fix-text {
+      flex: 1 1 auto;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-family: var(--font-body);
+      font-weight: 500;
+      font-size: 0.875rem;
+      color: var(--ink);
+    }
   }
 </style>

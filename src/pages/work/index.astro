@@ -9,6 +9,20 @@ import ClosingCTA from '../../components/ClosingCTA.astro';
 const all = (await getCollection('work')).sort((a, b) => a.data.order - b.data.order);
 
 /**
+ * Client names and logos are withheld, so each case study gets an industry mark where the
+ * client's logo would sit (24x24 stroke icons, drawn in a navy hexagon).
+ */
+const industryIcons: Record<string, string> = {
+  'commission-automation': 'M3 21V11l5 3v-3l5 3v-3l5 3V5h3v16zM3 21h18M7 17h2M12 17h2M17 17h1',
+  'project-feasibility-platform': 'M4 21V9h7v12M11 21V3h3l6 4M14 7h6M18 7v4M3 21h18M6.5 12h2M6.5 15h2M6.5 18h2',
+  'subcontractor-financing-marketplace': 'M3 17.5h18M5 17.5a7 7 0 0 1 14 0M10.5 10.6V6.5h3v4.1M12 20.5v.01',
+  'sales-performance-system': 'M4 20h16M6 16l4-4 3 3 5-6M14 9h4v4',
+  'digital-practice-growth': 'M4 8h16v11H4zM9 8V5.5h6V8M4 13h16M11 13v2h2v-2',
+  'momentum-exchange-prototype': 'M12 3c3 2.2 4.8 6 4.8 10l-2 3H9.2l-2-3c0-4 1.8-7.8 4.8-10zM9.4 16.2 7.5 20.5M14.6 16.2l1.9 4.3M12 8.5v3',
+  'supply-chain-assessment': 'M12 10v11M8.5 21h7M12 10l-3.5 11M12 10l3.5 11M9 6.5a4.2 4.2 0 0 0 0 6M15 6.5a4.2 4.2 0 0 1 0 6M6.2 4a8 8 0 0 0 0 11M17.8 4a8 8 0 0 1 0 11',
+};
+
+/**
  * Case study bodies are short markdown: a few "## Heading" sections of plain
  * paragraphs. They are shown as side-by-side columns in each project's details.
  */
@@ -31,14 +45,12 @@ const sectionsOf = (body = '') =>
   title="Our Work"
   description="What the people behind Spockhart have delivered: platforms, marketplaces, sales systems, production floors and engineering prototypes. Client names withheld."
 >
-  <PageHero terse class="work-hero" eyebrow="Our Work" title="Our team’s experience." lead="Spockhart is a new firm. The people behind it are not.">
-    <p class="hero-more">
-      Before Spockhart, our team led transformations, built technology, and solved operational problems inside some of North
-      America’s largest organizations. These are a few examples of what we’ve delivered.
-    </p>
-    <p class="disclosure">
-      Projects were led by members of our team in previous roles. They were not Spockhart engagements. Client names withheld.
-    </p>
+  <PageHero
+    class="work-hero"
+    eyebrow="Our Work"
+    title="Our team’s experience."
+    lead="Spockhart is a new firm built on years of experience. Our team has transformed operations and built technology at some of North America’s largest organizations, with the examples below drawn from previous roles."
+  >
     <Honeycomb slot="figure" />
   </PageHero>
 
@@ -52,24 +64,29 @@ const sectionsOf = (body = '') =>
           <article id={entry.id} class:list={['project', { flip: i % 2 === 1, tint: i % 2 === 1 }]} data-project>
             <div class="wrap project-grid">
               <div class="project-text" data-reveal>
-                <p class="project-meta">
-                  <span class:list={['tag', { 'tag-live': live }]}>{live ? 'In development' : 'Team experience'}</span>
-                  <span class="project-client-label">{d.client}</span>
+                <p class="project-kicker">
+                  Case study {String(i + 1).padStart(2, '0')}
+                  <span class="kicker-sep" aria-hidden="true" />
+                  {d.sector}
                 </p>
-                <h2>
-                  <span class:list={[{ 't-desk': d.mobileTitle }]}>{d.title}</span>
-                  {d.mobileTitle && <span class="t-mob">{d.mobileTitle}</span>}
-                </h2>
-                <p class="project-summary">{d.summary}</p>
+                <p class="project-client">
+                  <span class="client-mark" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                      <path d={industryIcons[entry.id] ?? industryIcons['digital-practice-growth']} />
+                    </svg>
+                  </span>
+                  <span class="client-name">{d.client}</span>
+                </p>
+                <h2>{d.title}</h2>
+              </div>
+              <div class="project-visual" data-reveal>
+                <ResultVisual id={entry.id} />
                 <button class="cs-toggle" type="button" aria-expanded="false" aria-controls={panelId} data-toggle>
                   <span data-label>See the details</span>
                   <svg viewBox="0 0 16 16" aria-hidden="true">
                     <path d="M3.5 6l4.5 4.5L12.5 6" />
                   </svg>
                 </button>
-              </div>
-              <div class="project-visual" data-reveal>
-                <ResultVisual id={entry.id} />
               </div>
             </div>
 
@@ -89,9 +106,11 @@ const sectionsOf = (body = '') =>
                       {sectionsOf(entry.body).map((s) => (
                         <div class="cs-col">
                           <h3>{s.heading}</h3>
-                          {s.paras.map((p) => (
-                            <p>{p}</p>
-                          ))}
+                          <div class="cs-text">
+                            {s.paras.map((p) => (
+                              <p>{p}</p>
+                            ))}
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -162,18 +181,7 @@ const sectionsOf = (body = '') =>
 </script>
 
 <style>
-  .hero-more { color: var(--ink-2); max-width: 56ch; }
-  .disclosure {
-    margin-top: var(--s-6);
-    max-width: 68ch;
-    font-size: 0.8125rem;
-    line-height: 1.5;
-    color: var(--ink-3);
-    padding-left: 0.85rem;
-    border-left: 2px solid var(--accent-soft);
-  }
-
-  .project { padding-block: clamp(4rem, 2.5rem + 5vw, 7rem); border-bottom: 1px solid var(--rule); scroll-margin-top: 72px; }
+  .project { padding-block: clamp(3.5rem, 2rem + 4.5vw, 6.5rem); border-bottom: 1px solid var(--rule); scroll-margin-top: 72px; }
   .project.tint { background: var(--paper-2); }
   .project-grid {
     display: grid;
@@ -185,18 +193,36 @@ const sectionsOf = (body = '') =>
   .flip .project-grid { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); }
   .flip .project-text { order: 2; }
   .project-text { display: grid; gap: var(--s-4); justify-items: start; align-content: center; }
-  .project-meta { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; font-size: 0.875rem; color: var(--ink-3); }
-  .project-text h2 { font-size: var(--step-3); line-height: 1.1; max-width: 18ch; }
-  .project-summary { color: var(--ink-2); font-size: var(--step-1); max-width: 44ch; }
-  .project-client { font-size: 0.875rem; color: var(--ink-3); }
-  .project-visual { min-width: 0; }
-  .tag-live { background: var(--accent-wash); color: var(--brand); border-color: transparent; }
+
+  /* "Case study 01 · Sector": says plainly what this is */
+  .project-kicker {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 0.6rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .kicker-sep { width: 4px; height: 4px; border-radius: 50%; background: var(--accent-soft); }
+
+  /* The client, as named as we can: an industry mark where the logo would be */
+  .project-client { display: flex; align-items: center; gap: 0.85rem; }
+  .client-mark { position: relative; flex: none; display: grid; place-items: center; width: 44px; height: 50px; }
+  .client-mark::before { content: ''; position: absolute; inset: 0; clip-path: var(--hex); background: var(--ink); }
+  .client-mark svg { position: relative; width: 22px; height: 22px; fill: none; stroke: #fff; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+  .client-name { font-family: var(--font-display); font-size: clamp(1.375rem, 1.15rem + 0.7vw, 1.75rem); line-height: 1.15; color: var(--ink); }
+
+  .project-text h2 { font-size: var(--step-3); line-height: 1.1; max-width: 20ch; }
+  .project-visual { min-width: 0; display: grid; gap: var(--s-4); justify-items: start; }
+  .project-visual > :global(.rv) { justify-self: stretch; }
 
   .cs-toggle {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    margin-top: var(--s-2);
     padding: 0.6rem 1rem 0.6rem 1.1rem;
     border: 1px solid var(--rule-2);
     border-radius: 999px;
@@ -210,47 +236,63 @@ const sectionsOf = (body = '') =>
   .cs-toggle svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; transition: transform 400ms var(--ease-out); }
   .cs-toggle[aria-expanded='true'] svg { transform: rotate(180deg); }
 
-  /* The details drop down beneath their project */
+  /* ---------- The details, laid out like a case study sheet ---------- */
   .cs-panel { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 550ms var(--ease-out); }
   .cs-panel[data-open='true'] { grid-template-rows: 1fr; }
   .cs-panel-inner { min-height: 0; overflow: hidden; }
   .cs-panel[data-open='false'] .cs-panel-inner { visibility: hidden; transition: visibility 0s 550ms; }
   .cs-card {
     display: grid;
-    gap: var(--s-6);
+    gap: var(--s-7);
     margin-top: var(--s-7);
-    padding: clamp(1.25rem, 0.8rem + 2vw, 2.25rem);
+    padding: clamp(1.5rem, 1rem + 2vw, 2.75rem);
     border: 1px solid var(--rule);
     border-radius: var(--radius-lg);
     background: var(--surface);
   }
+  /* Results: values on one line across, labels lined up underneath */
   .cs-metrics {
     list-style: none;
     padding: 0;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-    gap: var(--s-5);
+    gap: 0 var(--s-6);
   }
-  .cs-metrics li { display: grid; gap: 0.3rem; align-content: start; padding-top: var(--s-3); border-top: 2px solid var(--ink); }
+  .cs-metrics li {
+    grid-row: span 2;
+    display: grid;
+    grid-template-rows: subgrid;
+    gap: 0.4rem;
+    padding-top: var(--s-4);
+    border-top: 2px solid var(--ink);
+  }
   .cs-m-value {
+    align-self: end;
     font-family: var(--font-display);
-    font-size: clamp(1.375rem, 1.1rem + 0.9vw, 1.875rem);
-    line-height: 1.1;
+    font-size: clamp(1.25rem, 1.05rem + 0.6vw, 1.625rem);
+    line-height: 1.15;
     letter-spacing: -0.015em;
     font-variant-numeric: lining-nums;
   }
   .cs-m-label { font-size: 0.875rem; color: var(--ink-2); line-height: 1.45; }
-  .cs-cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s-6); }
-  .cs-col { display: grid; gap: var(--s-2); align-content: start; }
-  .cs-col h3 { font-family: var(--font-body); font-size: 0.75rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); }
-  .cs-col p { color: var(--ink-2); font-size: 0.9875rem; line-height: 1.6; }
+  /* The story: one row each, label on the left */
+  .cs-cols { display: grid; border-top: 1px solid var(--rule); }
+  .cs-col {
+    display: grid;
+    grid-template-columns: minmax(0, 3fr) minmax(0, 9fr);
+    gap: var(--s-6);
+    padding-block: var(--s-5);
+    border-bottom: 1px solid var(--rule);
+  }
+  .cs-col h3 { padding-top: 0.25rem; font-family: var(--font-body); font-size: 0.75rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); }
+  .cs-text { display: grid; gap: var(--s-3); max-width: 70ch; }
+  .cs-text p { color: var(--ink-2); font-size: 1rem; line-height: 1.65; }
   .cs-foot {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
     gap: var(--s-2) var(--s-5);
-    padding-top: var(--s-4);
-    border-top: 1px solid var(--rule);
+    margin-top: calc(var(--s-3) * -1);
     font-size: 0.8125rem;
     color: var(--ink-3);
   }
@@ -258,31 +300,25 @@ const sectionsOf = (body = '') =>
   @media (max-width: 960px) {
     .project-grid, .flip .project-grid { grid-template-columns: minmax(0, 1fr); gap: var(--s-6); }
     .flip .project-text { order: 0; }
-    .cs-cols { grid-template-columns: minmax(0, 1fr); gap: var(--s-5); }
   }
-  /* Phones: each project is its tags, its heading, the details button and the graphic.
-     The summary and the rest stay one tap away in the details. */
+  /* Phones: tighter, same content */
   @media (max-width: 640px) {
-    .hero-more, .disclosure, .project-summary, .project-client, .project-meta .tag { display: none; }
-    /* Just the title: no honeycomb on phones */
-    :global(.work-hero .hero-extra),
-    :global(.work-hero .hero-figure) { display: none; }
-    /* The details button sits under the graphic */
-    .project-text { display: contents; }
-    .project-meta, .project-text h2 { order: 0; }
-    .project-visual { order: 1; margin-top: 0.25rem; }
-    .cs-toggle { order: 2; justify-self: start; }
     .project { padding-block: 2.5rem; }
-    .project-grid, .flip .project-grid { gap: 0.65rem; }
-    .project-meta { font-size: 0.8125rem; gap: 0.5rem; }
-    .project-text h2 { font-size: 1.5rem; max-width: none; }
-    .project-summary { font-size: 1rem; line-height: 1.5; }
-    .project-client { font-size: 0.8125rem; }
-    .cs-toggle { margin-top: 0.25rem; padding: 0.45rem 0.85rem 0.45rem 0.95rem; font-size: 0.875rem; }
+    .project-grid, .flip .project-grid { gap: var(--s-5); }
+    .project-text { gap: 0.65rem; }
+    .project-kicker { font-size: 0.6875rem; }
+    .client-mark { width: 36px; height: 41px; }
+    .client-mark svg { width: 18px; height: 18px; }
+    .client-name { font-size: 1.25rem; }
+    .project-text h2 { font-size: 1.375rem; max-width: none; }
+    .cs-toggle { padding: 0.45rem 0.85rem 0.45rem 0.95rem; font-size: 0.875rem; }
     .cs-card { margin-top: var(--s-5); gap: var(--s-5); }
-    .cs-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-4); }
-    .cs-m-value { font-size: 1.25rem; }
+    .cs-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 var(--s-4); }
+    .cs-metrics li { padding-top: var(--s-3); margin-bottom: var(--s-4); }
+    .cs-m-value { font-size: 1.125rem; }
     .cs-m-label { font-size: 0.8125rem; }
-    .cs-col p { font-size: 0.9375rem; }
+    .cs-col { grid-template-columns: minmax(0, 1fr); gap: var(--s-2); padding-block: var(--s-4); }
+    .cs-text p { font-size: 0.9375rem; }
+    :global(.work-hero .hero-figure) { display: none; }
   }
 </style>
