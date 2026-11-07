@@ -1,18 +1,26 @@
 ---
 import CopyEmail from './CopyEmail.astro';
 
-/** The closing invitation at the end of each page: a heading and the two ways to reach us. */
 interface Props {
   title?: string;
+  body?: string;
   primary?: { label: string; href: string };
+  /** On phones, hide the paragraph and keep the heading and buttons */
+  terse?: boolean;
 }
-const { title = 'Tell us what is slowing you down.', primary = { label: 'Start a conversation', href: '/contact/' } } = Astro.props;
+const {
+  title = 'Tell us what is slowing you down.',
+  body = 'A 30-minute conversation about how work actually gets done in your organization. No pitch deck. We start on your real problem.',
+  primary = { label: 'Start a conversation', href: '/contact/' },
+  terse = false,
+} = Astro.props;
 ---
 
-<section class="closing section">
+<section class:list={['closing section', { terse }]}>
   <div class="wrap closing-inner" data-reveal>
     <div class="closing-copy">
       <h2>{title}</h2>
+      <p>{body}</p>
     </div>
     <div class="closing-actions">
       <a class="btn" href={primary.href}>{primary.label} <span class="arr" aria-hidden="true">→</span></a>
@@ -27,11 +35,15 @@ const { title = 'Tell us what is slowing you down.', primary = { label: 'Start a
     display: grid;
     grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
     gap: var(--s-6) var(--s-8);
-    align-items: center;
+    align-items: end;
   }
   .closing-copy { display: grid; gap: var(--s-4); }
   .closing-copy h2 { max-width: 14ch; }
+  .closing-copy p { color: var(--ink-2); font-size: var(--step-1); max-width: 46ch; }
   .closing-actions { display: flex; flex-wrap: wrap; gap: var(--s-3); justify-content: flex-end; align-items: center; }
+  @media (max-width: 640px) {
+    .terse .closing-copy p { display: none; }
+  }
   @media (max-width: 860px) {
     .closing-inner { grid-template-columns: minmax(0, 1fr); }
     .closing-actions { justify-content: flex-start; }

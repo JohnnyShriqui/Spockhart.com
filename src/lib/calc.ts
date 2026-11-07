@@ -13,6 +13,8 @@ export type InputDef = {
   step: number;
   value: number;
   format: 'int' | 'hours' | 'money';
+  /** Shorter wording for phones */
+  mobileLabel?: string;
 };
 
 export const inputs: InputDef[] = [
@@ -28,7 +30,8 @@ export const inputs: InputDef[] = [
   },
   {
     key: 'hours',
-    label: 'Hours each on repetitive tasks / week',
+    label: 'Hours each, every week',
+    mobileLabel: 'Hours spent on repetitive tasks / week',
     hint: 'Data entry, copying between systems, reports, chasing',
     min: 1,
     max: 30,

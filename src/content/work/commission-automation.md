@@ -1,5 +1,6 @@
 ---
-title: A sales organization's commissions, calculated automatically.
+title: An entire sales organization's commissions. Calculated automatically.
+mobileTitle: A sales organization's commissions, calculated automatically.
 summary: A custom commission platform replacing a $1.2B global manufacturer's manual Excel process with a centralized, auditable system. Scheduled to go live in January 2027.
 client: A $1.2B global manufacturer
 sector: Sales & financial operations

@@ -1,17 +1,26 @@
 ---
 /**
- * Waste calculator. Three sliders; the result is what tedious, repetitive tasks cost a year,
- * with three small figures underneath: hours a year, time lost per person each week, and
- * full-time people. Runs entirely in the browser. Model and defaults: src/lib/calc.ts.
+ * Time calculator. Three inputs; the result leads with what tedious, repetitive tasks cost a year,
+ * then the hours behind it, how much of each work week it takes, and how many full-time people
+ * it adds up to. Runs entirely in the browser. Model and defaults: src/lib/calc.ts.
  */
-import { inputs, compute, describeDays, WEEKS_PER_YEAR, type Values } from '../lib/calc';
+import { inputs, compute, describeDays, iconScale, WEEKS_PER_YEAR, type Values } from '../lib/calc';
 
 interface Props {
   title?: string;
   resultLabel?: string;
+  /** Words around the hours figure under the big number */
+  hoursBefore?: string;
+  hoursAfter?: string;
   cta?: string;
 }
-const { title = 'Waste calculator', resultLabel = 'Lost every year', cta = 'Get that time back' } = Astro.props;
+const {
+  title = 'How much time is your team losing to tedious, repetitive tasks?',
+  resultLabel = 'Every year, tedious, repetitive tasks cost you',
+  hoursBefore = 'in wages, across',
+  hoursAfter = 'of manual, repetitive work.',
+  cta = 'Get that time back',
+} = Astro.props;
 
 const start = Object.fromEntries(inputs.map((f) => [f.key, f.value])) as Values;
 const r = compute(start);
@@ -19,6 +28,14 @@ const money = (n: number) =>
   new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD', maximumFractionDigits: 0 }).format(n);
 const num = (n: number) => Math.round(n).toLocaleString('en-CA');
 const fmt = (format: string, v: number) => (format === 'money' ? `$${v}` : format === 'hours' ? `${v} h` : String(v));
+
+const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+const lostDays = start.hours / 8;
+const dayFill = (i: number) => Math.max(0, Math.min(1, lostDays - (4 - i)));
+
+const scale = iconScale(start.people);
+const fteIcons = r.fte / scale.per;
+const iconFill = (i: number) => Math.max(0, Math.min(1, fteIcons - i));
 ---
 
 <section id="calculator" class="calc-section" aria-labelledby="calc-title">
@@ -26,7 +43,8 @@ const fmt = (format: string, v: number) => (format === 'money' ? `$${v}` : forma
     <div class="calc" data-calc>
       <div class="calc-left">
         <div class="calc-head">
-          <h2 id="calc-title">{title}</h2>
+          <p class="eyebrow">Calculator</p>
+          <h2 id="calc-title"><span class="t-desk">{title}</span><span class="t-mob">Waste calculator</span></h2>
         </div>
 
         <form class="calc-inputs" data-calc-form onsubmit="return false" aria-label="Calculator inputs">
@@ -34,7 +52,11 @@ const fmt = (format: string, v: number) => (format === 'money' ? `$${v}` : forma
             inputs.map((f) => (
               <div class="slider-field">
                 <div class="slider-head">
-                  <label for={`in-${f.key}`}>{f.label}</label>
+                  <label for={`in-${f.key}`}>
+                    <span class:list={[{ 't-desk': f.mobileLabel }]}>{f.label}</span>
+                    {f.mobileLabel && <span class="t-mob">{f.mobileLabel}</span>}
+                    <span class="slider-hint">{f.hint}</span>
+                  </label>
                   <output for={`in-${f.key}`} class="tabular" data-display={f.key}>
                     {fmt(f.format, f.value)}
                   </output>
@@ -58,13 +80,51 @@ const fmt = (format: string, v: number) => (format === 'money' ? `$${v}` : forma
       </div>
 
       <div class="calc-right">
-        <p class="r-label">{resultLabel}</p>
+        <p class="r-label"><span class="t-desk">{resultLabel}</span><span class="t-mob">Lost every year</span></p>
         <p class="r-big tabular"><span data-out="cost">{money(r.cost)}</span></p>
-        <ul class="r-tiles">
+        <p class="r-sub">
+          {hoursBefore} <strong><span class="tabular" data-out="hours">{num(r.hours)}</span> hours</strong> {hoursAfter}
+        </p>
+
+        <ul class="r-tiles" aria-hidden="true">
           <li><span class="tile-v tabular" data-out="hours">{num(r.hours)}</span><span class="tile-k">hours a year</span></li>
           <li><span class="tile-v" data-out="days">{describeDays(start.hours)}</span><span class="tile-k">lost per person, weekly</span></li>
           <li><span class="tile-v tabular" data-out="fte">{r.fte.toFixed(1)}</span><span class="tile-k">full-time people</span></li>
         </ul>
+
+        <div class="r-viz">
+          <p class="r-line">
+            Each person loses <strong data-out="days">{describeDays(start.hours)}</strong> of every work week.
+          </p>
+          <div class="week" aria-hidden="true">
+            {
+              days.map((d, i) => (
+                <span class="day" style={`--f:${dayFill(i)}`}>
+                  <span class="day-fill" />
+                  <span class="day-name">{d}</span>
+                </span>
+              ))
+            }
+          </div>
+        </div>
+
+        <div class="r-viz">
+          <p class="r-line">
+            That adds up to <strong><span class="tabular" data-out="fte">{r.fte.toFixed(1)}</span> full-time people</strong> doing
+            nothing else.
+          </p>
+          <div class="team" aria-hidden="true" data-team>
+            {
+              Array.from({ length: scale.icons }, (_, i) => (
+                <span class="person" style={`--f:${iconFill(i)}`}>
+                  <svg viewBox="0 0 12 16"><circle cx="6" cy="4" r="3.2" /><path d="M0.6 16c0-3.6 2.4-6.2 5.4-6.2s5.4 2.6 5.4 6.2z" /></svg>
+                  <svg class="person-fill" viewBox="0 0 12 16"><circle cx="6" cy="4" r="3.2" /><path d="M0.6 16c0-3.6 2.4-6.2 5.4-6.2s5.4 2.6 5.4 6.2z" /></svg>
+                </span>
+              ))
+            }
+          </div>
+          <p class="team-key" data-team-key hidden={scale.per === 1}>Each figure is {scale.per} people</p>
+        </div>
 
         <a class="btn btn-on-brand" href="/contact/" data-calc-cta>{cta} <span class="arr" aria-hidden="true">→</span></a>
         <p class="visually-hidden" aria-live="polite" data-calc-summary></p>
@@ -97,10 +157,12 @@ const fmt = (format: string, v: number) => (format === 'money' ? `$${v}` : forma
   .calc-left { display: grid; gap: var(--s-5); align-content: start; padding: clamp(1.5rem, 1rem + 2vw, 2.5rem); }
   .calc-head { display: grid; gap: var(--s-2); }
   .calc-head h2 { font-size: clamp(1.625rem, 1.3rem + 1.1vw, 2.125rem); line-height: 1.1; max-width: 18ch; }
+  .calc-intro { color: var(--ink-2); }
   .calc-inputs { display: grid; gap: var(--s-5); }
   .slider-field { display: grid; gap: 0.35rem; }
   .slider-head { display: flex; justify-content: space-between; align-items: flex-end; gap: var(--s-4); }
   .slider-head label { font-weight: 600; font-size: 0.975rem; line-height: 1.3; }
+  .slider-hint { display: block; font-weight: 400; font-size: 0.8125rem; color: var(--ink-3); margin-top: 0.1rem; }
   .slider-head output {
     font-family: var(--font-display);
     font-size: 1.625rem;
@@ -186,47 +248,82 @@ const fmt = (format: string, v: number) => (format === 'money' ? `$${v}` : forma
     margin-top: calc(var(--s-2) * -1);
   }
   .r-unit { font-size: 0.42em; letter-spacing: -0.01em; font-weight: 400; color: #d9e6f2; }
-  .btn-on-brand { justify-self: stretch; width: 100%; margin-top: var(--s-2); background: #fff; color: var(--brand); border-color: #fff; }
+  .r-sub { color: #d9e6f2; font-size: 1.0625rem; margin-top: calc(var(--s-3) * -1); }
+  .r-sub strong { color: #fff; font-weight: 600; }
+
+  .r-viz { display: grid; gap: 0.6rem; padding-top: var(--s-4); border-top: 1px solid rgb(255 255 255 / 0.16); }
+  .r-line { font-size: 0.975rem; color: #d9e6f2; }
+  .r-line strong { color: #fff; font-weight: 600; }
+
+  .week { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+  .day {
+    --f: 0;
+    position: relative;
+    height: 38px;
+    border-radius: 4px;
+    background: rgb(255 255 255 / 0.1);
+    overflow: hidden;
+    display: grid;
+    place-items: center;
+  }
+  .day-fill {
+    position: absolute;
+    inset: 0;
+    background: #8ec0e6;
+    transform-origin: right center;
+    transform: scaleX(var(--f));
+    transition: transform 450ms var(--ease-out);
+  }
+  .day-name { position: relative; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.06em; color: #fff; mix-blend-mode: normal; }
+
+  .team { display: flex; flex-wrap: wrap; gap: 6px 5px; }
+  .person { --f: 0; position: relative; width: 19px; height: 25px; }
+  .person svg { position: absolute; inset: 0; width: 100%; height: 100%; fill: rgb(255 255 255 / 0.2); }
+  .person .person-fill { fill: #8ec0e6; clip-path: inset(0 calc((1 - var(--f)) * 100%) 0 0); transition: clip-path 450ms var(--ease-out); }
+  .team-key { font-size: 0.75rem; color: #bcd6ec; }
+
+  .btn-on-brand { justify-self: start; margin-top: var(--s-2); background: #fff; color: var(--brand); border-color: #fff; }
   .btn-on-brand:hover { background: var(--paper); border-color: var(--paper); }
 
   @media (max-width: 960px) {
     .calc { grid-template-columns: minmax(0, 1fr); }
   }
-  .r-tiles {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 8px;
-    list-style: none;
-    padding: 0;
-    margin: var(--s-2) 0 var(--s-1);
-  }
-  .r-tiles li {
-    display: grid;
-    gap: 0.3rem;
-    align-content: start;
-    padding: 0.85rem 0.9rem;
-    border-radius: 6px;
-    background: rgb(255 255 255 / 0.1);
-  }
-  .tile-v { font-family: var(--font-display); font-size: 1.5rem; line-height: 1.1; color: #fff; }
-  .tile-k { font-size: 0.8125rem; line-height: 1.3; color: #d9e6f2; }
+  .r-tiles { display: none; }
 
-  /* Phones: the same calculator, tighter */
+  /* On phones: a short title, the three sliders, then the result as one big number,
+     three small figures and a full-width button. */
   @media (max-width: 640px) {
     .calc-left { gap: 0.9rem; padding: 1.1rem 1rem 1rem; }
+    .calc-head .eyebrow, .calc-intro, .slider-hint { display: none; }
     .calc-head h2 { font-size: 1.375rem; line-height: 1.15; }
     .calc-method { font-size: 0.6875rem; }
     .calc-inputs { gap: 0.55rem; }
     .slider-field { gap: 0.15rem; }
     .slider-head label { font-size: 0.875rem; }
     .slider-head output { font-size: 1.125rem; }
+
     .calc-right { gap: 0.5rem; padding: 1.1rem 1rem 1rem; }
     .r-label { font-size: 0.6875rem; letter-spacing: 0.14em; }
     .r-big { font-size: min(2.75rem, 14cqi); margin-top: 0; }
-    .r-tiles { gap: 6px; margin: 0.35rem 0 0.25rem; }
-    .r-tiles li { padding: 0.6rem 0.55rem; gap: 0.2rem; }
-    .tile-v { font-size: 1.125rem; }
-    .tile-k { font-size: 0.6875rem; line-height: 1.25; }
-    .btn-on-brand { margin-top: 0.4rem; }
+    .r-sub, .r-viz { display: none; }
+    .r-tiles {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px;
+      list-style: none;
+      padding: 0;
+      margin: 0.35rem 0 0.25rem;
+    }
+    .r-tiles li {
+      display: grid;
+      gap: 0.2rem;
+      align-content: start;
+      padding: 0.6rem 0.55rem;
+      border-radius: 6px;
+      background: rgb(255 255 255 / 0.1);
+    }
+    .tile-v { font-family: var(--font-display); font-size: 1.125rem; line-height: 1.1; color: #fff; }
+    .tile-k { font-size: 0.6875rem; line-height: 1.25; color: #d9e6f2; }
+    .btn-on-brand { justify-self: stretch; width: 100%; margin-top: 0.4rem; }
   }
 </style>

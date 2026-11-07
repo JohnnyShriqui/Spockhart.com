@@ -11,8 +11,10 @@ import { site } from '../config/site';
   description={`How Spockhart works: embedded with your team, a working prototype in ${site.offer.prototypeDays} days, and systems you own.`}
 >
   <PageHero
+    terse
     eyebrow="Approach"
     title="Embedded from day one."
+    lead={`Every engagement runs the same way. We work inside your team, prove value with a working prototype in ${site.offer.prototypeDays} days, then build it out and hand it over.`}
   />
 
   <section class="section band-recessed engagement" aria-labelledby="engagement-title">
@@ -26,7 +28,9 @@ import { site } from '../config/site';
   </section>
 
   <ClosingCTA
+    terse
     title="Results in 30 days starts here."
+    body="Tell us where work slows down. We’ll walk you through what the diagnosis and first prototype would look like for your team."
     primary={{ label: 'Plan the first 30 days', href: '/contact/' }}
   />
 </Base>

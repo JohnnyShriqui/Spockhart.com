@@ -19,8 +19,8 @@ import { hexPath } from '../lib/logo';
         <h1 class="load-in" style="--i:1">We optimize <em class="display-em">operations.</em></h1>
         <div class="accent-rule load-in" style="--i:2"></div>
         <p class="lead load-in" style="--i:2">
-          Spockhart embeds with your team, finds where time and money are leaking, and builds the system to close the gaps.
-          Within {site.offer.prototypeDays} days, you’ll see a working first version in action.
+          Spockhart embeds with your company, finds opportunities to save time and money across your operations, and builds the
+          systems to make it happen. Within {site.offer.prototypeDays} days, you’ll see a working first version in action.
         </p>
         <div class="btn-row load-in" style="--i:3">
           <a class="btn" href="/contact/">Start a conversation <span class="arr" aria-hidden="true">→</span></a>
@@ -44,7 +44,7 @@ import { hexPath } from '../lib/logo';
 
   <Calculator />
 
-  <ClosingCTA />
+  <ClosingCTA terse />
 </Base>
 
 <style>
@@ -90,6 +90,5 @@ import { hexPath } from '../lib/logo';
   }
   @media (max-width: 640px) {
     .hero-figure { max-width: 190px; }
-    .hero-copy .lead { display: none; }
   }
 </style>
