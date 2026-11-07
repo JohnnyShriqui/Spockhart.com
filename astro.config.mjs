@@ -13,6 +13,8 @@ export default defineConfig({
   // Case studies used to have their own pages; they now open in place on /work/.
   redirects: {
     '/about/': '/',
+    '/privacy/': '/',
+    '/terms/': '/',
     '/work/commission-automation/': '/work/#commission-automation',
     '/work/project-feasibility-platform/': '/work/#project-feasibility-platform',
     '/work/subcontractor-financing-marketplace/': '/work/#subcontractor-financing-marketplace',

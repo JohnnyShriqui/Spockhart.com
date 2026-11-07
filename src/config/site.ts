@@ -12,7 +12,7 @@ export const site = {
   city: 'Toronto',
   region: 'Ontario',
   country: 'Canada',
-  /** Legal entity shown in the footer, privacy policy and terms. Update once incorporated. */
+  /** Legal entity shown in the footer. Update once incorporated. */
   legalName: 'Spockhart',
   /** LinkedIn company page URL. Leave empty to hide the link. */
   linkedin: '',
@@ -60,8 +60,6 @@ export const footerNav: { heading: string; items: NavItem[] }[] = [
     heading: 'Trust',
     items: [
       { label: 'Security and data', href: '/security/' },
-      { label: 'Privacy', href: '/privacy/' },
-      { label: 'Terms', href: '/terms/' },
     ],
   },
 ];
