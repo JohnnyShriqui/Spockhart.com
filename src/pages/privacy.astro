@@ -1,47 +1,52 @@
 ---
-import Document from '../layouts/Document.astro';
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import PolicyGrid from '../components/PolicyGrid.astro';
+import ClosingCTA from '../components/ClosingCTA.astro';
 import { site } from '../config/site';
+
+const updated = 'November 7, 2026';
+
+const points = [
+  {
+    title: 'Only what you send us',
+    body: 'When you use our contact form or email us, we receive what you choose to share: usually your name, email, organization, role and message.',
+  },
+  {
+    title: 'Your numbers stay with you',
+    body: 'The calculator runs in your browser. We never see what you enter unless you include the result in a message to us.',
+  },
+  {
+    title: 'No tracking cookies',
+    body: 'If we measure visits, we use a privacy-focused service that counts them without cookies and without identifying you.',
+  },
+  {
+    title: 'Used only to reply',
+    body: 'We use your information to respond, to discuss working together and to keep a record of our conversation. We never sell it or use it for advertising, and we delete it once we no longer need it.',
+  },
+  {
+    title: 'Shared only to run the site',
+    body: 'The providers behind our website, forms and email can use your information only to provide their services to us, and some may store it outside Canada. We disclose it otherwise only where the law requires.',
+  },
+  {
+    title: 'Your rights under Canadian law',
+    body: 'Under PIPEDA, you can ask to see the information we hold about you, correct it, or withdraw your consent. We respond within 30 days.',
+  },
+];
 ---
 
-<Document
-  title="Privacy policy"
-  eyebrow="Legal"
-  lead="What we collect through this website, why, and the choices you have."
-  description="How Spockhart collects, uses and protects personal information submitted through spockhart.com."
-  updated="November 5, 2026"
->
-  <h2>Who we are</h2>
-  <p>
-    This website is operated by {site.legalName} ("Spockhart", "we", "us"), based in {site.city}, {site.region}, {site.country}. Questions
-    about this policy can be sent to <a href={`mailto:${site.email}`}>{site.email}</a>.
-  </p>
-
-  <h2>What we collect</h2>
-  <ul>
-    <li><strong>Information you send us.</strong> When you use our contact form or email us, we receive what you provide: typically your name, email address, organization, role and message.</li>
-    <li><strong>Calculator inputs.</strong> The calculator runs in your browser. We do not receive what you enter unless you choose to include the result in a message to us.</li>
-    <li><strong>Basic usage data.</strong> If analytics are enabled, we use a privacy-focused service that counts visits without cookies and without identifying you.</li>
-  </ul>
-
-  <h2>How we use it</h2>
-  <p>We use the information you send only to reply to you, to discuss a possible engagement, and to keep a record of our correspondence. We do not sell personal information, and we do not use it for advertising.</p>
-
-  <h2>Who we share it with</h2>
-  <p>
-    We share information only with service providers that help us run this website and our business, such as our form processing,
-    email and hosting providers. They may process information outside Canada, and they are permitted to use it only to provide their
-    services to us. We may also disclose information where the law requires it.
-  </p>
-
-  <h2>How long we keep it</h2>
-  <p>We keep correspondence for as long as we need it to respond and to maintain a business relationship, and then delete it.</p>
-
-  <h2>Your choices</h2>
-  <p>
-    Under Canada’s Personal Information Protection and Electronic Documents Act (PIPEDA), you can ask to see the personal information
-    we hold about you, ask us to correct it, or withdraw your consent to our using it. Email <a href={`mailto:${site.email}`}>{site.email}</a> and we will respond within 30 days.
-  </p>
-
-  <h2>Changes</h2>
-  <p>If we change this policy, we will update the date at the top of this page.</p>
-</Document>
+<Base title="Privacy policy" description="How Spockhart collects, uses and protects personal information submitted through spockhart.com.">
+  <PageHero
+    eyebrow="Privacy"
+    title="We collect very little."
+    lead="What we collect through this website, why we collect it, and the choices you have."
+  />
+  <PolicyGrid items={points}>
+    <p>
+      This website is operated by {site.legalName}, based in {site.city}, {site.region}. Questions about your information?
+      Email <a class="link" href={`mailto:${site.email}`}>{site.email}</a>.
+    </p>
+    <p class="updated">Last updated {updated}. If this policy changes, we will update this date.</p>
+  </PolicyGrid>
+  <ClosingCTA />
+</Base>

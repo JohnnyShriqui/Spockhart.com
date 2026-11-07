@@ -7,7 +7,7 @@ export const site = {
   tagline: 'We optimize operations.',
   description:
     'Spockhart is a Toronto engineering firm. We embed with companies and nonprofits, find where operations lose time and money, and build the systems that fix it.',
-  url: 'https://www.spockhart.com',
+  url: 'https://spockhart.com',
   email: 'john@spockhart.com',
   city: 'Toronto',
   region: 'Ontario',
@@ -64,7 +64,6 @@ export const footerNav: { heading: string; items: NavItem[] }[] = [
       { label: 'Security and data', href: '/security/' },
       { label: 'Privacy', href: '/privacy/' },
       { label: 'Terms', href: '/terms/' },
-      { label: 'Accessibility', href: '/accessibility/' },
     ],
   },
 ];

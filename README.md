@@ -1,6 +1,6 @@
 # spockhart.com
 
-The Spockhart website. Static site built with [Astro](https://astro.build), deployed to GitHub Pages at www.spockhart.com.
+The Spockhart website. Static site built with [Astro](https://astro.build), deployed to GitHub Pages at spockhart.com.
 
 ## Run it locally
 

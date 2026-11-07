@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import PageHero from '../components/PageHero.astro';
+import PolicyGrid from '../components/PolicyGrid.astro';
 import ClosingCTA from '../components/ClosingCTA.astro';
 import { site } from '../config/site';
 
@@ -38,36 +39,11 @@ const practices = [
     title="Your data stays yours."
     lead="We work inside your systems and with your information. These are the commitments we make before we start."
   />
-  <section class="section">
-    <div class="wrap">
-      <ul class="practices grid-3" data-reveal="stagger">
-        {
-          practices.map((p) => (
-            <li>
-              <svg viewBox="0 0 20 20" aria-hidden="true">
-                <path d="M10 1 17.8 5.5 17.8 14.5 10 19 2.2 14.5 2.2 5.5Z" fill="none" stroke="currentColor" stroke-width="1.1" />
-                <path d="M6.5 10.2 9 12.6l4.6-5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
-              </svg>
-              <h2>{p.title}</h2>
-              <p>{p.body}</p>
-            </li>
-          ))
-        }
-      </ul>
-      <p class="sec-note" data-reveal>
-        Security questionnaire or a specific requirement? Email <a class="link" href={`mailto:${site.email}`}>{site.email}</a> and we will
-        answer it in writing.
-      </p>
-    </div>
-  </section>
+  <PolicyGrid items={practices}>
+    <p>
+      Security questionnaire or a specific requirement? Email <a class="link" href={`mailto:${site.email}`}>{site.email}</a> and we will
+      answer it in writing.
+    </p>
+  </PolicyGrid>
   <ClosingCTA />
 </Base>
-
-<style>
-  .practices { list-style: none; padding: 0; row-gap: var(--s-7); }
-  .practices li { display: grid; gap: var(--s-3); align-content: start; padding-top: var(--s-5); border-top: 1px solid var(--rule); }
-  .practices svg { width: 22px; height: 22px; color: var(--accent-soft); }
-  .practices h2 { font-size: var(--step-2); }
-  .practices p { color: var(--ink-2); }
-  .sec-note { margin-top: var(--s-8); color: var(--ink-2); max-width: 60ch; }
-</style>
