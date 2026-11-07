@@ -152,6 +152,8 @@ interface Controller {
   pause(): void;
   /** Stop and rest on the finished frame. */
   stop(): void;
+  /** Loop for as long as it runs, from where it is. */
+  loop(): void;
 }
 const controllers = new WeakMap<HTMLElement, Controller>();
 
@@ -235,6 +237,13 @@ function makeController(scene: HTMLElement): Controller {
     },
     pause: halt,
     stop,
+    loop() {
+      once = false;
+      onDone = undefined;
+      if (raf) return;
+      last = 0;
+      raf = requestAnimationFrame(frame);
+    },
   };
 }
 
@@ -260,20 +269,27 @@ function initScene(scene: HTMLElement) {
 /**
  * [data-scene-group]: its scenes play one at a time, in order, each for one loop.
  * Scenes that are not playing rest on their finished frame.
+ *
+ * The attribute can hold a media query, e.g. data-scene-group="(min-width: 901px)".
+ * Where the query does not match (phones), the scenes simply loop on their own while
+ * they are on screen, like any other scene.
  */
 function initGroup(group: HTMLElement) {
   if (group.dataset.groupReady || !canAnimate()) return;
   group.dataset.groupReady = '1';
   const scenes = Array.from(group.querySelectorAll<HTMLElement>('[data-scene]'));
   const ctrls = scenes.map((s) => controllers.get(s)!);
+  const mq = group.dataset.sceneGroup ? window.matchMedia(group.dataset.sceneGroup) : null;
+  const sequenced = () => !mq || mq.matches;
   let index = 0;
   let visible = false;
   let timer = 0;
   let running = false;
+  const onScreen = new Set<number>();
 
   const mark = (k: number) => scenes.forEach((s, i) => s.classList.toggle('is-active', i === k));
   const next = () => {
-    if (!visible) return;
+    if (!visible || !sequenced()) return;
     const k = index;
     running = true;
     mark(k);
@@ -293,15 +309,44 @@ function initGroup(group: HTMLElement) {
     running = false;
     mark(-1);
   };
+  const setMode = () => {
+    halt();
+    group.dataset.mode = sequenced() ? 'sequence' : 'free';
+    if (sequenced()) {
+      index = 0;
+      next();
+    } else {
+      onScreen.forEach((k) => ctrls[k].loop());
+    }
+  };
 
   new IntersectionObserver(
     (entries) => {
       visible = entries.some((e) => e.isIntersecting);
+      if (!sequenced()) return;
       if (visible && !running) next();
       if (!visible) halt();
     },
     { threshold: 0.35 },
   ).observe(group);
+
+  const each = new IntersectionObserver(
+    (entries) => {
+      for (const e of entries) {
+        const k = scenes.indexOf(e.target as HTMLElement);
+        if (e.isIntersecting) onScreen.add(k);
+        else onScreen.delete(k);
+        if (sequenced()) continue;
+        if (e.isIntersecting) ctrls[k].loop();
+        else ctrls[k].pause();
+      }
+    },
+    { threshold: 0.25 },
+  );
+  scenes.forEach((s) => each.observe(s));
+
+  group.dataset.mode = sequenced() ? 'sequence' : 'free';
+  mq?.addEventListener('change', setMode);
 }
 
 export function initScenes() {

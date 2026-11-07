@@ -137,11 +137,17 @@ const {
 </section>
 
 <script>
-  // Hovering or focusing a problem plugs its leak in the bucket.
+  // With a mouse, hovering or focusing a problem plugs its leak in the bucket.
+  // On touch screens the list is plain: nothing to tap, nothing that moves.
   function initProblems() {
+    const mouse = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
     document.querySelectorAll<HTMLElement>('[data-problems]').forEach((section) => {
       if (section.dataset.ready) return;
       section.dataset.ready = '1';
+      if (!mouse) {
+        section.querySelectorAll<HTMLElement>('[data-leak-key]').forEach((row) => row.removeAttribute('tabindex'));
+        return;
+      }
       const leaks = new Map<string, Element>();
       section.querySelectorAll('[data-leak]').forEach((g) => leaks.set((g as HTMLElement).dataset.leak!, g));
       const set = (key: string | null) => {
@@ -250,15 +256,40 @@ const {
     .p-fix-tag { vertical-align: 0.12em; margin-right: 0.3rem; }
     .p-arrow { margin-right: 0.3rem; }
   }
+  /* Phones and small tablets: a smaller bucket and a compact list of what we fix,
+     one line each. The bucket already shows the problems leaking. */
   @media (max-width: 900px) {
-    .p-layout { grid-template-columns: minmax(0, 1fr); }
-    .p-side { position: static; }
-    .p-figure { max-width: 440px; margin-inline: auto; width: 100%; }
-  }
-  @media (max-width: 560px) {
-    .p-row { padding: var(--s-4); gap: var(--s-2) var(--s-4); }
-    .p-row:hover, .p-row.is-active { transform: none; }
-    .p-badge { width: 36px; height: 41px; }
-    .p-badge svg { width: 19px; height: 19px; }
+    .p-layout { grid-template-columns: minmax(0, 1fr); gap: var(--s-6); }
+    .p-side { position: static; gap: var(--s-4); }
+    .p-figure { max-width: 300px; margin-inline: auto; width: 100%; }
+    .p-list {
+      gap: 0;
+      border: 1px solid var(--rule);
+      border-radius: var(--radius-lg);
+      background: var(--surface);
+      overflow: hidden;
+    }
+    .p-row,
+    .p-row:hover,
+    .p-row.is-active,
+    .p-row:focus-visible {
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 0.1rem var(--s-4);
+      padding: 0.85rem var(--s-4);
+      border: 0;
+      border-radius: 0;
+      background: none;
+      box-shadow: none;
+      transform: none;
+      transition: none;
+    }
+    .p-row + .p-row { border-top: 1px solid var(--rule); }
+    .p-badge { width: 32px; height: 36px; }
+    .p-badge svg { width: 17px; height: 17px; }
+    .p-row.is-active .p-badge::before { background: var(--ink); transform: none; }
+    .p-problem p, .p-problem .p-num, .p-fix-tag, .p-arrow { display: none; }
+    .p-problem h3 { font-size: 1.0625rem; }
+    .p-fix { grid-column: 2; display: block; padding: 0; border: 0; }
+    .p-fix-text { font-family: var(--font-body); font-weight: 400; font-size: 0.9rem; line-height: 1.4; color: var(--ink-2); }
   }
 </style>

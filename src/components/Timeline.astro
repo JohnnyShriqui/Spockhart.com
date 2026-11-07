@@ -89,7 +89,7 @@ const pct = (d: number) => `${(d / SCALE) * 100}%`;
     <div class="scale-now"><i></i></div>
   </div>
 
-  <ol class="phases" data-reveal="stagger" data-scene-group>
+  <ol class="phases" data-reveal="stagger" data-scene-group="(min-width: 901px)">
     {
       phases.map((p, i) => (
         <li
@@ -337,7 +337,7 @@ const pct = (d: number) => `${(d / SCALE) * 100}%`;
   initScenes();
   document.addEventListener('spockhart:view', initScenes);
 
-  // The marker on the scale follows whichever phase is playing.
+  // On larger screens, the marker on the scale follows whichever phase is playing.
   function followPhases() {
     document.querySelectorAll<HTMLElement>('[data-timeline]').forEach((tl) => {
       if (tl.dataset.follow) return;
@@ -349,6 +349,11 @@ const pct = (d: number) => `${(d / SCALE) * 100}%`;
         const to = Number(phase.dataset.to);
         const tail = phase.dataset.tail === '1';
         phase.addEventListener('scene:frame', (e) => {
+          // On phones the phases loop on their own, so the marker rests at the end.
+          if (phase.closest<HTMLElement>('[data-scene-group]')?.dataset.mode === 'free') {
+            scale.style.removeProperty('--pos');
+            return;
+          }
           const { t, loop } = (e as CustomEvent<{ t: number; loop: number }>).detail;
           const css = getComputedStyle(scale);
           const track = parseFloat(css.getPropertyValue('--track')) || 86;
