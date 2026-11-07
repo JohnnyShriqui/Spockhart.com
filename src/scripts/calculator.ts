@@ -15,6 +15,8 @@ export function initCalculator() {
   const form = root.querySelector<HTMLFormElement>('[data-calc-form]')!;
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const out = (key: string) => root.querySelector<HTMLElement>(`[data-out="${key}"]`);
+  // A figure can appear more than once (the phone layout repeats some), so update them all.
+  const outs = (key: string) => Array.from(root.querySelectorAll<HTMLElement>(`[data-out="${key}"]`));
   const ranges = Array.from(form.querySelectorAll<HTMLInputElement>('input[type="range"]'));
   const days = Array.from(root.querySelectorAll<HTMLElement>('.day'));
   const team = root.querySelector<HTMLElement>('[data-team]');
@@ -26,20 +28,21 @@ export function initCalculator() {
   const shown: Record<string, number> = {};
   const anims: Record<string, number> = {};
   const tween = (key: string, to: number, fmt: (n: number) => string, from?: number, dur = 420) => {
-    const el = out(key);
-    if (!el) return;
+    const els = outs(key);
+    if (!els.length) return;
+    const set = (text: string) => els.forEach((el) => (el.textContent = text));
     const start = from ?? shown[key] ?? to;
     shown[key] = to;
     cancelAnimationFrame(anims[key]);
     if (reduce || start === to) {
-      el.textContent = fmt(to);
+      set(fmt(to));
       return;
     }
     const t0 = performance.now();
     const step = (now: number) => {
       const t = Math.min(1, (now - t0) / dur);
       const e = 1 - Math.pow(1 - t, 3);
-      el.textContent = fmt(start + (to - start) * e);
+      set(fmt(start + (to - start) * e));
       if (t < 1) anims[key] = requestAnimationFrame(step);
     };
     anims[key] = requestAnimationFrame(step);
@@ -90,8 +93,7 @@ export function initCalculator() {
     tween('hours', r.hours, (n) => int.format(n));
     tween('cost', r.cost, (n) => money.format(n));
     tween('fte', r.fte, (n) => one.format(n));
-    const d = out('days');
-    if (d) d.textContent = describeDays(v.hours);
+    outs('days').forEach((d) => (d.textContent = describeDays(v.hours)));
     const lost = v.hours / 8;
     days.forEach((el, i) => el.style.setProperty('--f', String(Math.max(0, Math.min(1, lost - (4 - i))))));
     renderTeam(v.people, r.fte);

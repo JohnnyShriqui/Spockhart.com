@@ -1,5 +1,6 @@
 /**
- * Advisory board, shown on /about/ when site.showAdvisors is true.
+ * Advisory board. Not shown anywhere at the moment (the About page was removed);
+ * kept so the section can return when the advisors confirm.
  *
  * - `title` is the person's role, written without naming their organization.
  * - `focus` is what they advise Spockhart on.

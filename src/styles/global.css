@@ -473,6 +473,13 @@ a { color: inherit; }
   font-weight: 600;
 }
 .skip-link:focus { top: calc(1rem + env(safe-area-inset-top, 0px)); }
+/* Wording that changes on phones: .t-desk shows on larger screens, .t-mob on phones */
+.t-mob { display: none; }
+@media (max-width: 640px) {
+  .t-desk { display: none; }
+  .t-mob { display: inline; }
+}
+
 .visually-hidden {
   position: absolute !important;
   width: 1px; height: 1px;

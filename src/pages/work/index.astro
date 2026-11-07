@@ -31,7 +31,7 @@ const sectionsOf = (body = '') =>
   title="Our Work"
   description="What the people behind Spockhart have delivered: platforms, marketplaces, sales systems, production floors and engineering prototypes. Client names withheld."
 >
-  <PageHero eyebrow="Our Work" title="Our team’s experience." lead="Spockhart is a new firm. The people behind it are not.">
+  <PageHero terse eyebrow="Our Work" title="Our team’s experience." lead="Spockhart is a new firm. The people behind it are not.">
     <p class="hero-more">
       Before Spockhart, our team led transformations, built technology, and solved operational problems inside some of North
       America’s largest organizations. These are a few examples of what we’ve delivered.
@@ -56,7 +56,10 @@ const sectionsOf = (body = '') =>
                   <span class:list={['tag', { 'tag-live': live }]}>{live ? 'In development' : 'Team experience'}</span>
                   <span>{d.sector}</span>
                 </p>
-                <h2>{d.title}</h2>
+                <h2>
+                  <span class:list={[{ 't-desk': d.mobileTitle }]}>{d.title}</span>
+                  {d.mobileTitle && <span class="t-mob">{d.mobileTitle}</span>}
+                </h2>
                 <p class="project-summary">{d.summary}</p>
                 <p class="project-client">{d.client}</p>
                 <button class="cs-toggle" type="button" aria-expanded="false" aria-controls={panelId} data-toggle>
@@ -261,10 +264,14 @@ const sectionsOf = (body = '') =>
   /* Phones: each project is its tags, its heading, the details button and the graphic.
      The summary and the rest stay one tap away in the details. */
   @media (max-width: 640px) {
-    .hero-more, .project-summary, .project-client { display: none; }
+    .hero-more, .disclosure, .project-summary, .project-client, .tag-live { display: none; }
+    /* The details button sits under the graphic */
+    .project-text { display: contents; }
+    .project-meta, .project-text h2 { order: 0; }
+    .project-visual { order: 1; margin-top: 0.25rem; }
+    .cs-toggle { order: 2; justify-self: start; }
     .project { padding-block: 2.5rem; }
-    .project-grid, .flip .project-grid { gap: var(--s-5); }
-    .project-text { gap: 0.65rem; }
+    .project-grid, .flip .project-grid { gap: 0.65rem; }
     .project-meta { font-size: 0.8125rem; gap: 0.5rem; }
     .project-text h2 { font-size: 1.5rem; max-width: none; }
     .project-summary { font-size: 1rem; line-height: 1.5; }
