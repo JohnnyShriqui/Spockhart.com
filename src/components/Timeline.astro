@@ -67,6 +67,7 @@ const pct = (d: number) => `${(d / SCALE) * 100}%`;
           .map((p, i) => (
             <div class={`seg seg-${i + 1}`} style={`left:${pct(p.start)};width:${pct((p.end as number) - p.start)}`}>
               <span class="seg-label">{p.name}</span>
+              <span class="seg-n">{i + 1}</span>
             </div>
           ))
       }
@@ -84,10 +85,22 @@ const pct = (d: number) => `${(d / SCALE) * 100}%`;
     </div>
     <div class="scale-tail">
       <span class="seg-label">Yours to run</span>
+      <span class="seg-n">4</span>
     </div>
     <div class="scale-cover"></div>
     <div class="scale-now"><i></i></div>
   </div>
+  <ol class="scale-key" aria-hidden="true">
+    {
+      phases.map((p, i) => (
+        <li class={`key-${i + 1}`}>
+          <span class="key-n">{i + 1}</span>
+          <span class="key-name">{p.name}</span>
+          <span class="key-when">{p.when}</span>
+        </li>
+      ))
+    }
+  </ol>
 
   <ol class="phases" data-reveal="stagger" data-scene-group="(min-width: 901px)">
     {
@@ -321,12 +334,48 @@ const pct = (d: number) => `${(d / SCALE) * 100}%`;
   @media (max-width: 900px) {
     .phases { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
+  .seg-n, .scale-key { display: none; }
+
+  /* Phones and tablets: the phases loop on their own, so the bar holds still */
+  @media (max-width: 900px) {
+    .scale-cover, .scale-now { display: none; }
+  }
+
+  /* Phones: the bar is too narrow for names, so each part is numbered and a key sits below */
   @media (max-width: 640px) {
-    .scale { --track: 72; --tail: 28; grid-template-columns: minmax(0, 72fr) minmax(0, 28fr); }
-    .scale-tail { padding-inline: 0.5rem; }
-    .scale-tail .seg-label { font-size: 0.75rem; }
-    .seg-label { display: none; }
-    .scale-tail .seg-label { display: inline; }
+    .timeline { gap: var(--s-5); }
+    .scale { --track: 72; --tail: 28; grid-template-columns: minmax(0, 72fr) minmax(0, 28fr); padding-bottom: 1.9rem; }
+    .seg, .scale-tail { justify-content: center; padding-inline: 0; }
+    .seg-label, .scale-tail .seg-label { display: none; }
+    .seg-n { display: block; font-size: 0.8125rem; font-weight: 700; color: #fff; }
+    .seg-1 .seg-n { color: var(--navy); }
+    .scale-tail .seg-n { color: var(--ink-2); }
+    .scale-key {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.6rem 1rem;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .scale-key li { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0 0.5rem; align-items: center; }
+    .key-n {
+      grid-row: span 2;
+      display: grid;
+      place-items: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #fff;
+    }
+    .key-1 .key-n { background: var(--mist-1); color: var(--navy); }
+    .key-2 .key-n { background: var(--accent); }
+    .key-3 .key-n { background: var(--brand); }
+    .key-4 .key-n { background: repeating-linear-gradient(-45deg, var(--paper) 0 6px, var(--accent-wash) 6px 7px); border: 1px dashed var(--rule-2); color: var(--ink-2); }
+    .key-name { font-size: 0.875rem; font-weight: 600; line-height: 1.2; color: var(--ink); }
+    .key-when { font-size: 0.75rem; line-height: 1.2; color: var(--ink-3); }
     .tick:not(:first-of-type):not(:nth-of-type(3)):not(:last-of-type) span { display: none; }
     .phases { grid-template-columns: minmax(0, 1fr); }
   }

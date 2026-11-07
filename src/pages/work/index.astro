@@ -258,4 +258,21 @@ const sectionsOf = (body = '') =>
     .flip .project-text { order: 0; }
     .cs-cols { grid-template-columns: minmax(0, 1fr); gap: var(--s-5); }
   }
+  /* Phones: the same projects, tighter. Smaller type and spacing so each one fits in a
+     couple of screens instead of five. */
+  @media (max-width: 640px) {
+    .project { padding-block: 2.5rem; }
+    .project-grid, .flip .project-grid { gap: var(--s-5); }
+    .project-text { gap: 0.65rem; }
+    .project-meta { font-size: 0.8125rem; gap: 0.5rem; }
+    .project-text h2 { font-size: 1.5rem; max-width: none; }
+    .project-summary { font-size: 1rem; line-height: 1.5; }
+    .project-client { font-size: 0.8125rem; }
+    .cs-toggle { margin-top: 0.25rem; padding: 0.45rem 0.85rem 0.45rem 0.95rem; font-size: 0.875rem; }
+    .cs-card { margin-top: var(--s-5); gap: var(--s-5); }
+    .cs-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-4); }
+    .cs-m-value { font-size: 1.25rem; }
+    .cs-m-label { font-size: 0.8125rem; }
+    .cs-col p { font-size: 0.9375rem; }
+  }
 </style>

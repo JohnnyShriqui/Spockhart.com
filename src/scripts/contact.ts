@@ -11,7 +11,7 @@ export function initContactForm() {
   const submit = form.querySelector<HTMLButtonElement>('[data-submit]')!;
   const submitLabel = form.querySelector<HTMLElement>('[data-submit-label]')!;
   const message = form.querySelector<HTMLTextAreaElement>('#cf-message')!;
-  const type = form.querySelector<HTMLSelectElement>('#cf-type')!;
+  const type = form.querySelector<HTMLInputElement>('#cf-type')!;
 
   // Prefill from the calculator. Parameters arrive in the query string,
   // or after the hash when the site runs as a single page.
@@ -69,8 +69,7 @@ export function initContactForm() {
     const d = new FormData(form);
     return [
       `Name: ${d.get('name')}`,
-      `Organization: ${d.get('organization')}${d.get('role') ? ` (${d.get('role')})` : ''}`,
-      `Type: ${d.get('type')}, team of ${d.get('size')}`,
+      `Organization: ${d.get('organization')}${d.get('type') ? ` (${d.get('type')})` : ''}, team of ${d.get('size')}`,
       `Email: ${d.get('email')}`,
       '',
       String(d.get('message') ?? ''),

@@ -281,15 +281,36 @@ const iconFill = (i: number) => Math.max(0, Math.min(1, fteIcons - i));
   @media (max-width: 960px) {
     .calc { grid-template-columns: minmax(0, 1fr); }
   }
-  /* On phones, keep the big number close to the sliders so both fit on screen */
+  /* On phones, the same calculator zoomed out: smaller type, tighter spacing, and the
+     two pictures (days lost, people) side by side, so it reads at a glance. */
   @media (max-width: 640px) {
-    .calc-left { gap: var(--s-4); padding: var(--s-5) var(--s-4) var(--s-4); }
-    .calc-head h2 { font-size: 1.5rem; }
-    .calc-intro, .slider-hint, .calc-method { display: none; }
-    .calc-inputs { gap: var(--s-3); }
-    .slider-head output { font-size: 1.375rem; }
-    .calc-right { padding: var(--s-5) var(--s-4); gap: var(--s-3); }
-    .r-big { font-size: min(3.25rem, 14cqi); }
-    .person { width: 15px; height: 20px; }
+    .calc-left { gap: 0.9rem; padding: 1.1rem 1rem 1rem; }
+    .calc-head { gap: 0.35rem; }
+    .calc-head h2 { font-size: 1.25rem; line-height: 1.15; }
+    .calc-intro, .slider-hint { display: none; }
+    .calc-method { font-size: 0.6875rem; }
+    .calc-inputs { gap: 0.55rem; }
+    .slider-field { gap: 0.15rem; }
+    .slider-head label { font-size: 0.875rem; }
+    .slider-head output { font-size: 1.125rem; }
+
+    .calc-right {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.5rem 0.9rem;
+      padding: 1rem;
+    }
+    .calc-right > :not(.r-viz) { grid-column: 1 / -1; }
+    .r-label { font-size: 0.625rem; letter-spacing: 0.14em; }
+    .r-big { font-size: min(2.6rem, 13cqi); margin-top: 0; }
+    .r-sub { font-size: 0.875rem; margin-top: -0.2rem; }
+    .r-viz { align-content: start; gap: 0.45rem; padding-top: 0.7rem; }
+    .r-line { font-size: 0.8125rem; line-height: 1.35; }
+    .week { gap: 3px; }
+    .day { height: 22px; border-radius: 3px; }
+    .day-name { font-size: 0.5625rem; letter-spacing: 0.02em; }
+    .team { gap: 3px 2px; }
+    .person { width: 10px; height: 13px; }
+    .team-key { font-size: 0.6875rem; }
+    .btn-on-brand { --pad-y: 0.65rem; --pad-x: 1.05rem; font-size: 0.9rem; margin-top: 0.35rem; }
   }
 </style>

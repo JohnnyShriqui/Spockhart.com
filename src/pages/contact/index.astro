@@ -31,25 +31,10 @@ import { site } from '../../config/site';
               <input class="input" id="cf-email" name="email" type="email" autocomplete="email" required />
             </div>
           </div>
-          <div class="row-2">
+          <div class="row-2 row-org">
             <div class="field">
               <label for="cf-org">Organization</label>
               <input class="input" id="cf-org" name="organization" autocomplete="organization" required />
-            </div>
-            <div class="field">
-              <label for="cf-role">Your role <span class="optional">Optional</span></label>
-              <input class="input" id="cf-role" name="role" autocomplete="organization-title" />
-            </div>
-          </div>
-          <div class="row-2">
-            <div class="field">
-              <label for="cf-type">Type of organization</label>
-              <select class="select" id="cf-type" name="type">
-                <option value="Company">Company</option>
-                <option value="Nonprofit">Nonprofit</option>
-                <option value="Public sector">Public sector</option>
-                <option value="Other">Other</option>
-              </select>
             </div>
             <div class="field">
               <label for="cf-size">Team size</label>
@@ -58,15 +43,22 @@ import { site } from '../../config/site';
                 <option value="11-50" selected>11 to 50</option>
                 <option value="51-200">51 to 200</option>
                 <option value="201-1000">201 to 1,000</option>
-                <option value="1000+">More than 1,000</option>
+                <option value="1000+">1,000+</option>
               </select>
             </div>
           </div>
           <div class="field">
             <label for="cf-message">What is slowing your team down?</label>
-            <textarea class="textarea" id="cf-message" name="message" required aria-describedby="cf-message-hint"></textarea>
-            <p class="hint" id="cf-message-hint">A few sentences is plenty. The task your team complains about most is a good place to start.</p>
+            <textarea
+              class="textarea"
+              id="cf-message"
+              name="message"
+              rows="3"
+              required
+              placeholder="A sentence or two is plenty."
+            ></textarea>
           </div>
+          <input type="hidden" id="cf-type" name="type" value="" />
           <input type="text" name="_gotcha" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
           <div class="form-foot">
             <button class="btn" type="submit" data-submit>
@@ -114,13 +106,15 @@ import { site } from '../../config/site';
   .label { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); }
 
   .contact-form-wrap {
-    padding: clamp(1.5rem, 1rem + 2.5vw, 3rem);
+    padding: clamp(1.25rem, 0.9rem + 1.6vw, 2.25rem);
     border: 1px solid var(--rule);
     border-radius: var(--radius-lg);
     background: var(--surface);
   }
-  .contact-form { display: grid; gap: var(--s-5); }
-  .row-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-5); }
+  .contact-form { display: grid; gap: var(--s-4); }
+  .row-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-4); }
+  .row-org { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); }
+  .contact-form .textarea { min-height: 6.5rem; }
   .optional { font-weight: 400; color: var(--ink-3); margin-left: 0.35rem; font-size: 0.8125rem; }
   .hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
   .form-foot { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-4); }
@@ -145,10 +139,23 @@ import { site } from '../../config/site';
     overflow: auto;
   }
 
+  /* Tablets and phones: the heading, then the form, then the email option */
   @media (max-width: 960px) {
-    .contact-grid { grid-template-columns: minmax(0, 1fr); gap: var(--s-7); }
-    }
+    .contact { padding-top: clamp(6.5rem, 5rem + 4vw, 8.5rem); }
+    .contact-grid { grid-template-columns: minmax(0, 1fr); gap: var(--s-4); }
+    .contact-intro { display: contents; }
+    .contact-intro h1 { font-size: clamp(2.25rem, 1.6rem + 3vw, 3.5rem); max-width: none; }
+    .contact-form-wrap { order: 1; margin-top: var(--s-2); }
+    .contact-direct { order: 2; margin-top: var(--s-4); }
+  }
+  /* Phones: name and email stay side by side; organization and size share a row */
   @media (max-width: 560px) {
-    .row-2 { grid-template-columns: minmax(0, 1fr); }
+    .contact-form { gap: 0.85rem; }
+    .row-2 { gap: 0.6rem; }
+    .contact-form .field { gap: 0.3rem; }
+    .contact-form label { font-size: 0.8125rem; }
+    .contact-form .input, .contact-form .select { padding-block: 0.6rem; }
+    .contact-form .textarea { min-height: 5.5rem; }
+    .form-foot { gap: var(--s-3); }
   }
 </style>

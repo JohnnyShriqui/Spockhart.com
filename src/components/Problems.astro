@@ -119,7 +119,13 @@ const {
                 <h3>{p.name}</h3>
                 <p>{p.problem}</p>
               </div>
-              <p class="p-fix">
+              <button class="p-toggle" type="button" aria-expanded="false" aria-controls={`fix-${p.key}`}>
+                <span class="visually-hidden">Show the fix for {p.name}</span>
+                <svg viewBox="0 0 16 16" aria-hidden="true">
+                  <path d="M3.5 6l4.5 4.5L12.5 6" />
+                </svg>
+              </button>
+              <p class="p-fix" id={`fix-${p.key}`}>
                 <span class="p-fix-tag">
                   <Mark size={14} tone="current" />
                   Fix
@@ -139,11 +145,22 @@ const {
 <script>
   // With a mouse, hovering or focusing a problem plugs its leak in the bucket.
   // On touch screens the list is plain: nothing to tap, nothing that moves.
+  // On phones each problem opens to show its fix: tap the row or the arrow.
   function initProblems() {
     const mouse = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    const small = window.matchMedia('(max-width: 900px)');
     document.querySelectorAll<HTMLElement>('[data-problems]').forEach((section) => {
       if (section.dataset.ready) return;
       section.dataset.ready = '1';
+      section.querySelectorAll<HTMLElement>('[data-leak-key]').forEach((row) => {
+        const toggle = row.querySelector<HTMLButtonElement>('.p-toggle');
+        row.addEventListener('click', () => {
+          if (!small.matches || !toggle) return;
+          const open = !row.classList.contains('is-open');
+          row.classList.toggle('is-open', open);
+          toggle.setAttribute('aria-expanded', String(open));
+        });
+      });
       if (!mouse) {
         section.querySelectorAll<HTMLElement>('[data-leak-key]').forEach((row) => row.removeAttribute('tabindex'));
         return;
@@ -256,8 +273,10 @@ const {
     .p-fix-tag { vertical-align: 0.12em; margin-right: 0.3rem; }
     .p-arrow { margin-right: 0.3rem; }
   }
-  /* Phones and small tablets: a smaller bucket and a compact list of what we fix,
-     one line each. The bucket already shows the problems leaking. */
+  .p-toggle { display: none; }
+
+  /* Phones and small tablets: a smaller bucket and a compact list. Each row shows the
+     problem; tapping it opens the fix underneath. */
   @media (max-width: 900px) {
     .p-layout { grid-template-columns: minmax(0, 1fr); gap: var(--s-6); }
     .p-side { position: static; gap: var(--s-4); }
@@ -273,23 +292,56 @@ const {
     .p-row:hover,
     .p-row.is-active,
     .p-row:focus-visible {
-      grid-template-columns: auto minmax(0, 1fr);
-      gap: 0.1rem var(--s-4);
-      padding: 0.85rem var(--s-4);
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 0 0.85rem;
+      align-items: start;
+      padding: 0.8rem 0.6rem 0.8rem var(--s-4);
       border: 0;
       border-radius: 0;
       background: none;
       box-shadow: none;
       transform: none;
       transition: none;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
     }
     .p-row + .p-row { border-top: 1px solid var(--rule); }
-    .p-badge { width: 32px; height: 36px; }
-    .p-badge svg { width: 17px; height: 17px; }
+    .p-badge { width: 30px; height: 34px; margin-top: 0.1rem; }
+    .p-badge svg { width: 16px; height: 16px; }
     .p-row.is-active .p-badge::before { background: var(--ink); transform: none; }
-    .p-problem p, .p-problem .p-num, .p-fix-tag, .p-arrow { display: none; }
+    .p-problem { gap: 0.15rem; }
+    .p-problem .p-num { display: none; }
     .p-problem h3 { font-size: 1.0625rem; }
-    .p-fix { grid-column: 2; display: block; padding: 0; border: 0; }
-    .p-fix-text { font-family: var(--font-body); font-weight: 400; font-size: 0.9rem; line-height: 1.4; color: var(--ink-2); }
+    .p-problem p { font-size: 0.875rem; line-height: 1.4; }
+
+    .p-toggle {
+      display: grid;
+      place-items: center;
+      width: 36px;
+      height: 36px;
+      margin: -0.2rem 0 0;
+      padding: 0;
+      border: 0;
+      border-radius: 50%;
+      background: none;
+      color: var(--accent);
+    }
+    .p-toggle svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; transition: transform 300ms var(--ease-out); }
+    .p-row.is-open .p-toggle svg { transform: rotate(180deg); }
+
+    .p-fix,
+    .p-row.is-active .p-fix {
+      display: none;
+      grid-column: 2 / 4;
+      margin: 0.55rem 0.6rem 0.1rem 0;
+      padding: 0.6rem 0.75rem;
+      border: 0;
+      border-radius: var(--radius);
+      background: var(--accent-wash);
+    }
+    .p-row.is-open .p-fix { display: block; }
+    .p-fix-tag { padding: 0.1rem 0.45rem 0.1rem 0.35rem; margin-right: 0.35rem; vertical-align: 0.1em; font-size: 0.625rem; }
+    .p-arrow { display: none; }
+    .p-fix-text { display: inline; font-family: var(--font-body); font-weight: 500; font-size: 0.875rem; line-height: 1.45; color: var(--ink); }
   }
 </style>
