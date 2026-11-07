@@ -104,7 +104,7 @@ const {
   <div class="wrap p-layout">
     <div class="p-side">
       <div class="p-head" data-reveal>
-        <h2 id="problems-title">What we fix most often.</h2>
+        <h2 id="problems-title">Stop leaking time and money.</h2>
       </div>
       <div class="p-figure" data-reveal>
         <LeakyBucket inflow={inflow} leaks={problems.map((p) => ({ key: p.key, label: ('short' in p && p.short) || p.name, side: p.side, y: p.y }))} />
@@ -125,7 +125,15 @@ const {
                 <p class="p-num">Problem {String(i + 1).padStart(2, '0')}</p>
                 <h3>{p.name}</h3>
                 <p class="p-desc">{p.problem}</p>
-                <p class="p-brief">{('brief' in p && p.brief) || p.problem}</p>
+                <p class="p-brief">
+                  <span class="p-warn" aria-hidden="true">
+                    <svg viewBox="0 0 16 16">
+                      <path d="M7.13 2.04a1 1 0 0 1 1.74 0l6.01 10.46a1 1 0 0 1-.87 1.5H1.99a1 1 0 0 1-.87-1.5z" />
+                      <path class="p-warn-mark" d="M8 6.1v3.5M8 11.75v.01" />
+                    </svg>
+                  </span>
+                  <span class="p-brief-text">{('brief' in p && p.brief) || p.problem}</span>
+                </p>
               </div>
               <button class="p-toggle" type="button" aria-expanded="false" aria-controls={`fix-${p.key}`}>
                 <span class="visually-hidden">Show the fix for {p.name}</span>
@@ -283,6 +291,12 @@ const {
   }
   .p-toggle, .p-brief { display: none; }
 
+  /* The problem in one line: a red warning, then the problem in a lighter red */
+  .p-problem .p-brief { color: var(--warn-text); }
+  .p-warn { display: inline-flex; flex: none; color: var(--warn); }
+  .p-warn svg { width: 15px; height: 15px; fill: currentColor; }
+  .p-warn-mark { fill: none; stroke: #fff; stroke-width: 1.7; stroke-linecap: round; }
+
   /* Phones and small tablets: a smaller bucket and a compact list. Each row shows the
      problem; tapping it opens the fix underneath. */
   @media (max-width: 900px) {
@@ -322,7 +336,9 @@ const {
     .p-problem h3 { font-size: 1.0625rem; }
     .p-problem p { font-size: 0.875rem; line-height: 1.4; }
     .p-problem .p-desc { display: none; }
-    .p-problem .p-brief { display: block; }
+    .p-problem .p-brief { display: flex; align-items: flex-start; gap: 0.4rem; }
+    .p-warn { margin-top: 0.15rem; }
+    .p-warn svg { width: 14px; height: 14px; }
 
     .p-toggle {
       display: grid;
@@ -354,40 +370,34 @@ const {
     .p-arrow { display: none; }
     .p-fix-text { display: inline; font-family: var(--font-body); font-weight: 500; font-size: 0.875rem; line-height: 1.45; color: var(--ink); }
   }
-  /* Larger screens: each problem on one line, its fix on the line below */
+  /* Larger screens: a tidy table. The name and FIX share a column, the warning and the arrow
+     share the next, and each problem lines up with its fix. */
   @media (min-width: 901px) {
     .p-list { gap: var(--s-2); }
     .p-row {
-      grid-template-columns: auto minmax(0, 1fr);
+      grid-template-columns: auto 8.25rem 1.05rem minmax(0, 1fr);
       grid-template-rows: auto auto;
-      gap: 0.25rem var(--s-4);
-      align-items: center;
-      padding: 0.75rem var(--s-5) 0.75rem var(--s-4);
-    }
-    .p-badge { grid-row: 1 / 3; width: 38px; height: 43px; }
-    .p-badge svg { width: 19px; height: 19px; }
-    .p-problem { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 0.7rem; min-width: 0; }
-    .p-problem .p-num, .p-problem .p-desc { display: none; }
-    .p-problem h3 { flex: none; font-size: 1.0625rem; }
-    .p-problem .p-brief { display: block; min-width: 0; font-size: 0.9375rem; }
-    .p-fix {
-      grid-column: 2;
-      display: flex;
-      flex-wrap: nowrap;
+      gap: 0.5rem 0;
       align-items: baseline;
-      gap: 0.5rem;
-      min-width: 0;
-      padding-left: 0;
-      border-left: 0;
+      padding: 0.95rem var(--s-5) 0.95rem var(--s-4);
     }
-    .p-fix-tag { flex: none; margin: 0; vertical-align: 0; }
-    .p-arrow { flex: none; margin: 0; }
+    .p-badge { grid-column: 1; grid-row: 1 / 3; align-self: center; width: 38px; height: 43px; margin-right: 1.1rem; }
+    .p-badge svg { width: 19px; height: 19px; }
+    .p-problem, .p-problem .p-brief, .p-fix { display: contents; }
+    .p-problem .p-num, .p-problem .p-desc { display: none; }
+    .p-problem h3 { grid-column: 2; grid-row: 1; font-size: 1.0625rem; line-height: 1.3; }
+    .p-warn { grid-column: 3; grid-row: 1; align-self: start; margin-top: 0.2rem; }
+    .p-brief-text { grid-column: 4; grid-row: 1; padding-left: 0.45rem; color: var(--warn-text); font-size: 0.9375rem; line-height: 1.4; }
+    .p-fix-tag { grid-column: 2; grid-row: 2; justify-self: start; margin: 0; }
+    .p-arrow { grid-column: 3; grid-row: 2; margin: 0; }
     .p-fix-text {
-      flex: 1 1 auto;
-      min-width: 0;
+      grid-column: 4;
+      grid-row: 2;
+      padding-left: 0.45rem;
       font-family: var(--font-body);
       font-weight: 500;
-      font-size: 0.875rem;
+      font-size: 0.9375rem;
+      line-height: 1.4;
       color: var(--ink);
     }
   }

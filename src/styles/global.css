@@ -69,6 +69,8 @@
   --accent-soft: #4a8aba;    /* decorative lines and fills */
   --accent-on-navy: #8ec0e6;
   --accent-wash: rgb(74 138 186 / 0.14);
+  --warn: #c8322a;           /* warning icons on problems */
+  --warn-text: #c9473d;      /* problem text, a lighter red (AA on light surfaces) */
   --mist-1: #b8cce0;         /* ambient shapes, from the original site */
   --mist-2: #a3bcd4;
   --mist-3: #c5d5e4;
