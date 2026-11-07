@@ -36,6 +36,23 @@ const hoop = (y: number, ry: number) => {
 };
 const waterHalf = halfAt(WATER);
 
+// What pools on the ground: time and money, scattered across the puddle
+const lost: { kind: 'clock' | 'coin' | 'bill'; x: number; y: number; r: number; s: number }[] = [
+  { kind: 'coin', x: 62, y: 434, r: -12, s: 0.95 },
+  { kind: 'clock', x: 92, y: 429, r: 0, s: 1 },
+  { kind: 'bill', x: 126, y: 436, r: 10, s: 1 },
+  { kind: 'coin', x: 158, y: 428, r: 8, s: 0.9 },
+  { kind: 'clock', x: 190, y: 437, r: -8, s: 1.1 },
+  { kind: 'bill', x: 226, y: 430, r: -6, s: 0.95 },
+  { kind: 'coin', x: 260, y: 438, r: 14, s: 1 },
+  { kind: 'clock', x: 292, y: 429, r: 6, s: 0.95 },
+  { kind: 'coin', x: 324, y: 436, r: -10, s: 1.05 },
+  { kind: 'bill', x: 358, y: 430, r: 12, s: 0.95 },
+  { kind: 'clock', x: 392, y: 437, r: -4, s: 1 },
+  { kind: 'coin', x: 424, y: 429, r: 8, s: 0.9 },
+  { kind: 'clock', x: 450, y: 435, r: 0, s: 0.85 },
+];
+
 const jets = leaks.map((l) => {
   const dir = l.side === 'left' ? -1 : 1;
   const x0 = edge(l.side, l.y);
@@ -64,10 +81,26 @@ const jets = leaks.map((l) => {
         <stop offset="1" stop-color="#fff" stop-opacity="0.3" />
       </linearGradient>
       <clipPath id="bk-body"><path d={body} /></clipPath>
+      <!-- Small icons for time and money, drawn around 0,0 -->
+      <g id="bk-i-clock">
+        <circle r="5.6" />
+        <path d="M0 -3.1V0l2.2 1.4" />
+      </g>
+      <g id="bk-i-coin">
+        <circle r="5.6" />
+        <path d="M2 -2.1c-.6-.8-3.9-.9-3.9.8 0 1.9 4 .9 4 2.8 0 1.8-3.5 1.6-4.3.6M0 -3.8v7.6" />
+      </g>
+      <g id="bk-i-bill">
+        <rect x="-8" y="-4.6" width="16" height="9.2" rx="1.4" />
+        <circle r="2.2" />
+      </g>
     </defs>
 
-    <!-- Puddle of everything lost -->
-    <ellipse cx={CX} cy={GROUND} rx="214" ry="11" class="bk-puddle" />
+    <!-- Puddle of everything lost: time and money -->
+    <ellipse cx={CX} cy={GROUND + 1} rx="216" ry="14" class="bk-puddle" />
+    <g class="bk-lost">
+      {lost.map((i) => <use href={`#bk-i-${i.kind}`} transform={`translate(${i.x} ${i.y}) rotate(${i.r}) scale(${i.s})`} />)}
+    </g>
 
     <!-- Revenue pipe -->
     <text x="24" y="10" class="bk-cap">{inflow}</text>
@@ -88,6 +121,18 @@ const jets = leaks.map((l) => {
     <!-- Inflow -->
     <path d={`M${CX} 82 V${WATER}`} class="bk-stream" />
     <path d={`M${CX} 82 V${WATER}`} class="bk-stream-flow" />
+    <!-- Money pouring in -->
+    {
+      [0, 1, 2, 3].map((k) => (
+        <g class="bk-drop" style={`--k:${k}`}>
+          <circle cx={CX} cy="90" r="5.4" class="bk-drop-coin" />
+          <path
+            d={`M${CX + 1.9} 88c-.6-.75-3.7-.85-3.7.75 0 1.8 3.8.85 3.8 2.65 0 1.7-3.3 1.5-4.1.55M${CX} 86.4v7.2`}
+            class="bk-drop-sign"
+          />
+        </g>
+      ))
+    }
     <ellipse cx={CX} cy={WATER} rx="18" ry="4" class="bk-ripple" />
     <ellipse cx={CX} cy={WATER} rx="18" ry="4" class="bk-ripple bk-ripple-2" />
 
@@ -143,6 +188,11 @@ const jets = leaks.map((l) => {
   .bk-lip { fill: none; stroke: var(--ink); stroke-width: 5; stroke-linecap: round; }
   .bk-rim { fill: none; stroke: var(--ink); stroke-width: 2.5; }
   .bk-puddle { fill: rgb(74 138 186 / 0.2); }
+  /* Time and money: a slightly deeper blue than the water, quiet but easy to spot */
+  .bk-lost { fill: none; stroke: #2f6b9a; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; opacity: 0.7; }
+  .bk-drop { transform: translateY(calc(var(--k) * 24px)); }
+  .bk-drop-coin { fill: #2f6b9a; }
+  .bk-drop-sign { fill: none; stroke: #d9ebf7; stroke-width: 1.2; stroke-linecap: round; }
 
   .leak-crack { fill: none; stroke: var(--ink); stroke-width: 1.2; stroke-linecap: round; stroke-linejoin: round; opacity: 0.6; }
   .leak-hole { fill: var(--ink); }
@@ -165,6 +215,7 @@ const jets = leaks.map((l) => {
 
   @media (prefers-reduced-motion: no-preference) {
     .bk-stream-flow { animation: bk-flow 700ms linear infinite; }
+    .bk-drop { animation: bk-drop 2.4s linear infinite; animation-delay: calc(var(--k) * -0.6s); opacity: 0; }
     .leak-flow { animation: bk-flow 900ms linear infinite; }
     .bk-ripple { animation: bk-ripple 1.6s var(--ease-out) infinite; }
     .bk-ripple-2 { animation-delay: 0.8s; }
@@ -173,6 +224,12 @@ const jets = leaks.map((l) => {
     .leak:nth-of-type(3n) .leak-splash { animation-delay: 0.8s; }
     .bk-surface { animation: bk-bob 3.2s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
     @keyframes bk-flow { to { stroke-dashoffset: -18; } }
+    @keyframes bk-drop {
+      0% { transform: translateY(0); opacity: 0; }
+      12% { opacity: 1; }
+      82% { opacity: 1; }
+      100% { transform: translateY(84px); opacity: 0; }
+    }
     @keyframes bk-ripple { from { opacity: 0.9; transform: scale(0.4); } to { opacity: 0; transform: scale(2.6); } }
     @keyframes bk-splash { from { opacity: 0.8; transform: scale(0.3); } to { opacity: 0; transform: scale(1.6); } }
     @keyframes bk-bob { 50% { transform: scaleX(0.985) translateY(1px); } }

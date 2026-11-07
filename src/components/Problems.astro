@@ -6,7 +6,7 @@
  */
 import LeakyBucket from './LeakyBucket.astro';
 
-/** Plain text, or [crossed out, written in] */
+/** Plain text, or [crossed out, written in]; leave the second empty to just cross out */
 type Segment = string | readonly [string, string];
 
 export interface Problem {
@@ -57,7 +57,7 @@ const defaultProblems = [
   {
     key: 'followups',
     name: 'Follow-ups',
-    line: ['I ', ['lose track of', 'never miss'], ' leads, payments, and requests ', ['that slip through the cracks', 'because each one has an owner'], '.'],
+    line: ['I ', ['lose track of', 'never miss'], ' leads, payments, and requests ', ['that slip through the cracks', ''], '.'],
     side: 'right',
     y: 298,
     icon: 'M3 7l9 6 9-6M3 7v10a1 1 0 0 0 1 1h9M3 7a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v6M16 18h5M19 16l2 2-2 2',
@@ -124,7 +124,9 @@ const {
                         seg
                       ) : (
                         <>
-                          <del>{seg[0]}</del> <ins>{seg[1]}</ins>
+                          <del>{seg[0]}</del>
+                          {seg[1] && ' '}
+                          {seg[1] && <ins>{seg[1]}</ins>}
                         </>
                       ),
                     )}
