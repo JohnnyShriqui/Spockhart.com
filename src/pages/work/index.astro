@@ -265,9 +265,9 @@ const sectionsOf = (body = '') =>
      The summary and the rest stay one tap away in the details. */
   @media (max-width: 640px) {
     .hero-more, .disclosure, .project-summary, .project-client, .project-meta .tag { display: none; }
-    /* The honeycomb sits closer to the title */
-    :global(.work-hero .hero-extra) { display: none; }
-    :global(.work-hero.with-figure .hero-layout) { gap: var(--s-4); }
+    /* Just the title: no honeycomb on phones */
+    :global(.work-hero .hero-extra),
+    :global(.work-hero .hero-figure) { display: none; }
     /* The details button sits under the graphic */
     .project-text { display: contents; }
     .project-meta, .project-text h2 { order: 0; }
