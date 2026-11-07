@@ -1,7 +1,7 @@
 ---
-title: 'A working prototype for up to [83% more cargo] per trip, delivered [ahead of schedule and under budget].'
+title: 'A Working Prototype for Up to [83% More Cargo] per Trip, Delivered [Ahead of Schedule and Under Budget].'
 summary: A working engineering prototype of a momentum-exchange system that could carry up to 83% more cargo per trip, delivered ahead of schedule and under budget.
-client: An advanced engineering program
+client: 'A Leading North American Aerospace & Engineering Company'
 sector: Advanced engineering
 scope: Prototype design, testing and validation
 order: 6

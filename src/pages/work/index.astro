@@ -262,9 +262,9 @@ const plain = (title: string) => title.replace(/[\[\]]/g, '');
   .cs-panel[data-open='false'] .cs-panel-inner { visibility: hidden; transition: visibility 0s 550ms; }
   .cs-card {
     display: grid;
-    gap: var(--s-7);
-    margin-top: var(--s-7);
-    padding: clamp(1.5rem, 1rem + 2vw, 2.75rem);
+    gap: var(--s-5);
+    margin-top: var(--s-6);
+    padding: clamp(1.25rem, 0.9rem + 1.3vw, 2rem) clamp(1.25rem, 0.9rem + 1.6vw, 2.25rem);
     border: 1px solid var(--rule);
     border-radius: var(--radius-lg);
     background: var(--surface);
@@ -281,37 +281,37 @@ const plain = (title: string) => title.replace(/[\[\]]/g, '');
     grid-row: span 2;
     display: grid;
     grid-template-rows: subgrid;
-    gap: 0.4rem;
-    padding-top: var(--s-4);
+    gap: 0.3rem;
+    padding-top: var(--s-3);
     border-top: 2px solid var(--ink);
   }
   .cs-m-value {
     align-self: end;
     font-family: var(--font-display);
-    font-size: clamp(1.25rem, 1.05rem + 0.6vw, 1.625rem);
+    font-size: clamp(1.1875rem, 1rem + 0.5vw, 1.5rem);
     line-height: 1.15;
     letter-spacing: -0.015em;
     font-variant-numeric: lining-nums;
   }
-  .cs-m-label { font-size: 0.875rem; color: var(--ink-2); line-height: 1.45; }
+  .cs-m-label { font-size: 0.8125rem; color: var(--ink-2); line-height: 1.4; }
   /* The story: one row each, label on the left */
   .cs-cols { display: grid; border-top: 1px solid var(--rule); }
   .cs-col {
     display: grid;
-    grid-template-columns: minmax(0, 3fr) minmax(0, 9fr);
-    gap: var(--s-6);
-    padding-block: var(--s-5);
+    grid-template-columns: 11rem minmax(0, 1fr);
+    gap: var(--s-5);
+    padding-block: var(--s-3);
     border-bottom: 1px solid var(--rule);
   }
-  .cs-col h3 { padding-top: 0.25rem; font-family: var(--font-body); font-size: 0.75rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); }
-  .cs-text { display: grid; gap: var(--s-3); max-width: 70ch; }
-  .cs-text p { color: var(--ink-2); font-size: 1rem; line-height: 1.65; }
+  .cs-col h3 { padding-top: 0.3rem; font-family: var(--font-body); font-size: 0.75rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); }
+  .cs-text { display: grid; gap: var(--s-2); }
+  .cs-text p { color: var(--ink-2); font-size: 0.9375rem; line-height: 1.55; }
   .cs-foot {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
     gap: var(--s-2) var(--s-5);
-    margin-top: calc(var(--s-3) * -1);
+    margin-top: calc(var(--s-2) * -1);
     font-size: 0.8125rem;
     color: var(--ink-3);
   }
@@ -338,7 +338,7 @@ const plain = (title: string) => title.replace(/[\[\]]/g, '');
     .cs-metrics li { padding-top: var(--s-3); margin-bottom: var(--s-4); }
     .cs-m-value { font-size: 1.125rem; }
     .cs-m-label { font-size: 0.8125rem; }
-    .cs-col { grid-template-columns: minmax(0, 1fr); gap: var(--s-2); padding-block: var(--s-4); }
+    .cs-col { grid-template-columns: minmax(0, 1fr); gap: var(--s-1); padding-block: var(--s-3); }
     .cs-text p { font-size: 0.9375rem; }
     :global(.work-hero .hero-figure) { display: none; }
   }

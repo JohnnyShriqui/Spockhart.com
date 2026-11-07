@@ -32,60 +32,60 @@ interface Props {
 const defaultProblems = [
   {
     key: 'invoicing',
-    brief: 'Made by hand, chased one by one',
+    brief: 'Invoices created manually, payments chased individually.',
     name: 'Invoicing',
-    problem: 'Invoices prepared manually, details copied from spreadsheets, and payments chased one at a time.',
-    fix: 'Approved work becomes an invoice. Reminders go out automatically.',
+    problem: 'Invoices created manually, payments chased individually.',
+    fix: 'Automatically generate and send invoices from approved work, and track outstanding payments.',
     side: 'left',
     y: 214,
     icon: 'M7 3h7l4 4v14H7zM14 3v4h4M12.5 10v8M14.5 11.3c-.4-.6-1.1-.9-2-.9-1.2 0-2 .6-2 1.5 0 2 4 1.1 4 3.1 0 .9-.9 1.5-2 1.5-.9 0-1.7-.4-2.1-1',
   },
   {
     key: 'data-entry',
-    brief: 'The same details, typed twice',
+    brief: 'The same information entered across multiple systems.',
     name: 'Data entry',
-    problem: 'The same client, donor, or project details entered into multiple platforms.',
-    fix: 'Enter information once. It updates across the tools your team uses.',
+    problem: 'The same information entered across multiple systems.',
+    fix: 'Enter information once. Automatically sync it across the tools your team uses.',
     side: 'right',
     y: 238,
     icon: 'M8 4h10a2 2 0 0 1 2 2v10M4 8h10a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zM7 13h6M7 16h4',
   },
   {
     key: 'reporting',
-    brief: 'Hours pulling numbers by hand',
+    brief: 'Time spent gathering numbers from different spreadsheets.',
     name: 'Reporting',
-    problem: 'Hours spent pulling numbers from different spreadsheets before every meeting.',
-    fix: 'A live dashboard brings your key numbers together automatically.',
+    problem: 'Time spent gathering numbers from different spreadsheets.',
+    fix: 'Automatically pull data into one dashboard, with up-to-date reports at a glance.',
     side: 'left',
     y: 272,
     icon: 'M4 20h16M7 16v-4M12 16V8M17 16v-7M7 8.5l5-3.5 5 3',
   },
   {
     key: 'followups',
-    brief: 'Leads and payments left waiting',
+    brief: 'Leads, payments, and requests slipping through the cracks.',
     name: 'Follow-ups',
-    problem: 'Leads, outstanding payments, applications, and important requests waiting for someone to follow up.',
-    fix: 'Every outstanding item gets an owner, a reminder, and a next step.',
+    problem: 'Leads, payments, and requests slipping through the cracks.',
+    fix: 'Track outstanding items, assign responsibility, and automate reminders.',
     side: 'right',
     y: 298,
     icon: 'M3 7l9 6 9-6M3 7v10a1 1 0 0 0 1 1h9M3 7a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v6M16 18h5M19 16l2 2-2 2',
   },
   {
     key: 'scheduling',
-    brief: 'Endless emails to find a time',
+    brief: 'Endless emails coordinating appointments and availability.',
     name: 'Scheduling',
-    problem: 'Endless emails coordinating availability, appointments, and meetings.',
-    fix: 'People book directly into available times. Confirmations go out automatically.',
+    problem: 'Endless emails coordinating appointments and availability.',
+    fix: 'Let people book available times directly, with automatic confirmations and reminders.',
     side: 'left',
     y: 330,
     icon: 'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4M8 14h2M12 14h2M16 14h0M8 17h2M12 17h2',
   },
   {
     key: 'reconciliation',
-    brief: 'Records checked line by line',
+    brief: 'Transactions and records compared line by line.',
     name: 'Reconciliation',
-    problem: 'Receipts, transactions, records, and spreadsheets manually checked against one another.',
-    fix: 'Transactions are matched, exceptions flagged, and records kept up to date.',
+    problem: 'Transactions and records compared line by line.',
+    fix: 'Automatically match transactions, flag discrepancies, and keep records up to date.',
     side: 'right',
     y: 352,
     icon: 'M3.5 4h6v16h-6zM14.5 4h6v16h-6zM9.5 9h5M13 7.5l1.5 1.5-1.5 1.5M14.5 15h-5M11 13.5L9.5 15l1.5 1.5',
@@ -225,30 +225,23 @@ const {
     transform: translateX(-4px);
     box-shadow: 0 16px 32px -26px rgb(27 42 61 / 0.5);
   }
-  .p-row.is-active {
-    border-color: rgb(74 138 186 / 0.55);
-    box-shadow: 0 0 0 3px rgb(74 138 186 / 0.12), 0 14px 34px -14px rgb(74 138 186 / 0.6);
-  }
   .p-row:focus-visible { outline: 2px solid var(--accent-soft); outline-offset: 2px; }
 
-  /* Each problem is a red octagon. With a mouse, the one you point at turns Spockhart blue
-     and its fix lights up. */
-  .p-badge { position: relative; display: grid; place-items: center; width: 44px; height: 44px; }
+  .p-badge { position: relative; display: grid; place-items: center; width: 42px; height: 48px; }
   .p-badge::before {
     content: '';
     position: absolute;
     inset: 0;
-    clip-path: var(--oct);
-    background: var(--problem);
+    clip-path: var(--hex);
+    background: var(--ink);
     transition: background-color 300ms var(--ease), transform 600ms var(--ease-out);
   }
   .p-row.is-active .p-badge::before { background: var(--brand); transform: rotate(180deg); }
   .p-badge svg { position: relative; width: 22px; height: 22px; fill: none; stroke: #fff; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
 
   .p-problem { display: grid; gap: 0.1rem; }
-  .p-problem h3 { font-size: 1.1875rem; line-height: 1.2; color: var(--problem); transition: color 300ms var(--ease); }
-  .p-problem p { color: var(--problem); font-size: 0.9375rem; line-height: 1.45; transition: color 300ms var(--ease); }
-  .p-row.is-active .p-problem h3, .p-row.is-active .p-problem p { color: var(--brand); }
+  .p-problem h3 { font-size: 1.1875rem; line-height: 1.2; }
+  .p-problem p { color: var(--ink-2); font-size: 0.9375rem; line-height: 1.45; }
   .p-problem .p-num { font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); line-height: 1.2; }
 
   .p-fix {
@@ -277,15 +270,8 @@ const {
     letter-spacing: 0.14em;
     text-transform: uppercase;
   }
-  .p-fix-tag, .p-fix-text { transition: color 300ms var(--ease), background-color 300ms var(--ease), box-shadow 300ms var(--ease), text-shadow 300ms var(--ease); }
-  .p-row.is-active .p-fix-tag {
-    background: var(--accent);
-    color: #fff;
-    box-shadow: 0 0 0 3px rgb(74 138 186 / 0.2), 0 0 18px 2px rgb(74 138 186 / 0.6);
-  }
-  .p-row.is-active .p-fix-text { color: var(--accent); text-shadow: 0 0 16px rgb(74 138 186 / 0.45); }
   .p-arrow { color: var(--accent-soft); transition: transform var(--dur) var(--ease); }
-  .p-row.is-active .p-arrow { transform: translateX(3px); color: var(--accent); }
+  .p-row.is-active .p-arrow { transform: translateX(3px); }
   .p-fix-text { flex-basis: 100%; color: var(--ink); font-family: var(--font-display); font-weight: 500; font-size: 1rem; line-height: 1.35; }
   .p-more { justify-self: start; }
 
@@ -328,17 +314,15 @@ const {
       -webkit-tap-highlight-color: transparent;
     }
     .p-row + .p-row { border-top: 1px solid var(--rule); }
-    .p-badge { width: 32px; height: 32px; margin-top: 0.1rem; }
+    .p-badge { width: 30px; height: 34px; margin-top: 0.1rem; }
     .p-badge svg { width: 16px; height: 16px; }
-    /* Phones: the problem stays red and its fix stays blue */
-    .p-row.is-active .p-badge::before { background: var(--problem); transform: none; }
-    .p-row.is-active .p-problem h3, .p-row.is-active .p-problem p { color: var(--problem); }
+    .p-row.is-active .p-badge::before { background: var(--ink); transform: none; }
     .p-problem { gap: 0.15rem; }
     .p-problem .p-num { display: none; }
     .p-problem h3 { font-size: 1.0625rem; }
     .p-problem p { font-size: 0.875rem; line-height: 1.4; }
     .p-problem .p-desc { display: none; }
-    .p-problem .p-brief { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .p-problem .p-brief { display: block; }
 
     .p-toggle {
       display: grid;
@@ -368,9 +352,7 @@ const {
     .p-row.is-open .p-fix { display: block; }
     .p-fix-tag { padding: 0.1rem 0.45rem 0.1rem 0.35rem; margin-right: 0.35rem; vertical-align: 0.1em; font-size: 0.625rem; }
     .p-arrow { display: none; }
-    .p-fix-text,
-    .p-row.is-active .p-fix-text { display: inline; font-family: var(--font-body); font-weight: 600; font-size: 0.875rem; line-height: 1.45; color: var(--accent); text-shadow: none; }
-    .p-row.is-active .p-fix-tag { background: var(--accent-wash); color: var(--brand); box-shadow: none; }
+    .p-fix-text { display: inline; font-family: var(--font-body); font-weight: 500; font-size: 0.875rem; line-height: 1.45; color: var(--ink); }
   }
   /* Larger screens: each problem on one line, its fix on the line below */
   @media (min-width: 901px) {
@@ -382,30 +364,27 @@ const {
       align-items: center;
       padding: 0.75rem var(--s-5) 0.75rem var(--s-4);
     }
-    .p-badge { grid-row: 1 / 3; width: 42px; height: 42px; }
+    .p-badge { grid-row: 1 / 3; width: 38px; height: 43px; }
     .p-badge svg { width: 19px; height: 19px; }
-    .p-problem { display: flex; align-items: baseline; gap: 0.7rem; min-width: 0; white-space: nowrap; }
+    .p-problem { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 0.7rem; min-width: 0; }
     .p-problem .p-num, .p-problem .p-desc { display: none; }
     .p-problem h3 { flex: none; font-size: 1.0625rem; }
-    .p-problem .p-brief { display: block; min-width: 0; overflow: hidden; text-overflow: ellipsis; font-size: 0.9375rem; }
+    .p-problem .p-brief { display: block; min-width: 0; font-size: 0.9375rem; }
     .p-fix {
       grid-column: 2;
       display: flex;
       flex-wrap: nowrap;
-      align-items: center;
+      align-items: baseline;
       gap: 0.5rem;
       min-width: 0;
       padding-left: 0;
       border-left: 0;
-      white-space: nowrap;
     }
     .p-fix-tag { flex: none; margin: 0; vertical-align: 0; }
     .p-arrow { flex: none; margin: 0; }
     .p-fix-text {
       flex: 1 1 auto;
       min-width: 0;
-      overflow: hidden;
-      text-overflow: ellipsis;
       font-family: var(--font-body);
       font-weight: 500;
       font-size: 0.875rem;

@@ -1,7 +1,7 @@
 ---
-title: 'Replacing Excel with [automated commissions] across an [entire sales organization].'
+title: 'Replacing Excel With [Automated Commissions] Across the [Entire Sales Organization].'
 summary: A custom commission platform replacing a $1.2B global manufacturer's manual Excel process with a centralized, auditable system. Scheduled to go live in January 2027.
-client: A $1.2B global manufacturer
+client: 'A $1.2B Global Manufacturer'
 sector: Sales & financial operations
 scope: Commission platform design and build
 status: in-development

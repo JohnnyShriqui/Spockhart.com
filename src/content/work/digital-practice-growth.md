@@ -1,7 +1,7 @@
 ---
-title: 'A digital practice grown [more than 6x] in under a year, from [$150K to $1M].'
+title: 'A Digital Practice Grown [More Than 6x] in Under a Year, From [$150K to $1M].'
 summary: Building out a consulting firm's digital services practice across digital twins, analytics and transformation platforms, from about $150K to $1M in revenue in under a year.
-client: A consulting firm
+client: 'A Consulting Firm'
 sector: Digital transformation & commercial growth
 scope: Practice development, business development and delivery
 order: 5

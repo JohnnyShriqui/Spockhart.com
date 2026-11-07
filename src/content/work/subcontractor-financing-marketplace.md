@@ -1,7 +1,7 @@
 ---
-title: 'A [first-of-its-kind] marketplace that cut subcontractor financing from [6+ months to weeks].'
+title: 'A [First-of-Its-Kind] Marketplace That Cut Subcontractor Financing From [6+ Months to Weeks].'
 summary: A first-of-its-kind financing marketplace, launched across the US and Canada, that cut approvals for subcontractors from more than six months to weeks.
-client: A construction client in the US and Canada
+client: 'A North American Construction Client'
 sector: Construction finance
 scope: Marketplace design and launch
 order: 3
