@@ -119,7 +119,7 @@ const {
                     </svg>
                   </span>
                   <span class="p-text">
-                    {p.line.map((seg) =>
+                    “{p.line.map((seg) =>
                       typeof seg === 'string' ? (
                         seg
                       ) : (
@@ -129,7 +129,7 @@ const {
                           {seg[1] && <ins>{seg[1]}</ins>}
                         </>
                       ),
-                    )}
+                    )}”
                   </span>
                 </p>
               </div>
