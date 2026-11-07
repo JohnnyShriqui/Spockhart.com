@@ -16,6 +16,7 @@ const phases = [
   {
     n: '01',
     name: 'Diagnose',
+    brief: 'Map the system, find the bottlenecks.',
     when: 'Weeks 1 to 2',
     start: 0,
     end: 14,
@@ -24,6 +25,7 @@ const phases = [
   {
     n: '02',
     name: 'Prototype',
+    brief: 'Build it around your workflows, prove it works.',
     when: `By day ${site.offer.prototypeDays}`,
     start: 14,
     end: site.offer.prototypeDays,
@@ -32,6 +34,7 @@ const phases = [
   {
     n: '03',
     name: 'Build and embed',
+    brief: 'Harden it, connect your systems, train your team.',
     when: `Months 2 to ${site.offer.minimumMonths}`,
     start: site.offer.prototypeDays,
     end: SCALE,
@@ -40,6 +43,7 @@ const phases = [
   {
     n: '04',
     name: 'Hand over',
+    brief: 'Document everything, hand over the keys.',
     when: `Month ${site.offer.minimumMonths}`,
     start: SCALE,
     end: null,
@@ -122,6 +126,7 @@ const pct = (d: number) => `${(d / SCALE) * 100}%`;
           </p>
           <h3>{p.name}</h3>
           {!compact && <p class="phase-body">{p.body}</p>}
+          {!compact && <p class="phase-brief">{p.brief}</p>}
           {!compact && <PhaseGraphic phase={i as 0 | 1 | 2 | 3} />}
         </li>
       ))
@@ -328,6 +333,8 @@ const pct = (d: number) => `${(d / SCALE) * 100}%`;
   }
   .phase h3 { font-size: 1.5rem; line-height: 1.15; }
   .phase-body { color: var(--ink-2); font-size: 1rem; line-height: 1.55; }
+  /* Phones only: one short line in place of the description */
+  .phase-brief { display: none; }
   .compact { gap: var(--s-6); }
 
   /* Laptops: the title, the bar and all four phases fit on one screen */
@@ -360,6 +367,7 @@ const pct = (d: number) => `${(d / SCALE) * 100}%`;
      The phases become full-width bands that alternate in colour, like the projects on Our Work. */
   @media (max-width: 640px) {
     .phase-body { display: none; }
+    .phase-brief { display: block; margin-top: -0.15rem; color: var(--ink-2); font-size: 1rem; line-height: 1.45; }
     .phases { gap: 0; margin: var(--s-6) calc(var(--gutter) * -1) 0; }
     .phase,
     .phase.is-active {
