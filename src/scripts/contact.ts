@@ -31,7 +31,7 @@ export function initContactForm() {
 
   const fieldError = (el: HTMLInputElement | HTMLTextAreaElement): string => {
     const label = form.querySelector(`label[for="${el.id}"]`)?.childNodes[0]?.textContent?.trim() ?? 'This field';
-    if (!el.value.trim()) return `${label} is required.`;
+    if (!el.value.trim()) return label.endsWith('?') ? 'Add a sentence or two.' : `${label} is required.`;
     if (el.type === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(el.value.trim())) return 'Enter an email address like name@company.com.';
     return '';
   };

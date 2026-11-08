@@ -4,13 +4,13 @@ import CopyEmail from '../../components/CopyEmail.astro';
 import { site } from '../../config/site';
 ---
 
-<Base title="Contact" description="Start a conversation with Spockhart. Tell us what is slowing your team down and we will reply within one business day.">
+<Base title="Contact" description="Start a conversation with Spockhart. Tell us where you would like to see your team improve and we will reply within one business day.">
   <section class="contact">
     <div class="wrap contact-grid">
       <div class="contact-intro">
         <p class="eyebrow load-in" style="--i:0">Contact</p>
         <h1 class="load-in" style="--i:1">Start a conversation.</h1>
-        <p class="lead load-in" style="--i:2">Tell us what is slowing your team down. We reply within {site.offer.replyWithin}.</p>
+        <p class="lead load-in" style="--i:2">Tell us where you’d like to see your team improve. We reply within {site.offer.replyWithin}.</p>
 
         <div class="load-in contact-direct" style="--i:3">
           <p class="label">Prefer email?</p>
@@ -48,7 +48,7 @@ import { site } from '../../config/site';
             </div>
           </div>
           <div class="field">
-            <label for="cf-message">What is slowing your team down?</label>
+            <label for="cf-message">Where would you like to see your team improve?</label>
             <textarea
               class="textarea"
               id="cf-message"
