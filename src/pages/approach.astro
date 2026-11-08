@@ -16,21 +16,21 @@ import { site } from '../config/site';
     lead={`We work alongside your team to find ways to reduce costs, improve efficiency, and grow revenue across your operations. Then we engineer the solutions. Within ${site.offer.prototypeDays} days, you’ll see a working first version.`}
   />
 
-  <section class="section band-recessed engagement" aria-labelledby="engagement-title">
+  <section class="section band-recessed engagement engagement-fix" aria-labelledby="engagement-title">
     <div class="wrap">
       <div class="section-head" data-reveal>
-        <p class="eyebrow">Remove the waste</p>
-        <h2 id="engagement-title">Fix what’s broken.</h2>
+        <p class="eyebrow">Costs down</p>
+        <h2 id="engagement-title">Reduce operating costs.</h2>
       </div>
       <Timeline />
     </div>
   </section>
 
-  <section class="section engagement engagement-grow" aria-labelledby="growth-title">
+  <section class="section band-recessed engagement engagement-grow" aria-labelledby="growth-title">
     <div class="wrap">
       <div class="section-head" data-reveal>
-        <p class="eyebrow">Find new revenue</p>
-        <h2 id="growth-title">Build what’s missing.</h2>
+        <p class="eyebrow">Revenue up</p>
+        <h2 id="growth-title">Increase revenue opportunities.</h2>
       </div>
       <Timeline track="grow" />
     </div>
@@ -50,9 +50,13 @@ import { site } from '../config/site';
     .engagement .section-head { gap: var(--s-2); margin-bottom: var(--s-5); }
     .engagement .section-head h2 { font-size: var(--step-3); }
   }
+  /* The two tracks run on one band, one straight after the other */
+  .engagement-fix { padding-bottom: var(--s-8); }
+  .engagement-grow { padding-top: 0; }
   /* Phones: the bar sits right under the title; the phases run to the bottom of the section */
   @media (max-width: 640px) {
     .engagement { padding-bottom: 0; }
+    .engagement-grow { padding-top: var(--s-4); }
     .engagement .section-head { margin-bottom: 0.25rem; }
   }
 </style>
