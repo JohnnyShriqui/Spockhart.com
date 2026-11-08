@@ -255,8 +255,15 @@ function makeController(scene: HTMLElement): Controller {
 function initScene(scene: HTMLElement) {
   if (scene.dataset.sceneReady) return;
   scene.dataset.sceneReady = '1';
+  // [data-frozen]: a still picture (thumbnails). No clock; CSS rests it on --still.
+  if (scene.closest('[data-frozen]')) return;
   const ctrl = makeController(scene);
   controllers.set(scene, ctrl);
+  // [data-manual]: something else decides when it plays (sceneController below).
+  if (scene.closest('[data-manual]')) {
+    if (canAnimate()) ctrl.stop();
+    return;
+  }
   // Scenes inside a group are played one at a time by the group (below).
   if (!canAnimate() || scene.closest('[data-scene-group]')) {
     if (scene.closest('[data-scene-group]') && canAnimate()) ctrl.stop();
@@ -354,6 +361,12 @@ function initGroup(group: HTMLElement) {
   group.dataset.mode = sequenced() ? 'sequence' : 'free';
   mq?.addEventListener('change', setMode);
 }
+
+/** The controller for a scene, for scenes that are played by hand ([data-manual]). */
+export function sceneController(scene: HTMLElement): Controller | undefined {
+  return controllers.get(scene);
+}
+export const scenesCanAnimate = () => canAnimate();
 
 export function initScenes() {
   document.querySelectorAll<HTMLElement>('[data-scene]').forEach(initScene);

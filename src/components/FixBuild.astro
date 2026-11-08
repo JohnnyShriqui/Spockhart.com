@@ -1,0 +1,584 @@
+---
+/**
+ * Fix what's broken. Build what's missing.
+ *
+ * One chart, Before and After. After, revenue rises by three new slices (A to C) and costs fall
+ * by four slices (1 to 4). Each slice is a real result our team delivered, and each one is drawn
+ * out to its case study on the right. On laptops, pointing at a case study lights up its slice,
+ * enlarges it and plays its graphic. On phones and tablets the chart comes first and the case
+ * studies follow as two swipeable rows that play as they come into view.
+ *
+ * The chart is illustrative: the bars show direction, not client figures.
+ */
+import ResultVisual from './ResultVisual.astro';
+
+interface Item {
+  k: string;
+  id: string;
+  value: string;
+  label: string;
+}
+
+const build: Item[] = [
+  { k: 'A', id: 'sales-performance-system', value: '+$316K a month', label: 'In average sales, after a new sales analytics system' },
+  { k: 'B', id: 'digital-practice-growth', value: '$150K → $1M', label: 'New services grew a consulting firm’s practice in under a year' },
+  { k: 'C', id: 'project-feasibility-platform', value: 'A new market', label: 'A feasibility tool that became a North American lead-generation engine' },
+];
+const fix: Item[] = [
+  { k: '1', id: 'commission-automation', value: 'Excel → Automated', label: 'Commissions for a $1.2B manufacturer, going live January 2027' },
+  { k: '2', id: 'project-feasibility-platform', value: '12 months → Minutes', label: 'Feasibility assessments, from $100K+ each to $0' },
+  { k: '3', id: 'momentum-exchange-prototype', value: 'Up to 83% more cargo', label: 'Per trip on the same fuel, shown on a working prototype' },
+  { k: '4', id: 'subcontractor-financing-marketplace', value: '6+ months → Weeks', label: 'Financing approvals for subcontractors' },
+];
+
+/* Chart geometry (viewBox 0 0 560 400). Heights are illustrative. */
+const BASE = 350;
+const W = 54;
+const before = { rev: 96, cost: 158 };
+const after = { rev: 330, cost: 392 };
+const REV = 190; // revenue, before
+const COST = 178; // costs, before: barely under revenue
+const ADD = 40; // each new revenue slice
+const CUT = 22; // each cost slice removed
+const revTop = BASE - REV;
+const costTop = BASE - COST;
+const newTop = revTop - ADD * build.length;
+const costAfterTop = costTop + CUT * fix.length;
+const grid = [50, 110, 170, 230, 290];
+
+const sets = [
+  { key: 'build', title: 'Build what’s missing', note: 'Revenue up', items: build },
+  { key: 'fix', title: 'Fix what’s broken', note: 'Costs down', items: fix },
+];
+---
+
+<section class="fb" aria-labelledby="fb-title" data-fb>
+  <div class="wrap">
+    <div class="fb-head" data-reveal>
+      <h2 id="fb-title">Fix what’s broken. Build what’s missing.</h2>
+      <p>
+        Every slice of the After is a real result our team has delivered.{' '}
+        <span class="t-desk">Point at one to watch it play.</span>
+      </p>
+    </div>
+
+    <div class="fb-stage" data-fb-stage>
+      <svg class="fb-links" aria-hidden="true" data-fb-links></svg>
+
+      <!-- The chart, in the same window style as the case studies -->
+      <figure class="fb-chart" aria-label="Illustration: before, costs are just under revenue. After, revenue is up three slices and costs are down four.">
+        <div class="fb-win">
+          <div class="fb-win-bar"><span class="fb-dots"><i></i><i></i><i></i></span>Costs vs revenue</div>
+          <svg viewBox="0 0 560 400" class="fb-svg" data-fb-svg aria-hidden="true">
+            <defs>
+              <pattern id="fb-hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                <line x1="0" y1="0" x2="0" y2="6" class="fb-hatch-line" />
+              </pattern>
+            </defs>
+
+            {grid.map((y) => <line x1="24" x2="536" y1={y} y2={y} class="fb-grid" />)}
+            <line x1="24" x2="536" y1={BASE} y2={BASE} class="fb-axis" />
+            <line x1="280" x2="280" y1="30" y2={BASE + 40} class="fb-divider" />
+
+            <!-- Before: profitable, barely -->
+            <rect x={before.rev} y={revTop} width={W} height={REV} rx="2" class="fb-rev" />
+            <rect x={before.cost} y={costTop} width={W} height={COST} rx="2" class="fb-cost" />
+            <path d={`M${before.rev - 10} ${revTop} h-5 V${costTop} h5`} class="fb-bracket" />
+            <text x={before.rev - 20} y={revTop + 4} text-anchor="end" class="fb-ann">Thin</text>
+            <text x={before.rev - 20} y={revTop + 17} text-anchor="end" class="fb-ann">margin</text>
+            <text x={before.rev + W / 2} y={BASE + 18} text-anchor="middle" class="fb-axis-label">Revenue</text>
+            <text x={before.cost + W / 2} y={BASE + 18} text-anchor="middle" class="fb-axis-label">Costs</text>
+            <text x={(before.rev + before.cost + W) / 2} y={BASE + 42} text-anchor="middle" class="fb-group">Before</text>
+
+            <!-- After: revenue up by A to C, costs down by 1 to 4 -->
+            <rect x={after.rev} y={revTop} width={W} height={REV} rx="2" class="fb-rev" />
+            {
+              build.map((b, i) => {
+                const y = revTop - ADD * (build.length - i);
+                return (
+                  <g class="fb-slice fb-add" data-slice={b.k} style={`--i:${i}`}>
+                    <rect x={after.rev} y={y} width={W} height={ADD} class="fb-add-rect" data-slice-rect />
+                    <text x={after.rev + W / 2} y={y + ADD / 2 + 4} text-anchor="middle" class="fb-key-add">
+                      {b.k}
+                    </text>
+                  </g>
+                );
+              })
+            }
+            <rect x={after.cost} y={costTop} width={W} height={COST} rx="2" class="fb-cost fb-cost-after" style={`--cost-after:${((COST - CUT * fix.length) / COST).toFixed(4)}`} />
+            {
+              fix.map((f, i) => {
+                const y = costTop + CUT * i;
+                return (
+                  <g class="fb-slice fb-cut" data-slice={f.k} style={`--i:${i}`}>
+                    <rect x={after.cost + 0.75} y={y + 0.75} width={W - 1.5} height={CUT - 1.5} class="fb-cut-rect" data-slice-rect />
+                    <text x={after.cost + W / 2} y={y + CUT / 2 + 4} text-anchor="middle" class="fb-key-cut">
+                      {f.k}
+                    </text>
+                  </g>
+                );
+              })
+            }
+            <path d={`M${after.rev - 10} ${newTop} h-5 V${costAfterTop} h5`} class="fb-bracket fb-bracket-after" />
+            <text x={after.rev - 20} y={(newTop + costAfterTop) / 2 - 2} text-anchor="end" class="fb-ann fb-ann-hot">Wider</text>
+            <text x={after.rev - 20} y={(newTop + costAfterTop) / 2 + 11} text-anchor="end" class="fb-ann fb-ann-hot">margin</text>
+            <text x={after.rev + W / 2} y={BASE + 18} text-anchor="middle" class="fb-axis-label">Revenue</text>
+            <text x={after.cost + W / 2} y={BASE + 18} text-anchor="middle" class="fb-axis-label">Costs</text>
+            <text x={(after.rev + after.cost + W) / 2} y={BASE + 42} text-anchor="middle" class="fb-group">After</text>
+          </svg>
+        </div>
+        <div class="fb-split">
+          <div>
+            <span class="fb-k">Before</span>
+            <span class="fb-num">Barely profitable</span>
+          </div>
+          <div>
+            <span class="fb-k">After</span>
+            <span class="fb-num">Costs down. Revenue up.</span>
+          </div>
+        </div>
+        <figcaption class="fb-note">Illustrative. Each slice is one of the results <span class="t-desk">beside it</span><span class="t-mob">below</span>.</figcaption>
+      </figure>
+
+      <!-- The results, grouped the way they sit on the chart -->
+      <div class="fb-cards" data-fb-cards>
+        {
+          sets.map((set) => (
+            <div class:list={['fb-set', `fb-set-${set.key}`]}>
+              <p class="fb-set-head">
+                <span class="fb-set-title">{set.title}</span>
+                <span class="fb-set-note">{set.note}</span>
+              </p>
+              <div class="fb-row">
+                {set.items.map((it) => (
+                  <a class:list={['fb-card', `fb-card-${set.key}`]} href={`/work/#${it.id}`} data-card={it.k}>
+                    <span class="fb-key">{it.k}</span>
+                    <div class="fb-thumb" aria-hidden="true" data-frozen>
+                      <div class="fb-thumb-in">
+                        <ResultVisual id={it.id} />
+                      </div>
+                    </div>
+                    <span class="fb-text">
+                      <span class="fb-v">{it.value}</span>
+                      <span class="fb-l">{it.label}</span>
+                    </span>
+                    <div class="fb-pop" data-manual data-pop>
+                      <div class="fb-pop-head" aria-hidden="true">
+                        <span class="fb-key">{it.k}</span>
+                        <span class="fb-text">
+                          <span class="fb-v">{it.value}</span>
+                          <span class="fb-l">{it.label}</span>
+                        </span>
+                      </div>
+                      <ResultVisual id={it.id} />
+                      <span class="fb-pop-foot">Read the case study <span aria-hidden="true">→</span></span>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+
+    <a class="arrow-link fb-more" href="/work/"><span>See all our work</span><span class="arr" aria-hidden="true">→</span></a>
+  </div>
+</section>
+
+<script>
+  import { initScenes, sceneController, scenesCanAnimate } from '../scripts/scenes';
+
+  function initFixBuild() {
+    initScenes();
+    document.querySelectorAll<HTMLElement>('[data-fb]').forEach((root) => {
+      if (root.dataset.ready) return;
+      root.dataset.ready = '1';
+      const stage = root.querySelector<HTMLElement>('[data-fb-stage]')!;
+      const chart = root.querySelector<SVGSVGElement>('[data-fb-svg]')!;
+      const links = root.querySelector<SVGSVGElement>('[data-fb-links]')!;
+      const cardsBox = root.querySelector<HTMLElement>('[data-fb-cards]')!;
+      const cards = Array.from(root.querySelectorAll<HTMLAnchorElement>('[data-card]'));
+      const wide = window.matchMedia('(min-width: 1100px)');
+      const pointer = window.matchMedia('(hover: hover) and (pointer: fine)');
+      const ns = 'http://www.w3.org/2000/svg';
+
+      const slice = (k: string) => chart.querySelector<SVGGElement>(`[data-slice="${k}"]`);
+      const sceneOf = (card: Element) => card.querySelector<HTMLElement>('[data-pop] [data-scene]');
+
+      /* Lines from each slice out to its card (laptops only) */
+      const paths = new Map<string, SVGPathElement>();
+      const draw = () => {
+        links.replaceChildren();
+        paths.clear();
+        if (!wide.matches) return;
+        const box = stage.getBoundingClientRect();
+        links.setAttribute('viewBox', `0 0 ${box.width} ${box.height}`);
+        const m = chart.getScreenCTM();
+        if (!m) return;
+        for (const card of cards) {
+          const k = card.dataset.card!;
+          const rect = slice(k)?.querySelector<SVGRectElement>('[data-slice-rect]');
+          if (!rect) continue;
+          const b = rect.getBBox();
+          const sx = m.a * (b.x + b.width) + m.e - box.left + 4;
+          const sy = m.d * (b.y + b.height / 2) + m.f - box.top;
+          const c = card.getBoundingClientRect();
+          const ex = c.left - box.left - 10;
+          const ey = c.top + c.height / 2 - box.top;
+          const dx = Math.max(40, (ex - sx) * 0.55);
+          const path = document.createElementNS(ns, 'path');
+          path.setAttribute('d', `M${sx.toFixed(1)} ${sy.toFixed(1)} C${(sx + dx).toFixed(1)} ${sy.toFixed(1)} ${(ex - dx).toFixed(1)} ${ey.toFixed(1)} ${ex.toFixed(1)} ${ey.toFixed(1)}`);
+          path.setAttribute('pathLength', '1');
+          path.setAttribute('class', `fb-link fb-link-${/\d/.test(k) ? 'fix' : 'build'}`);
+          const dotA = document.createElementNS(ns, 'circle');
+          dotA.setAttribute('cx', sx.toFixed(1));
+          dotA.setAttribute('cy', sy.toFixed(1));
+          dotA.setAttribute('r', '2.5');
+          dotA.setAttribute('class', 'fb-link-dot');
+          const dotB = document.createElementNS(ns, 'circle');
+          dotB.setAttribute('cx', ex.toFixed(1));
+          dotB.setAttribute('cy', ey.toFixed(1));
+          dotB.setAttribute('r', '2.5');
+          dotB.setAttribute('class', 'fb-link-dot');
+          const g = document.createElementNS(ns, 'g');
+          g.setAttribute('class', `fb-link-g fb-link-g-${/\d/.test(k) ? 'fix' : 'build'}`);
+          g.dataset.link = k;
+          g.append(path, dotA, dotB);
+          links.append(g);
+          paths.set(k, path);
+        }
+      };
+
+      /* Point at a result: its slice and line light up, and it opens and plays */
+      let active: HTMLAnchorElement | null = null;
+      const show = (card: HTMLAnchorElement | null) => {
+        if (active === card) return;
+        if (active) {
+          active.classList.remove('is-on');
+          const sc = sceneOf(active);
+          if (sc) sceneController(sc)?.stop();
+        }
+        active = card;
+        root.classList.toggle('has-active', Boolean(card));
+        const k = card?.dataset.card ?? '';
+        chart.querySelectorAll<SVGGElement>('[data-slice]').forEach((s) => s.classList.toggle('is-on', s.dataset.slice === k));
+        links.querySelectorAll<SVGGElement>('[data-link]').forEach((l) => l.classList.toggle('is-on', l.dataset.link === k));
+        if (!card) return;
+        const pop = card.querySelector<HTMLElement>('[data-pop]')!;
+        // Centre the enlarged card on the one pointed at, kept within the list
+        const box = cardsBox.getBoundingClientRect();
+        const c = card.getBoundingClientRect();
+        const h = pop.offsetHeight;
+        const centre = c.top - box.top + c.height / 2;
+        const top = Math.min(Math.max(centre - h / 2, -24), box.height - h + 24);
+        pop.style.setProperty('--pop-top', `${top}px`);
+        card.classList.add('is-on');
+        const sc = sceneOf(card);
+        if (sc && scenesCanAnimate()) sceneController(sc)?.play();
+      };
+
+      cards.forEach((card) => {
+        card.addEventListener('pointerenter', () => {
+          if (wide.matches && pointer.matches) show(card);
+        });
+        card.addEventListener('focus', () => {
+          if (wide.matches) show(card);
+        });
+        card.addEventListener('blur', () => {
+          if (active === card) show(null);
+        });
+      });
+      cardsBox.addEventListener('pointerleave', () => show(null));
+
+      /* Phones and tablets: each result plays while it is on screen */
+      const each = new IntersectionObserver(
+        (entries) => {
+          if (wide.matches || !scenesCanAnimate()) return;
+          for (const e of entries) {
+            const sc = sceneOf(e.target);
+            if (!sc) continue;
+            if (e.isIntersecting) sceneController(sc)?.loop();
+            else sceneController(sc)?.pause();
+          }
+        },
+        { threshold: 0.4 },
+      );
+      cards.forEach((card) => each.observe(card));
+
+      /* The After builds itself the first time the chart comes into view */
+      if (scenesCanAnimate() && 'IntersectionObserver' in window) {
+        root.classList.add('fb-pre');
+        new IntersectionObserver(
+          (entries, obs) => {
+            if (!entries.some((e) => e.isIntersecting)) return;
+            obs.disconnect();
+            requestAnimationFrame(() => root.classList.remove('fb-pre'));
+          },
+          { threshold: 0.3 },
+        ).observe(chart);
+      }
+
+      const redraw = () => requestAnimationFrame(draw);
+      redraw();
+      window.addEventListener('resize', redraw);
+      document.fonts?.ready.then(redraw);
+      wide.addEventListener('change', () => {
+        show(null);
+        cards.forEach((card) => {
+          const sc = sceneOf(card);
+          if (sc) sceneController(sc)?.stop();
+        });
+        redraw();
+      });
+    });
+  }
+  initFixBuild();
+  document.addEventListener('spockhart:view', initFixBuild);
+</script>
+
+<style>
+  .fb { padding-block: clamp(3.5rem, 2.5rem + 3vw, 6rem); background: var(--paper-2); overflow-x: clip; }
+  .fb-head { display: grid; gap: var(--s-3); margin-bottom: var(--s-7); max-width: 760px; }
+  .fb-head h2 { font-size: var(--step-4); max-width: 22ch; }
+  .fb-head p { color: var(--ink-2); font-size: var(--step-1); max-width: 56ch; }
+
+  .fb-stage {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1.12fr) minmax(0, 1fr);
+    column-gap: clamp(4.5rem, 2rem + 5vw, 7.5rem);
+    align-items: center;
+  }
+  .fb-links { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; z-index: 1; }
+
+  /* ---------- The chart window ---------- */
+  .fb-chart {
+    position: relative;
+    z-index: 0;
+    display: grid;
+    gap: var(--s-4);
+    margin: 0;
+    padding: clamp(1rem, 0.6rem + 1.4vw, 1.75rem);
+    border-radius: var(--radius-lg);
+    background: var(--brand);
+    color: #fff;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .fb-chart::before {
+    content: '';
+    position: absolute;
+    width: 460px;
+    height: 460px;
+    right: -200px;
+    top: -220px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgb(184 204 224 / 0.2), transparent 70%);
+    z-index: -1;
+  }
+  .fb-win { border-radius: 10px; background: #173f5c; border: 1px solid rgb(255 255 255 / 0.12); box-shadow: 0 24px 48px -28px rgb(4 18 30 / 0.7); overflow: hidden; }
+  .fb-win-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.55rem 0.9rem;
+    background: #133650;
+    border-bottom: 1px solid rgb(255 255 255 / 0.08);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: #9fb6cb;
+  }
+  .fb-dots { display: flex; gap: 5px; }
+  .fb-dots i { width: 8px; height: 8px; border-radius: 50%; background: rgb(255 255 255 / 0.18); }
+  .fb-svg { display: block; width: 100%; height: auto; padding: 0.5rem 0.25rem 0.25rem; box-sizing: border-box; overflow: visible; }
+
+  .fb-grid { stroke: rgb(255 255 255 / 0.06); stroke-width: 1; }
+  .fb-axis { stroke: rgb(255 255 255 / 0.28); stroke-width: 1; }
+  .fb-divider { stroke: rgb(255 255 255 / 0.08); stroke-width: 1; stroke-dasharray: 2 4; }
+  .fb-axis-label { font-family: var(--font-body); font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; fill: #9fb6cb; }
+  .fb-group { font-family: var(--font-display); font-size: 17px; fill: #fff; }
+  .fb-ann { font-family: var(--font-body); font-size: 11px; fill: #9fb6cb; }
+  .fb-ann-hot { fill: #d9e6f2; font-weight: 600; }
+  .fb-bracket { fill: none; stroke: rgb(255 255 255 / 0.35); stroke-width: 1; }
+  .fb-bracket-after { stroke: rgb(255 255 255 / 0.6); }
+
+  .fb-rev { fill: #6f9fc6; }
+  .fb-cost { fill: #b0605a; }
+  .fb-cost-after { transform-box: fill-box; transform-origin: bottom; transform: scaleY(var(--cost-after, 0.5056)); }
+  .fb-add-rect { fill: #a9d1ee; stroke: #173f5c; stroke-width: 2; }
+  .fb-key-add { font-family: var(--font-body); font-size: 12px; font-weight: 700; fill: #133650; }
+  .fb-cut-rect { fill: url(#fb-hatch); stroke: #d98a82; stroke-width: 1; stroke-dasharray: 3 2.5; }
+  .fb-hatch-line { stroke: rgb(217 138 130 / 0.28); stroke-width: 2; }
+  .fb-key-cut { font-family: var(--font-body); font-size: 11px; font-weight: 700; fill: #e7a59e; }
+  .fb-slice { transition: opacity 250ms var(--ease); }
+  .fb-slice text { transition: fill 250ms var(--ease); }
+  .fb-slice rect { transition: fill 250ms var(--ease), stroke 250ms var(--ease); }
+
+  /* One result pointed at: everything else steps back */
+  .has-active .fb-slice:not(.is-on) { opacity: 0.35; }
+  .fb-add.is-on .fb-add-rect { fill: #fff; }
+  .fb-cut.is-on .fb-cut-rect { fill: rgb(217 138 130 / 0.35); stroke: #f1b8b2; stroke-dasharray: none; stroke-width: 1.5; }
+  .fb-cut.is-on .fb-key-cut { fill: #fff; }
+
+  .fb-split { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-4); }
+  .fb-split > div { display: grid; gap: 0.2rem; }
+  .fb-k { font-size: 0.8125rem; color: #d9e6f2; }
+  .fb-num { font-family: var(--font-display); font-size: clamp(1.125rem, 0.95rem + 0.6vw, 1.375rem); line-height: 1.15; letter-spacing: -0.01em; }
+  .fb-note { font-size: 0.75rem; color: #bcd6ec; margin-top: calc(var(--s-2) * -1); }
+
+  /* ---------- Lines from slices to results ---------- */
+  :global(.fb-link) { fill: none; stroke-width: 1.25; stroke-linecap: round; opacity: 0.55; transition: opacity 250ms var(--ease), stroke-width 250ms var(--ease); }
+  :global(.fb-link-build) { stroke: #4a8aba; }
+  :global(.fb-link-fix) { stroke: #c0726b; }
+  :global(.fb-link-dot) { stroke: none; }
+  :global(.fb-link-g-build .fb-link-dot) { fill: #4a8aba; }
+  :global(.fb-link-g-fix .fb-link-dot) { fill: #c0726b; }
+  :global(.fb-link-g) { transition: opacity 250ms var(--ease); }
+  .has-active :global(.fb-link-g:not(.is-on)) { opacity: 0.25; }
+  :global(.fb-link-g.is-on .fb-link) { opacity: 1; stroke-width: 2; }
+
+  /* ---------- The results ---------- */
+  .fb-cards { position: relative; z-index: 2; display: grid; gap: var(--s-5); }
+  .fb-set { display: grid; gap: var(--s-2); }
+  .fb-set-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s-3); padding-bottom: 0.4rem; border-bottom: 1px solid var(--rule-2); }
+  .fb-set-title { font-family: var(--font-display); font-size: 1.125rem; color: var(--ink); }
+  .fb-set-note { font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; }
+  .fb-set-build .fb-set-note { color: var(--accent); }
+  .fb-set-fix .fb-set-note { color: #a04f48; }
+  .fb-row { display: grid; gap: var(--s-2); }
+
+  .fb-card {
+    display: grid;
+    grid-template-columns: auto auto minmax(0, 1fr);
+    gap: 0.9rem;
+    align-items: center;
+    padding: 0.55rem 0.9rem 0.55rem 0.6rem;
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    background: var(--surface);
+    color: inherit;
+    text-decoration: none;
+    transition: border-color 250ms var(--ease), box-shadow 250ms var(--ease);
+  }
+  .fb-card:focus-visible { outline: 2px solid var(--accent-soft); outline-offset: 2px; }
+  .fb-key {
+    display: grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    font-variant-numeric: lining-nums;
+    color: #fff;
+  }
+  .fb-card-build .fb-key { background: var(--accent); }
+  .fb-card-fix .fb-key { background: #a04f48; }
+  .fb-text { display: grid; gap: 0.1rem; min-width: 0; }
+  .fb-v { font-family: var(--font-display); font-size: 1.125rem; line-height: 1.15; color: var(--ink); font-variant-numeric: lining-nums; }
+  .fb-l { font-size: 0.8125rem; line-height: 1.35; color: var(--ink-2); }
+
+  /* A still frame of the real graphic */
+  .fb-thumb { position: relative; display: block; width: 92px; height: 58px; border-radius: 6px; overflow: hidden; background: var(--brand); }
+  .fb-thumb-in { position: absolute; left: 0; top: 0; width: 520px; transform: scale(0.177); transform-origin: 0 0; pointer-events: none; }
+
+  /* Laptops: the enlarged result that plays, laid over the list */
+  .fb-pop {
+    position: absolute;
+    left: -72px;
+    right: -16px;
+    top: var(--pop-top, 0);
+    z-index: 3;
+    display: grid;
+    gap: 0.75rem;
+    padding: 0.85rem;
+    border: 1px solid var(--rule-2);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    box-shadow: 0 40px 80px -36px rgb(27 42 61 / 0.55), 0 12px 24px -16px rgb(27 42 61 / 0.3);
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(0.97);
+    transform-origin: left center;
+    pointer-events: none;
+    transition: opacity 220ms var(--ease), transform 300ms var(--ease-out), visibility 0s 220ms;
+  }
+  .fb-card.is-on .fb-pop { opacity: 1; visibility: visible; transform: none; transition: opacity 220ms var(--ease), transform 300ms var(--ease-out), visibility 0s; }
+  .fb-pop-head { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.9rem; align-items: center; padding: 0.15rem 0.2rem 0; }
+  .fb-pop-head .fb-v { font-size: 1.375rem; }
+  .fb-pop-foot { justify-self: end; font-size: 0.8125rem; font-weight: 600; color: var(--accent); padding: 0 0.2rem 0.1rem; }
+
+  .fb-more { display: inline-flex; margin-top: var(--s-6); }
+
+  /* The After builds itself: costs drop, the cut slices appear, new revenue stacks up */
+  @media (prefers-reduced-motion: no-preference) {
+    .fb-cost-after { transition: transform 900ms var(--ease-out) 150ms; }
+    .fb-cut { transition: opacity 400ms var(--ease) calc(500ms + var(--i) * 120ms); }
+    .fb-add { transition: opacity 400ms var(--ease) calc(900ms + (2 - var(--i)) * 160ms), transform 600ms var(--ease-out) calc(900ms + (2 - var(--i)) * 160ms); transform-box: fill-box; transform-origin: bottom; }
+    .fb-bracket-after, .fb-ann-hot { transition: opacity 500ms var(--ease) 1500ms; }
+    .fb-pre .fb-cost-after { transform: scaleY(1); transition: none; }
+    .fb-pre .fb-cut { opacity: 0; transition: none; }
+    .fb-pre .fb-add { opacity: 0; transform: translateY(14px); transition: none; }
+    .fb-pre .fb-bracket-after, .fb-pre .fb-ann-hot { opacity: 0; transition: none; }
+    .fb-pre :global(.fb-link) { stroke-dasharray: 1; stroke-dashoffset: 1; }
+    :global(.fb-link) { stroke-dasharray: 1; stroke-dashoffset: 0; transition: stroke-dashoffset 900ms var(--ease-out) 1700ms, opacity 250ms var(--ease), stroke-width 250ms var(--ease); }
+  }
+
+  /* ---------- Tablets and phones: chart first, then two rows to swipe ---------- */
+  @media (max-width: 1099px) {
+    .fb-stage { grid-template-columns: minmax(0, 1fr); row-gap: var(--s-6); }
+    .fb-links { display: none; }
+    .fb-cards { gap: var(--s-6); }
+    .fb-set-fix { order: -1; }
+    .fb-row {
+      grid-auto-flow: column;
+      grid-auto-columns: min(86%, 440px);
+      gap: var(--s-3);
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      margin-inline: calc(var(--gutter) * -1);
+      padding: 0.25rem var(--gutter) 0.5rem;
+      scroll-padding-inline: var(--gutter);
+      scrollbar-width: none;
+    }
+    .fb-row::-webkit-scrollbar { display: none; }
+    .fb-card {
+      scroll-snap-align: start;
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: start;
+      align-content: start;
+      gap: 0.75rem;
+      padding: 0.85rem;
+    }
+    .fb-thumb { display: none; }
+    .fb-pop {
+      position: static;
+      grid-column: 1 / -1;
+      opacity: 1;
+      visibility: visible;
+      transform: none;
+      padding: 0;
+      border: 0;
+      box-shadow: none;
+      background: none;
+      transition: none;
+    }
+    .fb-pop-head { display: none; }
+    .fb-pop-foot { justify-self: start; }
+  }
+  @media (max-width: 640px) {
+    /* The chart's labels, sized for a phone screen */
+    .fb-axis-label { font-size: 12.5px; letter-spacing: 0; }
+    .fb-ann { font-size: 16px; }
+    .fb-group { font-size: 26px; }
+    .fb-key-add, .fb-key-cut { font-size: 16px; }
+    .fb-row { grid-auto-columns: 88%; }
+    .fb-card { padding: 0.75rem 0.65rem; }
+    .fb-head { margin-bottom: var(--s-5); }
+    .fb-head h2 { font-size: clamp(2rem, 1.55rem + 1.5vw, 3rem); }
+    .fb-head p { font-size: 1rem; }
+    .fb-num { font-size: 1.125rem; }
+  }
+</style>
