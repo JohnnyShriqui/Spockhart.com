@@ -56,14 +56,14 @@ const costAfterTop = costTop + CUT * fix.length;
 const grid = [50, 122, 194, 266, 338];
 
 const sets = [
-  { key: 'build', title: 'Build what’s missing', note: 'Revenue up', items: build },
-  { key: 'fix', title: 'Remove the waste', note: 'Costs down', items: fix },
+  { key: 'build', title: 'Increase revenue opportunities', note: 'Revenue up', items: build },
+  { key: 'fix', title: 'Reduce operating costs', note: 'Costs down', items: fix },
 ];
 ---
 
 <section class="fb" aria-labelledby="fb-title" data-fb>
   <div class="wrap">
-    <h2 id="fb-title" class="fb-title" data-reveal>Reduce operating costs. Uncover revenue opportunities.</h2>
+    <h2 id="fb-title" class="fb-title" data-reveal>Reduce costs. Increase revenue.</h2>
 
     <div class="fb-stage" data-fb-stage>
       <svg class="fb-links" aria-hidden="true" data-fb-links></svg>
@@ -427,7 +427,7 @@ const sets = [
 
 <style>
   .fb { padding-block: clamp(3rem, 2rem + 2.5vw, 4.5rem); background: var(--paper-2); overflow-x: clip; }
-  .fb-title { font-size: clamp(2rem, 1.5rem + 1.3vw, 2.75rem); text-align: center; text-wrap: balance; margin: 0 auto var(--s-6); }
+  .fb-title { font-size: clamp(2.25rem, 1.6rem + 1.6vw, 3.25rem); text-align: center; text-wrap: balance; margin: 0 auto var(--s-6); }
 
   .fb-stage {
     position: relative;
@@ -688,6 +688,8 @@ const sets = [
     .fb-group { font-size: 28px; }
     .fb-key-add, .fb-key-cut { font-size: 18px; }
     .fb-row { grid-auto-columns: 88%; }
+    .fb-set-title { font-size: 1.0625rem; }
+    .fb-set-note { font-size: 0.625rem; letter-spacing: 0.1em; white-space: nowrap; }
     .fb-card { padding: 0.75rem 0.65rem; }
   }
 </style>
