@@ -198,6 +198,7 @@ const sets = [
 
 <script>
   import { initScenes, sceneController, scenesCanAnimate } from '../scripts/scenes';
+  import { focusOn } from '../scripts/focus';
 
   const LIVE_W = 640; // the width each case study graphic is laid out at before scaling
 
@@ -325,6 +326,7 @@ const sets = [
         control(active, 'stop');
         active = null;
         root.classList.remove('has-active');
+        focusOn(null);
         chart.querySelectorAll('[data-slice]').forEach((s) => s.classList.remove('is-on'));
         track();
         loop(3500);
@@ -349,6 +351,8 @@ const sets = [
         card.classList.add('is-on');
         active = card;
         root.classList.add('has-active');
+        // Everything else on the page steps back
+        focusOn(stage);
         // Hold the chart on the After while a case study is open
         clearTimeout(timer);
         root.classList.remove('fb-pre');
@@ -518,6 +522,11 @@ const sets = [
   /* ---------- The case studies ---------- */
   .fb-cards { position: relative; z-index: 2; display: grid; gap: 0.7rem; }
   .fb-eyebrow { margin-bottom: calc(var(--s-2) * -1); }
+  .fb-eyebrow, .fb-set-head { transition: opacity 300ms var(--ease), filter 300ms var(--ease); }
+  /* One case study open: the other case studies step back with the rest of the page */
+  .has-active .fb-card:not(.is-on),
+  .has-active .fb-set-head,
+  .has-active .fb-eyebrow { opacity: 0.35; filter: blur(1.5px) grayscale(0.6); }
   .fb-set { display: grid; gap: 0.45rem; }
   .fb-set + .fb-set { margin-top: 0.35rem; }
   .fb-set-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s-3); padding-bottom: 0.3rem; border-bottom: 1px solid var(--rule-2); }
@@ -541,7 +550,7 @@ const sets = [
     background: var(--surface);
     color: inherit;
     text-decoration: none;
-    transition: margin-left var(--ms) var(--ease-out), padding var(--ms) var(--ease-out), border-color 250ms var(--ease), box-shadow 300ms var(--ease);
+    transition: margin-left var(--ms) var(--ease-out), padding var(--ms) var(--ease-out), border-color 250ms var(--ease), box-shadow 300ms var(--ease), opacity 300ms var(--ease), filter 300ms var(--ease);
   }
   .fb-card:focus-visible { outline: 2px solid var(--accent-soft); outline-offset: 2px; }
 

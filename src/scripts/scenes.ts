@@ -293,7 +293,10 @@ function initGroup(group: HTMLElement) {
   const ctrls = scenes.map((s) => controllers.get(s)!);
   const gap = Number(group.dataset.gap ?? 700);
   const mq = group.dataset.sceneGroup ? window.matchMedia(group.dataset.sceneGroup) : null;
-  const sequenced = () => !mq || mq.matches;
+  // data-hover="(query)": where it matches, nothing moves until a scene is pointed at
+  const hoverMq = group.dataset.hover ? window.matchMedia(group.dataset.hover) : null;
+  const hovering = () => Boolean(hoverMq?.matches);
+  const sequenced = () => (!mq || mq.matches) && !hovering();
   let index = 0;
   let visible = false;
   let timer = 0;
@@ -322,9 +325,11 @@ function initGroup(group: HTMLElement) {
     running = false;
     mark(-1);
   };
+  const modeName = () => (hovering() ? 'hover' : sequenced() ? 'sequence' : 'free');
   const setMode = () => {
     halt();
-    group.dataset.mode = sequenced() ? 'sequence' : 'free';
+    group.dataset.mode = modeName();
+    if (hovering()) return;
     if (sequenced()) {
       index = 0;
       next();
@@ -349,7 +354,7 @@ function initGroup(group: HTMLElement) {
         const k = scenes.indexOf(e.target as HTMLElement);
         if (e.isIntersecting) onScreen.add(k);
         else onScreen.delete(k);
-        if (sequenced()) continue;
+        if (sequenced() || hovering()) continue;
         if (e.isIntersecting) ctrls[k].loop();
         else ctrls[k].pause();
       }
@@ -358,8 +363,23 @@ function initGroup(group: HTMLElement) {
   );
   scenes.forEach((s) => each.observe(s));
 
-  group.dataset.mode = sequenced() ? 'sequence' : 'free';
+  // Hover mode: the scene pointed at plays from the start and keeps looping; leaving stops it
+  scenes.forEach((scene, k) => {
+    scene.addEventListener('pointerenter', () => {
+      if (!hovering()) return;
+      mark(k);
+      ctrls[k].play();
+    });
+    scene.addEventListener('pointerleave', () => {
+      if (!hovering()) return;
+      ctrls[k].stop();
+      mark(-1);
+    });
+  });
+
+  group.dataset.mode = modeName();
   mq?.addEventListener('change', setMode);
+  hoverMq?.addEventListener('change', setMode);
 }
 
 /** The controller for a scene, for scenes that are played by hand ([data-manual]). */
