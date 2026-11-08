@@ -1,6 +1,7 @@
 ---
 /**
- * The engagement on a day scale. Phases and their spans live here.
+ * An engagement on a day scale. Phases and their spans live here.
+ * track 'fix' removes waste; track 'grow' finds and launches new revenue. Same scale, same rhythm.
  */
 import { site } from '../config/site';
 import PhaseGraphic from './PhaseGraphic.astro';
@@ -8,11 +9,12 @@ import PhaseGraphic from './PhaseGraphic.astro';
 interface Props {
   /** Scale and phase names only, for the home page. */
   compact?: boolean;
+  track?: 'fix' | 'grow';
 }
-const { compact = false } = Astro.props;
+const { compact = false, track = 'fix' } = Astro.props;
 
 const SCALE = 120; // days covered by the scale (the four-month minimum)
-const phases = [
+const fixPhases = [
   {
     n: '01',
     name: 'Diagnose',
@@ -50,6 +52,49 @@ const phases = [
     body: 'Everything we built is yours: documented, running and owned by your team.',
   },
 ];
+
+/* The engineering method, for revenue: define the real problem, invent, prove it with real
+   customers, then launch it */
+const growPhases = [
+  {
+    n: '01',
+    name: 'Discover',
+    brief: 'Find the real job to be done.',
+    when: 'Weeks 1 to 2',
+    start: 0,
+    end: 14,
+    body: 'We dig past the symptoms with your customers, your team and your numbers until we find the job customers really hire you for, and what solving it is worth.',
+  },
+  {
+    n: '02',
+    name: 'Invent',
+    brief: 'Many ideas, one working prototype.',
+    when: `By day ${site.offer.prototypeDays}`,
+    start: 14,
+    end: site.offer.prototypeDays,
+    body: 'We generate options, size each one by value and effort, and turn the strongest into a working prototype.',
+  },
+  {
+    n: '03',
+    name: 'Prove and build',
+    brief: 'Test with real customers, build what works.',
+    when: `Months 2 to ${site.offer.minimumMonths}`,
+    start: site.offer.prototypeDays,
+    end: SCALE,
+    body: 'Real customers use it. We measure what they do, not what they say, improve it and build out what earns.',
+  },
+  {
+    n: '04',
+    name: 'Launch',
+    brief: 'Take it to market, make it yours.',
+    when: `Month ${site.offer.minimumMonths}`,
+    start: SCALE,
+    end: null,
+    body: 'We price it, launch it with your team and hand over a revenue engine you own and run.',
+  },
+];
+const phases = track === 'grow' ? growPhases : fixPhases;
+const tail = track === 'grow' ? 'Yours to grow' : 'Yours to run';
 const ticks = [0, 14, 30, 60, 90, 120];
 /* Where each phase sits on the scale, in days (the hand-over runs into the tail) */
 const spans = [
@@ -88,7 +133,7 @@ const pct = (d: number) => `${(d / SCALE) * 100}%`;
       }
     </div>
     <div class="scale-tail">
-      <span class="seg-label">Yours to run</span>
+      <span class="seg-label">{tail}</span>
       <span class="seg-n">4</span>
     </div>
     <div class="scale-cover"></div>
@@ -127,7 +172,7 @@ const pct = (d: number) => `${(d / SCALE) * 100}%`;
           <h3>{p.name}</h3>
           {!compact && <p class="phase-body">{p.body}</p>}
           {!compact && <p class="phase-brief">{p.brief}</p>}
-          {!compact && <PhaseGraphic phase={i as 0 | 1 | 2 | 3} />}
+          {!compact && <PhaseGraphic phase={i as 0 | 1 | 2 | 3} track={track} />}
         </li>
       ))
     }

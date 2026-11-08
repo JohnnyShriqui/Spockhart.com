@@ -13,16 +13,26 @@ import { site } from '../config/site';
   <PageHero
     eyebrow="Approach"
     title="Embedded from day one."
-    lead={`We work alongside your team to save time and money, then build the systems to make it happen. Within ${site.offer.prototypeDays} days, you’ll have a working first version.`}
+    lead={`We work alongside your team to cut waste and uncover new revenue, then build the systems to make it happen. Within ${site.offer.prototypeDays} days, you’ll have a working first version.`}
   />
 
   <section class="section band-recessed engagement" aria-labelledby="engagement-title">
     <div class="wrap">
       <div class="section-head" data-reveal>
-        <p class="eyebrow">The engagement</p>
-        <h2 id="engagement-title">Four phases.</h2>
+        <p class="eyebrow">Remove the waste</p>
+        <h2 id="engagement-title">Fix what’s broken.</h2>
       </div>
       <Timeline />
+    </div>
+  </section>
+
+  <section class="section engagement engagement-grow" aria-labelledby="growth-title">
+    <div class="wrap">
+      <div class="section-head" data-reveal>
+        <p class="eyebrow">Find new revenue</p>
+        <h2 id="growth-title">Build what’s missing.</h2>
+      </div>
+      <Timeline track="grow" />
     </div>
   </section>
 

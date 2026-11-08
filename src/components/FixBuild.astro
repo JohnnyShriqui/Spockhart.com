@@ -268,19 +268,35 @@ const sets = [
 
       /* ---------- Thumbnails: each graphic, scaled down to a still frame ---------- */
       const chartFig = root.querySelector<HTMLElement>('.fb-chart')!;
+      // Laptops lay each graphic out at 640px wide and scale it down; phones at 400px, scaled
+      // to fit a box of the same height on every card, so every card is the same size.
+      const PHONE_W = 400;
       const size = () => {
-        // The chart is exactly as tall as the list of case studies, measured with all closed
-        if (wide.matches && !active) chartFig.style.height = `${cardsBox.offsetHeight}px`;
-        else if (!wide.matches) chartFig.style.removeProperty('height');
+        // Phones: every card as tall as the tallest; the graphic takes whatever space the
+        // words leave, so nothing is left blank
+        cards.forEach((c) => c.style.removeProperty('min-height'));
+        if (!wide.matches) {
+          const tallest = Math.max(...cards.map((c) => c.offsetHeight));
+          cards.forEach((c) => (c.style.minHeight = `${tallest}px`));
+        }
         for (const card of cards) {
           const media = card.querySelector<HTMLElement>('.fb-media')!;
           const live = card.querySelector<HTMLElement>('[data-live]')!;
-          if (!wide.matches) {
-            card.style.removeProperty('--s');
-            continue;
-          }
-          card.style.setProperty('--s', (media.clientWidth / LIVE_W).toFixed(4));
-          card.dataset.h = String(live.offsetHeight);
+          const natW = wide.matches ? LIVE_W : PHONE_W;
+          const natH = live.offsetHeight;
+          card.dataset.h = String(natH);
+          const bw = media.clientWidth;
+          const bh = media.clientHeight;
+          const sc = wide.matches ? bw / natW : Math.min(bw / natW, bh / natH);
+          card.style.setProperty('--s', sc.toFixed(4));
+          card.style.setProperty('--ox', wide.matches ? '0px' : `${((bw - natW * sc) / 2).toFixed(1)}px`);
+          card.style.setProperty('--oy', wide.matches ? '0px' : `${((bh - natH * sc) / 2).toFixed(1)}px`);
+        }
+        if (wide.matches) {
+          // The chart is exactly as tall as the list of case studies, measured with all closed
+          if (!active) chartFig.style.height = `${cardsBox.offsetHeight}px`;
+        } else {
+          chartFig.style.removeProperty('height');
         }
       };
 
@@ -319,13 +335,17 @@ const sets = [
         // Reach toward the chart, overlapping its empty right edge a little
         const reach = Math.max(0, card.getBoundingClientRect().left - chartFig.getBoundingClientRect().right + 80);
         const width = card.offsetWidth + reach;
+        // Every opened case study is the same size: the graphic is fitted into one box
+        const OPEN_H = 280;
         const natural = Number(card.dataset.h || 480);
-        const s = Math.min((width * 0.52) / LIVE_W, 300 / natural);
-        const mw = Math.round(LIVE_W * s);
+        const mw = Math.round(width * 0.5);
+        const s = Math.min(mw / LIVE_W, OPEN_H / natural);
         card.style.setProperty('--reach', `${reach}px`);
         card.style.setProperty('--mw', `${mw}px`);
-        card.style.setProperty('--mh', `${Math.round(natural * s)}px`);
+        card.style.setProperty('--mh', `${OPEN_H}px`);
         card.style.setProperty('--s-on', s.toFixed(4));
+        card.style.setProperty('--ox-on', `${((mw - LIVE_W * s) / 2).toFixed(1)}px`);
+        card.style.setProperty('--oy-on', `${((OPEN_H - natural * s) / 2).toFixed(1)}px`);
         card.classList.add('is-on');
         active = card;
         root.classList.add('has-active');
@@ -540,7 +560,7 @@ const sets = [
     left: 0;
     top: 0;
     width: 640px;
-    transform: scale(var(--s, 0.125));
+    transform: translate(var(--ox, 0px), var(--oy, 0px)) scale(var(--s, 0.125));
     transform-origin: 0 0;
     pointer-events: none;
     transition: transform var(--ms) var(--ease-out);
@@ -572,11 +592,11 @@ const sets = [
 
   /* Opened: the same client line and headline as on Our Work */
   .fb-cs { display: none; gap: 0.5rem; }
-  .fb-client { display: flex; align-items: center; gap: 0.6rem; font-family: var(--font-display); font-size: 1.0625rem; line-height: 1.2; color: var(--ink); }
+  .fb-client { display: flex; align-items: center; gap: 0.6rem; font-family: var(--font-display); font-size: 1rem; line-height: 1.2; color: var(--ink); }
   .fb-client-mark { position: relative; flex: none; display: grid; place-items: center; width: 28px; height: 32px; }
   .fb-client-mark::before { content: ''; position: absolute; inset: 0; clip-path: var(--hex); background: var(--ink); }
   .fb-client-mark svg { position: relative; width: 14px; height: 14px; fill: none; stroke: #fff; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
-  .fb-headline { font-family: var(--font-display); font-size: 1.1875rem; line-height: 1.2; color: var(--ink); }
+  .fb-headline { font-family: var(--font-display); font-size: 1.0625rem; line-height: 1.25; color: var(--ink); }
   .fb-headline .hl { color: var(--accent); }
 
   /* Laptops: open in place, toward the chart and down, graphic left and words right */
@@ -589,10 +609,10 @@ const sets = [
       box-shadow: 0 30px 60px -34px rgb(27 42 61 / 0.55), 0 10px 20px -14px rgb(27 42 61 / 0.25);
     }
     .fb-card.is-on .fb-media { width: var(--mw); height: var(--mh); border-radius: var(--radius); }
-    .fb-card.is-on .fb-live { transform: scale(var(--s-on)); }
+    .fb-card.is-on .fb-live { transform: translate(var(--ox-on, 0px), var(--oy-on, 0px)) scale(var(--s-on)); }
     .fb-card.is-on .fb-body { grid-template-columns: minmax(0, 1fr); align-items: start; gap: 0.6rem; padding-top: 0.2rem; }
     .fb-card.is-on .fb-text { gap: 0.4rem; }
-    .fb-card.is-on .fb-v { font-size: 1.5rem; }
+    .fb-card.is-on .fb-v { font-size: 1.375rem; }
     .fb-card.is-on .fb-l { display: none; }
     .fb-card.is-on .fb-cs { display: grid; margin-top: 0.35rem; padding-top: 0.75rem; border-top: 1px solid var(--rule); }
     .fb-card.is-on .fb-caret { align-self: start; transform: rotate(180deg); color: var(--accent); background: var(--accent-wash); }
@@ -644,8 +664,20 @@ const sets = [
       padding: 0.85rem;
     }
     .fb-body { order: -1; align-items: start; }
-    .fb-media { width: 100%; height: auto; background: none; border-radius: 0; overflow: visible; }
-    .fb-live { position: static; width: 100%; transform: none; transition: none; }
+    .fb-card { grid-template-rows: auto 1fr; }
+    /* Phones: the same content as an opened case study on a laptop, every card one size */
+    .fb-l { display: none; }
+    .fb-cs { display: grid; margin-top: 0.35rem; padding-top: 0.6rem; border-top: 1px solid var(--rule); }
+    .fb-media { width: 100%; height: auto; min-height: 210px; align-self: stretch; border-radius: var(--radius); }
+    .fb-live { width: 400px; transition: none; }
+    .fb-card { gap: 0.6rem; }
+    .fb-text { gap: 0; }
+    .fb-v { font-size: 1.0625rem; }
+    .fb-cs { gap: 0.35rem; margin-top: 0.4rem; padding-top: 0.5rem; }
+    .fb-client { font-size: 0.875rem; gap: 0.5rem; }
+    .fb-client-mark { width: 22px; height: 25px; }
+    .fb-client-mark svg { width: 12px; height: 12px; }
+    .fb-headline { font-size: 0.9375rem; line-height: 1.25; }
     .fb-caret { display: none; }
   }
   @media (max-width: 640px) {
