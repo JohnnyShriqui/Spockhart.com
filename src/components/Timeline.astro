@@ -53,44 +53,44 @@ const fixPhases = [
   },
 ];
 
-/* The engineering method, for revenue: define the real problem, invent, prove it with real
-   customers, then launch it */
+/* The engineering method, for revenue: assess where the money is, engineer the best option
+   into a prototype, develop it with real customers, then deploy it */
 const growPhases = [
   {
     n: '01',
-    name: 'Discover',
-    brief: 'Find the real job to be done.',
-    when: 'Weeks 1 to 2',
+    name: 'Assess',
+    brief: 'Find the untapped revenue.',
+    when: 'Weeks 1–2',
     start: 0,
     end: 14,
-    body: 'We dig past the symptoms with your customers, your team and your numbers until we find the job customers really hire you for, and what solving it is worth.',
+    body: 'We examine your customers, market, existing capabilities, and business model to uncover unmet needs and untapped revenue opportunities.',
   },
   {
     n: '02',
-    name: 'Invent',
-    brief: 'Many ideas, one working prototype.',
+    name: 'Engineer',
+    brief: 'Rank the options, prototype the best.',
     when: `By day ${site.offer.prototypeDays}`,
     start: 14,
     end: site.offer.prototypeDays,
-    body: 'We generate options, size each one by value and effort, and turn the strongest into a working prototype.',
+    body: 'We evaluate opportunities by market potential, customer demand, and feasibility. Then we design the strongest concept and turn it into a working prototype.',
   },
   {
     n: '03',
-    name: 'Prove and build',
-    brief: 'Test with real customers, build what works.',
-    when: `Months 2 to ${site.offer.minimumMonths}`,
+    name: 'Develop',
+    brief: 'Test with real customers, refine what sells.',
+    when: `Months 2–${site.offer.minimumMonths}`,
     start: site.offer.prototypeDays,
     end: SCALE,
-    body: 'Real customers use it. We measure what they do, not what they say, improve it and build out what earns.',
+    body: 'We put the solution in front of real customers, test demand, measure adoption, and refine the offering until there’s a clear path to generating revenue.',
   },
   {
     n: '04',
-    name: 'Launch',
-    brief: 'Take it to market, make it yours.',
+    name: 'Deploy',
+    brief: 'Take it to market, hand it over.',
     when: `Month ${site.offer.minimumMonths}`,
     start: SCALE,
     end: null,
-    body: 'We price it, launch it with your team and hand over a revenue engine you own and run.',
+    body: 'We bring the offering to market, establish pricing and sales processes, and hand over a revenue-generating operation your team can own and grow.',
   },
 ];
 const phases = track === 'grow' ? growPhases : fixPhases;
