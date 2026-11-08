@@ -2,8 +2,8 @@
 /**
  * A small live graphic for each phase of the engagement (Approach page).
  * The phase card it sits in is the scene: scripts/scenes.ts writes the time to
- * --t on the card and these styles turn it into motion. Process names, records
- * and roles rotate each time a graphic plays, so more teams see their own work.
+ * --t on the card and these styles turn it into motion. Shapes carry the meaning,
+ * with a few one-word labels and one line each, like the graphics on Our Work.
  * Everything shown is an illustration, not client data.
  */
 interface Props {
@@ -16,48 +16,41 @@ const fix = track === 'fix';
 const grow = track === 'grow';
 import { upperPath, lowerPath } from '../lib/logo';
 
-/* 1. Diagnose: one process, mapped, with its waste found */
-const processes = [
-  { name: 'Order to invoice', steps: ['Order in', 'Typed in CRM', 'Typed in books', 'Manager OK', 'Invoice sent'] },
-  { name: 'Donation to receipt', steps: ['Gift arrives', 'Into a sheet', 'Into the CRM', 'Finance check', 'Receipt sent'] },
-  { name: 'Intake to case file', steps: ['Client calls', 'Paper form', 'Re-typed', 'Review', 'Case opened'] },
-  { name: 'Offer to first day', steps: ['Offer signed', 'HR form', 'Payroll form', 'IT request', 'Day one'] },
-];
-const boxes = [
-  { x: 8, y: 46 },
-  { x: 92, y: 46 },
-  { x: 176, y: 46 },
-  { x: 176, y: 112 },
-  { x: 92, y: 112 },
-];
-const BW = 76;
-const BH = 30;
+/* Few words on purpose: shapes carry the meaning, like the case-study graphics on Our Work */
 
-/* 2. Prototype: a working tool on real records */
-const apps = [
-  { name: 'Invoice approvals', status: 'Approved', rows: [['INV-1042', '$4,280'], ['INV-1043', '$960'], ['INV-1044', '$12,400'], ['INV-1045', '$2,115']] },
-  { name: 'Donor receipts', status: 'Receipted', rows: [['Gift 2201', '$250'], ['Gift 2202', '$1,000'], ['Gift 2203', '$75'], ['Gift 2204', '$500']] },
-  { name: 'Intake tracker', status: 'Assigned', rows: [['Case 318', 'New'], ['Case 319', 'Urgent'], ['Case 320', 'Follow-up'], ['Case 321', 'New']] },
-  { name: 'Shift scheduler', status: 'Filled', rows: [['Sat AM', '6 of 6'], ['Sat PM', '5 of 5'], ['Sun AM', '6 of 6'], ['Sun PM', '4 of 4']] },
-];
-const rowY = [40, 66, 92, 118];
+/* 1. Diagnose: one process mapped; the same entry done twice, and work stuck waiting */
+const stepX = [26, 78, 130, 182, 234];
+const STEP_Y = 62;
+const stepLabels = ['Order', 'Entry', 'Entry', 'Approval', 'Invoice'];
+const envelope = (x: number, y: number) => `M${x - 8} ${y - 6}h16v12h-16zM${x - 8} ${y - 6}l8 6.5 8-6.5`;
+const keyboard = (x: number, y: number) =>
+  `M${x - 9} ${y - 5.5}h18v11h-18zM${x - 5.5} ${y - 2}h1.5M${x - 0.75} ${y - 2}h1.5M${x + 4} ${y - 2}h1.5M${x - 5.5} ${y + 2}h11`;
+const plane = (x: number, y: number) => `M${x - 8} ${y}L${x + 8} ${y - 7}L${x + 3} ${y + 8}L${x} ${y + 1.5}ZM${x} ${y + 1.5}L${x + 8} ${y - 7}`;
+const clock = (x: number, y: number, r: number) => `M${x} ${y - r * 0.55}V${y}H${x + r * 0.45}`;
 
-/* 3. Build and embed: connected to the tools already in use, and the team trained */
-const tools = [
-  { name: 'Email', x: 8, y: 10 },
-  { name: 'Accounting', x: 182, y: 10 },
-  { name: 'CRM', x: 8, y: 96 },
-  { name: 'Calendar', x: 182, y: 96 },
+/* 2. Prototype: a working tool, records going through it */
+const protoRows = [
+  { y: 60, w: 70, a: 1.4 },
+  { y: 80, w: 52, a: 1.9 },
+  { y: 100, w: 80, a: 2.4 },
+  { y: 120, w: 60, a: 2.9 },
 ];
-const hub = { x: 130, y: 64 };
-const roles = ['Finance', 'Operations', 'Admin'];
 
-/* 4. Hand over: the kit, and the keys */
-const kit = ['Source code', 'Documentation', 'Admin access', 'Training notes'];
+/* 3. Build and embed: hardened, connected to the tools in use, and the team trained */
+const hubPt = { x: 130, y: 62 };
+const toolPts = [
+  { x: 40, y: 38 },
+  { x: 220, y: 38 },
+  { x: 40, y: 88 },
+  { x: 220, y: 88 },
+];
+const shield = (x: number, y: number) => `M${x} ${y - 11}l9 3.6v6.2c0 6-4 9.2-9 11.2c-5-2-9-5.2-9-11.2v-6.2z`;
+
+/* 4. Hand over: code, documents, running; then the keys change hands */
+const docIcon = (x: number, y: number) => `M${x - 6} ${y - 8}h8l4 4v12h-12zM${x - 3} ${y - 1}h6M${x - 3} ${y + 3}h6`;
+const codeIcon = (x: number, y: number) => `M${x - 4} ${y - 5}L${x - 9} ${y}L${x - 4} ${y + 5}M${x + 4} ${y - 5}L${x + 9} ${y}L${x + 4} ${y + 5}M${x + 1.5} ${y - 7}L${x - 1.5} ${y + 7}`;
 
 /* ---------- Growth track ---------- */
-
-/* Few words on purpose: shapes carry the meaning, like the case-study graphics on Our Work */
 
 /* 1. Assess: four lenses on the business, adding up to untapped revenue */
 const lensX = [34, 94, 158, 224];
@@ -116,57 +109,46 @@ const tick = (x: number, y: number, s = 1) => `M${x - 3.5 * s} ${y}l${2.4 * s} $
     fix && phase === 0 && (
       <svg viewBox="0 0 260 196">
         <text x="8" y="16" class="cap">Mapping</text>
-        <g class="cycle" data-cycle>
-          {processes.map((p, i) => (
-            <text x="58" y="16" class:list={['title', { on: i === 0 }]}>
-              {p.name}
-            </text>
-          ))}
+
+        {/* the same entry, done twice */}
+        <g class="flag" style="--a:2.2">
+          <rect x="56" y={STEP_Y - 22} width="96" height="58" rx="10" class="flag-ring" />
+          <rect x="91" y={STEP_Y - 29} width="26" height="14" rx="7" class="flag-tag" />
+          <text x="104" y={STEP_Y - 19} class="flag-text" text-anchor="middle">×2</text>
         </g>
 
-        {/* arrows between steps */}
         <g class="ap" style="--a:1.4">
-          <path d={`M${8 + BW} 61 H92`} class="arrow" />
-          <path d={`M${92 + BW} 61 H176`} class="arrow" />
-          <path d={`M214 ${46 + BH} V112`} class="arrow" />
-          <path d={`M176 127 H${92 + BW}`} class="arrow" />
+          {stepX.slice(0, -1).map((x) => <path d={`M${x + 19} ${STEP_Y}H${x + 33}`} class="arrow" />)}
         </g>
 
-        {boxes.map((b, k) => (
+        {stepX.map((x, k) => (
           <g class="pop" style={`--a:${(0.2 + k * 0.28).toFixed(2)}`}>
-            <rect x={b.x} y={b.y} width={BW} height={BH} rx="5" class:list={['step', { 'step-dup': k === 1 || k === 2, 'step-slow': k === 3 }]} />
-            <g class="cycle" data-cycle>
-              {processes.map((p, i) => (
-                <text x={b.x + BW / 2} y={b.y + 19} class:list={['step-label', { on: i === 0 }]} text-anchor="middle">
-                  {p.steps[k]}
-                </text>
-              ))}
-            </g>
+            <rect x={x - 15} y={STEP_Y - 15} width="30" height="30" rx="7" class:list={['tile', { 'tile-slow': k === 3 }]} />
+            {k === 0 && <path d={envelope(x, STEP_Y)} class="tile-icon" />}
+            {(k === 1 || k === 2) && <path d={keyboard(x, STEP_Y)} class="tile-icon" />}
+            {k === 3 && <path d={person} transform={`translate(${x - 6} ${STEP_Y - 8})`} class="lens-icon" />}
+            {k === 4 && <path d={plane(x, STEP_Y)} class="tile-icon" />}
+            <text x={x} y={STEP_Y + 30} class="lens-label" text-anchor="middle">{stepLabels[k]}</text>
           </g>
         ))}
 
-        {/* duplication */}
-        <g class="flag" style="--a:2.2">
-          <rect x="88" y="42" width="168" height="38" rx="7" class="flag-ring" />
-          <rect x="120" y="26" width="104" height="14" rx="7" class="flag-tag" />
-          <text x="172" y="36" class="flag-text" text-anchor="middle">Same data, twice</text>
-        </g>
-
-        {/* bottleneck: work piling up */}
+        {/* work piling up, waiting */}
         {[0, 1, 2].map((i) => (
-          <rect x={209} y={80 + i * 9} width="10" height="7" rx="1.5" class="queue pop" style={`--a:${(3 + i * 0.25).toFixed(2)}`} />
+          <rect x="177" y={36 - i * 8} width="10" height="6" rx="1.5" class="queue pop" style={`--a:${(3 + i * 0.25).toFixed(2)}`} />
         ))}
-        <g class="flag" style="--a:3.5">
-          <rect x="172" y="146" width="84" height="14" rx="7" class="flag-tag" />
-          <text x="214" y="156" class="flag-text" text-anchor="middle">Bottleneck</text>
+        <g class="pop" style="--a:3.6">
+          <circle cx="197" cy={STEP_Y - 15} r="6.5" class="clock-badge" />
+          <path d={clock(197, STEP_Y - 15, 6.5)} class="clock-hands" />
         </g>
 
-        <g class="pop" style="--a:4.3">
-          <rect x="8" y="170" width="186" height="20" rx="10" class="found" />
-          <text x="20" y="184" class="found-text">
-            2 issues, priced in hours and dollars
-          </text>
+        <path d="M104 104 C104 128 76 128 66 145" class="merge ap" style="--a:4" />
+        <path d="M182 104 C182 136 96 124 72 148" class="merge ap" style="--a:4.1" />
+        <g class="pop" style="--a:4.4">
+          <polygon points={hex(60, 160, 17)} class="found-hex" />
+          <circle cx="60" cy="160" r="7.5" class="hex-clock" />
+          <path d={clock(60, 160, 7.5)} class="hex-clock" />
         </g>
+        <text x="86" y="166" class="headline ap" style="--a:4.7">Where the hours go</text>
       </svg>
     )
   }
@@ -174,67 +156,35 @@ const tick = (x: number, y: number, s = 1) => `M${x - 3.5 * s} ${y}l${2.4 * s} $
   {
     fix && phase === 1 && (
       <svg viewBox="0 0 260 196">
-        <rect x="6" y="6" width="248" height="150" rx="7" class="win" />
-        <path d="M6 13a7 7 0 0 1 7-7h234a7 7 0 0 1 7 7v15H6z" class="win-bar" />
-        <circle cx="17" cy="17" r="2.6" class="win-dot" />
-        <circle cx="26" cy="17" r="2.6" class="win-dot" />
-        <circle cx="35" cy="17" r="2.6" class="win-dot" />
-        <g class="cycle" data-cycle>
-          {apps.map((a, i) => (
-            <text x="46" y="21" class:list={['win-title', { on: i === 0 }]}>
-              {a.name}
-            </text>
-          ))}
-        </g>
-        <text x="246" y="21" class="win-day tabular" text-anchor="end" data-count="0.2 14, 5 30" data-fmt="Day {}">
+        <text x="8" y="16" class="cap">Prototyping</text>
+        <text x="252" y="17" class="counter tabular" text-anchor="end" data-count="0.2 1, 3.4 30" data-fmt="Day {}">
           Day 30
         </text>
 
-        {rowY.map((y, r) => {
-          const a = 1.6 + r * 0.45;
-          return (
-            <g>
-              {/* wireframe first */}
-              <g class="sk" style={`--a:${(0.3 + r * 0.15).toFixed(2)};--d:${a.toFixed(2)}`}>
-                <rect x="16" y={y + 6} width="56" height="9" rx="2" />
-                <rect x="88" y={y + 6} width="40" height="9" rx="2" />
-                <rect x="186" y={y + 4} width="58" height="13" rx="6.5" />
-              </g>
-              {/* then the real records */}
-              <g class="ap" style={`--a:${a.toFixed(2)}`}>
-                <g class="cycle" data-cycle>
-                  {apps.map((app, i) => (
-                    <g class:list={{ on: i === 0 }}>
-                      <text x="16" y={y + 14} class="cell cell-id">{app.rows[r][0]}</text>
-                      <text x="88" y={y + 14} class="cell">{app.rows[r][1]}</text>
-                    </g>
-                  ))}
-                </g>
-                <line x1="16" x2="244" y1={y + 22} y2={y + 22} class="row-rule" />
-              </g>
-              <g class="pop" style={`--a:${(a + 0.3).toFixed(2)}`}>
-                <rect x="186" y={y + 4} width="58" height="13" rx="6.5" class="pill" />
-                <path d={tick(194, y + 10.5, 0.8)} class="pill-tick" />
-                <g class="cycle" data-cycle>
-                  {apps.map((app, i) => (
-                    <text x="200" y={y + 13.5} class:list={['pill-text', { on: i === 0 }]}>
-                      {app.status}
-                    </text>
-                  ))}
-                </g>
-              </g>
-            </g>
-          );
-        })}
+        <rect x="20" y="28" width="220" height="108" rx="8" class="win" />
+        <path d="M20 36a8 8 0 0 1 8-8h204a8 8 0 0 1 8 8v8H20z" class="win-bar" />
+        <circle cx="30" cy="36" r="2.4" class="win-dot" />
+        <circle cx="38" cy="36" r="2.4" class="win-dot" />
+        <circle cx="46" cy="36" r="2.4" class="win-dot" />
 
-        <g class="pop" style="--a:4.4">
-          <rect x="6" y="168" width="176" height="22" rx="11" class="live" />
-          <circle cx="20" cy="179" r="3.5" class="live-dot" />
-          <text x="30" y="183" class="live-text">Working on your real data</text>
-        </g>
-        <g data-move="230 120 150 182 3.6 4.3" transform="translate(150 182)" class="ap" style="--a:3.5">
+        {protoRows.map((r, i) => (
+          <g>
+            <g class="ap" style={`--a:${(0.3 + i * 0.2).toFixed(2)}`}>
+              <rect x="34" y={r.y - 6} width="12" height="12" rx="3" class="row-icon" />
+              <rect x="54" y={r.y - 3.5} width={r.w} height="7" rx="3.5" class="mini-row" />
+              <rect x="146" y={r.y - 3.5} width="30" height="7" rx="3.5" class="mini-row" />
+            </g>
+            <g class="pop" style={`--a:${r.a}`}>
+              <circle cx="214" cy={r.y} r="7" class="trained" />
+              <path d={tick(214, r.y + 0.5, 0.7)} class="trained-tick" />
+            </g>
+          </g>
+        ))}
+        <g data-move="246 160 218 128 1.6 2.8" transform="translate(218 128)" class="ap" style="--a:1.4">
           <path d="M0 0 L0 13 L3.6 9.6 L6.4 15.4 L8.6 14.4 L5.8 8.8 L10.4 8.6 Z" class="cursor" />
         </g>
+
+        <text x="8" y="166" class="headline ap" style="--a:3.6">Built around your real work</text>
       </svg>
     )
   }
@@ -242,43 +192,43 @@ const tick = (x: number, y: number, s = 1) => `M${x - 3.5 * s} ${y}l${2.4 * s} $
   {
     fix && phase === 2 && (
       <svg viewBox="0 0 260 196">
-        {tools.map((t, i) => (
+        <text x="8" y="16" class="cap">Connecting</text>
+
+        {toolPts.map((t, i) => (
           <g>
-            <path d={`M${t.x + 35} ${t.y + 12} L${hub.x} ${hub.y}`} class="link" style={`--a:${(0.5 + i * 0.25).toFixed(2)}`} />
-            <path d={`M${t.x + 35} ${t.y + 12} L${hub.x} ${hub.y}`} class="link-flow" />
+            <path d={`M${t.x} ${t.y} L${hubPt.x} ${hubPt.y}`} class="link" style={`--a:${(0.5 + i * 0.25).toFixed(2)}`} />
+            <path d={`M${t.x} ${t.y} L${hubPt.x} ${hubPt.y}`} class="link-flow" />
           </g>
         ))}
-        {tools.map((t, i) => (
+        {toolPts.map((t, i) => (
           <g class="pop" style={`--a:${(0.2 + i * 0.15).toFixed(2)}`}>
-            <rect x={t.x} y={t.y} width="70" height="24" rx="12" class="tool" />
-            <text x={t.x + 35} y={t.y + 16} class="tool-text" text-anchor="middle">{t.name}</text>
+            <circle cx={t.x} cy={t.y} r="15" class="tile" />
+            {i === 0 && <path d={envelope(t.x, t.y)} class="tile-icon" />}
+            {i === 1 && <text x={t.x} y={t.y + 5} class="lens-dollar" text-anchor="middle">$</text>}
+            {i === 2 && <path d={person} transform={`translate(${t.x - 6} ${t.y - 8})`} class="lens-icon" />}
+            {i === 3 && <path d={`M${t.x - 8} ${t.y - 5}h16v12h-16zM${t.x - 8} ${t.y - 1}h16M${t.x - 4} ${t.y - 8}v4M${t.x + 4} ${t.y - 8}v4`} class="tile-icon" />}
           </g>
         ))}
-        <polygon points={hex(hub.x, hub.y, 26)} class="hub" />
-        <path d={`M${hub.x - 9} ${hub.y - 7}h18M${hub.x - 9} ${hub.y}h18M${hub.x - 9} ${hub.y + 7}h11`} class="hub-lines" />
+        <polygon points={hex(hubPt.x, hubPt.y, 26)} class="hub" />
         <g class="pop" style="--a:2.3">
-          <rect x="92" y="98" width="76" height="18" rx="9" class="shield" />
-          <path d={`M101 102.5l5-2 5 2v3.4c0 3-2.2 4.6-5 5.6-2.8-1-5-2.6-5-5.6z`} class="shield-icon" />
-          <text x="115" y="111" class="shield-text">Hardened</text>
+          <path d={shield(hubPt.x, hubPt.y)} class="hub-shield" />
+          <path d={tick(hubPt.x, hubPt.y + 1, 0.85)} class="hub-shield" />
         </g>
 
-        <line x1="8" x2="252" y1="134" y2="134" class="divider" />
-        <text x="8" y="160" class="cap">Your team</text>
-        {roles.map((r, i) => {
-          const x = 104 + i * 54;
+        {[0, 1, 2].map((i) => {
+          const x = 18 + i * 22;
           return (
             <g>
-              <circle cx={x} cy="154" r="13" class="face" />
-              <path d={person} transform={`translate(${x - 6.6} ${145}) scale(1.1)`} class="face-icon" />
+              <circle cx={x} cy="160" r="11" class="face" />
+              <path d={person} transform={`translate(${x - 5.4} ${152.5}) scale(0.9)`} class="face-icon" />
               <g class="pop" style={`--a:${(3.1 + i * 0.45).toFixed(2)}`}>
-                <circle cx={x + 10} cy="144" r="6" class="trained" />
-                <path d={tick(x + 10, 144.5, 0.7)} class="trained-tick" />
+                <circle cx={x + 8} cy="151" r="5" class="trained" />
+                <path d={tick(x + 8, 151.4, 0.55)} class="trained-tick" />
               </g>
-              <text x={x} y="183" class="role" text-anchor="middle">{r}</text>
             </g>
           );
         })}
-        <text x="8" y="178" class="trained-word ap" style="--a:4.5">Trained</text>
+        <text x="80" y="166" class="headline ap" style="--a:4.4">Connected, team trained</text>
       </svg>
     )
   }
@@ -286,56 +236,57 @@ const tick = (x: number, y: number, s = 1) => `M${x - 3.5 * s} ${y}l${2.4 * s} $
   {
     fix && phase === 3 && (
       <svg viewBox="0 0 260 196">
-        <rect x="34" y="6" width="192" height="104" rx="7" class="kit" />
-        <text x="48" y="25" class="kit-title">Handover kit</text>
-        {kit.map((k, i) => {
-          const y = 42 + i * 17;
+        <text x="8" y="16" class="cap">Handing over</text>
+
+        {[0, 1, 2].map((i) => {
+          const x = 90 + i * 40;
+          const y = 46;
           return (
-            <g>
-              <rect x="48" y={y - 8} width="10" height="10" rx="2.5" class="box" />
-              <g class="pop" style={`--a:${(0.4 + i * 0.45).toFixed(2)}`}>
-                <rect x="48" y={y - 8} width="10" height="10" rx="2.5" class="box-on" />
-                <path d={tick(53, y - 3, 0.6)} class="box-tick" />
-              </g>
-              <text x="66" y={y + 1} class="kit-item">{k}</text>
+            <g class="pop" style={`--a:${(0.3 + i * 0.45).toFixed(2)}`}>
+              <rect x={x - 15} y={y - 15} width="30" height="30" rx="7" class="tile" />
+              {i === 0 && <path d={codeIcon(x, y)} class="tile-icon" />}
+              {i === 1 && <path d={docIcon(x, y)} class="tile-icon" />}
+              {i === 2 && (
+                <g>
+                  <polygon points={gear(x, y, 5.5, 8)} class="lens-gear" />
+                  <circle cx={x} cy={y} r="2.6" class="lens-hole" />
+                </g>
+              )}
+              <circle cx={x + 14} cy={y - 14} r="5" class="trained" />
+              <path d={tick(x + 14, y - 13.6, 0.55)} class="trained-tick" />
             </g>
           );
         })}
 
-        <polygon points={hex(40, 148, 17)} class="us" />
-        <g transform="translate(40 148) scale(0.075)" class="us-mark">
+        <polygon points={hex(36, 110, 16)} class="us" />
+        <g transform="translate(36 110) scale(0.07)" class="us-mark">
           <path d={upperPath} />
           <path d={lowerPath} />
         </g>
-        <text x="40" y="182" class="who" text-anchor="middle">Spockhart</text>
-        <g>
-          {[0, 1, 2].map((i) => (
-            <g>
-              <circle cx={200 + i * 16} cy="148" r="11" class:list={['team', `team-${i}`]} />
-              <path d={person} transform={`translate(${200 + i * 16 - 5.4} ${140.5}) scale(0.9)`} class="face-icon" />
-            </g>
-          ))}
-        </g>
-        <text x="216" y="182" class="who who-hot" text-anchor="middle">Your team</text>
-        <path d="M62 148 H186" class="handoff" />
+        <text x="36" y="140" class="lens-label" text-anchor="middle">Spockhart</text>
+        <text x="220" y="140" class="lens-label" text-anchor="middle">Your team</text>
+        <path d="M58 110 H190" class="handoff" />
+        {[0, 1, 2].map((i) => (
+          <g>
+            <circle cx={204 + i * 16} cy="110" r="11" class:list={['team', `team-${i}`]} />
+            <path d={person} transform={`translate(${204 + i * 16 - 5.4} ${102.5}) scale(0.9)`} class="face-icon" />
+          </g>
+        ))}
 
         {/* the keys change hands */}
-        <g data-move="66 148 168 148 2.3 3.6" transform="translate(168 148)">
-          <g class="pop" style="--a:2.1">
+        <g data-move="64 110 174 110 2.1 3.4" transform="translate(174 110)">
+          <g class="pop" style="--a:1.9">
             <circle cx="-4" cy="0" r="5.5" class="key" />
             <circle cx="-4" cy="0" r="2" class="key-hole" />
             <path d="M1.5 0 H13 M9 0 v4 M12 0 v3" class="key-shaft" />
           </g>
         </g>
 
-        <g class="pop" style="--a:4">
-          <rect x="70" y="120" width="120" height="18" rx="9" class="owned" />
-          <circle cx="82" cy="129" r="3" class="live-dot" />
-          <text x="90" y="133" class="owned-text">Yours to run</text>
-        </g>
+        <text x="8" y="166" class="headline ap" style="--a:3.8">Yours to run</text>
       </svg>
     )
   }
+
   {
     grow && phase === 0 && (
       <svg viewBox="0 0 260 196">
@@ -553,39 +504,36 @@ const tick = (x: number, y: number, s = 1) => `M${x - 3.5 * s} ${y}l${2.4 * s} $
 
   text { font-family: var(--font-body); }
   .cap { font-size: 9px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; fill: var(--ink-3); }
-  .title { font-size: 11px; font-weight: 600; fill: var(--ink); }
 
-  /* 1. Diagnose */
-  .arrow { fill: none; stroke: var(--ink-3); stroke-width: 1.4; marker-end: none; }
-  .step { fill: var(--surface); stroke: var(--rule-2); stroke-width: 1.2; }
-  .step-dup { stroke: var(--accent-soft); fill: rgb(74 138 186 / calc(0.04 + 0.12 * clamp(0, (var(--t) - 2.2) * 4, 1))); }
-  .step-slow { fill: rgb(27 42 61 / calc(0.02 + 0.08 * clamp(0, (var(--t) - 3.5) * 4, 1))); }
-  .step-label { font-size: 9.5px; font-weight: 600; fill: var(--ink); }
+  /* Shared marks */
+  .arrow { fill: none; stroke: var(--ink-3); stroke-width: 1.4; }
   .flag-ring { fill: none; stroke: var(--accent); stroke-width: 1.5; stroke-dasharray: 4 3; }
   .flag-tag { fill: var(--accent); }
   .flag-text { font-size: 8.5px; font-weight: 700; fill: #fff; letter-spacing: 0.02em; }
-  .queue { fill: var(--accent); }
-  .found { fill: var(--brand); }
-  .found-text { font-size: 9.5px; font-weight: 600; fill: #fff; }
-
-  /* 2. Prototype */
   .win { fill: var(--surface); stroke: var(--rule-2); stroke-width: 1; }
   .win-bar { fill: #e9eef4; }
   .win-dot { fill: var(--rule-2); }
-  .win-title { font-size: 10px; font-weight: 700; fill: var(--ink); }
-  .win-day { font-family: var(--font-display); font-size: 11px; font-weight: 600; fill: var(--accent); font-variant-numeric: lining-nums tabular-nums; }
-  .sk rect { fill: #dfe6ee; }
-  .sk { opacity: calc(clamp(0, (var(--t) - var(--a)) * 6, 1) * clamp(0, (var(--d) - var(--t)) * 6, 1)); }
-  .cell { font-size: 9.5px; fill: var(--ink-2); }
-  .cell-id { font-weight: 600; fill: var(--ink); }
-  .row-rule { stroke: var(--rule); stroke-width: 1; }
   .pill { fill: rgb(63 154 107 / 0.14); }
   .pill-tick { fill: none; stroke: #2f7d55; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
-  .pill-text { font-size: 8.5px; font-weight: 700; fill: #2f7d55; }
-  .live { fill: var(--ink); }
   .live-dot { fill: #4cbf86; }
-  .live-text { font-size: 9.5px; font-weight: 600; fill: #fff; }
   .cursor { fill: var(--ink); stroke: #fff; stroke-width: 1; stroke-linejoin: round; }
+  .face { fill: var(--surface); stroke: var(--rule-2); }
+  .face-icon { fill: var(--ink-3); }
+  .trained { fill: #3f9a6b; stroke: var(--paper-2); stroke-width: 1.5; }
+  .trained-tick { fill: none; stroke: #fff; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+  .owned { fill: var(--ink); opacity: 1; }
+  .owned-text { font-size: 9.5px; font-weight: 600; fill: #fff; }
+  .headline { font-family: var(--font-display); font-size: 15px; font-weight: 600; fill: var(--ink); }
+
+  /* 1. Diagnose */
+  .tile-slow { stroke: var(--accent); stroke-width: 1.5; }
+  .queue { fill: var(--accent); }
+  .clock-badge { fill: var(--accent); stroke: var(--paper-2); stroke-width: 1.5; }
+  .clock-hands { fill: none; stroke: #fff; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+  .hex-clock { fill: none; stroke: #fff; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* 2. Prototype */
+  .row-icon { fill: var(--mist-1); }
 
   /* 3. Build and embed */
   .link {
@@ -603,28 +551,10 @@ const tick = (x: number, y: number, s = 1) => `M${x - 3.5 * s} ${y}l${2.4 * s} $
     stroke-dashoffset: calc(var(--t) * -26px);
     opacity: clamp(0, (var(--t) - 1.7) * 3, 1);
   }
-  .tool { fill: var(--surface); stroke: var(--rule-2); stroke-width: 1.2; }
-  .tool-text { font-size: 9.5px; font-weight: 600; fill: var(--ink); }
   .hub { fill: var(--brand); }
-  .hub-lines { fill: none; stroke: #fff; stroke-width: 1.8; stroke-linecap: round; }
-  .shield { fill: var(--ink); }
-  .shield-icon { fill: none; stroke: #8ec0e6; stroke-width: 1.3; stroke-linejoin: round; }
-  .shield-text { font-size: 9px; font-weight: 700; fill: #fff; }
-  .divider { stroke: var(--rule-2); stroke-dasharray: 3 3; }
-  .face { fill: var(--surface); stroke: var(--rule-2); }
-  .face-icon { fill: var(--ink-3); }
-  .trained { fill: #3f9a6b; stroke: var(--paper-2); stroke-width: 1.5; }
-  .trained-tick { fill: none; stroke: #fff; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
-  .role { font-size: 9px; font-weight: 600; fill: var(--ink-2); }
-  .trained-word { font-size: 10px; font-weight: 700; fill: #2f7d55; }
+  .hub-shield { fill: none; stroke: #fff; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 
   /* 4. Hand over */
-  .kit { fill: var(--surface); stroke: var(--rule-2); }
-  .kit-title { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; fill: var(--ink); }
-  .box { fill: none; stroke: var(--rule-2); stroke-width: 1.2; }
-  .box-on { fill: var(--brand); }
-  .box-tick { fill: none; stroke: #fff; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
-  .kit-item { font-size: 10px; fill: var(--ink-2); }
   .us { fill: var(--ink); }
   .us-mark { fill: #fff; }
   .team { stroke: var(--paper-2); stroke-width: 2; }
@@ -632,16 +562,10 @@ const tick = (x: number, y: number, s = 1) => `M${x - 3.5 * s} ${y}l${2.4 * s} $
   .team-1 { fill: var(--brand); }
   .team-2 { fill: var(--accent-soft); }
   .team + .face-icon, .pg .team ~ .face-icon { fill: #fff; }
-  .who { font-size: 9.5px; font-weight: 600; fill: var(--ink-3); }
-  .who-hot { fill: var(--ink); }
   .handoff { stroke: var(--rule-2); stroke-width: 1.2; stroke-dasharray: 3 4; }
   .key { fill: #c99a2e; }
   .key-hole { fill: var(--paper-2); }
   .key-shaft { fill: none; stroke: #c99a2e; stroke-width: 2.2; stroke-linecap: round; }
-  .owned { fill: var(--ink); opacity: 1; }
-  .owned-text { font-size: 9.5px; font-weight: 600; fill: #fff; }
-  /* Revenue graphics: few words, one statement each */
-  .headline { font-family: var(--font-display); font-size: 15px; font-weight: 600; fill: var(--ink); }
 
   /* Growth 1. Assess */
   .lens-hex { fill: var(--surface); stroke: var(--rule-2); stroke-width: 1.2; }
