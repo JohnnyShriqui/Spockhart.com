@@ -8,7 +8,7 @@
  */
 interface Props {
   phase: 0 | 1 | 2 | 3;
-  /** 'fix' removes waste (Diagnose to Hand over); 'grow' finds new revenue (Discover to Launch) */
+  /** 'fix' removes waste (Diagnose to Hand over); 'grow' finds new revenue (Assess to Deploy) */
   track?: 'fix' | 'grow';
 }
 const { phase, track = 'fix' } = Astro.props;
@@ -57,37 +57,60 @@ const kit = ['Source code', 'Documentation', 'Admin access', 'Training notes'];
 
 /* ---------- Growth track ---------- */
 
-/* 1. Discover: dig from the symptom to the real job customers hire you for */
-const digs = [
-  { name: 'Repeat orders', rows: ['Sales are flat', 'Fewer repeat orders', 'Reordering takes three calls'], job: 'Reorder in one click' },
-  { name: 'Monthly giving', rows: ['Donations are flat', 'Few monthly donors', 'Signing up takes a phone call'], job: 'Give monthly in one tap' },
-  { name: 'Winning bids', rows: ['Losing bids to rivals', 'Quotes take a week', 'Pricing lives in a spreadsheet'], job: 'Quote in minutes' },
-  { name: 'Bookings', rows: ['Bookings are down', 'Clients can’t find a time', 'Booking is by email only'], job: 'Book online, any time' },
+/* The same four kinds of organization run through all four revenue graphics, one per play */
+const scenarios = [
+  {
+    who: 'A manufacturer',
+    lenses: ['Want smaller, faster orders', 'No local rival offers it', 'Line idle two days a week', 'One-off sales only'],
+    found: 'Rush small-batch service',
+    options: ['Rush orders', 'Private label', 'Online store'],
+  },
+  {
+    who: 'A distributor',
+    lenses: ['Reorder the same items', 'Buyers want it automated', 'Years of order history', 'No recurring revenue'],
+    found: 'Auto-reorder subscription',
+    options: ['Auto-reorder', 'Same-day', 'Client portal'],
+  },
+  {
+    who: 'A nonprofit',
+    lenses: ['Donors ask to give monthly', 'Similar causes offer it', 'A list of 4,000 donors', 'One-time gifts only'],
+    found: 'Monthly giving program',
+    options: ['Monthly giving', 'Gift matching', 'Annual gala'],
+  },
+  {
+    who: 'A contractor',
+    lenses: ['Ask who services it after', 'Few firms offer upkeep', 'Crews free in winter', 'Project fees only'],
+    found: 'Annual service plans',
+    options: ['Service plans', 'Financing', 'New region'],
+  },
 ];
-const digY = [26, 62, 98];
-const digTags = ['Symptom', 'Why', 'Why'];
 
-/* 2. Invent: many ideas, sized by value and effort; the best becomes a prototype */
-const ideas = [
-  { x: 40, y: 58, best: true },
-  { x: 104, y: 50 },
-  { x: 126, y: 74 },
-  { x: 62, y: 108 },
-  { x: 112, y: 120 },
-  { x: 34, y: 128 },
-  { x: 90, y: 94 },
-  { x: 134, y: 106 },
+/* 1. Assess: four lenses on the business, each with a finding; two of them add up to an opportunity */
+const lenses = ['Customers', 'Market', 'Capabilities', 'Business model'];
+const lensY = [26, 52, 78, 104];
+
+/* 2. Engineer: every opportunity scored on the three tests, the strongest built by day 30 */
+const criteria = [
+  { name: 'Market', x: 120 },
+  { name: 'Demand', x: 164 },
+  { name: 'Feasibility', x: 214 },
+];
+const optionY = [42, 62, 82];
+const scores = [
+  [3, 3, 2],
+  [2, 1, 3],
+  [1, 2, 1],
 ];
 
-/* 3. Prove and build: real customers use it; each version does better */
+/* 3. Develop: real customers use it, demand is counted, adoption is measured, each version does better */
 const versions = [
   { x: 60, y: 114, a: 1.2, label: 'v1' },
   { x: 130, y: 92, a: 2.3, label: 'v2' },
   { x: 200, y: 58, a: 3.3, label: 'v3' },
 ];
 
-/* 4. Launch: priced, sold, and running */
-const launchKit = ['Pricing', 'Sales playbook', 'Revenue dashboard', 'Team trained'];
+/* 4. Deploy: priced, a sales process, in market, and handed to the team */
+const launchKit = ['Pricing', 'Sales process', 'Market launch', 'Team handover'];
 const bars = [18, 30, 44, 60, 78];
 
 const hex = (cx: number, cy: number, r: number) =>
@@ -329,48 +352,47 @@ const tick = (x: number, y: number, s = 1) => `M${x - 3.5 * s} ${y}l${2.4 * s} $
   {
     grow && phase === 0 && (
       <svg viewBox="0 0 260 196">
-        <text x="8" y="16" class="cap">Root cause</text>
+        <text x="8" y="16" class="cap">Assessing</text>
         <g class="cycle" data-cycle>
-          {digs.map((d, i) => (
-            <text x="82" y="16" class:list={['title', { on: i === 0 }]}>
-              {d.name}
+          {scenarios.map((s, i) => (
+            <text x="76" y="16" class:list={['title', { on: i === 0 }]}>
+              {s.who}
             </text>
           ))}
         </g>
 
-        {digY.map((y, r) => (
-          <g class="pop" style={`--a:${(0.2 + r * 0.8).toFixed(2)}`}>
-            <text x="8" y={y + 15.5} class="dig-tag">{digTags[r]}</text>
-            <rect x="62" y={y} width="190" height="24" rx="5" class:list={['step', { 'step-dig': r === 2 }]} />
+        {lensY.map((y, r) => (
+          <g class="pop" style={`--a:${(0.2 + r * 0.6).toFixed(2)}`}>
+            <rect x="8" y={y} width="244" height="22" rx="5" class:list={['step', { 'step-dig': r === 0 || r === 2 }]} />
+            <text x="16" y={y + 14.5} class="lens">{lenses[r]}</text>
+            <line x1="88" x2="88" y1={y + 5} y2={y + 17} class="lens-rule" />
             <g class="cycle" data-cycle>
-              {digs.map((d, i) => (
-                <text x="72" y={y + 15.5} class:list={['step-label', { on: i === 0 }]}>
-                  {d.rows[r]}
+              {scenarios.map((s, i) => (
+                <text x="96" y={y + 14.5} class:list={['step-label', { on: i === 0 }]}>
+                  {s.lenses[r]}
                 </text>
               ))}
             </g>
           </g>
         ))}
-        {[0, 1, 2].map((r) => (
-          <path d={`M157 ${digY[r] + 24} V${(r < 2 ? digY[r + 1] : 134) - 1}`} class="arrow ap" style={`--a:${(0.7 + r * 0.8).toFixed(2)}`} />
-        ))}
 
-        <g class="pop" style="--a:2.9">
-          <text x="8" y="149.5" class="dig-tag dig-tag-hot">The job</text>
-          <rect x="62" y="134" width="190" height="26" rx="13" class="job" />
+        <path d="M162 127 V137" class="arrow ap" style="--a:2.8" />
+        <g class="pop" style="--a:3.1">
+          <text x="8" y="155" class="dig-tag dig-tag-hot">Untapped</text>
+          <rect x="72" y="138" width="180" height="26" rx="13" class="job" />
           <g class="cycle" data-cycle>
-            {digs.map((d, i) => (
-              <text x="157" y="151" class:list={['job-text', { on: i === 0 }]} text-anchor="middle">
-                {d.job}
+            {scenarios.map((s, i) => (
+              <text x="162" y="155" class:list={['job-text', { on: i === 0 }]} text-anchor="middle">
+                {s.found}
               </text>
             ))}
           </g>
         </g>
 
         <g class="pop" style="--a:4.2">
-          <rect x="8" y="170" width="176" height="20" rx="10" class="found" />
-          <text x="20" y="184" class="found-text">
-            The real job, and what it’s worth
+          <rect x="8" y="172" width="180" height="20" rx="10" class="found" />
+          <text x="20" y="186" class="found-text">
+            Untapped revenue, found and sized
           </text>
         </g>
       </svg>
@@ -380,50 +402,84 @@ const tick = (x: number, y: number, s = 1) => `M${x - 3.5 * s} ${y}l${2.4 * s} $
   {
     grow && phase === 1 && (
       <svg viewBox="0 0 260 196">
-        <text x="8" y="16" class="cap">Options</text>
-        <text x="66" y="16" class="title">Value vs effort</text>
+        <text x="8" y="16" class="cap">Evaluating</text>
+        <text x="80" y="16" class="title">Three opportunities</text>
 
-        {/* the matrix: high value and low effort is the sweet spot */}
-        <rect x="16" y="28" width="66" height="60" class="sweet" />
-        <path d="M14 26 V150 H150" class="axis-line" />
-        <path d="M82 28 V148 M16 88 H148" class="quad-line" />
-        <text x="18" y="38" class="axis-text">Value</text>
-        <text x="148" y="162" class="axis-text" text-anchor="end">Effort</text>
-
-        {ideas.map((d, i) => (
-          <circle cx={d.x} cy={d.y} r="5.5" class:list={['idea', 'pop', { 'idea-best': d.best }]} style={`--a:${(0.3 + i * 0.2).toFixed(2)}`} />
+        {criteria.map((c, k) => (
+          <text x={c.x} y="35" class="score-head ap" text-anchor="middle" style={`--a:${(0.4 + k * 0.5).toFixed(2)}`}>
+            {c.name}
+          </text>
         ))}
-        <circle cx="40" cy="58" r="10" class="best-ring pop" style="--a:2.3" />
-        <g class="pop" style="--a:2.5">
-          <rect x="22" y="72" width="44" height="13" rx="6.5" class="flag-tag" />
-          <text x="44" y="81.5" class="flag-text" text-anchor="middle">Best bet</text>
-        </g>
 
-        <path d="M50 54 C 96 34, 130 40, 160 56" class="carry ap" style="--a:2.9" />
+        {optionY.map((y, r) => (
+          <g>
+            <g class="pop" style={`--a:${(0.2 + r * 0.15).toFixed(2)}`}>
+              <rect x="8" y={y} width="244" height="16" rx="4" class="step" />
+            </g>
+            {r === 0 && <rect x="8" y={y} width="244" height="16" rx="4" class="row-best" style="--a:2.4" />}
+            <g class="ap" style={`--a:${(0.25 + r * 0.15).toFixed(2)}`}>
+              <g class="cycle" data-cycle>
+                {scenarios.map((s, i) => (
+                  <text x="26" y={y + 11.5} class:list={['opt-name', { on: i === 0 }]}>
+                    {s.options[r]}
+                  </text>
+                ))}
+              </g>
+            </g>
+            {criteria.map((c, k) =>
+              [0, 1, 2].map((d) => (
+                <circle
+                  cx={c.x - 8 + d * 8}
+                  cy={y + 8}
+                  r="2.8"
+                  class:list={['pop', d < scores[r][k] ? 'dot-on' : 'dot-off']}
+                  style={`--a:${(0.6 + k * 0.5 + r * 0.12).toFixed(2)}`}
+                />
+              ))
+            )}
+            {r === 0 && (
+              <g class="pop" style="--a:2.6">
+                <circle cx="16" cy={y + 8} r="5" class="best-dot" />
+                <path d={tick(16, y + 8.4, 0.55)} class="best-tick" />
+              </g>
+            )}
+          </g>
+        ))}
 
-        <g class="pop" style="--a:3.2">
-          <rect x="160" y="40" width="94" height="90" rx="6" class="win" />
-          <path d="M160 46a6 6 0 0 1 6-6h82a6 6 0 0 1 6 6v8H160z" class="win-bar" />
-          <circle cx="168" cy="48" r="2" class="win-dot" />
-          <circle cx="175" cy="48" r="2" class="win-dot" />
-          <circle cx="182" cy="48" r="2" class="win-dot" />
-          <text x="248" y="51" class="mini-day" text-anchor="end">Day 30</text>
-          {[66, 84, 102].map((y, r) => (
+        <path d="M60 99 V109" class="arrow ap" style="--a:2.9" />
+        <g class="pop" style="--a:3.1">
+          <rect x="8" y="110" width="128" height="54" rx="6" class="win" />
+          <path d="M8 116a6 6 0 0 1 6-6h116a6 6 0 0 1 6 6v8H8z" class="win-bar" />
+          <circle cx="16" cy="118" r="2" class="win-dot" />
+          <circle cx="23" cy="118" r="2" class="win-dot" />
+          <circle cx="30" cy="118" r="2" class="win-dot" />
+          <text x="130" y="121" class="mini-day" text-anchor="end">Day 30</text>
+          {[134, 148].map((y, r) => (
             <g>
-              <rect x="168" y={y} width="44" height="7" rx="2" class="mini-row" />
-              <g class="pop" style={`--a:${(3.6 + r * 0.25).toFixed(2)}`}>
-                <rect x="220" y={y - 2} width="26" height="11" rx="5.5" class="pill" />
-                <path d={tick(227, y + 3.5, 0.6)} class="pill-tick" />
+              <rect x="16" y={y} width="62" height="7" rx="2" class="mini-row" />
+              <g class="pop" style={`--a:${(3.5 + r * 0.3).toFixed(2)}`}>
+                <rect x="100" y={y - 2} width="26" height="11" rx="5.5" class="pill" />
+                <path d={tick(107, y + 3.5, 0.6)} class="pill-tick" />
               </g>
             </g>
           ))}
-          <text x="168" y="124" class="mini-cap">Prototype</text>
+        </g>
+        <g class="ap" style="--a:3.3">
+          <text x="148" y="126" class="mini-cap">Strongest concept</text>
+          <g class="cycle" data-cycle>
+            {scenarios.map((s, i) => (
+              <text x="148" y="143" class:list={['concept', { on: i === 0 }]}>
+                {s.options[0]}
+              </text>
+            ))}
+          </g>
+          <text x="148" y="158" class="concept-sub">Designed and prototyped</text>
         </g>
 
         <g class="pop" style="--a:4.4">
-          <rect x="8" y="170" width="164" height="20" rx="10" class="found" />
-          <text x="20" y="184" class="found-text">
-            Many ideas, one working prototype
+          <rect x="8" y="172" width="190" height="20" rx="10" class="found" />
+          <text x="20" y="186" class="found-text">
+            Strongest concept, working by day 30
           </text>
         </g>
       </svg>
@@ -441,6 +497,7 @@ const tick = (x: number, y: number, s = 1) => `M${x - 3.5 * s} ${y}l${2.4 * s} $
 
         <path d="M10 96 H250 M10 60 H250" class="quad-line" />
         <path d="M10 132 H250" class="axis-line" />
+        <text x="12" y="40" class="axis-text">Adoption</text>
         <path d="M14 126 C40 122 50 116 60 114 S100 104 130 92 S180 64 200 58 S236 46 246 44 V132 H14 Z" class="trend-area" />
         <path d="M14 126 C40 122 50 116 60 114 S100 104 130 92 S180 64 200 58 S236 46 246 44" class="trend-line" pathLength="1" />
 
@@ -451,6 +508,7 @@ const tick = (x: number, y: number, s = 1) => `M${x - 3.5 * s} ${y}l${2.4 * s} $
             <text x={v.x} y={v.y - 12.5} class="flag-text" text-anchor="middle">{v.label}</text>
           </g>
         ))}
+        <text x="12" y="80" class="refine ap" style="--a:3.6">Refined each version</text>
 
         {[0, 1, 2, 3, 4, 5].map((i) => {
           const x = 18 + i * 22;
@@ -468,9 +526,9 @@ const tick = (x: number, y: number, s = 1) => `M${x - 3.5 * s} ${y}l${2.4 * s} $
         <text x="152" y="156" class="who who-hot ap" style="--a:3.6">Real customers</text>
 
         <g class="pop" style="--a:4.4">
-          <rect x="8" y="170" width="170" height="20" rx="10" class="found" />
-          <text x="20" y="184" class="found-text">
-            Built out what customers used
+          <rect x="8" y="172" width="134" height="20" rx="10" class="found" />
+          <text x="20" y="186" class="found-text">
+            A clear path to revenue
           </text>
         </g>
       </svg>
@@ -481,7 +539,7 @@ const tick = (x: number, y: number, s = 1) => `M${x - 3.5 * s} ${y}l${2.4 * s} $
     grow && phase === 3 && (
       <svg viewBox="0 0 260 196">
         <rect x="6" y="6" width="120" height="110" rx="7" class="kit" />
-        <text x="18" y="25" class="kit-title">Launch kit</text>
+        <text x="18" y="25" class="kit-title">Go to market</text>
         {launchKit.map((k, i) => {
           const y = 44 + i * 18;
           return (
@@ -514,9 +572,9 @@ const tick = (x: number, y: number, s = 1) => `M${x - 3.5 * s} ${y}l${2.4 * s} $
         <g class="pop" style="--a:3.9">
           <rect x="70" y="128" width="120" height="18" rx="9" class="owned" />
           <circle cx="82" cy="137" r="3" class="live-dot" />
-          <text x="90" y="141" class="owned-text">Live and selling</text>
+          <text x="90" y="141" class="owned-text">In market and selling</text>
         </g>
-        <text x="130" y="176" class="who who-hot ap" text-anchor="middle" style="--a:4.4">Owned and run by your team</text>
+        <text x="130" y="176" class="who who-hot ap" text-anchor="middle" style="--a:4.4">Owned and grown by your team</text>
       </svg>
     )
   }
@@ -650,27 +708,38 @@ const tick = (x: number, y: number, s = 1) => `M${x - 3.5 * s} ${y}l${2.4 * s} $
   .key-shaft { fill: none; stroke: #c99a2e; stroke-width: 2.2; stroke-linecap: round; }
   .owned { fill: var(--ink); opacity: 1; }
   .owned-text { font-size: 9.5px; font-weight: 600; fill: #fff; }
-  /* Growth 1. Discover */
+  /* Growth 1. Assess */
+  .lens { font-size: 9px; font-weight: 600; fill: var(--ink-3); }
+  .lens-rule { stroke: var(--rule-2); stroke-width: 1; }
   .dig-tag { font-size: 8.5px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; fill: var(--ink-3); }
   .dig-tag-hot { fill: var(--brand); }
-  .step-dig { stroke: var(--accent-soft); fill: rgb(74 138 186 / calc(0.04 + 0.1 * clamp(0, (var(--t) - 2.4) * 4, 1))); }
+  .step-dig { stroke: var(--accent-soft); fill: rgb(74 138 186 / calc(0.04 + 0.1 * clamp(0, (var(--t) - 2.5) * 4, 1))); }
   .job { fill: var(--brand); }
   .job-text { font-size: 10px; font-weight: 700; fill: #fff; }
 
-  /* Growth 2. Invent */
-  .sweet { fill: rgb(74 138 186 / calc(0.16 * clamp(0, (var(--t) - 2.1) * 3, 1))); }
-  .axis-line { fill: none; stroke: var(--rule-2); stroke-width: 1.2; }
-  .quad-line { fill: none; stroke: var(--rule-2); stroke-width: 1; stroke-dasharray: 3 3; }
-  .axis-text { font-size: 8.5px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; fill: var(--ink-3); }
-  .idea { fill: #b9c7d6; }
-  .idea-best { fill: var(--brand); }
-  .best-ring { fill: none; stroke: var(--accent-soft); stroke-width: 1.5; }
-  .carry { fill: none; stroke: var(--accent); stroke-width: 1.5; stroke-dasharray: 3 3; }
+  /* Growth 2. Engineer */
+  .score-head { font-size: 7.5px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; fill: var(--ink-3); }
+  .opt-name { font-size: 9.5px; font-weight: 600; fill: var(--ink); }
+  .dot-on { fill: var(--brand); }
+  .dot-off { fill: var(--surface); stroke: var(--rule-2); stroke-width: 1.1; }
+  .row-best {
+    fill: rgb(74 138 186 / 0.12);
+    stroke: var(--brand);
+    stroke-width: 1.4;
+    opacity: clamp(0, (var(--t) - var(--a)) * 5, 1);
+  }
+  .best-dot { fill: var(--brand); }
+  .best-tick { fill: none; stroke: #fff; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
   .mini-day { font-family: var(--font-display); font-size: 9px; font-weight: 600; fill: var(--accent); }
   .mini-row { fill: #dfe6ee; }
   .mini-cap { font-size: 8px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; fill: var(--ink-3); }
+  .concept { font-size: 11px; font-weight: 700; fill: var(--ink); }
+  .concept-sub { font-size: 9px; fill: var(--ink-2); }
 
-  /* Growth 3. Prove and build */
+  /* Growth 3. Develop */
+  .axis-line { fill: none; stroke: var(--rule-2); stroke-width: 1.2; }
+  .quad-line { fill: none; stroke: var(--rule-2); stroke-width: 1; stroke-dasharray: 3 3; }
+  .axis-text { font-size: 8.5px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; fill: var(--ink-3); }
   .trend-line {
     fill: none;
     stroke: var(--accent);
@@ -681,8 +750,9 @@ const tick = (x: number, y: number, s = 1) => `M${x - 3.5 * s} ${y}l${2.4 * s} $
   }
   .trend-area { fill: rgb(74 138 186 / calc(0.12 * clamp(0, (var(--t) - 3.6) * 2, 1))); }
   .ver-dot { fill: var(--brand); stroke: var(--paper-2); stroke-width: 2; }
+  .refine { font-size: 8.5px; font-weight: 600; fill: var(--accent); }
 
-  /* Growth 4. Launch */
+  /* Growth 4. Deploy */
   .bar {
     fill: var(--mist-1);
     transform: scaleY(clamp(0, (var(--t) - var(--a)) / 0.6, 1));
