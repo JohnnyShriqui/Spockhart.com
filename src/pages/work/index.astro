@@ -5,22 +5,10 @@ import PageHero from '../../components/PageHero.astro';
 import Honeycomb from '../../components/Honeycomb.astro';
 import ResultVisual from '../../components/ResultVisual.astro';
 import ClosingCTA from '../../components/ClosingCTA.astro';
+import { iconFor, headline, plainTitle as plain } from '../../lib/work';
 
 const all = (await getCollection('work')).sort((a, b) => a.data.order - b.data.order);
 
-/**
- * Client names and logos are withheld, so each case study gets an industry mark where the
- * client's logo would sit (24x24 stroke icons, drawn in a navy hexagon).
- */
-const industryIcons: Record<string, string> = {
-  'commission-automation': 'M3 21V11l5 3v-3l5 3v-3l5 3V5h3v16zM3 21h18M7 17h2M12 17h2M17 17h1',
-  'project-feasibility-platform': 'M4 21V9h7v12M11 21V3h3l6 4M14 7h6M18 7v4M3 21h18M6.5 12h2M6.5 15h2M6.5 18h2',
-  'subcontractor-financing-marketplace': 'M3 17.5h18M5 17.5a7 7 0 0 1 14 0M10.5 10.6V6.5h3v4.1M12 20.5v.01',
-  'sales-performance-system': 'M4 20h16M6 16l4-4 3 3 5-6M14 9h4v4',
-  'digital-practice-growth': 'M4 8h16v11H4zM9 8V5.5h6V8M4 13h16M11 13v2h2v-2',
-  'momentum-exchange-prototype': 'M12 3c3 2.2 4.8 6 4.8 10l-2 3H9.2l-2-3c0-4 1.8-7.8 4.8-10zM9.4 16.2 7.5 20.5M14.6 16.2l1.9 4.3M12 8.5v3',
-  'supply-chain-assessment': 'M12 10v11M8.5 21h7M12 10l-3.5 11M12 10l3.5 11M9 6.5a4.2 4.2 0 0 0 0 6M15 6.5a4.2 4.2 0 0 1 0 6M6.2 4a8 8 0 0 0 0 11M17.8 4a8 8 0 0 1 0 11',
-};
 
 /**
  * Case study bodies are short markdown: a few "## Heading" sections of plain
@@ -40,9 +28,6 @@ const sectionsOf = (body = '') =>
       return { heading: heading.trim(), paras };
     });
 
-/** Headlines mark their numbers in [brackets]; those parts are set in blue. */
-const headline = (title: string) => title.split(/\[(.+?)\]/g);
-const plain = (title: string) => title.replace(/[\[\]]/g, '');
 
 ---
 
@@ -77,7 +62,7 @@ const plain = (title: string) => title.replace(/[\[\]]/g, '');
                 <p class="project-client">
                   <span class="client-mark" aria-hidden="true">
                     <svg viewBox="0 0 24 24">
-                      <path d={industryIcons[entry.id] ?? industryIcons['digital-practice-growth']} />
+                      <path d={iconFor(entry.id)} />
                     </svg>
                   </span>
                   <span class="client-name">{d.client}</span>
