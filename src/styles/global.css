@@ -467,14 +467,15 @@ a { color: inherit; }
   inset: 0;
   z-index: 200;
   pointer-events: none;
-  background: rgb(228 234 241 / 0.55);
-  -webkit-backdrop-filter: blur(3px) grayscale(0.6);
-  backdrop-filter: blur(3px) grayscale(0.6);
+  background: rgb(19 31 46 / 0.5);
+  -webkit-backdrop-filter: blur(4px) grayscale(0.5);
+  backdrop-filter: blur(4px) grayscale(0.5);
   opacity: 0;
   transition: opacity 320ms var(--ease);
 }
 html.is-focusing .focus-veil { opacity: 1; }
-.is-focus-zone { position: relative; z-index: 201; }
+/* Wins over a component's own layering, so whatever is pointed at always sits above the veil */
+.is-focus-zone { position: relative; z-index: 201 !important; }
 
 /* ---------- Skip link ---------- */
 .skip-link {

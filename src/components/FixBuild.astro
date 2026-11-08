@@ -352,7 +352,7 @@ const sets = [
         active = card;
         root.classList.add('has-active');
         // Everything else on the page steps back
-        focusOn(stage);
+        focusOn(card);
         // Hold the chart on the After while a case study is open
         clearTimeout(timer);
         root.classList.remove('fb-pre');
@@ -520,13 +520,9 @@ const sets = [
   :global(.fb-link-g.is-on .fb-link) { opacity: 1; stroke-width: 2; }
 
   /* ---------- The case studies ---------- */
-  .fb-cards { position: relative; z-index: 2; display: grid; gap: 0.7rem; }
+  .fb-cards { position: relative; display: grid; gap: 0.7rem; }
   .fb-eyebrow { margin-bottom: calc(var(--s-2) * -1); }
   .fb-eyebrow, .fb-set-head { transition: opacity 300ms var(--ease), filter 300ms var(--ease); }
-  /* One case study open: the other case studies step back with the rest of the page */
-  .has-active .fb-card:not(.is-on),
-  .has-active .fb-set-head,
-  .has-active .fb-eyebrow { opacity: 0.35; filter: blur(1.5px) grayscale(0.6); }
   .fb-set { display: grid; gap: 0.45rem; }
   .fb-set + .fb-set { margin-top: 0.35rem; }
   .fb-set-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s-3); padding-bottom: 0.3rem; border-bottom: 1px solid var(--rule-2); }
@@ -539,6 +535,7 @@ const sets = [
   .fb-card {
     --ms: 420ms;
     position: relative;
+    z-index: 2;
     display: grid;
     grid-template-columns: auto minmax(0, 1fr) auto;
     gap: 0.8rem;

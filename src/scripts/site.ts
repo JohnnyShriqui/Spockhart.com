@@ -74,13 +74,23 @@ function initReveals() {
   const els = Array.from(document.querySelectorAll<HTMLElement>('[data-reveal]'));
   if (!els.length) return;
 
+  // Once an element has risen into place it goes back to normal, so it no longer sits on
+  // its own layer (the focus veil needs to be able to lift things out of it)
+  const settle = (el: Element) =>
+    el.addEventListener('animationend', function done(e) {
+      if (e.target !== el || (e as AnimationEvent).animationName !== 'rise') return;
+      el.classList.remove('reveal-in');
+      el.removeEventListener('animationend', done);
+    });
   const play = (el: HTMLElement) => {
     if (el.dataset.reveal === 'stagger') {
       Array.from(el.children).forEach((child, i) => {
         (child as HTMLElement).style.setProperty('--i', String(i));
+        settle(child);
         child.classList.add('reveal-in');
       });
     } else {
+      settle(el);
       el.classList.add('reveal-in');
     }
   };

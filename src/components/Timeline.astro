@@ -392,8 +392,6 @@ const pct = (d: number) => `${(d / SCALE) * 100}%`;
     .phase-body { font-size: 0.9375rem; line-height: 1.5; }
   }
 
-  /* One phase pointed at: the others step back with the rest of the page */
-  :global(html.is-focusing) .timeline.is-focus-zone .phase:not(.is-active) { opacity: 0.35; filter: blur(1.5px) grayscale(0.6); }
 
   @media (prefers-reduced-motion: no-preference) {
     /* The marker only pulses while a phase is playing; otherwise the page holds still */
@@ -486,7 +484,7 @@ const pct = (d: number) => `${(d / SCALE) * 100}%`;
         const tail = phase.dataset.tail === '1';
         // Laptops: pointing at a phase plays it and the rest of the page steps back
         phase.addEventListener('pointerenter', () => {
-          if (phase.closest<HTMLElement>('[data-scene-group]')?.dataset.mode === 'hover') focusOn(tl);
+          if (phase.closest<HTMLElement>('[data-scene-group]')?.dataset.mode === 'hover') focusOn(phase);
         });
         phase.addEventListener('pointerleave', () => {
           if (phase.closest<HTMLElement>('[data-scene-group]')?.dataset.mode !== 'hover') return;
