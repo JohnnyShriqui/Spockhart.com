@@ -16,11 +16,11 @@ import { hexPath } from '../lib/logo';
     <div class="wrap hero-grid">
       <div class="hero-copy">
         <p class="eyebrow load-in" style="--i:0">Engineering impact</p>
-        <h1 class="load-in" style="--i:1">We optimize <em class="display-em">operations.</em></h1>
+        <h1 class="load-in" style="--i:1"><span class="h-line">Reduce operating costs.</span> <em class="display-em h-line">Uncover revenue opportunities.</em></h1>
         <div class="accent-rule load-in" style="--i:2"></div>
         <p class="lead load-in" style="--i:2">
-          Spockhart embeds with your company to save time and money across your operations and find new ways to grow revenue, then builds
-          the systems to make it happen. Within {site.offer.prototypeDays} days, you’ll see a working first version in action.
+          We identify opportunities to reduce costs, improve efficiency, and grow revenue. Then we build the systems to make it happen.
+          Within {site.offer.prototypeDays} days, you’ll have a working first version.
         </p>
         <div class="btn-row load-in" style="--i:3">
           <a class="btn" href="/contact/">Start a conversation <span class="arr" aria-hidden="true">→</span></a>
@@ -63,7 +63,8 @@ import { hexPath } from '../lib/logo';
     align-items: center;
   }
   .hero-copy { display: grid; gap: var(--s-5); justify-items: start; }
-  .hero-copy h1 { font-size: clamp(3rem, 1.6rem + 6vw, 6.75rem); max-width: 10ch; }
+  .hero-copy h1 { font-size: clamp(2.375rem, 1.3rem + 2.6vw, 3.625rem); max-width: none; text-wrap: balance; }
+  .hero-copy .h-line { display: block; }
   .hero-copy .lead { max-width: 48ch; }
   .hero-copy .btn-row { margin-top: var(--s-3); }
 
