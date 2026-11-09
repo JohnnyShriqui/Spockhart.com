@@ -98,7 +98,7 @@ const sets = [
             </g>
 
             <!-- After: revenue up by A to C, costs down by 1 to 4 -->
-            <rect x={after.rev} y={revTop} width={W} height={REV} rx="2" class="fb-rev" />
+            <rect x={after.rev} y={revTop} width={W} height={REV} rx="2" class="fb-rev fb-rev-after" />
             {
               build.map((b, i) => {
                 const y = revTop - ADD * (build.length - i);
@@ -828,4 +828,29 @@ const sets = [
     .fb-note { display: none; }
     .fb-cs { border-top-color: rgb(255 255 255 / 0.1); }
   }
+  /* After glows: lightsaber blue for revenue, red for costs, like the hero readout, so the
+     improvement reads at a glance. Before stays dull. The lines and the list's keys carry the
+     same light. */
+  .fb {
+    --neon-blue: #3fd0ff;
+    --neon-red: #ff3d5e;
+  }
+  .fb-rev-after { fill: rgb(63 208 255 / 0.13); stroke: var(--neon-blue); stroke-width: 1.5; filter: drop-shadow(0 0 6px rgb(63 208 255 / 0.55)); }
+  .fb-cost-after { fill: rgb(255 42 77 / 0.13); stroke: var(--neon-red); stroke-width: 1.5; vector-effect: non-scaling-stroke; filter: drop-shadow(0 0 6px rgb(255 42 77 / 0.55)); }
+  .fb-add-rect { fill: rgb(63 208 255 / 0.2); stroke: var(--neon-blue); stroke-width: 1.5; filter: drop-shadow(0 0 7px rgb(63 208 255 / 0.65)); }
+  .fb-add.is-on .fb-add-rect { fill: rgb(63 208 255 / 0.4); }
+  .fb-key-add { fill: #eafaff; }
+  .fb-cut-rect { stroke: rgb(255 61 94 / 0.8); stroke-width: 1.25; }
+  .fb-hatch-line { stroke: rgb(255 61 94 / 0.3); }
+  .fb-key-cut { fill: #ff8a9d; }
+  .fb-bracket-after { stroke: var(--neon-blue); filter: drop-shadow(0 0 4px rgb(63 208 255 / 0.7)); }
+  .fb-ann-hot { fill: #bfefff; }
+  :global(.fb-link) { opacity: 0.6; }
+  :global(.fb-link-build) { stroke: var(--neon-blue); filter: drop-shadow(0 0 3px rgb(63 208 255 / 0.6)); }
+  :global(.fb-link-fix) { stroke: var(--neon-red); filter: drop-shadow(0 0 3px rgb(255 42 77 / 0.6)); }
+  .fb-card-build { --c: var(--neon-blue); }
+  .fb-card-fix { --c: var(--neon-red); }
+  .fb-key::before { box-shadow: 0 0 6px var(--c); }
+  .fb-set-build .fb-set-note { color: var(--neon-blue); }
+  .fb-set-fix .fb-set-note { color: var(--neon-red); }
 </style>
