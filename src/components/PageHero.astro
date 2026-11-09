@@ -1,22 +1,26 @@
 ---
 import Mist from './Mist.astro';
 interface Props {
-  eyebrow?: string;
   title: string;
   lead?: string;
+  /** Each page's own hero colours (see "Hero themes" in global.css). Every theme is dark except 'nonprofit'. */
+  theme?: 'approach' | 'work' | 'security' | 'nonprofit' | 'quiet';
   /** On phones, hide the lead and keep just the heading */
   terse?: boolean;
   class?: string;
 }
-const { eyebrow, title, lead, terse = false, class: className = '' } = Astro.props;
+const { title, lead, theme = 'quiet', terse = false, class: className = '' } = Astro.props;
 const hasFigure = Astro.slots.has('figure');
+const dark = theme !== 'nonprofit';
 ---
 
-<section class:list={['page-hero', className, { 'with-figure': hasFigure, terse }]}>
+<section
+  class:list={['page-hero', `theme-${theme}`, className, { 'hero-dark': dark, 'with-figure': hasFigure, terse }]}
+  data-hero-dark={dark ? '' : undefined}
+>
   <Mist />
   <div class="wrap hero-layout">
     <div class="hero-text">
-      {eyebrow && <p class="eyebrow load-in" style="--i:0">{eyebrow}</p>}
       <h1 class="load-in" style="--i:1" set:html={title} />
       <div class="accent-rule load-in" style="--i:2"></div>
       {lead && <p class="lead load-in" style="--i:2">{lead}</p>}

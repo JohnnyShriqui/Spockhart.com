@@ -13,9 +13,11 @@ interface Props {
   ogType?: 'website' | 'article';
   /** Extra JSON-LD objects for this page. */
   schema?: Record<string, unknown>[];
+  /** The page opens on a light hero (Nonprofits); every other hero is dark. */
+  lightHero?: boolean;
 }
 
-const { title, description = site.description, noindex = false, ogType = 'website', schema = [] } = Astro.props;
+const { title, description = site.description, noindex = false, ogType = 'website', schema = [], lightHero = false } = Astro.props;
 const fullTitle = title ? `${title} | ${site.name}` : `${site.name} | ${site.tagline.replace(/\.$/, '')}`;
 const canonical = new URL(Astro.url.pathname, site.url).href;
 const ogImage = new URL('/og.png', site.url).href;
@@ -77,7 +79,7 @@ const jsonld = [organization, ...schema];
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
-    <Header />
+    <Header overDark={!lightHero} />
     <main id="main" tabindex="-1">
       <slot />
     </main>

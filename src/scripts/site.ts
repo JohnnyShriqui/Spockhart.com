@@ -11,9 +11,13 @@ const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 function initHeader() {
   const header = document.querySelector<HTMLElement>('[data-header]');
   if (!header) return;
+  // Pages that open on a dark hero keep the header light-on-dark until the hero has scrolled past
+  const hero = document.querySelector<HTMLElement>('[data-hero-dark]');
   let ticking = false;
   const update = () => {
     header.classList.toggle('is-scrolled', window.scrollY > 8);
+    if (hero) header.classList.toggle('over-dark', hero.getBoundingClientRect().bottom > header.offsetHeight / 2);
+    else header.classList.remove('over-dark');
     ticking = false;
   };
   update();
@@ -27,6 +31,7 @@ function initHeader() {
     },
     { passive: true },
   );
+  window.addEventListener('resize', update, { passive: true });
 }
 
 /* ---------- Mobile menu ---------- */

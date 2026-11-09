@@ -2,11 +2,16 @@
 import Logo from './Logo.astro';
 import { primaryNav, site } from '../config/site';
 
+interface Props {
+  /** The page opens on a dark hero, so the header starts in its light-on-dark colours */
+  overDark?: boolean;
+}
+const { overDark = false } = Astro.props;
 const path = Astro.url.pathname;
 const isCurrent = (href: string) => (href === '/' ? path === '/' : path.startsWith(href));
 ---
 
-<header class="site-header" data-header>
+<header class:list={['site-header', { 'over-dark': overDark }]} data-header>
   <div class="wrap header-inner">
     <a class="brand" href="/" aria-label={`${site.name}, home`}>
       <Logo size={26} />
@@ -74,6 +79,20 @@ const isCurrent = (href: string) => (href === '/' ? path === '/' : path.startsWi
     -webkit-backdrop-filter: saturate(1.4) blur(14px);
     backdrop-filter: saturate(1.4) blur(14px);
     box-shadow: 0 1px 0 var(--rule);
+  }
+  /* Over a dark hero: light text, and a dark glass once the page scrolls */
+  .site-header.over-dark:not(.is-open) {
+    --ink: #eef3f8;
+    --ink-2: #c2d0dd;
+    --mark: #eef3f8;
+    --accent-soft: #8ec0e6;
+    --btn-bg: #eef3f8;
+    --btn-fg: #14212f;
+    --btn-bg-hover: #ffffff;
+  }
+  .site-header.over-dark.is-scrolled:not(.is-open) {
+    background: rgb(9 17 27 / 0.55);
+    box-shadow: 0 1px 0 rgb(255 255 255 / 0.07);
   }
   /* backdrop-filter would make the header the containing block for the fixed menu panel */
   .site-header.is-open {

@@ -1,11 +1,13 @@
 ---
 import Base from '../../layouts/Base.astro';
 import Mark from '../../components/Mark.astro';
+import Mist from '../../components/Mist.astro';
 import { site } from '../../config/site';
 ---
 
 <Base title="Thank you" noindex>
-  <section class="thanks">
+  <section class="thanks hero-dark theme-quiet" data-hero-dark>
+    <Mist />
     <div class="wrap thanks-inner">
       <div class="load-in" style="--i:0"><Mark size={72} tone="brand" assemble tilt /></div>
       <h1 class="load-in" style="--i:1">Thank you. We have it.</h1>

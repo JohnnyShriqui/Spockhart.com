@@ -1,13 +1,14 @@
 ---
 import Base from '../layouts/Base.astro';
 import Mark from '../components/Mark.astro';
+import Mist from '../components/Mist.astro';
 ---
 
 <Base title="Page not found" noindex>
-  <section class="nf">
+  <section class="nf hero-dark theme-quiet" data-hero-dark>
+    <Mist />
     <div class="wrap nf-inner">
       <div class="load-in" style="--i:0"><Mark size={84} tone="brand" assemble tilt /></div>
-      <p class="eyebrow load-in" style="--i:1">404</p>
       <h1 class="load-in" style="--i:2">This page is not here.</h1>
       <p class="lead load-in" style="--i:3">The link may be old, or the address may have a typo.</p>
       <div class="btn-row load-in" style="--i:4">

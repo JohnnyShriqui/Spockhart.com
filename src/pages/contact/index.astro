@@ -1,14 +1,15 @@
 ---
 import Base from '../../layouts/Base.astro';
 import CopyEmail from '../../components/CopyEmail.astro';
+import Mist from '../../components/Mist.astro';
 import { site } from '../../config/site';
 ---
 
 <Base title="Contact" description="Start a conversation with Spockhart. Tell us what your team could accomplish with more time and we will reply within one business day.">
-  <section class="contact">
+  <section class="contact hero-dark theme-contact" data-hero-dark>
+    <Mist />
     <div class="wrap contact-grid">
       <div class="contact-intro">
-        <p class="eyebrow load-in" style="--i:0">Contact</p>
         <h1 class="load-in" style="--i:1">Start a conversation.</h1>
         <p class="lead load-in" style="--i:2">Tell us what your team could accomplish with more time. We reply within {site.offer.replyWithin}.</p>
 
@@ -19,7 +20,7 @@ import { site } from '../../config/site';
         </div>
       </div>
 
-      <div class="contact-form-wrap load-in" style="--i:2">
+      <div class="contact-form-wrap on-light load-in" style="--i:2">
         <form class="contact-form" data-contact-form data-endpoint={site.formEndpoint} novalidate>
           <div class="row-2">
             <div class="field">

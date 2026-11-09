@@ -3,24 +3,25 @@ import Base from '../layouts/Base.astro';
 import PageHero from '../components/PageHero.astro';
 import GapChart from '../components/GapChart.astro';
 import ClosingCTA from '../components/ClosingCTA.astro';
-import NonprofitGap from '../components/NonprofitGap.astro';
+import NonprofitImpact from '../components/NonprofitImpact.astro';
 
 
 ---
 
 <Base
+  lightHero
   title="Nonprofits"
   description="Every nonprofit faces the same fundamental challenge: unlimited demand on limited resources. Spockhart closes that gap by taking tedious, repetitive tasks off your team."
 >
   <PageHero
-    eyebrow="Nonprofits"
+    theme="nonprofit"
     title="Engineering nonprofit impact."
     lead="Every nonprofit faces the same fundamental challenge: unlimited demand on limited resources. We exist to close that gap."
   >
     <GapChart slot="figure" />
   </PageHero>
 
-  <NonprofitGap />
+  <NonprofitImpact />
 
   <ClosingCTA
     terse

@@ -297,6 +297,145 @@ a { color: inherit; }
   background: linear-gradient(90deg, var(--accent), var(--accent-soft));
 }
 
+/* ---------- Hero themes ----------
+   Every hero is deep and dark except Nonprofits. Each page fades its own colours over a
+   navy ground, with a fine grain so the fades read as depth rather than flat fills.
+   The content and graphics inside stay as they are; only the tokens they read change. */
+:root {
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.hero-dark {
+  --ink: #eef3f8;
+  --ink-2: #b5c4d3;
+  --ink-3: #94a8bc;
+  --rule: rgb(255 255 255 / 0.1);
+  --rule-2: rgb(255 255 255 / 0.2);
+  --accent: #8ec0e6;
+  --accent-soft: #6fa8d6;
+  --brand: #6fa4d2;
+  --mark: #eef3f8;
+  --btn-bg: #eef3f8;
+  --btn-fg: #14212f;
+  --btn-bg-hover: #ffffff;
+  --selection: rgb(142 192 230 / 0.3);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  color: var(--ink);
+  background-color: #0c1724;
+  border-bottom: 0;
+}
+.hero-dark > .wrap { position: relative; z-index: 1; }
+.hero-dark::after,
+.theme-nonprofit::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: var(--grain);
+  background-size: 200px;
+}
+.hero-dark::after { opacity: 0.13; mix-blend-mode: overlay; }
+
+/* Home: midnight blue, the brand's steel glowing behind the mark, deep teal underneath */
+.theme-home {
+  background:
+    radial-gradient(52% 72% at 80% 40%, rgb(46 104 152 / 0.5), transparent 72%),
+    radial-gradient(48% 62% at 0% 105%, rgb(20 80 94 / 0.55), transparent 72%),
+    radial-gradient(42% 46% at 38% -8%, rgb(56 66 132 / 0.32), transparent 72%),
+    linear-gradient(165deg, #09131e 0%, #0d1c2d 55%, #10233a 100%);
+  --mist-1: #2a6496;
+  --mist-2: #1b5c68;
+  --mist-3: #3a4c8c;
+}
+/* Approach: indigo dusk, light rising from the lower right */
+.theme-approach {
+  background:
+    radial-gradient(50% 85% at 8% -5%, rgb(72 78 152 / 0.5), transparent 72%),
+    radial-gradient(55% 75% at 100% 105%, rgb(38 96 142 / 0.48), transparent 72%),
+    radial-gradient(30% 50% at 64% 30%, rgb(108 80 136 / 0.16), transparent 72%),
+    linear-gradient(200deg, #0c1325 0%, #111930 60%, #131c33 100%);
+  --mist-1: #4a4f9c;
+  --mist-2: #2a5f8e;
+  --mist-3: #5c4a82;
+}
+/* Our Work: deep petrol, cool light behind the results */
+.theme-work {
+  background:
+    radial-gradient(50% 72% at 80% 46%, rgb(26 104 118 / 0.48), transparent 72%),
+    radial-gradient(46% 62% at 0% 0%, rgb(36 78 126 / 0.45), transparent 72%),
+    radial-gradient(40% 52% at 34% 112%, rgb(18 72 82 / 0.5), transparent 72%),
+    linear-gradient(170deg, #07141a 0%, #0a1f28 55%, #0d2932 100%);
+  --mist-1: #1c6b76;
+  --mist-2: #285a88;
+  --mist-3: #1e5b64;
+}
+/* Contact: a warmer night, a low copper light against the blue */
+.theme-contact {
+  background:
+    radial-gradient(46% 56% at 92% 4%, rgb(166 112 86 / 0.24), transparent 72%),
+    radial-gradient(56% 72% at -4% 72%, rgb(40 92 140 / 0.42), transparent 72%),
+    radial-gradient(36% 46% at 56% 44%, rgb(94 72 118 / 0.15), transparent 72%),
+    linear-gradient(180deg, #0f151f 0%, #131926 60%, #161b28 100%);
+  --mist-1: #8a604c;
+  --mist-2: #2b5f90;
+  --mist-3: #5a4a7a;
+}
+/* Security: graphite with a cold, quiet light */
+.theme-security {
+  background:
+    radial-gradient(50% 75% at 86% 20%, rgb(60 112 142 / 0.4), transparent 72%),
+    radial-gradient(45% 60% at 6% 100%, rgb(52 62 96 / 0.4), transparent 72%),
+    linear-gradient(180deg, #0d1219 0%, #121a24 100%);
+  --mist-1: #3b6f8e;
+  --mist-2: #3a4566;
+  --mist-3: #2d5874;
+}
+/* 404 and thank-you: one slow blue light */
+.theme-quiet {
+  background:
+    radial-gradient(55% 80% at 70% 30%, rgb(44 98 146 / 0.42), transparent 72%),
+    radial-gradient(40% 55% at 0% 100%, rgb(30 70 100 / 0.4), transparent 72%),
+    linear-gradient(170deg, #0a1420 0%, #0f1e30 100%);
+  --mist-1: #2a6496;
+  --mist-2: #1f4f72;
+  --mist-3: #34508a;
+}
+
+/* Nonprofits stays light: warm paper in the corner, cool morning light opposite,
+   a fine grain like good stock, fading into the page below */
+.theme-nonprofit {
+  background:
+    radial-gradient(58% 85% at -2% -4%, rgb(242 226 204 / 0.85), transparent 72%),
+    radial-gradient(50% 75% at 102% 24%, rgb(204 221 238 / 0.75), transparent 72%),
+    radial-gradient(44% 60% at 52% 108%, rgb(236 227 214 / 0.55), transparent 72%),
+    linear-gradient(180deg, #f6f2eb 0%, #f3f2ef 60%, var(--paper) 100%);
+  --mist-1: #e8d5bc;
+  --mist-2: #dbc8b2;
+  --mist-3: #cadcec;
+  border-bottom: 0;
+}
+.theme-nonprofit::after { opacity: 0.06; mix-blend-mode: multiply; }
+
+/* Light panels that sit inside a dark hero (the contact form) */
+.on-light {
+  --ink: #1b2a3d;
+  --ink-2: #4a5d72;
+  --ink-3: #586b80;
+  --rule: #d6dee8;
+  --rule-2: #b5c3d3;
+  --accent: #2c5f8a;
+  --accent-soft: #4a8aba;
+  --brand: #1f4d6f;
+  --mark: #1f4d6f;
+  --btn-bg: #1b2a3d;
+  --btn-fg: #f0f3f7;
+  --btn-bg-hover: #2c4a6a;
+  --selection: rgb(74 138 186 / 0.25);
+  color: var(--ink);
+}
+
 /* ---------- Section heads ---------- */
 .section-head { display: grid; gap: var(--s-4); margin-bottom: var(--s-8); max-width: 760px; }
 .section-head h2 { max-width: 20ch; }
@@ -549,3 +688,13 @@ html.is-focusing .focus-veil { opacity: 1; }
   .site-header, .site-footer, .no-print { display: none !important; }
   body { background: #fff; color: #000; }
 }
+
+/* The Our Work honeycomb keeps its own colours inside the dark hero */
+.hero-dark .comb {
+  --brand: #1f4d6f;
+  --accent: #2c5f8a;
+  --mist-1: #b8cce0;
+}
+
+/* A dark hero that runs straight into the footer (contact, 404) gets a hairline between them */
+main > .hero-dark:last-child { border-bottom: 1px solid rgb(255 255 255 / 0.07); }
