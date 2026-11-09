@@ -92,6 +92,7 @@ export function initCalculator() {
 
     tween('hours', r.hours, (n) => int.format(n));
     tween('cost', r.cost, (n) => money.format(n));
+    tween('half', r.cost / 2, (n) => money.format(n));
     tween('fte', r.fte, (n) => one.format(n));
     outs('days').forEach((d) => (d.textContent = describeDays(v.hours)));
     const lost = v.hours / 8;
@@ -99,7 +100,7 @@ export function initCalculator() {
     renderTeam(v.people, r.fte);
 
     if (cta) {
-      const estimate = `Our numbers: ${v.people} people spend about ${v.hours} hours a week each on manual work. That is ${int.format(r.hours)} hours and ${money.format(r.cost)} a year.`;
+      const estimate = `Our numbers: ${v.people} people spend about ${v.hours} hours a week each on manual work. That is ${int.format(r.hours)} hours and ${money.format(r.cost)} a year; half of it back would be ${money.format(r.cost / 2)}.`;
       cta.href = `${cta.getAttribute('href')!.split('?')[0]}?${new URLSearchParams({ estimate }).toString()}`;
     }
 
@@ -113,7 +114,7 @@ export function initCalculator() {
 
   // Seed tween state from the server-rendered figures.
   const initial = compute(Object.fromEntries(inputs.map((f) => [f.key, f.value])) as Values);
-  Object.assign(shown, { hours: initial.hours, cost: initial.cost, fte: initial.fte });
+  Object.assign(shown, { hours: initial.hours, cost: initial.cost, half: initial.cost / 2, fte: initial.fte });
 
   form.addEventListener('input', update);
   form.addEventListener('change', update);
@@ -130,6 +131,7 @@ export function initCalculator() {
           const r = compute(values());
           tween('hours', r.hours, (n) => int.format(n), 0, 1400);
           tween('cost', r.cost, (n) => money.format(n), 0, 1400);
+          tween('half', r.cost / 2, (n) => money.format(n), 0, 1400);
           tween('fte', r.fte, (n) => one.format(n), 0, 1400);
         },
         { threshold: 0.6 },

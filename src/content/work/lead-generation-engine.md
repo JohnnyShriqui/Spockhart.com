@@ -8,20 +8,24 @@ order: 3
 metrics:
   - value: $1B+ market
     label: Opened up through one digital service
-  - value: Lead engine
-    label: Every assessment became a conversation with a potential customer
+  - value: Every assessment
+    label: Becomes a conversation with a potential customer
   - value: North America
     label: Builders, developers and organizations reached across the continent
 ---
 
-## The situation
+## The challenge
 
-One division of a national general contractor had years of expertise in judging which development opportunities were worth pursuing, but no way to offer it at scale to the builders, developers and organizations in a new market.
+One division of a national general contractor had years of expertise in judging which development opportunities were worth pursuing. That expertise lived with its people, so it could serve only one project at a time and could not reach the builders, developers and organizations in a new market.
 
 ## What we did
 
-We digitized that expertise into a service anyone in the market could use. Every assessment became a lead, giving the company a new way to start conversations with customers and win business.
+We turned that expertise into a digital service anyone in the market could use.
 
-## The result
+- Captured the division's judgement in a tool that assesses an opportunity on its own
+- Made it available to builders, developers and organizations across North America
+- Designed it so every assessment opens a conversation with a potential customer
 
-A $1B+ market opened up, and a new lead-generation engine reaching builders, developers and organizations across North America.
+## The outcome
+
+A $1B+ market opened through one digital service, and a lead-generation engine that gives the company a new conversation with every assessment.

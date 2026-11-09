@@ -78,6 +78,7 @@ const iconFill = (i: number) => Math.max(0, Math.min(1, fteIcons - i));
       <div class="calc-right">
         <p class="r-label"><span class="t-desk">{resultLabel}</span><span class="t-mob">Lost every year</span></p>
         <p class="r-big tabular"><span data-out="cost">{money(r.cost)}</span></p>
+        <p class="r-back">If half of this were automated, you’d get <strong class="tabular" data-out="half">{money(r.cost / 2)}</strong> a year back.</p>
 
         <ul class="r-tiles" aria-hidden="true">
           <li><span class="tile-v tabular" data-out="hours">{num(r.hours)}</span><span class="tile-k">hours a year</span></li>
@@ -386,9 +387,13 @@ const iconFill = (i: number) => Math.max(0, Math.min(1, fteIcons - i));
   /* Laptops: the result uses the full height beside the inputs. The label and figure sit
      together at the top, each picture gets its own room, and the button lines up with the
      bottom of the inputs. */
+  /* What half of it back would be worth: a show of potential, not a promise */
+  .r-back { font-size: 1.0625rem; line-height: 1.45; color: var(--ink-2); }
+  .r-back strong { font-weight: 600; color: var(--ink); white-space: nowrap; }
   @media (min-width: 961px) {
     .calc-right { display: flex; flex-direction: column; gap: 0; }
-    .r-big { margin-top: 0.6rem; padding-bottom: 1.5rem; }
+    .r-big { margin-top: 0.6rem; padding-bottom: 0.9rem; }
+    .r-back { padding-bottom: 1.5rem; }
     /* Whatever height the inputs give is shared out evenly above each picture and the button */
     .r-viz { gap: 1.1rem; margin-top: auto; padding-block: 1.5rem; }
     .day { height: 44px; }
@@ -402,6 +407,7 @@ const iconFill = (i: number) => Math.max(0, Math.min(1, fteIcons - i));
   }
   @media (max-width: 640px) {
     .calc { border-radius: 12px; }
+    .r-back { font-size: 0.9375rem; }
     .r-tiles li { background: rgb(var(--hair) / 0.05); }
   }
 </style>

@@ -14,16 +14,18 @@ metrics:
     label: Clear, consistent metrics for every representative
 ---
 
-## The situation
+## The challenge
 
-A sales organization had limited visibility into individual performance, making it difficult to identify opportunities, manage representatives, and understand what was driving results.
+A multi-million-dollar sales organization had little visibility into how each of its 16 representatives was performing. Without consistent numbers it was hard to see what was driving results, where the opportunities were, or how to coach the team.
 
 ## What we did
 
-We implemented a centralized performance tracking system that gave management clear, consistent metrics across all 16 representatives.
+We implemented a centralized performance tracking system.
 
-Following implementation, average monthly team sales increased by about $316K.
+- Brought all 16 representatives into one system
+- Defined clear, consistent metrics for every representative
+- Gave management a single view of the whole team's performance
 
-## The result
+## The outcome
 
-Management gained the visibility to understand performance, coach effectively, and manage the team against real numbers.
+Following implementation, average monthly team sales rose by about $316K, and management could coach and manage the team against real numbers.

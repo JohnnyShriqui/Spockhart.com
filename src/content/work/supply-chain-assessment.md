@@ -14,14 +14,18 @@ metrics:
     label: Findings shaped the following year's continuous-improvement priorities
 ---
 
-## The situation
+## The challenge
 
-A global telecommunications equipment company needed a clearer picture of how its supplier network performed against modern manufacturing standards.
+A global telecommunications equipment company needed a clear, comparable picture of how its suppliers' processes performed against modern manufacturing standards, so it could decide where to focus improvement.
 
 ## What we did
 
-We mapped supplier processes across its global network, assessed them against Industry 4.0 best practices, and built a weighted-scoring platform to evaluate and rank improvement opportunities.
+We built a structured assessment of the whole supplier network.
 
-## The result
+- Mapped supplier processes across the global network
+- Assessed each against Industry 4.0 best practice
+- Built a weighted-scoring platform to evaluate and rank the improvement opportunities
 
-Leadership gained a structured, evidence-based way to identify where improvements mattered most and direct resources accordingly.
+## The outcome
+
+Leadership gained a structured, evidence-based view of where improvement mattered most, and the findings set the following year's continuous-improvement priorities.

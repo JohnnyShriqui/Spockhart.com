@@ -17,14 +17,19 @@ metrics:
     label: Scheduled go-live
 ---
 
-## The situation
+## The challenge
 
-A $1.2B global manufacturer was relying on a manual Excel process to calculate sales commissions across its entire sales organization.
+A $1.2B global manufacturer calculates sales commissions for its entire sales organization by hand, in Excel. Every payout depends on spreadsheets maintained manually, which takes a large share of the team's time each cycle and makes results difficult to check or explain.
 
 ## What we are doing
 
-We are building a custom automated commission platform to replace that process with a centralized, auditable system that calculates compensation consistently and transparently.
+We are designing and building a custom commission platform to replace the spreadsheets.
 
-## The objective
+- One central system for commission calculations across the entire sales organization
+- The same rules applied to every representative, every time
+- Every calculation traceable, so any payout can be checked and explained
+- Scheduled to go live in January 2027
 
-Eliminate manual commission administration while giving the organization a reliable, transparent source of truth for compensation.
+## What it will deliver
+
+An 80% reduction in the time spent processing commissions, and a single, auditable source of truth for compensation that management and representatives can both rely on.

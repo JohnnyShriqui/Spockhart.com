@@ -11,21 +11,28 @@ const all = (await getCollection('work')).sort((a, b) => a.data.order - b.data.o
 
 
 /**
- * Case study bodies are short markdown: a few "## Heading" sections of plain
- * paragraphs. They are shown as side-by-side columns in each project's details.
+ * Case study bodies are short markdown: a few "## Heading" sections of plain paragraphs and short
+ * "- " lists. They are shown as rows in each project's details.
  */
+type Block = { list: false; text: string } | { list: true; items: string[] };
 const sectionsOf = (body = '') =>
   body
     .split(/^## /m)
     .slice(1)
     .map((chunk) => {
       const [heading, ...rest] = chunk.split('\n');
-      const paras = rest
+      const blocks: Block[] = rest
         .join('\n')
         .split(/\n\s*\n/)
-        .map((p) => p.replace(/\s+/g, ' ').trim())
-        .filter(Boolean);
-      return { heading: heading.trim(), paras };
+        .map((b) => b.trim())
+        .filter(Boolean)
+        .map((b) => {
+          const lines = b.split('\n').map((l) => l.trim());
+          return lines.every((l) => l.startsWith('- '))
+            ? { list: true as const, items: lines.map((l) => l.slice(2).trim()) }
+            : { list: false as const, text: b.replace(/\s+/g, ' ') };
+        });
+      return { heading: heading.trim(), blocks };
     });
 
 
@@ -105,9 +112,17 @@ const sectionsOf = (body = '') =>
                         <div class="cs-col">
                           <h3>{s.heading}</h3>
                           <div class="cs-text">
-                            {s.paras.map((p) => (
-                              <p>{p}</p>
-                            ))}
+                            {s.blocks.map((b) =>
+                              b.list ? (
+                                <ul class="cs-list">
+                                  {b.items.map((item) => (
+                                    <li>{item}</li>
+                                  ))}
+                                </ul>
+                              ) : (
+                                <p>{b.text}</p>
+                              ),
+                            )}
                           </div>
                         </div>
                       ))}
@@ -330,6 +345,9 @@ const sectionsOf = (body = '') =>
   .cs-col h3 { padding-top: 0.3rem; font-family: var(--font-body); font-size: 0.75rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); }
   .cs-text { display: grid; gap: var(--s-2); }
   .cs-text p { color: var(--ink-2); font-size: 0.9375rem; line-height: 1.55; }
+  .cs-list { list-style: none; padding: 0; display: grid; gap: 0.45rem; }
+  .cs-list li { position: relative; padding-left: 1.35rem; color: var(--ink-2); font-size: 0.9375rem; line-height: 1.5; }
+  .cs-list li::before { content: ''; position: absolute; left: 0.1rem; top: 0.68em; width: 0.6rem; height: 1.5px; background: var(--accent); }
   .cs-foot {
     display: flex;
     flex-wrap: wrap;

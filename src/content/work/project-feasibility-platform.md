@@ -14,14 +14,18 @@ metrics:
     label: Ranked first in a $5M government technology grant review
 ---
 
-## The situation
+## The challenge
 
-A national general contractor was spending more than $100,000 and over 12 months assessing individual development opportunities.
+For a national general contractor, deciding whether a single development opportunity was worth pursuing meant a feasibility assessment that took more than 12 months and cost over $100,000. That cost and delay limited how many opportunities could be evaluated at all.
 
 ## What we did
 
-We sold and built an automated feasibility platform that reduced the process to minutes, at no cost per assessment. The platform opened a new market for the company and became its North American lead-generation engine.
+We sold the project and built an automated feasibility platform.
 
-## The result
+- Turned the year-long assessment into an automated analysis that returns an answer in minutes
+- Removed the cost per assessment, so any opportunity can be checked
+- Opened the platform to the wider market, where it became the company's North American lead-generation engine
 
-A six-figure, year-long process became an accessible tool that could assess opportunities at scale and generate new business.
+## The outcome
+
+Assessments went from more than 12 months and $100K+ each to minutes, at no cost per assessment. The platform ranked first nationally in a $5M government technology grant review.

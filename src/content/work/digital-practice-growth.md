@@ -8,22 +8,24 @@ order: 1
 metrics:
   - value: '~$150K → ~$1M'
     label: Practice revenue in under a year
-  - value: Multiple new capabilities
-    label: Digital twins, analytics, and transformation platforms
-  - value: New enterprise opportunities
-    label: We expanded the firm's ability to sell and deliver technology-led engagements
+  - value: 3 new service areas
+    label: Digital twins, analytics and enterprise transformation platforms
+  - value: Enterprise clients
+    label: A new ability to sell and deliver technology-led engagements
 ---
 
-## The situation
+## The challenge
 
-A consulting firm wanted to expand its digital services offering beyond traditional advisory work and build a stronger technical delivery capability.
+A consulting firm's digital practice was earning about $150K a year from traditional advisory work. The firm wanted to grow it into a technical delivery business able to win and deliver larger, technology-led engagements.
 
 ## What we did
 
-As part of the team responsible for developing and scaling the practice, we helped bring new services to market across digital twins, analytics, and enterprise transformation platforms.
+As part of the team responsible for building and scaling the practice, we worked across business development, client relationships and delivery.
 
-Working across business development, client relationships, and delivery, we grew the practice from approximately $150K to $1M in revenue in under a year.
+- Brought new services to market in digital twins, analytics and enterprise transformation platforms
+- Built the capability to sell and deliver technology-led engagements to enterprise clients
+- Delivered the work alongside selling it, so each new service had proof behind it
 
-## The result
+## The outcome
 
-An expanded digital services business, a broader technical offering, and a new source of commercial growth for the firm.
+Practice revenue grew from about $150K to about $1M in under a year, more than six times over, with a broader technical offering and a new source of growth for the firm.

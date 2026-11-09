@@ -16,16 +16,18 @@ metrics:
     label: We completed the working prototype ahead of schedule and under budget
 ---
 
-## The situation
+## The challenge
 
-Moving cargo is expensive. Fuel costs, payload limits, and the resources required to transport goods put hard constraints on how much can be delivered in a single trip.
-
-We were tasked with helping develop a more efficient approach using a momentum-exchange system that transfers energy between moving objects, reducing the amount of fuel required to transport additional cargo.
+Moving cargo is expensive. Fuel costs and payload limits cap how much can be delivered in a single trip. The client was developing a momentum-exchange system, which transfers energy between moving objects to reduce the fuel needed to carry additional cargo.
 
 ## What we did
 
-We helped turn the existing concept into a working engineering prototype, contributing to its design, mechanical requirements, testing, and validation.
+We helped turn the concept into a working engineering prototype.
 
-## The result
+- Contributed to the design and mechanical requirements
+- Tested and validated the prototype
+- Redesigned it through testing, making its tracking 7x more accurate and reaching 5mm precision
 
-A validated engineering prototype that demonstrated the concept's feasibility and established the foundation for a full-scale design.
+## The outcome
+
+A validated prototype of a system that could carry up to 83% more cargo per trip, delivered ahead of schedule and under budget, and the foundation for a full-scale design.

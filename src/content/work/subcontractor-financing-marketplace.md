@@ -14,14 +14,18 @@ metrics:
     label: A new financing marketplace for the construction sector
 ---
 
-## The situation
+## The challenge
 
-Subcontractors were waiting more than six months for financing approvals, slowing their ability to take on and deliver new construction work.
+Construction subcontractors were waiting more than six months for financing approval. Without timely financing they were slower to take on and deliver new work, which held up projects further along the pipeline.
 
 ## What we did
 
-We closed and launched a first-of-its-kind financing marketplace across the US and Canada, dramatically reducing approval timelines and creating a new revenue channel across the construction pipeline.
+We closed and launched a first-of-its-kind financing marketplace for the construction sector.
 
-## The result
+- Brought subcontractors and financing together in one marketplace
+- Launched it across the United States and Canada
+- Created a new revenue channel across the construction pipeline
 
-Faster access to financing, less friction in the construction pipeline, and a new source of revenue.
+## The outcome
+
+Approval timelines fell from more than six months to weeks, giving subcontractors faster access to capital and the client a new source of revenue.
