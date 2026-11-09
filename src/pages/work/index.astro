@@ -44,6 +44,8 @@ const sectionsOf = (body = '') =>
     <Honeycomb slot="figure" />
   </PageHero>
 
+  <!-- The whole page carries on in the hero's deep petrol, not just the opening -->
+  <div class="work-dark" data-dark-page>
   <section class="projects" aria-label="Projects" data-projects>
     {
       all.map((entry, i) => {
@@ -137,6 +139,7 @@ const sectionsOf = (body = '') =>
   </noscript>
 
   <ClosingCTA terse title="Your operation could be next." />
+  </div>
 </Base>
 
 <script>
@@ -182,8 +185,53 @@ const sectionsOf = (body = '') =>
 </script>
 
 <style>
-  .project { padding-block: clamp(3.5rem, 2rem + 4.5vw, 6.5rem); border-bottom: 1px solid var(--rule); scroll-margin-top: 72px; }
-  .project.tint { background: var(--paper-2); }
+  /* ---------- Dark, in the hero's colours ----------
+     One deep petrol ground for the whole page, the same fine grain as the hero, and a soft glow
+     behind each graphic (teal and blue in turn, like the hero's) that fades out well before the
+     edges of its case study, so nothing ever meets on a line. */
+  .work-dark {
+    --ink: #eef3f8;
+    --ink-2: #b5c4d3;
+    --ink-3: #94a8bc;
+    --rule: rgb(255 255 255 / 0.1);
+    --rule-2: rgb(255 255 255 / 0.22);
+    --accent: #8ec0e6;
+    --accent-soft: #6fa8d6;
+    --accent-wash: rgb(142 192 230 / 0.14);
+    --surface: rgb(255 255 255 / 0.04);
+    --btn-bg: #eef3f8;
+    --btn-fg: #14212f;
+    --btn-bg-hover: #ffffff;
+    --selection: rgb(142 192 230 / 0.3);
+    position: relative;
+    isolation: isolate;
+    color: var(--ink);
+    background: linear-gradient(180deg, #0c1f28 0%, #0b1c25 50%, #0a1922 100%);
+  }
+  .work-dark::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image: var(--grain);
+    background-size: 200px;
+    opacity: 0.13;
+    mix-blend-mode: overlay;
+  }
+  .work-dark :global(.closing) { border-top: 0; }
+
+  .project {
+    --glow: rgb(26 104 118 / 0.46);
+    --glow-x: 70%;
+    padding-block: clamp(3.5rem, 2rem + 4.5vw, 6.5rem);
+    scroll-margin-top: 72px;
+    background: radial-gradient(56% 44% at var(--glow-x) 50%, var(--glow), transparent 72%);
+  }
+  .project.flip { --glow-x: 30%; }
+  .project:nth-child(4n + 2), .project:nth-child(4n + 3) { --glow: rgb(36 78 126 / 0.46); }
+  .client-mark::before { background: #eef3f8 !important; }
+  .client-mark svg { stroke: #14212f !important; }
   .project-grid {
     display: grid;
     grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
@@ -236,7 +284,7 @@ const sectionsOf = (body = '') =>
     color: var(--ink);
     transition: background-color var(--dur) var(--ease), border-color var(--dur) var(--ease);
   }
-  .cs-toggle:hover { background: var(--surface); border-color: var(--ink-3); }
+  .cs-toggle:hover { background: rgb(255 255 255 / 0.08); border-color: rgb(255 255 255 / 0.4); }
   .cs-toggle svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; transition: transform 400ms var(--ease-out); }
   .cs-toggle[aria-expanded='true'] svg { transform: rotate(180deg); }
 
