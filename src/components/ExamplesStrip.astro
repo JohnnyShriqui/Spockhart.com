@@ -5,7 +5,7 @@ import ResultVisual from './ResultVisual.astro';
  * and one short line. By default, the everyday work we take on (under the section's opening line),
  * with a note that these are only examples. Given its own groups (the case studies, on phones),
  * each card links to its case study and shows an arrow.
- * Laptops: the two groups side by side, each a 2 x 2 grid. Phones: one card per line.
+ * Laptops: the two groups side by side, each a 2 x 2 grid, Operations Efficiency first. Phones: one card per line.
  */
 interface Item {
   name: string;
@@ -28,17 +28,6 @@ interface Props {
 }
 const examples: Group[] = [
   {
-    key: 'build',
-    title: 'Revenue Development',
-    note: 'Revenue up',
-    items: [
-      { name: 'New Digital Services', line: 'Your expertise, made sellable', icon: 'M12 3l8 4.5-8 4.5-8-4.5z M4 12l8 4.5 8-4.5 M4 16.5l8 4.5 8-4.5' },
-      { name: 'Lead Generation', line: 'A steady flow of new leads', icon: 'M9 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6 M18 8v6 M15 11h6' },
-      { name: 'Quoting and Estimating', line: 'Accurate quotes in minutes', icon: 'M7 3h7l4 4v14H7z M14 3v4h4 M10 12h5 M10 16h5' },
-      { name: 'Customer Portals', line: 'Orders and status in one place', icon: 'M3 5h18v14H3z M3 9h18 M6.5 7h.01 M9 7h.01' },
-    ],
-  },
-  {
     key: 'fix',
     title: 'Operations Efficiency',
     note: 'Costs down',
@@ -47,6 +36,17 @@ const examples: Group[] = [
       { name: 'Scheduling and Dispatch', line: 'Right people, right place', icon: 'M4 6h16v14H4z M4 10h16 M8 3v5 M16 3v5 M8 14h3' },
       { name: 'Duplicate Data Entry', line: 'Entered once, synced everywhere', icon: 'M4 8h13l-3-3 M20 16H7l3 3' },
       { name: 'Reporting and Dashboards', line: 'Live numbers, not spreadsheets', icon: 'M4 20h16 M7 16v-4 M12 16V7 M17 16v-7' },
+    ],
+  },
+  {
+    key: 'build',
+    title: 'Revenue Development',
+    note: 'Revenue up',
+    items: [
+      { name: 'New Digital Services', line: 'Your expertise, made sellable', icon: 'M12 3l8 4.5-8 4.5-8-4.5z M4 12l8 4.5 8-4.5 M4 16.5l8 4.5 8-4.5' },
+      { name: 'Lead Generation', line: 'A steady flow of new leads', icon: 'M9 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6 M18 8v6 M15 11h6' },
+      { name: 'Quoting and Estimating', line: 'Accurate quotes in minutes', icon: 'M7 3h7l4 4v14H7z M14 3v4h4 M10 12h5 M10 16h5' },
+      { name: 'Customer Portals', line: 'Orders and status in one place', icon: 'M3 5h18v14H3z M3 9h18 M6.5 7h.01 M9 7h.01' },
     ],
   },
 ];
