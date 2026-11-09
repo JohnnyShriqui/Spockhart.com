@@ -474,6 +474,20 @@ a { color: inherit; }
   transition: opacity 320ms var(--ease);
 }
 html.is-focusing .focus-veil { opacity: 1; }
+.focus-halo {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 200;
+  pointer-events: none;
+  border-radius: 28px;
+  background: rgb(232 238 245 / 0.6);
+  box-shadow: 0 0 0 18px rgb(232 238 245 / 0.3);
+  filter: blur(26px);
+  opacity: 0;
+  transition: opacity 320ms var(--ease);
+}
+html.is-focusing .focus-halo { opacity: 1; }
 /* Wins over a component's own layering, so whatever is pointed at always sits above the veil */
 .is-focus-zone { position: relative; z-index: 201 !important; }
 

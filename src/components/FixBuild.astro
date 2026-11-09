@@ -307,12 +307,12 @@ const sets = [
       let active: HTMLElement | null = null;
       const toAfter = () => {
         root.classList.remove('fb-pre');
-        timer = window.setTimeout(toBefore, 8500);
+        timer = window.setTimeout(toBefore, 9800);
       };
       const toBefore = () => {
         if (!shown || active) return;
         root.classList.add('fb-pre');
-        timer = window.setTimeout(toAfter, 1600);
+        timer = window.setTimeout(toAfter, 1900);
       };
       const loop = (delay: number) => {
         clearTimeout(timer);
@@ -334,13 +334,15 @@ const sets = [
       const open = (card: HTMLElement) => {
         if (active === card) return;
         close();
-        // Reach toward the chart, overlapping its empty right edge a little
-        const reach = Math.max(0, card.getBoundingClientRect().left - chartFig.getBoundingClientRect().right + 80);
-        const width = card.offsetWidth + reach;
+        // Open wide, over the chart (which steps back behind the veil anyway), so the graphic
+        // and its words can be large enough to read
+        const span = cardsBox.getBoundingClientRect().right - chartFig.getBoundingClientRect().left;
+        const width = Math.round(Math.min(1000, span * 0.82));
+        const reach = Math.max(0, width - card.offsetWidth);
         // Every opened case study is the same size: the graphic is fitted into one box
-        const OPEN_H = 280;
+        const OPEN_H = 360;
         const natural = Number(card.dataset.h || 480);
-        const mw = Math.round(width * 0.5);
+        const mw = Math.round(width * 0.6);
         const s = Math.min(mw / LIVE_W, OPEN_H / natural);
         card.style.setProperty('--reach', `${reach}px`);
         card.style.setProperty('--mw', `${mw}px`);
@@ -541,7 +543,7 @@ const sets = [
     gap: 0.8rem;
     align-items: center;
     margin-left: 0;
-    padding: 0.4rem 0.75rem 0.4rem 0.4rem;
+    padding: 0.5rem 0.8rem 0.5rem 0.5rem;
     border: 1px solid var(--rule);
     border-radius: var(--radius);
     background: var(--surface);
@@ -554,8 +556,8 @@ const sets = [
   /* The real graphic, shrunk to a still frame; it grows and plays when opened */
   .fb-media {
     position: relative;
-    width: 80px;
-    height: 48px;
+    width: 92px;
+    height: 56px;
     border-radius: 5px;
     overflow: hidden;
     background: var(--brand);
@@ -587,14 +589,15 @@ const sets = [
   .fb-card-build .fb-key { background: var(--accent); }
   .fb-card-fix .fb-key { background: #a04f48; }
   .fb-text { display: grid; gap: 0.1rem; min-width: 0; }
-  .fb-v { font-family: var(--font-display); font-size: 1.0625rem; line-height: 1.15; color: var(--ink); font-variant-numeric: lining-nums; }
-  .fb-l { font-size: 0.8125rem; line-height: 1.3; color: var(--ink-2); }
+  .fb-v { font-family: var(--font-display); font-size: 1.1875rem; line-height: 1.15; color: var(--ink); font-variant-numeric: lining-nums; }
+  .fb-l { font-size: 0.875rem; line-height: 1.3; color: var(--ink-2); }
   /* A chevron says there is more to see; it turns when the case study opens */
   .fb-caret { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; color: var(--ink-3); transition: transform var(--ms) var(--ease-out), color 250ms var(--ease), background-color 250ms var(--ease); }
   .fb-caret svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
   .fb-card:hover .fb-caret { color: var(--accent); background: var(--accent-wash); }
   /* On the home page the graphics drop their number rows; the words carry the numbers */
   .fb-live :global(.rv-split) { display: none; }
+  .fb-live :global(.rv) { padding: 14px; gap: 0; }
 
   /* Opened: the same client line and headline as on Our Work */
   .fb-cs { display: none; gap: 0.5rem; }
@@ -610,28 +613,33 @@ const sets = [
     .fb-card.is-on {
       margin-left: calc(var(--reach, 0px) * -1);
       align-items: start;
-      padding: 0.75rem 1.1rem 0.75rem 0.75rem;
+      padding: 0.85rem 1.25rem 0.85rem 0.85rem;
+      gap: 1.5rem;
       border-color: var(--rule-2);
       box-shadow: 0 30px 60px -34px rgb(27 42 61 / 0.55), 0 10px 20px -14px rgb(27 42 61 / 0.25);
     }
     .fb-card.is-on .fb-media { width: var(--mw); height: var(--mh); border-radius: var(--radius); }
     .fb-card.is-on .fb-live { transform: translate(var(--ox-on, 0px), var(--oy-on, 0px)) scale(var(--s-on)); }
-    .fb-card.is-on .fb-body { grid-template-columns: minmax(0, 1fr); align-items: start; gap: 0.6rem; padding-top: 0.2rem; }
+    .fb-card.is-on .fb-body { grid-template-columns: minmax(0, 1fr); align-self: center; align-items: start; gap: 0.75rem; }
     .fb-card.is-on .fb-text { gap: 0.4rem; }
-    .fb-card.is-on .fb-v { font-size: 1.375rem; }
+    .fb-card.is-on .fb-v { font-size: 2rem; line-height: 1.1; }
+    .fb-card.is-on .fb-client { font-size: 1.25rem; }
+    .fb-card.is-on .fb-client-mark { width: 34px; height: 39px; }
+    .fb-card.is-on .fb-client-mark svg { width: 17px; height: 17px; }
+    .fb-card.is-on .fb-headline { font-size: 1.4375rem; line-height: 1.25; }
     .fb-card.is-on .fb-l { display: none; }
-    .fb-card.is-on .fb-cs { display: grid; margin-top: 0.35rem; padding-top: 0.75rem; border-top: 1px solid var(--rule); }
+    .fb-card.is-on .fb-cs { display: grid; gap: 0.75rem; margin-top: 0.5rem; padding-top: 1rem; border-top: 1px solid var(--rule); }
     .fb-card.is-on .fb-caret { align-self: start; transform: rotate(180deg); color: var(--accent); background: var(--accent-wash); }
   }
 
   /* The After builds itself, over and over: costs drop, the cut slices appear, new revenue
      stacks up, then the lines draw out to the case studies */
   @media (prefers-reduced-motion: no-preference) {
-    .fb-cost-after { transition: transform 1200ms var(--ease-out) 200ms; }
-    .fb-cut { transition: opacity 550ms var(--ease) calc(800ms + var(--i) * 160ms); }
-    .fb-add { transition: opacity 500ms var(--ease) calc(1400ms + (2 - var(--i)) * 220ms), transform 750ms var(--ease-out) calc(1400ms + (2 - var(--i)) * 220ms); }
-    .fb-wide { transition: opacity 600ms var(--ease) 2300ms; }
-    :global(.fb-link) { stroke-dasharray: 1; stroke-dashoffset: 0; transition: stroke-dashoffset 1100ms var(--ease-out) 2500ms, opacity 250ms var(--ease), stroke-width 250ms var(--ease); }
+    .fb-cost-after { transition: transform 1450ms var(--ease-out) 250ms; }
+    .fb-cut { transition: opacity 650ms var(--ease) calc(950ms + var(--i) * 190ms); }
+    .fb-add { transition: opacity 600ms var(--ease) calc(1700ms + (2 - var(--i)) * 260ms), transform 900ms var(--ease-out) calc(1700ms + (2 - var(--i)) * 260ms); }
+    .fb-wide { transition: opacity 700ms var(--ease) 2750ms; }
+    :global(.fb-link) { stroke-dasharray: 1; stroke-dashoffset: 0; transition: stroke-dashoffset 1300ms var(--ease-out) 3000ms, opacity 250ms var(--ease), stroke-width 250ms var(--ease); }
 
     /* Back to Before, quickly and together */
     .fb-pre .fb-cost-after { transform: scaleY(1); transition: transform 700ms var(--ease); }

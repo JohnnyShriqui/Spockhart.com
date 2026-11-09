@@ -22,7 +22,7 @@ const fixPhases = [
     when: 'Weeks 1 to 2',
     start: 0,
     end: 14,
-    body: 'We work alongside your team to map how work gets done, uncover bottlenecks and duplication, and identify where better processes and technology can make the biggest difference.',
+    body: 'We map your workflows, identify bottlenecks, and uncover opportunities for improvement.',
   },
   {
     n: '02',
@@ -31,7 +31,7 @@ const fixPhases = [
     when: `By day ${site.offer.prototypeDays}`,
     start: 14,
     end: site.offer.prototypeDays,
-    body: 'A working prototype that demonstrates the proposed solution, built around your team’s actual workflows and requirements.',
+    body: 'We design and build a working prototype around your team’s needs and requirements.',
   },
   {
     n: '03',
@@ -40,7 +40,7 @@ const fixPhases = [
     when: `Months 2 to ${site.offer.minimumMonths}`,
     start: site.offer.prototypeDays,
     end: SCALE,
-    body: 'We harden it, connect it to your systems and train the people who will own it.',
+    body: 'We develop the solution, integrate it with your systems, and prepare your team to use it.',
   },
   {
     n: '04',
@@ -49,7 +49,7 @@ const fixPhases = [
     when: `Month ${site.offer.minimumMonths}`,
     start: SCALE,
     end: null,
-    body: 'Everything we built is yours: documented, running and owned by your team.',
+    body: 'We deliver a fully documented solution, ready for your team to own and operate.',
   },
 ];
 
@@ -151,7 +151,7 @@ const pct = (d: number) => `${(d / SCALE) * 100}%`;
     }
   </ol>
 
-  <ol class="phases" data-reveal="stagger" data-scene-group="(min-width: 901px)" data-hover="(min-width: 901px) and (hover: hover) and (pointer: fine)" data-rate="1.05" data-gap="350">
+  <ol class="phases" data-reveal="stagger" data-scene-group="(min-width: 901px)" data-hover="(min-width: 901px) and (hover: hover) and (pointer: fine)" data-rate="0.9" data-gap="400">
     {
       phases.map((p, i) => (
         <li
@@ -387,9 +387,9 @@ const pct = (d: number) => `${(d / SCALE) * 100}%`;
     .timeline:not(.compact) { gap: var(--s-5); }
     .timeline:not(.compact) .scale { --above: 2.2rem; --bar: 38px; padding-bottom: 1.7rem; }
     .phases { gap: var(--s-4); }
-    .phase { --pad: 1.15rem; gap: 0.3rem; }
-    .phase h3 { font-size: 1.375rem; }
-    .phase-body { font-size: 0.9375rem; line-height: 1.5; }
+    .phase { --pad: 1.35rem; gap: 0.4rem; }
+    .phase h3 { font-size: 1.625rem; }
+    .phase-body { font-size: 1.0625rem; line-height: 1.5; }
   }
 
 
