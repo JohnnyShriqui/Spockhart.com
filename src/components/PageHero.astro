@@ -9,14 +9,16 @@ interface Props {
   light?: boolean;
   /** On phones, hide the lead and keep just the heading */
   terse?: boolean;
+  /** On laptops, fill the screen (like the home hero) */
+  full?: boolean;
   class?: string;
 }
-const { title, lead, theme = 'quiet', light = false, terse = false, class: className = '' } = Astro.props;
+const { title, lead, theme = 'quiet', light = false, terse = false, full = false, class: className = '' } = Astro.props;
 const hasFigure = Astro.slots.has('figure');
 ---
 
 <section
-  class:list={['page-hero', light ? `hero-light theme-${theme}-light` : `hero-dark theme-${theme}`, className, { 'with-figure': hasFigure, terse }]}
+  class:list={['page-hero', light ? `hero-light theme-${theme}-light` : `hero-dark theme-${theme}`, className, { 'with-figure': hasFigure, terse, 'hero-full': full }]}
   data-hero-dark={light ? undefined : ''}
 >
   <Mist />
@@ -51,6 +53,18 @@ const hasFigure = Astro.slots.has('figure');
     align-items: center;
   }
   .hero-figure { width: 100%; max-width: 480px; justify-self: end; }
+  /* Laptops: the hero fills the screen, its content centred below the header */
+  @media (min-width: 961px) {
+    .hero-full {
+      min-height: 100vh;
+      min-height: 100svh;
+      display: flex;
+      align-items: center;
+      padding-top: calc(88px + clamp(1.5rem, 1rem + 2vw, 3rem));
+      padding-bottom: clamp(3rem, 1.5rem + 6vh, 6rem);
+    }
+    .hero-full > .wrap { width: 100%; }
+  }
   @media (max-width: 640px) {
     .terse .lead { display: none; }
   }

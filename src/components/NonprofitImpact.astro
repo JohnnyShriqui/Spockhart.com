@@ -274,12 +274,16 @@ const charts = [
     --muted: #8fa1b4;
     --hot: #d9e6f2;
     --hair: 255 255 255;
-    --c-demand: #e2a39a;
-    --c-res: #9cc8ea;
-    --c-further: #6ea0cd;
-    --demand-rgb: 226 163 154;
-    --res-rgb: 156 200 234;
-    --further-rgb: 110 160 205;
+    /* The home chart's colours: before (without us) muted; after (with us) in the hero's
+       lightsaber blue and red */
+    --c-demand: #ff2a4d;
+    --c-res: #3fd0ff;
+    --c-further: #3fd0ff;
+    --demand-rgb: 255 42 77;
+    --res-rgb: 63 208 255;
+    --further-rgb: 63 208 255;
+    --before-demand: rgb(214 84 96 / 0.75);
+    --before-res: rgb(110 160 205 / 0.85);
     --ground: #0d1a28;
     margin: 0;
     padding: clamp(1.1rem, 0.8rem + 1vw, 1.6rem) clamp(1.1rem, 0.8rem + 1vw, 1.6rem) clamp(1.25rem, 0.9rem + 1vw, 1.75rem);
@@ -395,4 +399,17 @@ const charts = [
     .npi-cap { margin-bottom: 1rem; }
     .npi-legend { gap: 1rem; font-size: 0.75rem; }
   }
+  /* Before and after, as on the home chart */
+  .l-without-demand { stroke: var(--before-demand); }
+  .l-without-res { stroke: var(--before-res); }
+  .l-demand { filter: drop-shadow(0 0 4px rgb(var(--demand-rgb) / 0.7)); }
+  .l-res { filter: drop-shadow(0 0 4px rgb(var(--res-rgb) / 0.7)); }
+  .dot-demand { filter: drop-shadow(0 0 4px rgb(var(--demand-rgb) / 0.8)); }
+  .dot-res { filter: drop-shadow(0 0 4px rgb(var(--res-rgb) / 0.8)); }
+  .r-further { fill: rgb(var(--further-rgb) / 0.12); }
+  .r-funding { fill: rgb(var(--res-rgb) / 0.24); }
+  .seam { stroke: rgb(var(--res-rgb) / 0.55); }
+  .hatch-line { stroke: rgb(var(--demand-rgb) / 0.4); }
+  .end-demand { fill: #ff8a9c; }
+  .end-res { fill: #8fe3ff; }
 </style>
