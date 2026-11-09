@@ -23,23 +23,25 @@ const work = Object.fromEntries((await getCollection('work')).map((e) => [e.id, 
 interface Item {
   k: string;
   id: string;
+  /** Each case study is one line: the result (bright) and how we got it (quieter). On the
+      smaller-screen cards only the result shows, since the card carries the headline. */
   value: string;
-  label: string;
-  /** Shown as a small pill beside the figure: delivered, or being built now */
+  rest: string;
+  /** Shown as a small pill beside the line: delivered, or being built now */
   status: 'done' | 'progress';
 }
 const STATUS = { done: 'Delivered', progress: 'In progress' } as const;
 
 const build: Item[] = [
-  { k: 'A', id: 'sales-performance-system', value: '+$316K A Month', label: 'We lifted average sales with a new analytics system', status: 'done' },
-  { k: 'B', id: 'digital-practice-growth', value: '$150K → $1M', label: 'We grew a consulting practice in under a year', status: 'done' },
-  { k: 'C', id: 'lead-generation-engine', value: '+$1B Market', label: 'We digitized a division’s expertise to open a new market', status: 'done' },
+  { k: 'A', id: 'sales-performance-system', value: '+$316K a month', rest: ' with a new sales intelligence system', status: 'done' },
+  { k: 'B', id: 'digital-practice-growth', value: '$150K to $1M revenue', rest: ' by scaling a digital services practice', status: 'done' },
+  { k: 'C', id: 'lead-generation-engine', value: 'A $1B+ market opened', rest: ' through a new digital service', status: 'done' },
 ];
 const fix: Item[] = [
-  { k: '1', id: 'commission-automation', value: 'Excel → Automated', label: 'We’re automating commissions for a $1.2B manufacturer', status: 'progress' },
-  { k: '2', id: 'project-feasibility-platform', value: '12 Months → Minutes', label: 'We cut feasibility assessments from $100K+ each to $0', status: 'done' },
-  { k: '3', id: 'momentum-exchange-prototype', value: '↑ 83% More Fuel Efficient', label: 'In a prototype we built', status: 'done' },
-  { k: '4', id: 'subcontractor-financing-marketplace', value: '6+ Months → Weeks', label: 'We cut financing approvals for subcontractors', status: 'done' },
+  { k: '1', id: 'commission-automation', value: '80% less time', rest: ' processing commissions for a $1.2B manufacturer', status: 'progress' },
+  { k: '2', id: 'project-feasibility-platform', value: '12 months → minutes', rest: ', eliminating $100K+ assessment costs', status: 'done' },
+  { k: '3', id: 'momentum-exchange-prototype', value: '83% greater fuel efficiency', rest: ' with a new momentum-transfer system', status: 'done' },
+  { k: '4', id: 'subcontractor-financing-marketplace', value: '6+ months → weeks', rest: ' for subcontractor financing approvals', status: 'done' },
 ];
 
 /* Chart geometry (viewBox 0 0 560 470). Heights are illustrative. */
@@ -176,12 +178,11 @@ const sets = [
                         <span class="fb-key">{it.k}</span>
                         <span class="fb-note">Our Work</span>
                         <span class="fb-text">
-                          <span class="fb-v">{it.value}</span>
+                          <span class="fb-line"><span class="fb-v">{it.value}</span><span class="fb-l">{it.rest}</span></span>
                           <span class:list={['fb-pill', `fb-pill-${it.status}`]}>
                             <i aria-hidden="true"></i>
                             {STATUS[it.status]}
                           </span>
-                          <span class="fb-l">{it.label}</span>
                         </span>
                       </div>
                       <span class="fb-caret" aria-hidden="true">
@@ -873,10 +874,31 @@ const sets = [
 
   /* Status: a hairline pill, quiet type, a small coloured dot. Nothing glows or pulses. */
   .fb-text { display: flex; flex-wrap: wrap; align-items: center; gap: 0.2rem 0.85rem; }
-  /* The one-line description under each figure */
-  .fb-l { flex-basis: 100%; font-size: 0.9375rem; line-height: 1.35; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  /* One line per case study, one typeface: the result in full ink, the rest a step quieter */
+  .fb-line { min-width: 0; font-family: var(--font-display); line-height: 1.3; }
+  .fb-line .fb-v { font-size: inherit; }
+  .fb-l { color: var(--ink-3); }
+  @media (min-width: 1100px) {
+    /* The list gets the wider column so each line fits on one line on a laptop; the chart is
+       drawn a little smaller, with its words set larger so they read at the same size. On a
+       narrower window a long line wraps rather than being cut off. */
+    .fb-stage { grid-template-columns: minmax(0, 0.78fr) minmax(0, 1.22fr); column-gap: clamp(3.5rem, 1rem + 5vw, 5.5rem); }
+    .fb-text { flex-wrap: nowrap; }
+    /* The line takes the row; the status pills line up in a column at the right */
+    .fb-line { flex: 1 1 auto; font-size: 1rem; }
+    .fb-axis-label { font-size: 12.5px; letter-spacing: 0.1em; }
+    .fb-group { font-size: 25px; }
+    .fb-ann { font-size: 16px; }
+    .fb-key-add { font-size: 16px; }
+    .fb-key-cut { font-size: 15px; }
+  }
+  /* Smaller laptops: a touch smaller so the lines still fit on one line */
+  @media (min-width: 1100px) and (max-width: 1399px) {
+    .fb-line { font-size: 0.9375rem; }
+  }
   /* On smaller screens each case study is a card that already shows its headline */
   @media (max-width: 1099px) {
+    .fb-line { font-size: 1.0625rem; }
     .fb-l { display: none; }
   }
   .fb-pill {
