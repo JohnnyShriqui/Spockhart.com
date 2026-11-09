@@ -172,15 +172,8 @@ const spans = [
   .phase-1 { --seg: var(--mist-1); --seg-ink: var(--navy); --seg-ink-2: #2f4760; --seg-meta: var(--brand); }
   .phase-2 { --seg: var(--accent); --seg-ink: #fff; --seg-ink-2: rgb(255 255 255 / 0.86); --seg-meta: rgb(255 255 255 / 0.72); }
   .phase-3 { --seg: var(--brand); --seg-ink: #fff; --seg-ink-2: rgb(255 255 255 / 0.86); --seg-meta: rgb(255 255 255 / 0.72); }
-  .phase-4 {
-    --seg: repeating-linear-gradient(-45deg, var(--surface) 0 6px, var(--accent-wash) 6px 7px);
-    --seg-ink: var(--ink);
-    --seg-ink-2: var(--ink-2);
-    --seg-meta: var(--accent);
-    border-style: dashed;
-    border-color: var(--rule-2);
-  }
-  .phase-4 .phase-head { border-bottom: 1px dashed var(--rule-2); }
+  /* The headings deepen from left to right, so the hand over is the darkest */
+  .phase-4 { --seg: #142a40; --seg-ink: #fff; --seg-ink-2: rgb(255 255 255 / 0.86); --seg-meta: rgb(255 255 255 / 0.72); }
   .phase-head h3 { color: var(--seg-ink); }
   .phase-head .phase-body,
   .phase-head .phase-brief { color: var(--seg-ink-2); }
@@ -241,7 +234,6 @@ const spans = [
     .phase-body { display: none; }
     .phase-brief { display: block; margin-top: -0.15rem; font-size: 1rem; line-height: 1.45; }
     .phase-head { margin: 0; padding: 1.1rem 1.15rem 1.2rem; border-radius: var(--radius-lg); }
-    .phase-4 .phase-head { border: 1px dashed var(--rule-2); }
     .phases { gap: var(--s-4); margin-top: var(--s-5); }
     .phase { padding: 1rem 1rem 1.15rem; }
     .phase h3 { font-size: 1.625rem; }
@@ -273,13 +265,7 @@ const spans = [
     .phase-1 { --seg: rgb(184 204 224 / 0.14); --seg-ink: #eef3f8; --seg-ink-2: #c3d0dd; --seg-meta: #b8cce0; }
     .phase-2 { --seg: rgb(74 138 186 / 0.3); --seg-ink: #eef3f8; --seg-ink-2: #c3d0dd; --seg-meta: #9cc8ea; }
     .phase-3 { --seg: rgb(31 77 111 / 0.75); --seg-ink: #eef3f8; --seg-ink-2: #c3d0dd; --seg-meta: #8ec0e6; }
-    .phase-4 {
-      --seg: repeating-linear-gradient(-45deg, transparent 0 6px, rgb(255 255 255 / 0.04) 6px 7px);
-      --seg-ink: #eef3f8;
-      --seg-ink-2: #c3d0dd;
-      --seg-meta: #8ec0e6;
-      border-color: rgb(255 255 255 / 0.22);
-    }
+    .phase-4 { --seg: #0e2236; --seg-ink: #eef3f8; --seg-ink-2: #c3d0dd; --seg-meta: #8ec0e6; }
     /* Shapes that put white words on a dark fill: the fill turns light, so the words turn dark */
     .phase :global(.live), .phase :global(.shield), .phase :global(.us), .phase :global(.owned) { fill: #dfe8f1; }
     .phase :global(.live-text), .phase :global(.shield-text), .phase :global(.owned-text), .phase :global(.us-mark), .phase :global(.flag-text) { fill: #14212f; }
