@@ -42,18 +42,20 @@ import ClosingCTA from '../components/ClosingCTA.astro';
     isolation: isolate;
   }
   .hero > .wrap { position: relative; z-index: 1; }
-  /* Laptops: the hero fills the screen, its content centred below the header */
+  /* Every screen size: the hero fills the screen (the visible part, on phones, with the browser
+     bars showing), its content centred below the header */
+  .hero {
+    min-height: 100vh;
+    min-height: 100svh;
+    display: flex;
+    align-items: center;
+    /* The headline sits a little above the middle of the screen */
+    padding-top: calc(72px + clamp(1rem, 0.5rem + 2vw, 3rem));
+    padding-bottom: clamp(5rem, 2rem + 14vh, 13rem);
+  }
+  .hero > .wrap { width: 100%; }
   @media (min-width: 961px) {
-    .hero {
-      min-height: 100vh;
-      min-height: 100svh;
-      display: flex;
-      align-items: center;
-      /* The headline sits a little above the middle of the screen */
-      padding-top: calc(88px + clamp(1.5rem, 1rem + 2vw, 3rem));
-      padding-bottom: clamp(7rem, 3rem + 14vh, 13rem);
-    }
-    .hero > .wrap { width: 100%; }
+    .hero { padding-top: calc(88px + clamp(1.5rem, 1rem + 2vw, 3rem)); }
   }
   .hero-grid {
     display: grid;
