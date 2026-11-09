@@ -1,10 +1,8 @@
 ---
 /**
- * Approach, below the hero: fine lines that run down out of the dark hero and through the page,
- * drawn to fit the layout, like a circuit. A spine down the left margin branches into each
- * section's heading marker and ends at the closing line; a quieter one runs down the right margin.
- * Each set of steps is fed from the spine by a line that drops into the top of every card, and the
- * first set joins back into the spine below it, so the scroll reads as one connected path.
+ * Approach, below the hero: a fine line runs down the left margin out of the dark hero, like a
+ * circuit, drawn to fit the layout. It branches into each section's heading marker, feeds each set
+ * of steps through a line that drops into the top of every card, and ends at the closing line.
  * A light grid of dots sits behind it all. Still, decorative, behind the content.
  */
 ---
@@ -63,26 +61,9 @@
       node(sx, s.y);
     });
 
-    // The right spine, quieter: nodes level with the top and bottom of each set of steps
-    const rx = Math.min(box.width - 14, sets[0].right + 34);
-    const last = sets[sets.length - 1];
-    path(`M${rx} 0 V${last.cards[0].bottom}`, 'tr-spine tr-quiet');
-    sets.forEach((s) => {
-      node(rx, s.cards[0].top + 28, 'tr-node tr-quiet');
-      node(rx, s.cards[0].bottom - 28, 'tr-node tr-quiet');
-    });
-
-    // Short lines fall from the hero above each step of the first set and fade
-    sets[0].cards.forEach((c, i) => {
-      const end = 58 + ((i * 37) % 4) * 18;
-      path(`M${c.cx} 0 V${end}`, 'tr-drop');
-      node(c.cx, end, 'tr-dot', 2);
-    });
-
     // Each set of steps is fed from the spine: a line branches off just above the cards and drops
-    // into the top of each one. The first set's cards then join back into the spine below them,
-    // so the path runs on to the second set.
-    sets.forEach((s, k) => {
+    // into the top of each one
+    sets.forEach((s) => {
       const lastX = s.cards[s.cards.length - 1].cx;
       const inY = s.cards[0].top - 30;
       path(`M${sx} ${inY} H${lastX}`, 'tr-bus');
@@ -91,15 +72,6 @@
         path(`M${c.cx} ${inY} V${c.top}`, 'tr-stub');
         node(c.cx, c.top, 'tr-dot', 2.4);
       });
-      if (k < sets.length - 1) {
-        const outY = s.cards[0].bottom + 44;
-        path(`M${lastX} ${outY} H${sx}`, 'tr-bus');
-        node(sx, outY, 'tr-node', 2.6);
-        s.cards.forEach((c) => {
-          path(`M${c.cx} ${c.bottom} V${outY}`, 'tr-stub');
-          node(c.cx, c.bottom, 'tr-dot', 2.4);
-        });
-      }
     });
   }
 
@@ -144,11 +116,8 @@
   .traces :global(path) { fill: none; stroke-width: 1; }
   .traces :global(.tr-spine) { stroke: rgb(var(--tr) / 0.28); }
   .traces :global(.tr-branch) { stroke: rgb(var(--tr) / 0.34); }
-  .traces :global(.tr-quiet) { stroke-opacity: 0.55; }
-  .traces :global(.tr-drop) { stroke: rgb(var(--tr) / 0.3); }
-  .traces :global(.tr-bus) { stroke: rgb(var(--tr) / 0.2); }
+      .traces :global(.tr-bus) { stroke: rgb(var(--tr) / 0.2); }
   .traces :global(.tr-stub) { stroke: rgb(var(--tr) / 0.28); }
   .traces :global(.tr-node) { fill: var(--tr-ground); stroke: rgb(var(--tr) / 0.5); stroke-width: 1; }
-  .traces :global(.tr-node.tr-quiet) { stroke: rgb(var(--tr) / 0.28); }
-  .traces :global(.tr-dot) { fill: rgb(var(--tr) / 0.45); }
+    .traces :global(.tr-dot) { fill: rgb(var(--tr) / 0.45); }
 </style>

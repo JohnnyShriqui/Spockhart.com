@@ -158,7 +158,6 @@ const sectionsOf = (body = '') =>
       return sc ? sceneController(sc) : undefined;
     };
     let current: HTMLElement | null = null;
-    let idle = 0;
     const pick = () => {
       const mid = window.innerHeight / 2;
       let best: HTMLElement | null = null;
@@ -177,24 +176,18 @@ const sectionsOf = (body = '') =>
       current = best;
       if (current) ctrl(current)?.play();
     };
-    // While the page is being scrolled, the graphic holds still and the scroll has the browser
-    // to itself; a moment after scrolling stops, the right graphic carries on
-    const settle = () => {
-      window.clearTimeout(idle);
-      idle = window.setTimeout(() => {
+    // As the page scrolls, the graphic in the middle takes over (checked once a frame at most)
+    let ticking = false;
+    const soon = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        ticking = false;
         pick();
-        if (current) ctrl(current)?.resume();
-      }, 160);
+      });
     };
-    window.addEventListener(
-      'scroll',
-      () => {
-        if (current) ctrl(current)?.pause();
-        settle();
-      },
-      { passive: true },
-    );
-    window.addEventListener('resize', settle, { passive: true });
+    window.addEventListener('scroll', soon, { passive: true });
+    window.addEventListener('resize', soon, { passive: true });
     pick();
   }
   initFocusPlay();
