@@ -30,7 +30,7 @@ interface Item {
 const build: Item[] = [
   { k: 'A', id: 'sales-performance-system', value: '+$316K a month', label: 'We lifted average sales with a new analytics system' },
   { k: 'B', id: 'digital-practice-growth', value: '$150K → $1M', label: 'We grew a consulting practice in under a year' },
-  { k: 'C', id: 'project-feasibility-platform', value: 'A new market', label: 'We built a feasibility tool that now generates leads' },
+  { k: 'C', id: 'lead-generation-engine', value: 'A $1B+ market', label: 'We turned a contractor’s expertise into a lead engine' },
 ];
 const fix: Item[] = [
   { k: '1', id: 'commission-automation', value: 'Excel → Automated', label: 'We’re automating commissions for a $1.2B manufacturer' },
@@ -351,6 +351,18 @@ const sets = [
         card.style.setProperty('--s-on', s.toFixed(4));
         card.style.setProperty('--ox-on', `${((mw - LIVE_W * s) / 2).toFixed(1)}px`);
         card.style.setProperty('--oy-on', `${((OPEN_H - natural * s) / 2).toFixed(1)}px`);
+        // Revenue case studies open downward; cost case studies sit low on the page, so they
+        // grow upward instead and keep their bottom edge where it was
+        if (card.classList.contains('fb-card-fix')) {
+          // Measure the opened height with motion switched off, then open for real
+          const closedH = card.offsetHeight;
+          card.classList.add('fb-measure', 'is-on');
+          const openH = card.offsetHeight;
+          card.classList.remove('is-on');
+          void card.offsetHeight;
+          card.classList.remove('fb-measure');
+          card.style.setProperty('--lift', `${Math.max(0, openH - closedH).toFixed(1)}px`);
+        }
         card.classList.add('is-on');
         active = card;
         root.classList.add('has-active');
@@ -550,7 +562,7 @@ const sets = [
     background: var(--surface);
     color: inherit;
     text-decoration: none;
-    transition: margin-left var(--ms) var(--ease-out), padding var(--ms) var(--ease-out), border-color 250ms var(--ease), box-shadow 300ms var(--ease), opacity 300ms var(--ease), filter 300ms var(--ease);
+    transition: margin-left var(--ms) var(--ease-out), margin-top var(--ms) var(--ease-out), padding var(--ms) var(--ease-out), border-color 250ms var(--ease), box-shadow 300ms var(--ease), opacity 300ms var(--ease), filter 300ms var(--ease);
   }
   .fb-card:focus-visible { outline: 2px solid var(--accent-soft); outline-offset: 2px; }
 
@@ -634,6 +646,9 @@ const sets = [
       border-color: var(--rule-2);
       box-shadow: 0 30px 60px -34px rgb(27 42 61 / 0.55), 0 10px 20px -14px rgb(27 42 61 / 0.25);
     }
+    .fb-card-fix.is-on { margin-top: calc(var(--lift, 0px) * -1); }
+    .fb-measure.is-on { margin-top: 0; }
+    .fb-measure, .fb-measure * { transition: none !important; }
     .fb-card.is-on .fb-media { width: var(--mw); height: var(--mh); border-radius: var(--radius); }
     .fb-card.is-on .fb-live { transform: translate(var(--ox-on, 0px), var(--oy-on, 0px)) scale(var(--s-on)); }
     .fb-card.is-on .fb-body { grid-template-columns: minmax(0, 1fr); align-self: center; align-items: start; gap: 0.75rem; }

@@ -95,6 +95,21 @@ const asking = new Set([1, 4, 6, 9, 11, 14]);
 const doc = 'M2 0h7l3 3v12H2zM9 0v3h3';
 
 const person = 'M2.8 4.2a3.2 3.2 0 1 0 6.4 0a3.2 3.2 0 1 0 -6.4 0zM0.6 16c0-3.6 2.4-6.2 5.4-6.2s5.4 2.6 5.4 6.2z';
+
+/* Lead generation: the market around the company. Before, out of reach; after, every
+   builder, developer and organization that runs an assessment becomes a lead. */
+const hub = [118, 78];
+const market = [
+  { g: 0, x: 24, y: 44 }, { g: 0, x: 46, y: 30 }, { g: 0, x: 30, y: 72 }, { g: 0, x: 54, y: 58 },
+  { g: 1, x: 190, y: 30 }, { g: 1, x: 212, y: 46 }, { g: 1, x: 184, y: 60 }, { g: 1, x: 210, y: 76 },
+  { g: 2, x: 64, y: 128 }, { g: 2, x: 96, y: 140 }, { g: 2, x: 140, y: 140 }, { g: 2, x: 172, y: 128 },
+].map((d, i) => ({ ...d, a: (0.6 + [0, 4, 8, 1, 5, 9, 2, 6, 10, 3, 7, 11][i] * 0.42).toFixed(2), len: Math.hypot(d.x - hub[0], d.y - hub[1]) - 15 }));
+const groupsAt = [
+  { name: 'Builders', x: 38, y: 14 },
+  { name: 'Developers', x: 198, y: 14 },
+  { name: 'Organizations', x: 118, y: 162 },
+];
+const building = 'M-6 7V-4l6-4 6 4v11zM-3 -1h2M1 -1h2M-3 3h2M1 3h2';
 ---
 
 <figure class:list={['rv', className]} data-rv>
@@ -321,6 +336,84 @@ const person = 'M2.8 4.2a3.2 3.2 0 1 0 6.4 0a3.2 3.2 0 1 0 -6.4 0zM0.6 16c0-3.6 
     )
   }
 
+  {
+    id === 'lead-generation-engine' && (
+      <>
+        <div class="win">
+          <div class="win-bar" aria-hidden="true"><span class="win-dots"><i /><i /><i /></span><span>Winning new business</span></div>
+          <div class="scene panes" data-scene data-loop="10" data-still="9.2" style="--loop:10;--still:9.2">
+            <div class="lane">
+              <div class="lane-head">
+                <span class="tag">Before</span>
+                <span class="readout">One project at a time</span>
+              </div>
+              <svg class="pane-svg" viewBox="0 0 236 168" aria-hidden="true">
+                {groupsAt.map((g) => (
+                  <text x={g.x} y={g.y} class="node-label" text-anchor="middle">{g.name}</text>
+                ))}
+                {market.map((d) => (
+                  <circle cx={d.x} cy={d.y} r="5" class="lead-dot" />
+                ))}
+                <path d={`M${market[3].x} ${market[3].y} L${hub[0]} ${hub[1]}`} class="arc" />
+                <polygon points={hex(hub[0], hub[1], 15)} class="node" />
+                <path d={building} transform={`translate(${hub[0]} ${hub[1]})`} class="lead-hq" />
+              </svg>
+              <div class="spark">
+                <span class="meter-k">New leads</span>
+                <svg viewBox="0 0 236 40" aria-hidden="true">
+                  <path d="M0 30 L30 31 L60 28 L90 31 L120 29 L150 31 L180 28 L210 30 L236 29" class="flat" />
+                </svg>
+              </div>
+            </div>
+            <div class="lane">
+              <div class="lane-head">
+                <span class="tag tag-hot">After</span>
+                <span class="readout readout-hot">A lead engine</span>
+              </div>
+              <svg class="pane-svg" viewBox="0 0 236 168" aria-hidden="true">
+                {groupsAt.map((g) => (
+                  <text x={g.x} y={g.y} class="node-label node-label-hot" text-anchor="middle">{g.name}</text>
+                ))}
+                <g class="ends">
+                  {market.map((d) => (
+                    <path
+                      d={`M${d.x} ${d.y} L${hub[0]} ${hub[1]}`}
+                      class="link lead-link"
+                      style={`--len:${d.len.toFixed(1)};--a:${d.a}`}
+                    />
+                  ))}
+                </g>
+                {market.map((d) => (
+                  <g>
+                    <circle cx={d.x} cy={d.y} r="5" class="lead-dot" />
+                    <circle cx={d.x} cy={d.y} r="5" class="lead-dot-hot pop ends" style={`--a:${d.a}`} />
+                  </g>
+                ))}
+                <polygon points={hex(hub[0], hub[1], 15)} class="node node-on" />
+                <path d={building} transform={`translate(${hub[0]} ${hub[1]})`} class="lead-hq lead-hq-on" />
+              </svg>
+              <div class="spark">
+                <span class="meter-k">New leads</span>
+                <svg viewBox="0 0 236 40" aria-hidden="true">
+                  <path d="M0 34 C50 33 80 29 110 23 S180 8 236 4" class="trend" style="--a:0.6;--b:5.6" />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="rv-split">
+          <div>
+            <span class="rv-k">New market opened</span>
+            <p class="rv-num"><strong>$1B+</strong></p>
+          </div>
+          <div>
+            <span class="rv-k">Every assessment</span>
+            <p class="rv-num rv-num-sm"><strong>A new lead</strong></p>
+          </div>
+        </div>
+      </>
+    )
+  }
   {
     id === 'sales-performance-system' && (
       <>
@@ -844,6 +937,13 @@ const person = 'M2.8 4.2a3.2 3.2 0 1 0 6.4 0a3.2 3.2 0 1 0 -6.4 0zM0.6 16c0-3.6 
   .spin { transform: rotate(calc(var(--t) * 160deg)); }
   .fuel { position: absolute; inset: 0; border-radius: 5px; background: rgb(255 255 255 / 0.3); transform-origin: left center; transform: scaleX(calc(1 - 0.9 * clamp(0, (var(--t) - 0.4) / 7.2, 1))); }
   .fuel-hot { background: var(--hot); }
+
+  /* Lead generation */
+  .lead-dot { fill: rgb(255 255 255 / 0.22); }
+  .lead-dot-hot { fill: var(--hot); }
+  .lead-link { stroke: rgb(142 192 230 / 0.45); stroke-width: 1.3; }
+  .lead-hq { fill: none; stroke: var(--soft); stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+  .lead-hq-on { stroke: var(--brand); stroke-width: 1.6; }
 
   /* Commissions */
   .sheet { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 3px; }

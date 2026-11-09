@@ -11,6 +11,7 @@ export const industryIcons: Record<string, string> = {
   'sales-performance-system': 'M4 20h16M6 16l4-4 3 3 5-6M14 9h4v4',
   'digital-practice-growth': 'M4 8h16v11H4zM9 8V5.5h6V8M4 13h16M11 13v2h2v-2',
   'momentum-exchange-prototype': 'M12 3c3 2.2 4.8 6 4.8 10l-2 3H9.2l-2-3c0-4 1.8-7.8 4.8-10zM9.4 16.2 7.5 20.5M14.6 16.2l1.9 4.3M12 8.5v3',
+  'lead-generation-engine': 'M3 4.5h18l-7 8v6l-4 2v-8zM8 8.5h8',
   'supply-chain-assessment': 'M12 10v11M8.5 21h7M12 10l-3.5 11M12 10l3.5 11M9 6.5a4.2 4.2 0 0 0 0 6M15 6.5a4.2 4.2 0 0 1 0 6M6.2 4a8 8 0 0 0 0 11M17.8 4a8 8 0 0 1 0 11',
 };
 export const iconFor = (id: string) => industryIcons[id] ?? industryIcons['digital-practice-growth'];
