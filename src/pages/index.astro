@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import Mist from '../components/Mist.astro';
+import HeroFlow from '../components/HeroFlow.astro';
 import Calculator from '../components/Calculator.astro';
 import FixBuild from '../components/FixBuild.astro';
 import ClosingCTA from '../components/ClosingCTA.astro';
@@ -10,6 +11,7 @@ import ClosingCTA from '../components/ClosingCTA.astro';
 <Base>
   <section class="hero hero-dark theme-home" data-hero-dark>
     <Mist />
+    <HeroFlow />
     <div class="wrap hero-grid">
       <div class="hero-copy">
         <h1 class="load-in" style="--i:1">We optimize <em class="display-em">operations.</em></h1>
@@ -47,8 +49,9 @@ import ClosingCTA from '../components/ClosingCTA.astro';
       min-height: 100svh;
       display: flex;
       align-items: center;
-      padding-top: calc(76px + clamp(1.5rem, 1rem + 2vw, 3rem));
-      padding-bottom: clamp(2.5rem, 1.5rem + 2vw, 4rem);
+      /* The headline sits a little above the middle of the screen */
+      padding-top: calc(88px + clamp(1.5rem, 1rem + 2vw, 3rem));
+      padding-bottom: clamp(7rem, 3rem + 14vh, 13rem);
     }
     .hero > .wrap { width: 100%; }
   }

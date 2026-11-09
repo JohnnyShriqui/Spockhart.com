@@ -71,8 +71,10 @@ const isCurrent = (href: string) => (href === '/' ? path === '/' : path.startsWi
     left: 0;
     right: 0;
     z-index: 50;
-    transition: background-color 300ms var(--ease), box-shadow 300ms var(--ease), backdrop-filter 300ms var(--ease);
+    padding-top: 0.75rem;
+    transition: background-color 300ms var(--ease), box-shadow 300ms var(--ease), backdrop-filter 300ms var(--ease), padding-top 300ms var(--ease);
   }
+  .site-header.is-scrolled, .site-header.is-open { padding-top: 0; }
   .site-header.is-scrolled,
   .site-header.is-open {
     background: var(--header-bg);
@@ -97,8 +99,16 @@ const isCurrent = (href: string) => (href === '/' ? path === '/' : path.startsWi
     box-shadow: 0 1px 0 rgb(255 255 255 / 0.07);
   }
   /* backdrop-filter would make the header the containing block for the fixed menu panel */
+  /* The open menu is dark, like every page */
   .site-header.is-open {
-    background: var(--paper);
+    --ink: #eef3f8;
+    --ink-2: #c2d0dd;
+    --ink-3: #8fa1b4;
+    --rule: rgb(255 255 255 / 0.1);
+    --accent: #8ec0e6;
+    --mark: #eef3f8;
+    background: #0d1826;
+    box-shadow: 0 1px 0 rgb(255 255 255 / 0.07);
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
   }
@@ -215,7 +225,7 @@ const isCurrent = (href: string) => (href === '/' ? path === '/' : path.startsWi
     left: 0;
     right: 0;
     bottom: 0;
-    background: var(--paper);
+    background: #0d1826;
     overflow-y: auto;
     padding-block: var(--s-6) calc(var(--s-7) + env(safe-area-inset-bottom, 0px));
     padding-left: max(var(--gutter), env(safe-area-inset-left, 0px));
