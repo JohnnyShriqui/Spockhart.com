@@ -19,7 +19,7 @@ type Update = (t: number) => void;
 
 /** How fast scene time runs against the clock. Below 1 slows every graphic down evenly.
  *  A scene, or anything around it, can set its own pace with data-rate (the Approach phases do). */
-const SPEED = 0.32;
+const SPEED = 0.25;
 
 const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 const smooth = (x: number) => {

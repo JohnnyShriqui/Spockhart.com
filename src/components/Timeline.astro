@@ -63,7 +63,7 @@ const growPhases = [
     when: 'Weeks 1–2',
     start: 0,
     end: 14,
-    body: 'We examine your customers, market, existing capabilities, and business model to uncover unmet needs and untapped revenue opportunities.',
+    body: 'We examine your customers, market, and capabilities to uncover untapped opportunities.',
   },
   {
     n: '02',
@@ -72,7 +72,7 @@ const growPhases = [
     when: `By day ${site.offer.prototypeDays}`,
     start: 14,
     end: site.offer.prototypeDays,
-    body: 'We evaluate opportunities by market potential, customer demand, and feasibility. Then we design the strongest concept and turn it into a working prototype.',
+    body: 'We evaluate opportunities and turn the strongest concept into a working prototype.',
   },
   {
     n: '03',
@@ -81,7 +81,7 @@ const growPhases = [
     when: `Months 2–${site.offer.minimumMonths}`,
     start: site.offer.prototypeDays,
     end: SCALE,
-    body: 'We put the solution in front of real customers, test demand, measure adoption, and refine the offering until there’s a clear path to generating revenue.',
+    body: 'We test with real customers, measure demand, and refine the offering.',
   },
   {
     n: '04',
@@ -90,7 +90,7 @@ const growPhases = [
     when: `Month ${site.offer.minimumMonths}`,
     start: SCALE,
     end: null,
-    body: 'We bring the offering to market, establish pricing and sales processes, and hand over a revenue-generating operation your team can own and grow.',
+    body: 'We bring the offering to market and equip your team to operate and grow it.',
   },
 ];
 const phases = track === 'grow' ? growPhases : fixPhases;
@@ -136,8 +136,6 @@ const pct = (d: number) => `${(d / SCALE) * 100}%`;
       <span class="seg-label">{tail}</span>
       <span class="seg-n">4</span>
     </div>
-    <div class="scale-cover"></div>
-    <div class="scale-now"><i></i></div>
   </div>
   <ol class="scale-key" aria-hidden="true">
     {
@@ -151,7 +149,7 @@ const pct = (d: number) => `${(d / SCALE) * 100}%`;
     }
   </ol>
 
-  <ol class="phases" data-reveal="stagger" data-scene-group="(min-width: 901px)" data-hover="(min-width: 901px) and (hover: hover) and (pointer: fine)" data-rate="0.55" data-gap="600">
+  <ol class="phases" data-reveal="stagger" data-scene-group="(min-width: 901px)" data-hover="(min-width: 901px) and (hover: hover) and (pointer: fine)" data-rate="0.32" data-gap="600">
     {
       phases.map((p, i) => (
         <li
@@ -188,8 +186,6 @@ const pct = (d: number) => `${(d / SCALE) * 100}%`;
     /* Room above the bar for the milestone, and the bar's height */
     --above: 2.6rem;
     --bar: 44px;
-    /* Where the marker is: set by the script below as phases play; rests at the end */
-    --pos: 100%;
     position: relative;
     display: grid;
     grid-template-columns: minmax(0, 86fr) minmax(0, 14fr);
@@ -197,35 +193,6 @@ const pct = (d: number) => `${(d / SCALE) * 100}%`;
     padding-bottom: 2rem;
   }
   /* Everything to the right of the marker is still ahead */
-  .scale-cover {
-    position: absolute;
-    top: var(--above);
-    height: var(--bar);
-    left: var(--pos);
-    right: 0;
-    background: rgb(228 234 241 / 0.72);
-    pointer-events: none;
-  }
-  .scale-now {
-    position: absolute;
-    top: calc(var(--above) - 12px);
-    height: calc(var(--bar) + 24px);
-    left: var(--pos);
-    width: 0;
-    pointer-events: none;
-    transition: opacity 300ms var(--ease);
-  }
-  .scale-now::before { content: ''; position: absolute; left: -1px; top: 0; bottom: 0; width: 2px; background: var(--ink); border-radius: 1px; }
-  .scale-now i {
-    position: absolute;
-    left: -8px;
-    top: -9px;
-    width: 16px;
-    height: 18px;
-    background: var(--ink);
-    clip-path: var(--hex);
-  }
-  .scale-now i::after { content: ''; position: absolute; inset: 5px 4px; background: var(--paper); clip-path: var(--hex); }
   .scale-track { position: relative; height: var(--bar); }
   .axis {
     position: absolute;
@@ -343,7 +310,7 @@ const pct = (d: number) => `${(d / SCALE) * 100}%`;
   .phase.is-active {
     z-index: 1;
     border-color: rgb(44 95 138 / 0.55);
-    transform: translateY(-6px) scale(1.1);
+    transform: translateY(-8px) scale(1.2);
     box-shadow: 0 26px 44px -30px rgb(27 42 61 / 0.6);
   }
   /* Time running through the phase that is playing */
@@ -396,8 +363,6 @@ const pct = (d: number) => `${(d / SCALE) * 100}%`;
 
   @media (prefers-reduced-motion: no-preference) {
     /* The marker only pulses while a phase is playing; otherwise the page holds still */
-    .timeline:has(.phase.is-active) .scale-now i { animation: now-pulse 1.6s ease-in-out infinite; }
-    @keyframes now-pulse { 50% { transform: scale(1.18); } }
   }
 
   @media (max-width: 900px) {
@@ -407,7 +372,6 @@ const pct = (d: number) => `${(d / SCALE) * 100}%`;
 
   /* Phones and tablets: the phases loop on their own, so the bar holds still */
   @media (max-width: 900px) {
-    .scale-cover, .scale-now { display: none; }
   }
 
   /* Phones: the bar is too narrow for names, so each part is numbered and a key sits below.
@@ -473,42 +437,18 @@ const pct = (d: number) => `${(d / SCALE) * 100}%`;
   document.addEventListener('spockhart:view', initScenes);
 
   // On larger screens, the marker on the scale follows whichever phase is playing.
-  function followPhases() {
+  // Laptops: pointing at a phase plays it and the rest of the page steps back
+  function focusPhases() {
     document.querySelectorAll<HTMLElement>('[data-timeline]').forEach((tl) => {
       if (tl.dataset.follow) return;
       tl.dataset.follow = '1';
-      const scale = tl.querySelector<HTMLElement>('.scale');
-      if (!scale) return;
       tl.querySelectorAll<HTMLElement>('[data-scene]').forEach((phase) => {
-        const from = Number(phase.dataset.from);
-        const to = Number(phase.dataset.to);
-        const tail = phase.dataset.tail === '1';
-        // Laptops: pointing at a phase plays it and the rest of the page steps back
-        phase.addEventListener('pointerenter', () => {
-          if (phase.closest<HTMLElement>('[data-scene-group]')?.dataset.mode === 'hover') focusOn(phase);
-        });
-        phase.addEventListener('pointerleave', () => {
-          if (phase.closest<HTMLElement>('[data-scene-group]')?.dataset.mode !== 'hover') return;
-          scale.style.removeProperty('--pos');
-          focusOn(null);
-        });
-        phase.addEventListener('scene:frame', (e) => {
-          // On phones the phases loop on their own, so the marker rests at the end.
-          if (phase.closest<HTMLElement>('[data-scene-group]')?.dataset.mode === 'free') {
-            scale.style.removeProperty('--pos');
-            return;
-          }
-          const { t, loop } = (e as CustomEvent<{ t: number; loop: number }>).detail;
-          const css = getComputedStyle(scale);
-          const track = parseFloat(css.getPropertyValue('--track')) || 86;
-          const rest = parseFloat(css.getPropertyValue('--tail')) || 14;
-          const p = Math.min(1, t / (loop * 0.85));
-          const pos = tail ? track + rest * p : (track * (from + (to - from) * p)) / 120;
-          scale.style.setProperty('--pos', `${pos.toFixed(2)}%`);
-        });
+        const hover = () => phase.closest<HTMLElement>('[data-scene-group]')?.dataset.mode === 'hover';
+        phase.addEventListener('pointerenter', () => hover() && focusOn(phase));
+        phase.addEventListener('pointerleave', () => hover() && focusOn(null));
       });
     });
   }
-  followPhases();
-  document.addEventListener('spockhart:view', followPhases);
+  focusPhases();
+  document.addEventListener('spockhart:view', focusPhases);
 </script>
