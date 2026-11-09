@@ -3,7 +3,6 @@ import Base from '../layouts/Base.astro';
 import PageHero from '../components/PageHero.astro';
 import Timeline from '../components/Timeline.astro';
 import ClosingCTA from '../components/ClosingCTA.astro';
-import WeekOne from '../components/WeekOne.astro';
 import { site } from '../config/site';
 ---
 
@@ -13,11 +12,10 @@ import { site } from '../config/site';
 >
   <PageHero
     theme="approach"
+    class="approach-hero"
     title='Embedded <em class="display-em">from day one.</em>'
     lead="From workflow automation to building entirely new digital offerings, we turn great opportunities into working solutions."
-  >
-    <WeekOne slot="figure" />
-  </PageHero>
+  />
 
   <section class="section band-recessed engagement engagement-fix" aria-labelledby="engagement-title">
     <div class="wrap">
@@ -48,6 +46,29 @@ import { site } from '../config/site';
 </Base>
 
 <style>
+  /* Hero: the headline set large across most of the width, the lead beside its last line under
+     a hairline, like the opening of a magazine feature */
+  :global(.approach-hero .accent-rule) { display: none; }
+  :global(.approach-hero .lead) { padding-top: var(--s-4); border-top: 1px solid var(--rule-2); }
+  @media (min-width: 961px) {
+    :global(.approach-hero .hero-text) {
+      grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);
+      column-gap: var(--s-8);
+      align-items: end;
+    }
+    :global(.approach-hero h1) {
+      grid-column: 1;
+      grid-row: 1;
+      max-width: none;
+      font-size: clamp(3.5rem, 1.6rem + 5.6vw, 6.75rem);
+    }
+    :global(.approach-hero .lead) {
+      grid-column: 2;
+      grid-row: 1;
+      max-width: none;
+      margin-bottom: 1.1rem;
+    }
+  }
   /* Laptops: room under each title before its phases, and more again before the next track */
   @media (min-width: 901px) {
     .engagement .section-head { gap: var(--s-2); margin-bottom: var(--s-7); max-width: none; }
