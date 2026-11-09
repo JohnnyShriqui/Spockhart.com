@@ -27,40 +27,38 @@ interface Item {
       smaller-screen cards only the result shows, since the card carries the headline. */
   value: string;
   rest: string;
-  /** Shown as a small pill beside the line: delivered, or being built now */
-  status: 'done' | 'progress';
 }
-const STATUS = { done: 'Delivered', progress: 'In progress' } as const;
 
 const build: Item[] = [
-  { k: 'A', id: 'sales-performance-system', value: '+$316K a month', rest: ' with a new sales intelligence system', status: 'done' },
-  { k: 'B', id: 'digital-practice-growth', value: '$150K to $1M revenue', rest: ' by scaling a digital services practice', status: 'done' },
-  { k: 'C', id: 'lead-generation-engine', value: 'A $1B+ market opened', rest: ' through a new digital service', status: 'done' },
+  { k: 'A', id: 'sales-performance-system', value: '+$316K a month', rest: ' with a new sales intelligence system' },
+  { k: 'B', id: 'digital-practice-growth', value: '$150K to $1M revenue', rest: ' by scaling a digital services practice' },
+  { k: 'C', id: 'lead-generation-engine', value: 'A $1B+ market opened', rest: ' through a new digital service' },
 ];
 const fix: Item[] = [
-  { k: '1', id: 'commission-automation', value: '80% less time', rest: ' processing commissions for a $1.2B manufacturer', status: 'progress' },
-  { k: '2', id: 'project-feasibility-platform', value: '12 months → minutes', rest: ', eliminating $100K+ assessment costs', status: 'done' },
-  { k: '3', id: 'momentum-exchange-prototype', value: '83% greater fuel efficiency', rest: ' with a new momentum-transfer system', status: 'done' },
-  { k: '4', id: 'subcontractor-financing-marketplace', value: '6+ months → weeks', rest: ' for subcontractor financing approvals', status: 'done' },
+  { k: '1', id: 'commission-automation', value: '80% less time', rest: ' processing commissions for a $1.2B manufacturer' },
+  { k: '2', id: 'project-feasibility-platform', value: '12 months → minutes', rest: ', eliminating $100K+ assessment costs' },
+  { k: '3', id: 'momentum-exchange-prototype', value: '83% greater fuel efficiency', rest: ' with a new momentum-transfer system' },
+  { k: '4', id: 'subcontractor-financing-marketplace', value: '6+ months → weeks', rest: ' for subcontractor financing approvals' },
 ];
 
 /* Chart geometry. The same chart is drawn twice: tall beside the list of case studies on laptops
-   (as tall as the list), and in its original proportions above the cards on phones and tablets.
+   (from the first case study to the last), and in its original proportions above the cards on
+   phones and tablets.
    Heights are illustrative. */
 const W = 60;
 const before = { rev: 92, cost: 160 };
 const after = { rev: 330, cost: 398 };
 const chartFor = (key: 'wide' | 'narrow') => {
-  const S = key === 'wide' ? 1.75 : 1; // how much taller the bars are drawn
+  const S = key === 'wide' ? 0.85 : 1; // the laptop drawing is shaped to sit beside the bars
   const REV = 230 * S; // revenue, before
   const COST = 216 * S; // costs, before: just under revenue
   const ADD = 46 * S; // each new revenue slice
   const CUT = 26 * S; // each cost slice removed
   const TOP = 42;
   const BASE = TOP + REV + ADD * build.length;
-  const lab = key === 'wide' ? 26 : 22; // axis labels below the base line
-  const grp = key === 'wide' ? 58 : 48; // Before / After
-  const line = key === 'wide' ? 18 : 14; // between the two lines of a note
+  const lab = 22; // axis labels below the base line
+  const grp = 48; // Before / After
+  const line = 14; // between the two lines of a note
   const revTop = BASE - REV;
   const costTop = BASE - COST;
   const newTop = revTop - ADD * build.length;
@@ -135,9 +133,6 @@ const sets = [
                     return (
                       <g class="fb-slice fb-add" data-slice={b.k} style={`--i:${i}`}>
                         <rect x={after.rev} y={y} width={W} height={c.ADD} class="fb-add-rect" data-slice-rect />
-                        <text x={after.rev + W / 2} y={y + c.ADD / 2 + 5} text-anchor="middle" class="fb-key-add">
-                          {b.k}
-                        </text>
                       </g>
                     );
                   })
@@ -165,9 +160,6 @@ const sets = [
                           fill={`url(#fb-hatch-${c.key})`}
                           data-slice-rect
                         />
-                        <text x={after.cost + W / 2} y={y + c.CUT / 2 + 4} text-anchor="middle" class="fb-key-cut">
-                          {f.k}
-                        </text>
                       </g>
                     );
                   })
@@ -210,14 +202,9 @@ const sets = [
                         </div>
                       </div>
                       <div class="fb-body">
-                        <span class="fb-key">{it.k}</span>
                         <span class="fb-note">Our Work</span>
                         <span class="fb-text">
                           <span class="fb-line"><span class="fb-v">{it.value}</span><span class="fb-l">{it.rest}</span></span>
-                          <span class:list={['fb-pill', `fb-pill-${it.status}`]}>
-                            <i aria-hidden="true"></i>
-                            {STATUS[it.status]}
-                          </span>
                         </span>
                       </div>
                       <span class="fb-caret" aria-hidden="true">
@@ -933,58 +920,20 @@ const sets = [
     .fb-hold .fb-rev-after { transition: none !important; }
   }
 
-  /* Status: a hairline pill, quiet type, a small coloured dot. Nothing glows or pulses. */
   .fb-text { display: flex; flex-wrap: wrap; align-items: center; gap: 0.2rem 0.85rem; }
   /* One line per case study, one typeface: the result in full ink, the rest a step quieter */
   .fb-line { min-width: 0; font-family: var(--font-display); line-height: 1.3; }
   .fb-line .fb-v { font-size: inherit; }
   .fb-l { color: var(--ink-3); }
   @media (min-width: 1100px) {
-    /* The list gets the wider column so each line fits on one line on a laptop; the chart is
-       drawn a little smaller, with its words set larger so they read at the same size. On a
-       narrower window a long line wraps rather than being cut off. */
-    .fb-stage { grid-template-columns: minmax(0, 0.78fr) minmax(0, 1.22fr); column-gap: clamp(3.5rem, 1rem + 5vw, 5.5rem); }
     .fb-text { flex-wrap: nowrap; }
-    /* The line takes the row; the status pills line up in a column at the right */
     .fb-line { flex: 1 1 auto; font-size: 1rem; }
-    .fb-axis-label { font-size: 12.5px; letter-spacing: 0.1em; }
-    .fb-group { font-size: 25px; }
-    .fb-ann { font-size: 16px; }
-    .fb-key-add { font-size: 16px; }
-    .fb-key-cut { font-size: 15px; }
-  }
-  /* Smaller laptops: a touch smaller so the lines still fit on one line */
-  @media (min-width: 1100px) and (max-width: 1399px) {
-    .fb-line { font-size: 0.9375rem; }
   }
   /* On smaller screens each case study is a card that already shows its headline */
   @media (max-width: 1099px) {
     .fb-line { font-size: 1.0625rem; }
     .fb-l { display: none; }
   }
-  .fb-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.45rem;
-    padding: 0.2rem 0.6rem 0.2rem 0.5rem;
-    border: 1px solid rgb(var(--hair) / 0.12);
-    border-radius: 999px;
-    font-family: var(--font-body);
-    font-size: 0.6875rem;
-    font-weight: 500;
-    letter-spacing: 0.1em;
-    line-height: 1.2;
-    text-transform: uppercase;
-    white-space: nowrap;
-    color: var(--ink-3);
-  }
-  .fb-pill i { width: 5px; height: 5px; border-radius: 50%; background: var(--dot); flex: none; }
-  .fb-pill-done { --dot: var(--ok); }
-  .fb-pill-progress { --dot: var(--wip); }
-  @media (max-width: 1099px) {
-    .fb-pill { font-size: 0.625rem; padding: 0.16rem 0.5rem 0.16rem 0.42rem; }
-  }
-
   /* The dropdown (laptops): the words on the left with room around them, lined up with the
      row's sentence, and the graphic small beside them. */
   @media (min-width: 1100px) {
@@ -1003,21 +952,17 @@ const sets = [
     .fb-headline { font-size: 1.125rem; line-height: 1.55; }
   }
   /* ==========================================================================
-     Laptops: each case study is a bar, with its graphic as a small still on the left, a
-     coloured key, the one-line result, its status and the chevron. The dropdown is as before.
-     The chart beside them is drawn tall, from the first bar to the last.
+     Laptops: each case study is a slim bar, with its graphic as a small still on the left, the
+     one-line result and the chevron. The dropdown is as before. The chart beside them is as
+     tall as the bars, from the first to the last, and takes the width the bars leave.
      ========================================================================== */
   .fb {
-    --key-build: #2c5f8a;
-    --key-fix: #a9524a;
     --bar-bg: #ffffff;
     --bar-line: rgb(27 42 61 / 0.1);
     --bar-shadow: 0 1px 2px rgb(27 42 61 / 0.05);
   }
   @media (prefers-color-scheme: dark) {
     .fb {
-      --key-build: #3c78aa;
-      --key-fix: #a65a52;
       --bar-bg: rgb(255 255 255 / 0.035);
       --bar-line: rgb(255 255 255 / 0.1);
       --bar-shadow: none;
@@ -1027,36 +972,26 @@ const sets = [
     .fb-svg-wide { display: none; }
   }
   @media (min-width: 1100px) {
-    .fb-stage { grid-template-columns: minmax(0, 0.46fr) minmax(0, 1fr); }
+    .fb { padding-block: clamp(3rem, 2rem + 2.5vw, 4.75rem) clamp(2rem, 1.25rem + 2vw, 3.5rem); }
+    .fb-title { margin-bottom: clamp(1.75rem, 1rem + 2vw, 2.75rem); }
+    .fb-stage { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1fr); column-gap: clamp(3rem, 1rem + 4vw, 4.5rem); }
     .fb-svg-narrow { display: none; }
     .fb-svg-wide { flex: none; width: 100%; padding: 0; }
-    .fb-axis-label { font-size: 13px; }
-    .fb-group { font-size: 24px; }
-    .fb-ann { font-size: 15px; }
-    .fb-key-add { font-size: 17px; }
-    .fb-key-cut { font-size: 15px; }
+    .fb-axis-label { font-size: 10.5px; letter-spacing: 0.14em; }
+    .fb-group { font-size: 19px; }
+    .fb-ann { font-size: 12px; }
 
-    .fb-set { gap: 0.6rem; }
-    .fb-set + .fb-set { margin-top: 0.9rem; }
-    .fb-row { gap: 0.5rem; }
+    .fb-set { gap: 0.45rem; }
+    .fb-set + .fb-set { margin-top: 0.6rem; }
+    .fb-row { gap: 0.35rem; }
     .fb-card { border: 1px solid var(--bar-line); border-radius: var(--radius-lg); background: var(--bar-bg); box-shadow: var(--bar-shadow); }
     .fb-card.is-open { border-color: rgb(var(--hair) / 0.2); }
-    .fb-head { grid-template-columns: auto minmax(0, 1fr) auto; gap: 0.85rem; padding: 0.45rem 0.75rem 0.45rem 0.45rem; }
-    .fb-media { display: block; width: 74px; height: 44px; border-radius: 4px; }
-    .fb-body { gap: 0.75rem; }
-    .fb-key {
-      display: grid;
-      place-items: center;
-      width: 22px;
-      height: 22px;
-      padding: 0;
-      border-radius: 5px;
-      font-size: 0.6875rem;
-      letter-spacing: 0;
-      color: #fff;
-    }
-    .fb-key::before { display: none; }
-    .fb-card-build .fb-key { background: var(--key-build) !important; }
-    .fb-card-fix .fb-key { background: var(--key-fix) !important; }
+    .fb-head { grid-template-columns: auto minmax(0, 1fr) auto; gap: 0.85rem; padding: 0.3rem 0.6rem 0.3rem 0.3rem; }
+    .fb-media { display: block; width: 60px; height: 36px; border-radius: 4px; }
+    .fb-body { grid-template-columns: minmax(0, 1fr); }
+  }
+  /* Smaller laptops: a touch smaller so the lines still fit on one line */
+  @media (min-width: 1100px) and (max-width: 1399px) {
+    .fb-line { font-size: 0.9375rem; }
   }
 </style>
