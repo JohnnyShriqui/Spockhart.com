@@ -367,20 +367,31 @@ const tick = (x: number, y: number, s = 1) => `M${x - 3.5 * s} ${y}l${2.4 * s} $
           </g>
         ))}
 
-        {/* Each lens drops straight down onto one line, which leads into the result */}
+        {/* Feedback from each lens flows down one shared line into an idea */}
         <g class="ap" style="--a:2.1">
           {lensX.map((x) => (
             <path d={`M${x} ${LENS_Y + 50}V122`} class="merge" />
           ))}
           <path d={`M${lensX[0]} 122H${lensX[3]}`} class="merge" />
-          <path d="M129 122V132" class="merge" />
+          <path d="M129 122V129" class="merge" />
+          <path d="M125.5 126.5L129 130.5L132.5 126.5" class="merge" />
+        </g>
+        {/* one stream per stretch of line, all flowing toward the idea */}
+        <g>
+          {lensX.map((x) => (
+            <path d={`M${x} ${LENS_Y + 50}V122`} class="feed" />
+          ))}
+          <path d={`M${lensX[0]} 122H129`} class="feed" />
+          <path d={`M${lensX[3]} 122H129`} class="feed" />
         </g>
 
         <g class="pop" style="--a:2.6">
           <polygon points={hex(129, 148, 16)} class="found-hex" />
-          <text x="129" y="153.5" class="found-dollar" text-anchor="middle">$</text>
+          {/* a lightbulb */}
+          <path d="M129 138.2a6.3 6.3 0 0 0-3.6 11.5c.7.5 1 1.2 1 2v.8h5.2v-.8c0-.8.3-1.5 1-2a6.3 6.3 0 0 0-3.6-11.5z" class="bulb" />
+          <path d="M126.6 154.6h4.8M127.3 156.8h3.4" class="bulb-base" />
         </g>
-        <text x="129" y="189" class="headline ap" text-anchor="middle" style="--a:3">Untapped revenue</text>
+        <text x="129" y="189" class="headline ap" text-anchor="middle" style="--a:3">Untapped opportunity</text>
       </svg>
     )
   }
@@ -660,6 +671,17 @@ const tick = (x: number, y: number, s = 1) => `M${x - 3.5 * s} ${y}l${2.4 * s} $
   .merge { fill: none; stroke: var(--accent-soft); stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
   .found-hex { fill: var(--brand); }
   .found-dollar { font-family: var(--font-display); font-size: 15px; font-weight: 700; fill: #fff; }
+  .feed {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-dasharray: 1.5 8;
+    stroke-dashoffset: calc(var(--t) * -12px);
+    opacity: clamp(0, (var(--t) - 2.4) * 3, 1);
+  }
+  .bulb { fill: #fff; }
+  .bulb-base { fill: none; stroke: #fff; stroke-width: 1.4; stroke-linecap: round; }
 
   /* Growth 2. Engineer */
   .gate { fill: none; stroke: var(--accent-soft); stroke-width: 1.4; stroke-dasharray: 4 3; }
