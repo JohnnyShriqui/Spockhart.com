@@ -87,9 +87,9 @@ function draw(d: Dims) {
       up: { x: ax, y1: y(r0(ax)) - 6, y2: y(rW(ax)) + 7 },
     },
     keys: [
-      { k: '1', x: ax + 18, y: mid(rEff, r0), at: 13200 },
-      { k: '2', x: ax + 18, y: mid(rW, rEff), at: 13600 },
-      { k: '3', x: ax + 18, y: y((f0(ax) + fW(ax)) / 2), at: 14000 },
+      { k: '1', x: ax + 18, y: mid(rEff, r0), at: 7920 },
+      { k: '2', x: ax + 18, y: mid(rW, rEff), at: 8160 },
+      { k: '3', x: ax + 18, y: y((f0(ax) + fW(ax)) / 2), at: 8400 },
     ],
     ends: { demand: y(fW(d.X1)), res: y(rW(d.X1)), demand0: y(f0(d.X1)), res0: y(r0(d.X1)) },
     left: { demand: y(f0(d.X0)), res: y(r0(d.X0)) },
@@ -133,12 +133,12 @@ const charts = [
               <text x={c.X1} y={c.BASE + 22} class="axis-label" text-anchor="end">Time</text>
 
               <!-- First, without us: demand runs away from resources -->
-              <g class="reveal" style="--at:300ms;--dur:3600ms">
+              <g class="reveal" style="--at:180ms;--dur:2160ms">
                 <path d={c.without.demand} class="l-without l-without-demand" />
                 <path d={c.without.res} class="l-without l-without-res" />
               </g>
-              <text x={c.X1 + 22} y={c.ends.demand0 + 4} class="fade end-label end-demand" style="--at:3600ms">Demand</text>
-              <text x={c.X1 + 22} y={c.ends.res0 + 4} class="fade end-label end-res" style="--at:3600ms">Resources</text>
+              <text x={c.X1 + 22} y={c.ends.demand0 + 4} class="fade end-label end-demand" style="--at:2160ms">Demand</text>
+              <text x={c.X1 + 22} y={c.ends.res0 + 4} class="fade end-label end-res" style="--at:2160ms">Resources</text>
               <!-- The gap without us, marked the same way as the reduced gap later; it fades as our lines come in -->
               <g class="gap-then">
                 <path d={`M${c.X1 + 10} ${c.ends.demand0 + 1} h4 V${c.ends.res0 - 1} h-4`} class="bracket" />
@@ -146,7 +146,7 @@ const charts = [
               </g>
 
               <!-- Then, with us: the lines and the light under them move together -->
-              <g class="reveal" style="--at:8000ms;--dur:5600ms">
+              <g class="reveal" style="--at:4800ms;--dur:3360ms">
                 <path d={c.regions.demand} fill={`url(#npi-hatch-${c.cls})`} />
                 <path d={c.regions.further} class="r-further" />
                 <path d={c.regions.funding} class="r-funding" />
@@ -158,21 +158,21 @@ const charts = [
               </g>
 
               <!-- What changes: demand pushed down, resources pushed up -->
-              <g class="fade" style="--at:13800ms">
+              <g class="fade" style="--at:8280ms">
                 <path d={`M${c.arrows.up.x} ${c.arrows.up.y1} V${c.arrows.up.y2} M${c.arrows.up.x - 3.5} ${c.arrows.up.y2 + 4.5} L${c.arrows.up.x} ${c.arrows.up.y2} L${c.arrows.up.x + 3.5} ${c.arrows.up.y2 + 4.5}`} class="arrow" />
               </g>
-              <g class="fade" style="--at:14400ms">
+              <g class="fade" style="--at:8640ms">
                 <path d={`M${c.arrows.down.x} ${c.arrows.down.y1} V${c.arrows.down.y2} M${c.arrows.down.x - 3.5} ${c.arrows.down.y2 - 4.5} L${c.arrows.down.x} ${c.arrows.down.y2} L${c.arrows.down.x + 3.5} ${c.arrows.down.y2 - 4.5}`} class="arrow" />
               </g>
               {c.keys.map((k) => (
-                <g class={`fade key key-${k.k}`} style={`--at:${k.at + 600}ms`}>
+                <g class={`fade key key-${k.k}`} style={`--at:${k.at + 360}ms`}>
                   <circle cx={k.x} cy={k.y} r="8" />
                   <text x={k.x} y={k.y + 3.6} text-anchor="middle">{k.k}</text>
                 </g>
               ))}
 
               <!-- The gap that is left -->
-              <g class="fade" style="--at:14800ms">
+              <g class="fade" style="--at:8880ms">
                 <path d={`M${c.X1 + 10} ${c.ends.demand + 1} h4 V${c.ends.res - 1} h-4`} class="bracket" />
                 <text x={c.X1 + 22} y={(c.ends.demand + c.ends.res) / 2 + 4} class="bracket-label">Reduced gap</text>
               </g>
@@ -213,12 +213,12 @@ const charts = [
       let timer = 0;
       const toAfter = () => {
         root.classList.remove('npi-pre');
-        timer = window.setTimeout(toBefore, 27000);
+        timer = window.setTimeout(toBefore, 16200);
       };
       const toBefore = () => {
         if (!shown) return;
         root.classList.add('npi-pre');
-        timer = window.setTimeout(toAfter, 1800);
+        timer = window.setTimeout(toAfter, 1100);
       };
 
       root.classList.add('npi-pre');
@@ -327,13 +327,13 @@ const charts = [
      again. Each part is revealed left to right, so a line and the light under it move together. */
   @media (prefers-reduced-motion: no-preference) {
     .reveal { clip-path: inset(-20px -20px -20px -20px); transition: clip-path var(--dur) cubic-bezier(0.45, 0, 0.4, 1) var(--at); }
-    .fade { opacity: 1; transition: opacity 1200ms var(--ease) var(--at); }
+    .fade { opacity: 1; transition: opacity 800ms var(--ease) var(--at); }
     .npi-pre .reveal { clip-path: inset(-20px calc(100% + 20px) -20px -20px); transition: clip-path 900ms var(--ease); }
     .npi-pre .fade { opacity: 0; transition: opacity 700ms var(--ease); }
     /* The first gap: fades in over two seconds once the lines without us reach the end, holds,
        then fades out over about three seconds as ours come in. An even, gentle curve on every step
        so it never pops. */
-    .gap-then { animation: npi-gap-then 7000ms cubic-bezier(0.45, 0, 0.55, 1) 3800ms both; }
+    .gap-then { animation: npi-gap-then 4200ms cubic-bezier(0.45, 0, 0.55, 1) 2280ms both; }
     .npi-pre .gap-then { animation: none; opacity: 0; }
     @keyframes npi-gap-then {
       0% { opacity: 0; }

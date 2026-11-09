@@ -133,6 +133,9 @@ const sets = [
                     return (
                       <g class="fb-slice fb-add" data-slice={b.k} style={`--i:${i}`}>
                         <rect x={after.rev} y={y} width={W} height={c.ADD} class="fb-add-rect" data-slice-rect />
+                        <text x={after.rev + W / 2} y={y + c.ADD / 2 + 4.5} text-anchor="middle" class="fb-key-add">
+                          {b.k}
+                        </text>
                       </g>
                     );
                   })
@@ -160,6 +163,9 @@ const sets = [
                           fill={`url(#fb-hatch-${c.key})`}
                           data-slice-rect
                         />
+                        <text x={after.cost + W / 2} y={y + c.CUT / 2 + 4} text-anchor="middle" class="fb-key-cut">
+                          {f.k}
+                        </text>
                       </g>
                     );
                   })
@@ -451,12 +457,12 @@ const sets = [
       let timer = 0;
       const toAfter = () => {
         root.classList.remove('fb-pre');
-        timer = window.setTimeout(toBefore, 14000);
+        timer = window.setTimeout(toBefore, 9000);
       };
       const toBefore = () => {
         if (!shown || open) return;
         root.classList.add('fb-pre');
-        timer = window.setTimeout(toAfter, 2600);
+        timer = window.setTimeout(toAfter, 1600);
       };
       function hold(on: boolean) {
         window.clearTimeout(timer);
@@ -728,11 +734,11 @@ const sets = [
   /* The After builds itself, over and over: costs drop, the cut slices appear, new revenue
      stacks up, then the lines draw out to the case studies */
   @media (prefers-reduced-motion: no-preference) {
-    .fb-cost-after { transition: transform 2200ms var(--ease-out) 300ms; }
-    .fb-cut { transition: opacity 1000ms var(--ease) calc(1400ms + var(--i) * 300ms); }
-    .fb-add { transition: opacity 900ms var(--ease) calc(2600ms + (2 - var(--i)) * 400ms), transform 1300ms var(--ease-out) calc(2600ms + (2 - var(--i)) * 400ms); }
-    .fb-wide { transition: opacity 1000ms var(--ease) 4100ms; }
-    :global(.fb-link) { stroke-dasharray: 1; stroke-dashoffset: 0; transition: stroke-dashoffset 1800ms var(--ease-out) 4400ms, opacity 250ms var(--ease), stroke-width 250ms var(--ease); }
+    .fb-cost-after { transition: transform 1300ms var(--ease-out) 200ms; }
+    .fb-cut { transition: opacity 600ms var(--ease) calc(850ms + var(--i) * 180ms); }
+    .fb-add { transition: opacity 550ms var(--ease) calc(1550ms + (2 - var(--i)) * 250ms), transform 800ms var(--ease-out) calc(1550ms + (2 - var(--i)) * 250ms); }
+    .fb-wide { transition: opacity 600ms var(--ease) 2450ms; }
+    :global(.fb-link) { stroke-dasharray: 1; stroke-dashoffset: 0; transition: stroke-dashoffset 1100ms var(--ease-out) 2650ms, opacity 250ms var(--ease), stroke-width 250ms var(--ease); }
 
     /* A case study is open: the chart sits still on its finished After */
     .fb-hold .fb-cost-after, .fb-hold .fb-cut, .fb-hold .fb-add, .fb-hold .fb-wide, .fb-hold :global(.fb-link) { transition: none !important; }
@@ -902,38 +908,46 @@ const sets = [
      the After bars start just as muted and fill to full colour once our work is built on them
      (costs once the cuts land, revenue once the new slices stack up). */
   .fb {
+    /* Before (and the After before our work lands): muted */
     --c-rev: 47 111 166;
     --c-cost: 192 98 88;
     --c-rev-dull: rgb(47 111 166 / 0.4);
+    /* After: bright and clear */
+    --a-rev: 22 119 242;
+    --a-cost: 240 82 64;
+    --a-rev-ink: #0b4fb0;
   }
   @media (prefers-color-scheme: dark) {
     .fb {
       --c-rev: 156 200 234;
       --c-cost: 226 163 154;
       --c-rev-dull: rgb(110 160 205 / 0.5);
+      --a-rev: 77 160 255;
+      --a-cost: 255 112 96;
+      --a-rev-ink: #eaf3ff;
     }
   }
   .fb-chart { color: var(--ink); }
-  .fb-rev-after { fill: rgb(var(--c-rev) / 0.92); }
-  .fb-cost-after { fill: rgb(var(--c-cost) / 0.88); }
-  .fb-add-rect { fill: rgb(var(--c-rev) / 0.2); stroke: rgb(var(--c-rev)); stroke-width: 1.25; }
-  .fb-add.is-on .fb-add-rect { fill: rgb(var(--c-rev) / 0.4); }
-  .fb-key-add { fill: var(--ink); }
-  .fb-cut-rect { stroke: rgb(var(--c-cost) / 0.9); stroke-width: 1.25; }
-  .fb-hatch-line { stroke: rgb(var(--c-cost) / 0.4); }
-  .fb-key-cut { fill: var(--warm); }
+  .fb-rev-after { fill: rgb(var(--a-rev)); }
+  .fb-cost-after { fill: rgb(var(--a-cost)); }
+  .fb-add-rect { fill: rgb(var(--a-rev) / 0.22); stroke: rgb(var(--a-rev)); stroke-width: 1.5; }
+  .fb-add.is-on .fb-add-rect { fill: rgb(var(--a-rev) / 0.4); }
+  .fb-key-add { fill: var(--a-rev-ink); font-weight: 700; }
+  .fb-cut-rect { stroke: rgb(var(--a-cost)); stroke-width: 1.5; }
+  .fb-hatch-line { stroke: rgb(var(--a-cost) / 0.45); }
+  .fb-key-cut { fill: rgb(var(--a-cost)); font-weight: 700; }
   .fb-bracket-after { stroke: rgb(var(--hair) / 0.5); }
   .fb-ann-hot { fill: var(--hot); }
   :global(.fb-link) { opacity: 0.8; }
-  :global(.fb-link-build) { stroke: var(--hl); }
-  :global(.fb-link-fix) { stroke: var(--warm); }
+  :global(.fb-link-build) { stroke: rgb(var(--a-rev)); }
+  :global(.fb-link-fix) { stroke: rgb(var(--a-cost)); }
   .fb-card-build { --c: var(--hl); }
   .fb-card-fix { --c: var(--warm); }
   .fb-set-build .fb-set-note { color: var(--hl); }
   .fb-set-fix .fb-set-note { color: var(--warm); }
   @media (prefers-reduced-motion: no-preference) {
-    .fb-cost-after { transition: transform 2200ms var(--ease-out) 300ms, fill 1400ms var(--ease) 2700ms; }
-    .fb-rev-after { transition: fill 1400ms var(--ease) 4000ms; }
+    .fb-cost-after { transition: transform 1300ms var(--ease-out) 200ms, fill 900ms var(--ease) 1600ms; }
+    .fb-rev-after { transition: fill 900ms var(--ease) 2400ms; }
     .fb-pre .fb-cost-after { fill: rgb(var(--c-cost) / 0.42); transition: transform 700ms var(--ease), fill 600ms var(--ease); }
     .fb-pre .fb-rev-after { fill: var(--c-rev-dull); transition: fill 600ms var(--ease); }
     .fb-hold .fb-rev-after { transition: none !important; }
