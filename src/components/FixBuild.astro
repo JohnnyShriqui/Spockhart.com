@@ -920,29 +920,29 @@ const sets = [
     --c-rev: 47 111 166;
     --c-cost: 192 98 88;
     --c-rev-dull: rgb(47 111 166 / 0.4);
-    /* After: bright and clear */
-    --a-rev: 22 119 242;
-    --a-cost: 240 82 64;
-    --a-rev-ink: #0b4fb0;
+    /* After: full, confident colour, like a printed annual report: cobalt and crimson */
+    --a-rev: 30 88 166;
+    --a-cost: 182 46 56;
+    --a-rev-ink: #174a8b;
   }
   @media (prefers-color-scheme: dark) {
     .fb {
       --c-rev: 156 200 234;
       --c-cost: 226 163 154;
       --c-rev-dull: rgb(110 160 205 / 0.5);
-      --a-rev: 77 160 255;
-      --a-cost: 255 112 96;
-      --a-rev-ink: #eaf3ff;
+      --a-rev: 74 130 206;
+      --a-cost: 206 74 80;
+      --a-rev-ink: #e6eef8;
     }
   }
   .fb-chart { color: var(--ink); }
   .fb-rev-after { fill: rgb(var(--a-rev)); }
   .fb-cost-after { fill: rgb(var(--a-cost)); }
-  .fb-add-rect { fill: rgb(var(--a-rev) / 0.22); stroke: rgb(var(--a-rev)); stroke-width: 1.5; }
+  .fb-add-rect { fill: rgb(var(--a-rev) / 0.14); stroke: rgb(var(--a-rev)); stroke-width: 1.5; }
   .fb-add.is-on .fb-add-rect { fill: rgb(var(--a-rev) / 0.4); }
   .fb-key-add { fill: var(--a-rev-ink); font-weight: 700; }
   .fb-cut-rect { stroke: rgb(var(--a-cost)); stroke-width: 1.5; }
-  .fb-hatch-line { stroke: rgb(var(--a-cost) / 0.45); }
+  .fb-hatch-line { stroke: rgb(var(--a-cost) / 0.35); }
   .fb-key-cut { fill: rgb(var(--a-cost)); font-weight: 700; }
   .fb-bracket-after { stroke: rgb(var(--hair) / 0.5); }
   .fb-ann-hot { fill: var(--hot); }
