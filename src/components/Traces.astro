@@ -100,10 +100,6 @@
     --tr-ground: var(--paper);
     --tr-dots: rgb(27 42 61 / 0.1);
   }
-  @media (prefers-color-scheme: dark) {
-    /* On the dark page the hero's indigo would vanish, so the line goes light */
-    .traces { --tr-line: rgb(238 243 248 / 0.4); --tr-ground: #111930; --tr-dots: rgb(238 243 248 / 0.06); }
-  }
   /* A light grid of dots, a little stronger near the hero; only the dots fade, not the line */
   .traces::before {
     content: '';

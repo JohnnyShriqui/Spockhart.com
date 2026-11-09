@@ -299,13 +299,6 @@ const iconFill = (i: number) => Math.max(0, Math.min(1, fteIcons - i));
     --day-name: var(--ink);
     --person-fill: rgb(74 138 186 / 0.9);
   }
-  @media (prefers-color-scheme: dark) {
-    .calc-section {
-      --day-fill: rgb(156 200 234 / 0.75);
-      --day-name: #fff;
-      --person-fill: rgb(156 200 234 / 0.85);
-    }
-  }
   /* The result's words, which were white on the old blue panel, now follow the page */
   .calc-right { color: var(--ink); }
   .r-unit { color: var(--ink-2); }
@@ -318,14 +311,6 @@ const iconFill = (i: number) => Math.max(0, Math.min(1, fteIcons - i));
     --calc-out: #f5f8fb;
     --calc-line: rgb(27 42 61 / 0.09);
     --calc-shadow: 0 1px 2px rgb(27 42 61 / 0.06), 0 34px 70px -34px rgb(27 42 61 / 0.38);
-  }
-  @media (prefers-color-scheme: dark) {
-    .calc-section {
-      --calc-bg: #16263a;
-      --calc-out: #13223a;
-      --calc-line: rgb(255 255 255 / 0.09);
-      --calc-shadow: 0 34px 70px -30px rgb(0 0 0 / 0.7);
-    }
   }
   .calc { border: 1px solid var(--calc-line); border-radius: 16px; background: var(--calc-bg); box-shadow: var(--calc-shadow); overflow: hidden; }
   .calc-head .eyebrow { color: var(--ink-3); }

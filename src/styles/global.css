@@ -385,9 +385,7 @@ a { color: inherit; }
   --mist-3: #d6ccef;
 }
 
-/* Below the hero (Home, Approach, Nonprofits): light, or dark when the visitor's device is in
-   dark mode (many switch to it at sunset). The hero above always stays dark. The components
-   in here read these tokens, so the same markup works on either ground. */
+/* Below the hero (Home, Approach, Nonprofits): always light. The hero above always stays dark. */
 .page-body {
   /* Shared by the components below the hero: hairlines and tints are drawn in --hair at a low
      alpha; --hl and --warm are the blue (revenue) and red (costs) of the charts */
@@ -411,58 +409,6 @@ a { color: inherit; }
 .page-body .closing { border-top: 0 !important; }
 .page-body .band-recessed { background: transparent; }
 
-@media (prefers-color-scheme: dark) {
-  .page-body {
-    --ink: #eef3f8;
-    --ink-2: #b5c4d3;
-    --ink-3: #94a8bc;
-    --rule: rgb(255 255 255 / 0.1);
-    --rule-2: rgb(255 255 255 / 0.22);
-    --accent: #8ec0e6;
-    --accent-soft: #6fa8d6;
-    --accent-wash: rgb(142 192 230 / 0.14);
-    --btn-bg: #eef3f8;
-    --btn-fg: #14212f;
-    --btn-bg-hover: #ffffff;
-    --selection: rgb(142 192 230 / 0.3);
-    --hair: 255 255 255;
-    --hl: #9cc8ea;
-    --hl-rgb: 156 200 234;
-    --warm: #e2a39a;
-    --warm-rgb: 226 163 154;
-    --muted: #8fa1b4;
-    --hot: #d9e6f2;
-    --on-ink: #14212f;
-    --ok: #7fbf9a;
-    --wip: #d9b56a;
-    --card-bg: rgb(255 255 255 / 0.03);
-    color-scheme: dark;
-  }
-  .page-body h2 { text-shadow: 0 18px 44px rgb(0 0 0 / 0.35); }
-  /* Home below its hero: the hero's deep blue, soft light well clear of the top edge */
-  .body-home {
-    background:
-      radial-gradient(45% 14% at 100% 30%, rgb(46 104 152 / 0.28), transparent 72%),
-      radial-gradient(45% 14% at 0% 62%, rgb(42 95 142 / 0.24), transparent 72%),
-      radial-gradient(40% 12% at 100% 88%, rgb(56 66 132 / 0.2), transparent 72%),
-      linear-gradient(180deg, #0e1f32 0%, #0d1c2d 50%, #0c1a29 100%);
-  }
-  /* Nonprofits below its hero: the hero's deep blue, with the same soft light */
-  .body-nonprofit {
-    background:
-      radial-gradient(45% 20% at 100% 42%, rgb(46 102 150 / 0.3), transparent 72%),
-      radial-gradient(45% 20% at 0% 74%, rgb(42 95 142 / 0.26), transparent 72%),
-      linear-gradient(180deg, #121c2c 0%, #121b2b 60%, #111a29 100%);
-  }
-  /* Approach below its hero: the indigo dusk of the old hero, soft light in the corners */
-  .body-approach {
-    background:
-      radial-gradient(45% 16% at 0% 26%, rgb(72 78 152 / 0.3), transparent 72%),
-      radial-gradient(45% 16% at 100% 52%, rgb(38 96 142 / 0.3), transparent 72%),
-      radial-gradient(40% 14% at 10% 84%, rgb(80 70 140 / 0.22), transparent 72%),
-      linear-gradient(180deg, #0f1528 0%, #111930 55%, #121a30 100%);
-  }
-}
 .theme-home .mist,
 .theme-approach .mist,
 .theme-nonprofit .mist {

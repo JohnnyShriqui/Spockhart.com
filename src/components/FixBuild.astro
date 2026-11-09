@@ -982,9 +982,6 @@ const sets = [
     box-shadow: 0 24px 48px -30px rgb(4 18 30 / 0.55);
     color: var(--ink);
   }
-  @media (prefers-color-scheme: dark) {
-    .fb-chart { background: rgb(5 11 19 / 0.55); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.07); }
-  }
   .fb-rev-after { fill: var(--c-rev-dull); }
   .fb-cost-after { fill: rgb(var(--c-cost) / 0.5); }
   .fb-add-rect { fill: rgb(var(--saber-blue) / 0.16); stroke: rgb(var(--saber-blue)); stroke-width: 1.5; filter: drop-shadow(0 0 4px rgb(var(--saber-blue) / 0.7)); }
@@ -1053,13 +1050,6 @@ const sets = [
     --bar-line: rgb(27 42 61 / 0.1);
     --bar-shadow: 0 1px 2px rgb(27 42 61 / 0.05);
   }
-  @media (prefers-color-scheme: dark) {
-    .fb {
-      --bar-bg: rgb(255 255 255 / 0.035);
-      --bar-line: rgb(255 255 255 / 0.1);
-      --bar-shadow: none;
-    }
-  }
   @media (max-width: 1099px) {
     .fb-svg-wide { display: none; }
     /* Phones and tablets: the chart alone; the case studies are for laptops (and Our Work) */
@@ -1086,9 +1076,6 @@ const sets = [
     background: linear-gradient(100deg, rgb(63 208 255 / 0.25) 0, rgb(63 208 255 / 0.7) 0.35em, rgb(63 208 255 / 0.6) calc(100% - 0.4em), rgb(63 208 255 / 0.3) 100%);
     -webkit-box-decoration-break: clone;
     box-decoration-break: clone;
-  }
-  @media (prefers-color-scheme: dark) {
-    .fb-hl { background: linear-gradient(100deg, rgb(63 208 255 / 0.6) 0, rgb(63 208 255 / 0.95) 0.35em, rgb(63 208 255 / 0.9) calc(100% - 0.4em), rgb(63 208 255 / 0.65) 100%); }
   }
   .fb-more-l {
     background-image: linear-gradient(var(--accent-soft), var(--accent-soft));
