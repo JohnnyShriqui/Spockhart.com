@@ -932,40 +932,46 @@ const sets = [
   /* Restrained, like a printed annual report: flat colour, hairlines, no glow. Before is muted;
      the After bars start just as muted and fill to full colour once our work is built on them
      (costs once the cuts land, revenue once the new slices stack up). */
+  /* The chart sits on its own dark panel, in the hero's colours, in light and dark mode alike.
+     Before and After bars share the same quiet colours; what our work adds or cuts is drawn in
+     the hero's lightsaber blue and red, with the same soft glow. */
   .fb {
-    /* Before (and the After before our work lands): muted */
-    --c-rev: 47 111 166;
-    --c-cost: 192 98 88;
-    --c-rev-dull: rgb(47 111 166 / 0.4);
-    /* After: full, confident colour, like a printed annual report: cobalt and crimson */
-    --a-rev: 30 88 166;
-    --a-cost: 182 46 56;
-    --a-rev-ink: #174a8b;
+    --c-rev: 156 200 234;
+    --c-cost: 226 163 154;
+    --c-rev-dull: rgb(110 160 205 / 0.5);
+    --saber-blue: 63 208 255;
+    --saber-red: 255 42 77;
+  }
+  .fb-chart {
+    --ink: #eef3f8;
+    --ink-2: #b5c4d3;
+    --ink-3: #94a8bc;
+    --muted: #8fa1b4;
+    --hot: #d9e6f2;
+    --hair: 255 255 255;
+    box-sizing: content-box;
+    padding: 1.1rem 1.25rem 1.25rem;
+    border-radius: var(--radius-lg);
+    background: linear-gradient(165deg, #0e1c2c 0%, #0a1521 100%);
+    box-shadow: 0 24px 48px -30px rgb(4 18 30 / 0.55);
+    color: var(--ink);
   }
   @media (prefers-color-scheme: dark) {
-    .fb {
-      --c-rev: 156 200 234;
-      --c-cost: 226 163 154;
-      --c-rev-dull: rgb(110 160 205 / 0.5);
-      --a-rev: 74 130 206;
-      --a-cost: 206 74 80;
-      --a-rev-ink: #e6eef8;
-    }
+    .fb-chart { background: rgb(5 11 19 / 0.55); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.07); }
   }
-  .fb-chart { color: var(--ink); }
-  .fb-rev-after { fill: rgb(var(--a-rev)); }
-  .fb-cost-after { fill: rgb(var(--a-cost)); }
-  .fb-add-rect { fill: rgb(var(--a-rev) / 0.14); stroke: rgb(var(--a-rev)); stroke-width: 1.5; }
-  .fb-add.is-on .fb-add-rect { fill: rgb(var(--a-rev) / 0.4); }
-  .fb-key-add { fill: var(--a-rev-ink); font-weight: 700; }
-  .fb-cut-rect { stroke: rgb(var(--a-cost)); stroke-width: 1.5; }
-  .fb-hatch-line { stroke: rgb(var(--a-cost) / 0.35); }
-  .fb-key-cut { fill: rgb(var(--a-cost)); font-weight: 700; }
+  .fb-rev-after { fill: var(--c-rev-dull); }
+  .fb-cost-after { fill: rgb(var(--c-cost) / 0.42); }
+  .fb-add-rect { fill: rgb(var(--saber-blue) / 0.16); stroke: rgb(var(--saber-blue)); stroke-width: 1.5; filter: drop-shadow(0 0 4px rgb(var(--saber-blue) / 0.7)); }
+  .fb-add.is-on .fb-add-rect { fill: rgb(var(--saber-blue) / 0.3); }
+  .fb-key-add { fill: #dff7ff; font-weight: 700; }
+  .fb-cut-rect { stroke: rgb(var(--saber-red)); stroke-width: 1.5; filter: drop-shadow(0 0 4px rgb(var(--saber-red) / 0.7)); }
+  .fb-hatch-line { stroke: rgb(var(--saber-red) / 0.4); }
+  .fb-key-cut { fill: #ff8a9c; font-weight: 700; }
   .fb-bracket-after { stroke: rgb(var(--hair) / 0.5); }
   .fb-ann-hot { fill: var(--hot); }
   :global(.fb-link) { opacity: 0.8; }
-  :global(.fb-link-build) { stroke: rgb(var(--a-rev)); }
-  :global(.fb-link-fix) { stroke: rgb(var(--a-cost)); }
+  :global(.fb-link-build) { stroke: #3fd0ff; }
+  :global(.fb-link-fix) { stroke: #ff2a4d; }
   .fb-card-build { --c: var(--hl); }
   .fb-card-fix { --c: var(--warm); }
   .fb-set-build .fb-set-note { color: var(--hl); }
