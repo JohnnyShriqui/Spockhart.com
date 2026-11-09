@@ -1,19 +1,20 @@
 ---
 /**
- * Waste calculator. Three inputs on the left; on the right, one figure for what repetitive work
- * costs a year, set very large and glowing hotter as it grows, and one line for how many full-time
- * people that is. Runs entirely in the browser. Model and defaults: src/lib/calc.ts.
+ * Time calculator. Three inputs; the result leads with what tedious, repetitive tasks cost a year,
+ * then the hours behind it, how much of each work week it takes, and how many full-time people
+ * it adds up to. Runs entirely in the browser. Model and defaults: src/lib/calc.ts.
  */
-import { inputs, compute, heat, WEEKS_PER_YEAR, type Values } from '../lib/calc';
+import { inputs, compute, describeDays, iconScale, WEEKS_PER_YEAR, type Values } from '../lib/calc';
 
 interface Props {
   title?: string;
   resultLabel?: string;
+  /** Words around the hours figure under the big number */
   cta?: string;
 }
 const {
   title = 'How much time is your team losing?',
-  resultLabel = 'Lost every year',
+  resultLabel = 'Every year, tedious, repetitive tasks cost you',
   cta = 'Get that time back',
 } = Astro.props;
 
@@ -21,13 +22,21 @@ const start = Object.fromEntries(inputs.map((f) => [f.key, f.value])) as Values;
 const r = compute(start);
 const money = (n: number) =>
   new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD', maximumFractionDigits: 0 }).format(n);
-const fte = (n: number) => n.toFixed(n < 0.1 ? 2 : 1);
+const num = (n: number) => Math.round(n).toLocaleString('en-CA');
 const fmt = (format: string, v: number) => (format === 'money' ? `$${v}` : format === 'hours' ? `${v} h` : String(v));
+
+const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+const lostDays = start.hours / 8;
+const dayFill = (i: number) => Math.max(0, Math.min(1, lostDays - (4 - i)));
+
+const scale = iconScale(start.people);
+const fteIcons = r.fte / scale.per;
+const iconFill = (i: number) => Math.max(0, Math.min(1, fteIcons - i));
 ---
 
 <section id="calculator" class="calc-section" aria-labelledby="calc-title">
   <div class="wrap">
-    <div class="calc" data-calc style={`--heat:${heat(r.cost)};--len:${money(r.cost).length}`}>
+    <div class="calc" data-calc>
       <div class="calc-left">
         <div class="calc-head">
           <p class="eyebrow">Waste calculator</p>
@@ -67,11 +76,49 @@ const fmt = (format: string, v: number) => (format === 'money' ? `$${v}` : forma
       </div>
 
       <div class="calc-right">
-        <p class="r-label"><span class="r-dot" aria-hidden="true"></span>{resultLabel}</p>
+        <p class="r-label"><span class="t-desk">{resultLabel}</span><span class="t-mob">Lost every year</span></p>
         <p class="r-big tabular"><span data-out="cost">{money(r.cost)}</span></p>
-        <p class="r-line">
-          That&rsquo;s <strong><span class="tabular" data-out="fte">{fte(r.fte)}</span> full-time people</strong> doing nothing else.
-        </p>
+
+        <ul class="r-tiles" aria-hidden="true">
+          <li><span class="tile-v tabular" data-out="hours">{num(r.hours)}</span><span class="tile-k">hours a year</span></li>
+          <li><span class="tile-v" data-out="days">{describeDays(start.hours)}</span><span class="tile-k">lost per person, weekly</span></li>
+          <li><span class="tile-v tabular" data-out="fte">{r.fte.toFixed(1)}</span><span class="tile-k">full-time people</span></li>
+        </ul>
+
+        <div class="r-viz">
+          <p class="r-line">
+            Each person loses <strong data-out="days">{describeDays(start.hours)}</strong> of every work week.
+          </p>
+          <div class="week" aria-hidden="true">
+            {
+              days.map((d, i) => (
+                <span class="day" style={`--f:${dayFill(i)}`}>
+                  <span class="day-fill" />
+                  <span class="day-name">{d}</span>
+                </span>
+              ))
+            }
+          </div>
+        </div>
+
+        <div class="r-viz">
+          <p class="r-line">
+            That adds up to <strong><span class="tabular" data-out="fte">{r.fte.toFixed(1)}</span> full-time people</strong> doing
+            nothing else.
+          </p>
+          <div class="team" aria-hidden="true" data-team>
+            {
+              Array.from({ length: scale.icons }, (_, i) => (
+                <span class="person" style={`--f:${iconFill(i)}`}>
+                  <svg viewBox="0 0 12 16"><circle cx="6" cy="4" r="3.2" /><path d="M0.6 16c0-3.6 2.4-6.2 5.4-6.2s5.4 2.6 5.4 6.2z" /></svg>
+                  <svg class="person-fill" viewBox="0 0 12 16"><circle cx="6" cy="4" r="3.2" /><path d="M0.6 16c0-3.6 2.4-6.2 5.4-6.2s5.4 2.6 5.4 6.2z" /></svg>
+                </span>
+              ))
+            }
+          </div>
+          <p class="team-key" data-team-key hidden={scale.per === 1}>Each figure is {scale.per} people</p>
+        </div>
+
         <a class="btn btn-on-brand" href="/contact/" data-calc-cta>{cta} <span class="arr" aria-hidden="true">→</span></a>
         <p class="visually-hidden" aria-live="polite" data-calc-summary></p>
       </div>
@@ -273,91 +320,42 @@ const fmt = (format: string, v: number) => (format === 'money' ? `$${v}` : forma
   }
 
   /* ==========================================================================
-     Dark and powerful (on .page-dark): no box or panel. The controls glow lightsaber blue, the loss
-     is one huge figure in red that burns brighter as it grows (--heat, 0 to 1), with one line under it.
+     Dark and refined (on .page-dark): no box or panel, the inputs and the result side by side,
+     divided by a hairline, the result set as large type
      ========================================================================== */
   .calc-section { padding-block: clamp(2.5rem, 1.5rem + 3vw, 5rem); }
-  .calc {
-    --blue: #3fd0ff;
-    --red: #ff3d5e;
-    --heat: 0.5;
-    --len: 8;
-    border: 0;
-    border-radius: 0;
-    background: none;
-    box-shadow: none;
-    overflow: visible;
-    border-top: 1px solid rgb(255 255 255 / 0.1);
-    border-bottom: 1px solid rgb(255 255 255 / 0.1);
-  }
+  .calc { border: 0; border-radius: 0; background: none; box-shadow: none; border-top: 1px solid rgb(255 255 255 / 0.1); border-bottom: 1px solid rgb(255 255 255 / 0.1); }
   .calc-left { padding-left: 0; }
   .calc-head .eyebrow { color: var(--ink-3); }
   .calc-head .eyebrow::before { display: none; }
   .calc-head h2 { font-weight: 400; }
   .slider-head label { font-weight: 500; }
   .slider-head output { font-weight: 400; color: #eef3f8; }
-  input[type='range']::-webkit-slider-runnable-track { height: 2px; background: linear-gradient(to right, var(--blue) 0 var(--p), rgb(255 255 255 / 0.12) var(--p) 100%); }
+  /* The controls glow lightsaber blue */
+  input[type='range']::-webkit-slider-runnable-track { height: 2px; background: linear-gradient(to right, #3fd0ff 0 var(--p), rgb(255 255 255 / 0.12) var(--p) 100%); }
   input[type='range']::-moz-range-track { height: 2px; background: rgb(255 255 255 / 0.12); }
-  input[type='range']::-moz-range-progress { height: 2px; background: var(--blue); box-shadow: 0 0 8px rgb(63 208 255 / 0.7); }
-  input[type='range']::-webkit-slider-thumb {
-    width: 16px;
-    height: 16px;
-    margin-top: -7px;
-    background: #f2fbff;
-    border: 0;
-    box-shadow: 0 0 0 4px rgb(63 208 255 / 0.16), 0 0 14px rgb(63 208 255 / 0.65);
-  }
+  input[type='range']::-moz-range-progress { height: 2px; background: #3fd0ff; box-shadow: 0 0 8px rgb(63 208 255 / 0.7); }
+  input[type='range']::-webkit-slider-thumb { width: 16px; height: 16px; margin-top: -7px; background: #f2fbff; border: 0; box-shadow: 0 0 0 4px rgb(63 208 255 / 0.16), 0 0 14px rgb(63 208 255 / 0.65); }
   input[type='range']::-moz-range-thumb { width: 16px; height: 16px; background: #f2fbff; border: 0; box-shadow: 0 0 0 4px rgb(63 208 255 / 0.16), 0 0 14px rgb(63 208 255 / 0.65); }
   input[type='range']:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 6px rgb(63 208 255 / 0.28), 0 0 16px rgb(63 208 255 / 0.8); }
-
-  .calc-right {
-    align-content: center;
-    gap: var(--s-4);
-    background: none;
-    border-left: 1px solid rgb(255 255 255 / 0.1);
-    padding-right: 0;
-    padding-left: clamp(1.5rem, 1rem + 3vw, 4rem);
-    overflow: visible;
-  }
+  .calc-right { background: none; border-left: 1px solid rgb(255 255 255 / 0.1); padding-right: 0; }
   .calc-right::before { display: none; }
-  .r-label {
-    display: flex;
-    align-items: center;
-    gap: 0.55rem;
-    color: var(--red);
-    letter-spacing: 0.2em;
-    text-shadow: 0 0 10px rgb(255 61 94 / 0.45);
-  }
-  .r-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--red); box-shadow: 0 0 8px var(--red); flex: none; }
-  /* As big as the column allows for the figure's length, so long figures never spill */
-  .r-big {
-    font-size: min(clamp(3.5rem, 1.5rem + 6.5vw, 8rem), calc(165cqi / var(--len)));
-    font-weight: 400;
-    line-height: 0.92;
-    letter-spacing: -0.035em;
-    margin: 0;
-    color: #ffe9ec;
-    text-shadow:
-      0 0 calc(4px + var(--heat) * 10px) rgb(255 61 94 / calc(0.35 + var(--heat) * 0.45)),
-      0 0 calc(18px + var(--heat) * 46px) rgb(255 42 77 / calc(0.18 + var(--heat) * 0.42));
-    transition: text-shadow 500ms var(--ease);
-  }
-  .r-line { font-size: clamp(1rem, 0.9rem + 0.35vw, 1.1875rem); line-height: 1.45; color: var(--ink-2); }
-  .r-line strong { color: #eef3f8; font-weight: 500; }
-  .btn-on-brand { margin-top: var(--s-3); background: #eef3f8; color: #14212f; border-color: #eef3f8; }
-  .btn-on-brand:hover { background: #fff; border-color: #fff; box-shadow: 0 0 24px rgb(63 208 255 / 0.35); }
-  @media (prefers-reduced-motion: no-preference) {
-    .r-dot { animation: r-pulse 4.5s ease-in-out infinite; }
-    @keyframes r-pulse { 50% { opacity: 0.35; } }
-  }
+  .r-label { color: var(--ink-3); }
+  .r-big { font-weight: 400; color: #eef3f8; }
+  .r-viz { border-top-color: rgb(255 255 255 / 0.1); }
+  .r-line { color: var(--ink-2); }
+  .day { background: rgb(255 255 255 / 0.06); }
+  .day-fill { background: rgb(156 200 234 / 0.75); }
+  .person svg { fill: rgb(255 255 255 / 0.14); }
+  .person .person-fill { fill: rgb(156 200 234 / 0.85); }
+  .team-key { color: var(--ink-3); }
+  .btn-on-brand { background: #eef3f8; color: #14212f; border-color: #eef3f8; }
+  .btn-on-brand:hover { background: #fff; border-color: #fff; }
   @media (max-width: 960px) {
-    .calc-right { border-left: 0; border-top: 1px solid rgb(255 255 255 / 0.1); padding-left: 0; padding-block: clamp(2rem, 1.5rem + 3vw, 3rem); }
+    .calc-right { border-left: 0; border-top: 1px solid rgb(255 255 255 / 0.1); padding-left: 0; }
   }
   @media (max-width: 640px) {
     .calc-left, .calc-right { padding-inline: 0; }
-    .calc-right { gap: 0.7rem; }
-    .r-label { font-size: 0.6875rem; }
-    .r-big { font-size: min(4rem, calc(165cqi / var(--len))); }
-    .r-line { font-size: 0.975rem; }
+    .r-tiles li { background: rgb(255 255 255 / 0.05); }
   }
 </style>
