@@ -363,6 +363,8 @@ a { color: inherit; }
 /* Our Work: deep petrol, cool light behind the results */
 .theme-work {
   background:
+    /* The bottom edge settles on one colour, so the first case study can fade in from it */
+    linear-gradient(180deg, rgb(12 31 40 / 0) 45%, rgb(12 31 40 / 0.35) 70%, rgb(12 31 40 / 0.8) 88%, #0c1f28 100%),
     radial-gradient(50% 72% at 80% 46%, rgb(26 104 118 / 0.48), transparent 72%),
     radial-gradient(46% 62% at 0% 0%, rgb(36 78 126 / 0.45), transparent 72%),
     radial-gradient(40% 52% at 34% 112%, rgb(18 72 82 / 0.5), transparent 72%),
@@ -370,6 +372,12 @@ a { color: inherit; }
   --mist-1: #1c6b76;
   --mist-2: #285a88;
   --mist-3: #1e5b64;
+}
+/* The drifting light and the grain fade out before the bottom edge */
+.theme-work .mist,
+.theme-work::after {
+  -webkit-mask-image: linear-gradient(180deg, #000 40%, transparent 92%);
+  mask-image: linear-gradient(180deg, #000 40%, transparent 92%);
 }
 /* Contact: a warmer night, a low copper light against the blue */
 .theme-contact {

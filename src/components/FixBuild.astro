@@ -71,7 +71,7 @@ const sets = [
       <figure class="fb-chart" aria-label="Before, costs are just under revenue. After, revenue is up three slices and costs are down four.">
         <div class="fb-win">
           <div class="fb-win-bar"><span class="fb-dots"><i></i><i></i><i></i></span>Costs vs revenue</div>
-          <svg viewBox={`0 0 560 ${VB_H}`} class="fb-svg" data-fb-svg aria-hidden="true" preserveAspectRatio="none">
+          <svg viewBox={`0 0 560 ${VB_H}`} class="fb-svg" data-fb-svg aria-hidden="true" preserveAspectRatio="xMidYMid meet">
             <defs>
               <pattern id="fb-hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
                 <line x1="0" y1="0" x2="0" y2="7" class="fb-hatch-line" />
@@ -220,7 +220,6 @@ const sets = [
 
 <script>
   import { initScenes, sceneController, scenesCanAnimate } from '../scripts/scenes';
-  import { focusOn } from '../scripts/focus';
 
   const LIVE_W = 640; // the width each thumbnail graphic is laid out at before scaling
   const PHONE_W = 400;
@@ -276,6 +275,10 @@ const sets = [
         links.setAttribute('viewBox', `0 0 ${box.width} ${box.height}`);
         const m = chart.getScreenCTM();
         if (!m) return;
+        // Every line runs straight out to the chart's right edge, then curves across the gap to
+        // its case study. All the curves start and end at the same x with the same shape, so
+        // keeping them in the same order top to bottom means they can never cross.
+        const gx = chartFig.getBoundingClientRect().right - box.left;
         for (const card of cards) {
           const rect = slice(card.dataset.card!)?.querySelector<SVGRectElement>('[data-slice-rect]');
           if (!rect) continue;
@@ -285,28 +288,18 @@ const sets = [
           const h = headOf(card).getBoundingClientRect();
           const ex = h.left - box.left - 9;
           const ey = h.top + h.height / 2 - box.top;
-          const dx = Math.max(24, (ex - sx) * 0.55);
+          const dx = (ex - gx) * 0.5;
           const { g, path } = lineFor(card);
           g.setAttribute('class', `fb-link-g${card === open ? ' is-open' : ''}`);
-          path.setAttribute('d', `M${sx.toFixed(1)} ${sy.toFixed(1)} C${(sx + dx).toFixed(1)} ${sy.toFixed(1)} ${(ex - dx).toFixed(1)} ${ey.toFixed(1)} ${ex.toFixed(1)} ${ey.toFixed(1)}`);
+          path.setAttribute('d', `M${sx.toFixed(1)} ${sy.toFixed(1)} H${gx.toFixed(1)} C${(gx + dx).toFixed(1)} ${sy.toFixed(1)} ${(ex - dx).toFixed(1)} ${ey.toFixed(1)} ${ex.toFixed(1)} ${ey.toFixed(1)}`);
         }
       };
-      // The bars stretch to the chart's height, so each slice stays level with its case study.
-      // Text is scaled back by the same amount so it never looks squashed or stretched.
-      const stretch = () => {
-        const m = chart.getScreenCTM();
-        if (!m || !m.a || !m.d) return;
-        chart.style.setProperty('--ik', (m.a / m.d).toFixed(4));
-      };
-      // While a case study opens or closes, the chart grows or shrinks with the list, frame by
-      // frame, and the lines stay attached to every case study
+      // While a case study opens or closes, the lines follow their case studies frame by frame
       let follow = 0;
       const track = (ms = 600) => {
         const until = performance.now() + ms;
         cancelAnimationFrame(follow);
         const step = () => {
-          if (wide.matches) chartFig.style.height = `${cardsBox.offsetHeight}px`;
-          stretch();
           draw();
           if (performance.now() < until) follow = requestAnimationFrame(step);
         };
@@ -345,8 +338,9 @@ const sets = [
           }
         }
         if (wide.matches) {
-          // The chart is always exactly as tall as the list of case studies, open or closed
-          chartFig.style.height = `${cardsBox.offsetHeight}px`;
+          // The chart is exactly as tall as the list of case studies with all of them closed,
+          // and stays that size
+          if (!open) chartFig.style.height = `${cardsBox.offsetHeight}px`;
         } else {
           chartFig.style.removeProperty('height');
         }
@@ -367,8 +361,6 @@ const sets = [
         open = next ? card : null;
         root.classList.toggle('has-open', Boolean(open));
         hold(Boolean(open));
-        // The open case study stays sharp; everything else dims and blurs behind it
-        focusOn(open);
         track(700);
       };
       const mode = () => {
@@ -378,13 +370,6 @@ const sets = [
           panelOf(card).inert = wide.matches && !card.classList.contains('is-open');
         });
       };
-      // A click anywhere outside the open case study, or Escape, closes it
-      document.addEventListener('click', (e) => {
-        if (open && !open.contains(e.target as Node)) toggle(open);
-      });
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && open) toggle(open);
-      });
       cards.forEach((card) => {
         const head = headOf(card);
         head.addEventListener('click', () => toggle(card));
@@ -446,7 +431,6 @@ const sets = [
 
       const refresh = () => {
         size();
-        stretch();
         requestAnimationFrame(draw);
       };
       mode();
@@ -457,7 +441,6 @@ const sets = [
         if (open) setOpen(open, false);
         open = null;
         root.classList.remove('has-open');
-        focusOn(null);
         hold(false);
         cards.forEach((card) => control(card, 'thumb', 'stop'));
         mode();
@@ -523,12 +506,6 @@ const sets = [
   .fb-dots { display: flex; gap: 5px; }
   .fb-dots i { width: 8px; height: 8px; border-radius: 50%; background: rgb(255 255 255 / 0.18); }
   .fb-svg { display: block; flex: 1; min-height: 0; width: 100%; height: auto; padding: 0.5rem 0.25rem; box-sizing: border-box; overflow: visible; }
-  /* The chart stretches with the list (laptops); strokes keep their width and text keeps its shape */
-  .fb-svg :is(line, rect, path) { vector-effect: non-scaling-stroke; }
-  .fb-svg text { transform-box: fill-box; transform-origin: center; transform: scaleY(var(--ik, 1)); }
-  /* The labels under each pair of bars stay together, tucked under the baseline */
-  .fb-svg .fb-under { transform-box: fill-box; transform-origin: center top; transform: scaleY(var(--ik, 1)); }
-  .fb-svg .fb-under text { transform: none; }
 
   .fb-grid { stroke: rgb(255 255 255 / 0.06); stroke-width: 1; }
   .fb-axis { stroke: rgb(255 255 255 / 0.28); stroke-width: 1; }

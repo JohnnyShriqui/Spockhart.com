@@ -1,14 +1,13 @@
 ---
 /**
  * Nonprofits: more impact per dollar. One line chart in the same window style as the chart on
- * the home page. Each line keeps one colour all the way across: demand in coral (like costs),
- * resources in blue (like revenue). From the day Spockhart starts, each splits in two: dashed is
- * where it goes without us, solid is where it goes with us, and every line end says which.
- * Arrows show what we do to each: demand pushed down, resources pushed up, in three numbered
- * parts that match the cards beside the chart. An illustration, not data.
+ * the home page, told the same simple way as the gap chart in the hero:
+ * without Spockhart, demand (red) runs away from resources (white). With Spockhart, our demand
+ * line (blue) bends down and our resources line (blue) bends up, and the two blue areas between
+ * them, both labelled "With Spockhart", are what we change. An illustration, not data.
  *
  * Like the home chart, it builds itself slowly on a loop while on screen: first the problem,
- * then Spockhart's lines and parts 1 to 3, and the result holds.
+ * then Spockhart's lines and areas, and the result holds.
  */
 
 interface Dims {
@@ -18,6 +17,8 @@ interface Dims {
   X1: number;
   TOP: number;
   BASE: number;
+  /** how far in from the right edge the arrows sit */
+  ax: number;
 }
 
 const ways = [
@@ -52,56 +53,42 @@ function draw(d: Dims) {
   /* Without Spockhart: demand accelerates, resources stay flat */
   const f0 = (x: number) => 0.7 - 0.62 * Math.pow(u(x), 1.6);
   const r0 = (x: number) => 0.84 - 0.05 * u(x);
-  /* With Spockhart: demand eases to a steady rise, and the gap narrows to half of where it
-     stood when we started, so resources rise alongside demand and never cross it */
+  /* With Spockhart: demand eases to a steady rise, and the gap narrows from where it stood
+     when we started, so resources rise alongside demand and never cross it */
   const gapAtStart = r0(xS) - f0(xS);
   const fW = (x: number) => f0(x) + 0.24 * Math.pow(p(x), 1.5);
   const rW = (x: number) => (u(x) <= S ? r0(x) : fW(x) + gapAtStart * (1 - 0.42 * smooth(x)));
-  const rEff = (x: number) => r0(x) - 0.7 * (r0(x) - rW(x));
 
   const after = xs.filter((x) => x >= xS - 0.01);
-  const before = xs.filter((x) => x <= xS + 0.01);
   const pts = (f: (x: number) => number, set = xs) => set.map((x, i) => `${i ? 'L' : 'M'}${x.toFixed(1)} ${y(f(x)).toFixed(1)}`).join(' ');
   const back = (f: (x: number) => number, set = xs) => [...set].reverse().map((x) => `L${x.toFixed(1)} ${y(f(x)).toFixed(1)}`).join(' ');
   const area = (a: (x: number) => number, b: (x: number) => number) => `${pts(a, after)} ${back(b, after)} Z`;
 
-  const kx = d.X1 - 40;
-  const mid = (a: (x: number) => number, b: (x: number) => number) => y((a(kx) + b(kx)) / 2);
+  const ax = d.X1 - d.ax;
   const gx = d.X0 + (d.X1 - d.X0) * 0.14;
-
-  /* The arrows: from where each line would be without us to where it is with us */
-  const ax = d.X1 - 58;
-  const sg = (x: number) => d.X0 + (d.X1 - d.X0) * x;
-  const gapAt = sg(0.74);
 
   return {
     ...d,
     xS,
     grid: [0.15, 0.4, 0.65].map(y),
-    regions: { further: area(rEff, r0), funding: area(rW, rEff), demand: area(f0, fW) },
-    seam: pts(rEff, after),
-    pre: { demand: pts(f0, before), res: pts(r0, before) },
-    without: { demand: pts(f0, after), res: pts(r0, after) },
-    withUs: { demand: pts(fW, after), res: pts(rW, after) },
+    demand: pts(f0),
+    res: pts(r0),
+    ours: { demand: pts(fW, after), res: pts(rW, after) },
+    areas: { demand: area(f0, fW), res: area(rW, r0) },
+    /* The middle of each area, for its label to follow */
+    mids: { demand: pts((x) => (f0(x) + fW(x)) / 2, after), res: pts((x) => (rW(x) + r0(x)) / 2, after) },
     arrows: {
       down: { x: ax, y1: y(f0(ax)) + 6, y2: y(fW(ax)) - 7 },
       up: { x: ax, y1: y(r0(ax)) - 6, y2: y(rW(ax)) + 7 },
     },
-    keys: [
-      { k: '1', x: ax + 18, y: mid(rEff, r0), at: 4900 },
-      { k: '2', x: ax + 18, y: mid(rW, rEff), at: 5800 },
-      { k: '3', x: ax + 18, y: y((f0(ax) + fW(ax)) / 2), at: 6800 },
-    ],
-    ends: { demand: y(fW(d.X1)), res: y(rW(d.X1)), demand0: y(f0(d.X1)), res0: y(r0(d.X1)) },
-    left: { demand: y(f0(d.X0)), res: y(r0(d.X0)) },
+    ends: { demand: y(f0(d.X1)), res: y(r0(d.X1)), ourDemand: y(fW(d.X1)), ourRes: y(rW(d.X1)) },
     gap: { x: gx, y: y((f0(gx) + r0(gx)) / 2) },
-    smaller: { x: gapAt, y: y((fW(gapAt) + rW(gapAt)) / 2) },
   };
 }
 
 const charts = [
-  { cls: 'npi-wide', ...draw({ W: 560, H: 392, X0: 24, X1: 450, TOP: 26, BASE: 342 }) },
-  { cls: 'npi-narrow', ...draw({ W: 352, H: 318, X0: 10, X1: 258, TOP: 22, BASE: 270 }) },
+  { cls: 'npi-wide', ...draw({ W: 560, H: 392, X0: 24, X1: 470, TOP: 24, BASE: 340, ax: 26 }) },
+  { cls: 'npi-narrow', ...draw({ W: 352, H: 318, X0: 10, X1: 272, TOP: 18, BASE: 270, ax: 16 }) },
 ];
 ---
 
@@ -113,25 +100,13 @@ const charts = [
       <figure
         data-npi-chart
         class="npi-chart"
-        aria-label="Illustration: without Spockhart, demand keeps rising and resources stay flat, so the gap keeps growing. With Spockhart, resources go further (1) and new funding comes in (2) while demand is brought down (3), so the gap narrows."
+        aria-label="Illustration: without Spockhart, demand (red) keeps rising and resources (white) stay flat, so the gap keeps growing. With Spockhart, demand is brought down and resources go up, so the gap narrows."
       >
         <div class="npi-win">
-          <div class="npi-win-bar">
-            <span class="npi-dots"><i></i><i></i><i></i></span>Demand vs resources
-            <span class="npi-legend" aria-hidden="true">
-              <span><i class="lg-with"></i>With Spockhart</span>
-              <span><i class="lg-without"></i>Without</span>
-            </span>
-          </div>
+          <div class="npi-win-bar"><span class="npi-dots"><i></i><i></i><i></i></span>Demand vs resources</div>
           {
             charts.map((c) => (
               <svg viewBox={`0 0 ${c.W} ${c.H}`} class:list={['npi-svg', c.cls]} aria-hidden="true">
-                <defs>
-                  <pattern id={`npi-hatch-${c.cls}`} width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-                    <line x1="0" y1="0" x2="0" y2="7" class="hatch-line" />
-                  </pattern>
-                </defs>
-
                 {c.grid.map((gy) => (
                   <line x1={c.X0} x2={c.X1} y1={gy} y2={gy} class="grid" />
                 ))}
@@ -140,59 +115,45 @@ const charts = [
                 <text x={c.xS} y={c.BASE + 24} class="axis-label" text-anchor="middle">Spockhart starts</text>
                 <text x={c.X1} y={c.BASE + 24} class="axis-label" text-anchor="end">Time</text>
 
-                <!-- What Spockhart changes: the space between each line without us and with us -->
-                <path d={c.regions.demand} fill={`url(#npi-hatch-${c.cls})`} class="sweep" style="--at:3600ms;--dur:3400ms" />
-                <path d={c.regions.further} class="sweep r-further" style="--at:700ms;--dur:4000ms" />
-                <path d={c.regions.funding} class="sweep r-funding" style="--at:2100ms;--dur:3400ms" />
-                <path d={c.seam} class="sweep seam" style="--at:2100ms;--dur:3400ms" />
+                <!-- With Spockhart: the two blue areas -->
+                <path d={c.areas.res} class="sweep area" style="--at:700ms;--dur:4000ms" />
+                <path d={c.areas.demand} class="sweep area" style="--at:1600ms;--dur:4000ms" />
 
-                <!-- Each line, one colour all the way: solid up to the start, then dashed without us -->
-                <path d={c.pre.demand} class="l-demand" />
-                <path d={c.pre.res} class="l-res" />
-                <path d={c.without.demand} class="l-without l-without-demand" />
-                <path d={c.without.res} class="l-without l-without-res" />
-                <text x={c.X0} y={c.left.demand - 12} class="side-label side-demand">Demand</text>
-                <text x={c.X0} y={c.left.res + 22} class="side-label side-res">Resources</text>
+                <!-- Without Spockhart: demand in red, resources in white -->
+                <path d={c.demand} class="l-demand" />
+                <path d={c.res} class="l-res" />
+                <circle cx={c.X1} cy={c.ends.demand} r="4.5" class="dot-demand" />
+                <circle cx={c.X1} cy={c.ends.res} r="4.5" class="dot-res" />
+                <text x={c.X1 + 10} y={c.ends.demand + 4.5} class="end-label end-demand">Demand</text>
+                <text x={c.X1 + 10} y={c.ends.res + 4.5} class="end-label end-res">Resources</text>
                 <text x={c.gap.x} y={c.gap.y + 4} class="gap-label" text-anchor="middle">The gap</text>
-                <text x={c.X1 + 8} y={c.ends.demand0 - 3} class="end-label end-without">
-                  <tspan x={c.X1 + 8} class="end-demand-soft">Demand</tspan>
-                  <tspan x={c.X1 + 8} dy="13">without us</tspan>
-                </text>
-                <text x={c.X1 + 8} y={c.ends.res0 - 3} class="end-label end-without">
-                  <tspan x={c.X1 + 8} class="end-res-soft">Resources</tspan>
-                  <tspan x={c.X1 + 8} dy="13">without us</tspan>
-                </text>
 
-                <!-- With Spockhart: solid -->
-                <path d={c.withUs.res} pathLength="1" class="draw l-res" />
-                <path d={c.withUs.demand} pathLength="1" class="draw l-demand" />
-                <g class="fade" style="--at:4900ms">
-                  <text x={c.X1 + 8} y={c.ends.demand - 3} class="end-label end-with">
-                    <tspan x={c.X1 + 8} class="end-demand">Demand</tspan>
-                    <tspan x={c.X1 + 8} dy="13">with Spockhart</tspan>
-                  </text>
-                  <text x={c.X1 + 8} y={c.ends.res + 7} class="end-label end-with">
-                    <tspan x={c.X1 + 8} class="end-res">Resources</tspan>
-                    <tspan x={c.X1 + 8} dy="13">with Spockhart</tspan>
-                  </text>
+                <!-- With Spockhart: our demand comes down, our resources go up, both in blue -->
+                <path d={c.ours.res} pathLength="1" class="draw l-ours" style="--at:700ms" />
+                <path d={c.ours.demand} pathLength="1" class="draw l-ours" style="--at:1600ms" />
+                <g class="fade" style="--at:4700ms">
+                  <circle cx={c.X1} cy={c.ends.ourRes} r="4.5" class="dot-ours" />
                 </g>
-                <text x={c.smaller.x} y={c.smaller.y + 4} class="fade gap-label" text-anchor="middle" style="--at:5400ms">Smaller gap</text>
-
-                <!-- Arrows: demand pushed down, resources pushed up -->
-                <g class="fade" style="--at:4900ms">
-                  <line x1={c.arrows.up.x} x2={c.arrows.up.x} y1={c.arrows.up.y1} y2={c.arrows.up.y2} class="arrow arrow-up" />
-                  <path d={`M${c.arrows.up.x - 5} ${c.arrows.up.y2 + 6} L${c.arrows.up.x} ${c.arrows.up.y2} L${c.arrows.up.x + 5} ${c.arrows.up.y2 + 6}`} class="arrow arrow-up" />
-                </g>
-                <g class="fade" style="--at:6800ms">
-                  <line x1={c.arrows.down.x} x2={c.arrows.down.x} y1={c.arrows.down.y1} y2={c.arrows.down.y2} class="arrow arrow-down" />
-                  <path d={`M${c.arrows.down.x - 5} ${c.arrows.down.y2 - 6} L${c.arrows.down.x} ${c.arrows.down.y2} L${c.arrows.down.x + 5} ${c.arrows.down.y2 - 6}`} class="arrow arrow-down" />
+                <g class="fade" style="--at:5600ms">
+                  <circle cx={c.X1} cy={c.ends.ourDemand} r="4.5" class="dot-ours" />
                 </g>
 
-                {c.keys.map((k) => (
-                  <text x={k.x} y={k.y + 4.5} text-anchor="middle" class={`fade key key-${k.k}`} style={`--at:${k.at}ms`}>
-                    {k.k}
+                <path id={`npi-mid-res-${c.cls}`} d={c.mids.res} fill="none" />
+                <path id={`npi-mid-demand-${c.cls}`} d={c.mids.demand} fill="none" />
+                <g class="fade" style="--at:4700ms">
+                  <text class="area-label" dy="0.35em">
+                    <textPath href={`#npi-mid-res-${c.cls}`} startOffset="60%" text-anchor="middle">With Spockhart</textPath>
                   </text>
-                ))}
+                  <line x1={c.arrows.up.x} x2={c.arrows.up.x} y1={c.arrows.up.y1} y2={c.arrows.up.y2} class="arrow" />
+                  <path d={`M${c.arrows.up.x - 4.5} ${c.arrows.up.y2 + 5.5} L${c.arrows.up.x} ${c.arrows.up.y2} L${c.arrows.up.x + 4.5} ${c.arrows.up.y2 + 5.5}`} class="arrow" />
+                </g>
+                <g class="fade" style="--at:5600ms">
+                  <text class="area-label" dy="0.35em">
+                    <textPath href={`#npi-mid-demand-${c.cls}`} startOffset="68%" text-anchor="middle">With Spockhart</textPath>
+                  </text>
+                  <line x1={c.arrows.down.x} x2={c.arrows.down.x} y1={c.arrows.down.y1} y2={c.arrows.down.y2} class="arrow" />
+                  <path d={`M${c.arrows.down.x - 4.5} ${c.arrows.down.y2 - 5.5} L${c.arrows.down.x} ${c.arrows.down.y2} L${c.arrows.down.x + 4.5} ${c.arrows.down.y2 - 5.5}`} class="arrow" />
+                </g>
               </svg>
             ))
           }
@@ -202,7 +163,7 @@ const charts = [
       <ol class="npi-ways">
         {
           ways.map((w) => (
-            <li class:list={['npi-way', `way-${w.k}`]}>
+            <li class="npi-way">
               <span class="npi-key" aria-hidden="true">{w.k}</span>
               <div>
                 <h3 class="npi-way-title">{w.name}</h3>
@@ -306,10 +267,6 @@ const charts = [
   }
   .npi-dots { display: flex; gap: 5px; }
   .npi-dots i { width: 8px; height: 8px; border-radius: 50%; background: rgb(255 255 255 / 0.18); }
-  .npi-legend { display: flex; gap: 1rem; margin-left: auto; font-weight: 600; letter-spacing: 0.02em; color: #9fb6cb; }
-  .npi-legend span { display: inline-flex; align-items: center; gap: 0.5rem; }
-  .npi-legend i { display: inline-block; width: 20px; border-top: 3px solid #d9e6f2; border-radius: 2px; }
-  .npi-legend .lg-without { border-top: 2px dashed rgb(217 230 242 / 0.55); }
   .npi-svg { display: block; width: 100%; height: auto; padding: 0.75rem 0.5rem 0.6rem; box-sizing: border-box; overflow: visible; }
   .npi-narrow { display: none; }
 
@@ -317,45 +274,30 @@ const charts = [
   .axis { stroke: rgb(255 255 255 / 0.28); stroke-width: 1; }
   .start { stroke: rgb(255 255 255 / 0.3); stroke-width: 1; stroke-dasharray: 2 4; }
   .axis-label { font-family: var(--font-body); font-size: 11.5px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; fill: #9fb6cb; }
-
-  /* Each line keeps its colour: demand coral, resources blue. Solid is with Spockhart,
-     dashed is without, faint. */
-  .l-demand, .l-res { fill: none; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
-  .l-demand { stroke: #e8958c; }
-  .l-res { stroke: #a9d1ee; }
-  .l-without { fill: none; stroke-width: 2; stroke-dasharray: 5 5; }
-  .l-without-demand { stroke: rgb(232 149 140 / 0.6); }
-  .l-without-res { stroke: rgb(169 209 238 / 0.55); }
-  .side-label { font-family: var(--font-body); font-size: 12.5px; font-weight: 700; }
-  .side-demand { fill: #f1b3ac; }
-  .side-res { fill: #bcdcf3; }
   .gap-label { font-family: var(--font-body); font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; fill: #9fb6cb; }
-  .end-label { font-family: var(--font-body); font-size: 11px; font-weight: 600; }
-  .end-without { fill: #8ea6bc; }
-  .end-with { fill: #d9e6f2; }
-  .end-demand, .end-res, .end-demand-soft, .end-res-soft { font-size: 12.5px; font-weight: 700; }
-  .end-demand { fill: #f1b3ac; }
-  .end-res { fill: #bcdcf3; }
-  .end-demand-soft { fill: rgb(241 179 172 / 0.7); }
-  .end-res-soft { fill: rgb(188 220 243 / 0.7); }
 
-  /* What Spockhart changes: resources added in the revenue blues, demand taken away in coral */
-  .r-further { fill: #6f9fc6; }
-  .r-funding { fill: #a9d1ee; }
-  .seam { fill: none; stroke: #173f5c; stroke-width: 2; }
-  .hatch-line { stroke: rgb(217 138 130 / 0.38); stroke-width: 2; }
-  .arrow { fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-  .arrow-up { stroke: #133650; }
-  .arrow-down { stroke: #f1b3ac; }
-  .key { font-family: var(--font-body); font-size: 14px; font-weight: 700; }
-  .key-1, .key-2 { fill: #133650; }
-  .key-3 { fill: #f1b3ac; }
+  /* Without Spockhart: demand red, resources white */
+  .l-demand, .l-res, .l-ours { fill: none; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+  .l-demand { stroke: #e5675d; }
+  .l-res { stroke: #eef3f8; }
+  .dot-demand { fill: #e5675d; }
+  .dot-res { fill: #eef3f8; }
+  .end-label { font-family: var(--font-body); font-size: 13.5px; font-weight: 700; }
+  .end-demand { fill: #f0897f; }
+  .end-res { fill: #eef3f8; }
+
+  /* With Spockhart: blue lines, blue areas */
+  .l-ours { stroke: #8ec0e6; }
+  .dot-ours { fill: #8ec0e6; stroke: #173f5c; stroke-width: 2; }
+  .area { fill: rgb(74 138 186 / 0.38); }
+  .area-label { font-family: var(--font-body); font-size: 12.5px; font-weight: 700; letter-spacing: 0.01em; fill: #cfe6f8; }
+  .arrow { fill: none; stroke: #b9dcf5; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
   /* ---------- Motion ----------
      At rest (and with reduced motion) the chart shows the finished picture. On screen it starts
      from the problem, then builds Spockhart's part slowly, holds, and starts again. */
   @media (prefers-reduced-motion: no-preference) {
-    .draw { stroke-dasharray: 1 1; stroke-dashoffset: 0; transition: stroke-dashoffset 4000ms var(--ease-out) 900ms; }
+    .draw { stroke-dasharray: 1 1; stroke-dashoffset: 0; transition: stroke-dashoffset 4000ms var(--ease-out) var(--at); }
     .sweep { clip-path: inset(0 0 0 0); transition: clip-path var(--dur) var(--ease-out) var(--at); }
     .fade { opacity: 1; transition: opacity 900ms var(--ease) var(--at); }
 
@@ -365,7 +307,7 @@ const charts = [
     .npi-pre .fade { opacity: 0; transition: opacity 500ms var(--ease); }
   }
 
-  /* ---------- The three ways, keyed to the chart ---------- */
+  /* ---------- The three ways ---------- */
   .npi-ways { list-style: none; padding: 0; display: grid; gap: 0.6rem; }
   .npi-way {
     display: grid;
@@ -384,13 +326,12 @@ const charts = [
     height: 28px;
     margin-top: 0.1rem;
     border-radius: 6px;
+    background: var(--accent);
+    color: #fff;
     font-size: 0.875rem;
     font-weight: 700;
     font-variant-numeric: lining-nums;
   }
-  .way-1 .npi-key { background: #6f9fc6; color: #133650; }
-  .way-2 .npi-key { background: #a9d1ee; color: #133650; }
-  .way-3 .npi-key { background: #a04f48; color: #fff; }
   .npi-way-title {
     font-family: var(--font-display);
     font-size: clamp(1.2rem, 1.1rem + 0.4vw, 1.4rem);
@@ -410,11 +351,9 @@ const charts = [
     .npi-narrow { display: block; }
     .npi-chart { padding: 0.75rem; }
     .npi-svg { padding: 0.6rem 0.35rem 0.2rem; }
-    .npi-win-bar { flex-wrap: wrap; gap: 0.3rem 0.5rem; padding: 0.5rem 0.75rem; font-size: 0.6875rem; letter-spacing: 0.02em; }
+    .npi-win-bar { padding: 0.45rem 0.7rem; font-size: 0.6875rem; letter-spacing: 0.02em; }
     .npi-dots { display: none; }
-    .npi-legend { width: 100%; margin-left: 0; gap: 1rem; }
-    .npi-legend span { gap: 0.4rem; white-space: nowrap; }
-    .npi-legend i { width: 14px; }
+    .area-label { font-size: 11px; }
     .npi-way { padding: 0.9rem 0.95rem; gap: 0.75rem; }
   }
 </style>
