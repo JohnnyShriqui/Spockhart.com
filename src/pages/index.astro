@@ -17,9 +17,9 @@ import ClosingCTA from '../components/ClosingCTA.astro';
         <h1 class="load-in" style="--i:1">We optimize <em class="display-em">operations.</em></h1>
         <div class="accent-rule load-in" style="--i:2"></div>
       </div>
-
     </div>
-
+    <!-- Frosted glass that settles over the hero as the page slides up over it -->
+    <div class="hero-frost" aria-hidden="true"></div>
   </section>
 
 
@@ -60,6 +60,51 @@ import ClosingCTA from '../components/ClosingCTA.astro';
     grid-template-columns: minmax(0, 1fr);
     align-items: center;
   }
+  /* The hero holds still while the rest of the page slides up over it, and frosts over as it
+     goes: the frost fades in with how far the page has been scrolled (set below) */
+  .hero { position: sticky; top: 0; z-index: 0; }
+  .hero-frost {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    /* The blur itself deepens as the page scrolls, so the hero goes soft rather than fading */
+    background: rgb(12 23 36 / calc(var(--frost, 0) * 0.3));
+    -webkit-backdrop-filter: blur(calc(var(--frost, 0) * 24px)) saturate(calc(1 + var(--frost, 0) * 0.15));
+    backdrop-filter: blur(calc(var(--frost, 0) * 24px)) saturate(calc(1 + var(--frost, 0) * 0.15));
+  }
   .hero-copy { display: grid; gap: var(--s-5); justify-items: start; }
   .hero-copy h1 { font-size: clamp(3rem, 1.6rem + 6vw, 6.75rem); max-width: 10ch; }
 </style>
+
+<style is:global>
+  /* The page below the home hero rides over it, with a soft shadow along its top edge */
+  .body-home { z-index: 1; box-shadow: 0 -28px 60px -24px rgb(0 0 0 / 0.5); }
+</style>
+
+<script>
+  function initFrost() {
+    const hero = document.querySelector<HTMLElement>('.theme-home');
+    if (!hero || hero.dataset.frost) return;
+    hero.dataset.frost = '1';
+    let ticking = false;
+    const update = () => {
+      ticking = false;
+      const f = Math.min(1, Math.max(0, window.scrollY / (hero.offsetHeight * 0.75)));
+      hero.style.setProperty('--frost', f.toFixed(3));
+    };
+    update();
+    window.addEventListener(
+      'scroll',
+      () => {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(update);
+      },
+      { passive: true },
+    );
+    window.addEventListener('resize', update, { passive: true });
+  }
+  initFrost();
+  document.addEventListener('spockhart:view', initFrost);
+</script>

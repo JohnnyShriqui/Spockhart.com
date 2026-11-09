@@ -44,21 +44,37 @@ const fix: Item[] = [
   { k: '4', id: 'subcontractor-financing-marketplace', value: '6+ months → weeks', rest: ' for subcontractor financing approvals', status: 'done' },
 ];
 
-/* Chart geometry (viewBox 0 0 560 470). Heights are illustrative. */
-const VB_H = 470;
-const BASE = 410;
+/* Chart geometry. The same chart is drawn twice: tall beside the list of case studies on laptops
+   (as tall as the list), and in its original proportions above the cards on phones and tablets.
+   Heights are illustrative. */
 const W = 60;
 const before = { rev: 92, cost: 160 };
 const after = { rev: 330, cost: 398 };
-const REV = 230; // revenue, before
-const COST = 216; // costs, before: just under revenue
-const ADD = 46; // each new revenue slice
-const CUT = 26; // each cost slice removed
-const revTop = BASE - REV;
-const costTop = BASE - COST;
-const newTop = revTop - ADD * build.length;
-const costAfterTop = costTop + CUT * fix.length;
-const grid = [50, 122, 194, 266, 338];
+const chartFor = (key: 'wide' | 'narrow') => {
+  const S = key === 'wide' ? 1.75 : 1; // how much taller the bars are drawn
+  const REV = 230 * S; // revenue, before
+  const COST = 216 * S; // costs, before: just under revenue
+  const ADD = 46 * S; // each new revenue slice
+  const CUT = 26 * S; // each cost slice removed
+  const TOP = 42;
+  const BASE = TOP + REV + ADD * build.length;
+  const lab = key === 'wide' ? 26 : 22; // axis labels below the base line
+  const grp = key === 'wide' ? 58 : 48; // Before / After
+  const line = key === 'wide' ? 18 : 14; // between the two lines of a note
+  const revTop = BASE - REV;
+  const costTop = BASE - COST;
+  const newTop = revTop - ADD * build.length;
+  const costAfterTop = costTop + CUT * fix.length;
+  const x2 = key === 'wide' ? 476 : 536;
+  return {
+    key, REV, COST, ADD, CUT, BASE, lab, grp, line, revTop, costTop, newTop, costAfterTop, x2,
+    H: BASE + 60,
+    grid: [1, 2, 3, 4, 5].map((k) => BASE - 72 * S * k),
+    // The drawing itself, from the top of the new revenue to the Before and After labels
+    crop: `20 ${newTop} 460 ${BASE + grp + 8 - newTop}`,
+  };
+};
+const charts = [chartFor('wide'), chartFor('narrow')];
 
 const sets = [
   { key: 'build', title: 'Revenue Development', note: 'Revenue up', items: build },
@@ -77,81 +93,100 @@ const sets = [
       <figure class="fb-chart" aria-label="Before, costs are just under revenue. After, revenue is up three slices and costs are down four.">
         <div class="fb-win">
           <div class="fb-win-bar"><span class="fb-dots"><i></i><i></i><i></i></span>Costs vs revenue</div>
-          <svg viewBox={`0 0 560 ${VB_H}`} class="fb-svg" data-fb-svg aria-hidden="true" preserveAspectRatio="xMidYMid meet">
-            <defs>
-              <pattern id="fb-hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-                <line x1="0" y1="0" x2="0" y2="7" class="fb-hatch-line" />
-              </pattern>
-            </defs>
+          {
+            charts.map((c) => (
+              <svg
+                viewBox={`0 0 560 ${c.H}`}
+                class:list={['fb-svg', `fb-svg-${c.key}`]}
+                data-fb-svg={c.key}
+                data-crop={c.key === 'wide' ? c.crop : undefined}
+                aria-hidden="true"
+                preserveAspectRatio="xMidYMid meet"
+              >
+                <defs>
+                  <pattern id={`fb-hatch-${c.key}`} width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                    <line x1="0" y1="0" x2="0" y2="7" class="fb-hatch-line" />
+                  </pattern>
+                </defs>
 
-            {grid.map((y) => <line x1="24" x2="536" y1={y} y2={y} class="fb-grid" />)}
-            <line x1="24" x2="536" y1={BASE} y2={BASE} class="fb-axis" />
-            <line x1="280" x2="280" y1="30" y2={BASE + 44} class="fb-divider" />
+                {c.grid.map((y) => <line x1="24" x2={c.x2} y1={y} y2={y} class="fb-grid" />)}
+                <line x1="24" x2={c.x2} y1={c.BASE} y2={c.BASE} class="fb-axis" />
+                <line x1="280" x2="280" y1={c.newTop - 12} y2={c.BASE + c.grp - 4} class="fb-divider" />
 
-            <!-- Before: profitable, barely -->
-            <rect x={before.rev} y={revTop} width={W} height={REV} rx="2" class="fb-rev" />
-            <rect x={before.cost} y={costTop} width={W} height={COST} rx="2" class="fb-cost" />
-            <path d={`M${before.rev - 10} ${revTop} h-5 V${costTop} h5`} class="fb-bracket" />
-            <text x={before.rev - 20} y={revTop + 4} text-anchor="end" class="fb-ann">
-              <tspan x={before.rev - 20}>Old</tspan>
-              <tspan x={before.rev - 20} dy="14">margin</tspan>
-            </text>
-            <g class="fb-under">
-              <text x={before.rev + W / 2} y={BASE + 22} text-anchor="middle" class="fb-axis-label">Revenue</text>
-              <text x={before.cost + W / 2} y={BASE + 22} text-anchor="middle" class="fb-axis-label">Costs</text>
-              <text x={(before.rev + before.cost + W) / 2} y={BASE + 48} text-anchor="middle" class="fb-group">Before</text>
-            </g>
+                <!-- Before: profitable, barely -->
+                <rect x={before.rev} y={c.revTop} width={W} height={c.REV} rx="2" class="fb-rev" />
+                <rect x={before.cost} y={c.costTop} width={W} height={c.COST} rx="2" class="fb-cost" />
+                <path d={`M${before.rev - 10} ${c.revTop} h-5 V${c.costTop} h5`} class="fb-bracket" />
+                <text x={before.rev - 20} y={c.revTop + 4} text-anchor="end" class="fb-ann">
+                  <tspan x={before.rev - 20}>Old</tspan>
+                  <tspan x={before.rev - 20} dy={c.line}>margin</tspan>
+                </text>
+                <g class="fb-under">
+                  <text x={before.rev + W / 2} y={c.BASE + c.lab} text-anchor="middle" class="fb-axis-label">Revenue</text>
+                  <text x={before.cost + W / 2} y={c.BASE + c.lab} text-anchor="middle" class="fb-axis-label">Costs</text>
+                  <text x={(before.rev + before.cost + W) / 2} y={c.BASE + c.grp} text-anchor="middle" class="fb-group">Before</text>
+                </g>
 
-            <!-- After: revenue up by A to C, costs down by 1 to 4 -->
-            <rect x={after.rev} y={revTop} width={W} height={REV} rx="2" class="fb-rev fb-rev-after" />
-            {
-              build.map((b, i) => {
-                const y = revTop - ADD * (build.length - i);
-                return (
-                  <g class="fb-slice fb-add" data-slice={b.k} style={`--i:${i}`}>
-                    <rect x={after.rev} y={y} width={W} height={ADD} class="fb-add-rect" data-slice-rect />
-                    <text x={after.rev + W / 2} y={y + ADD / 2 + 5} text-anchor="middle" class="fb-key-add">
-                      {b.k}
-                    </text>
-                  </g>
-                );
-              })
-            }
-            <rect
-              x={after.cost}
-              y={costTop}
-              width={W}
-              height={COST}
-              rx="2"
-              class="fb-cost fb-cost-after"
-              style={`--cost-after:${((COST - CUT * fix.length) / COST).toFixed(4)}`}
-            />
-            {
-              fix.map((f, i) => {
-                const y = costTop + CUT * i;
-                return (
-                  <g class="fb-slice fb-cut" data-slice={f.k} style={`--i:${i}`}>
-                    <rect x={after.cost + 0.75} y={y + 0.75} width={W - 1.5} height={CUT - 1.5} class="fb-cut-rect" data-slice-rect />
-                    <text x={after.cost + W / 2} y={y + CUT / 2 + 4} text-anchor="middle" class="fb-key-cut">
-                      {f.k}
-                    </text>
-                  </g>
-                );
-              })
-            }
-            <g class="fb-wide">
-              <path d={`M${after.rev - 10} ${newTop} h-5 V${costAfterTop} h5`} class="fb-bracket fb-bracket-after" />
-              <text x={after.rev - 20} y={(newTop + costAfterTop) / 2 - 3} text-anchor="end" class="fb-ann fb-ann-hot">
-                <tspan x={after.rev - 20}>New</tspan>
-                <tspan x={after.rev - 20} dy="15">margin</tspan>
-              </text>
-            </g>
-            <g class="fb-under">
-              <text x={after.rev + W / 2} y={BASE + 22} text-anchor="middle" class="fb-axis-label">Revenue</text>
-              <text x={after.cost + W / 2} y={BASE + 22} text-anchor="middle" class="fb-axis-label">Costs</text>
-              <text x={(after.rev + after.cost + W) / 2} y={BASE + 48} text-anchor="middle" class="fb-group">After</text>
-            </g>
-          </svg>
+                <!-- After: revenue up by A to C, costs down by 1 to 4 -->
+                <rect x={after.rev} y={c.revTop} width={W} height={c.REV} rx="2" class="fb-rev fb-rev-after" />
+                {
+                  build.map((b, i) => {
+                    const y = c.revTop - c.ADD * (build.length - i);
+                    return (
+                      <g class="fb-slice fb-add" data-slice={b.k} style={`--i:${i}`}>
+                        <rect x={after.rev} y={y} width={W} height={c.ADD} class="fb-add-rect" data-slice-rect />
+                        <text x={after.rev + W / 2} y={y + c.ADD / 2 + 5} text-anchor="middle" class="fb-key-add">
+                          {b.k}
+                        </text>
+                      </g>
+                    );
+                  })
+                }
+                <rect
+                  x={after.cost}
+                  y={c.costTop}
+                  width={W}
+                  height={c.COST}
+                  rx="2"
+                  class="fb-cost fb-cost-after"
+                  style={`--cost-after:${((c.COST - c.CUT * fix.length) / c.COST).toFixed(4)}`}
+                />
+                {
+                  fix.map((f, i) => {
+                    const y = c.costTop + c.CUT * i;
+                    return (
+                      <g class="fb-slice fb-cut" data-slice={f.k} style={`--i:${i}`}>
+                        <rect
+                          x={after.cost + 0.75}
+                          y={y + 0.75}
+                          width={W - 1.5}
+                          height={c.CUT - 1.5}
+                          class="fb-cut-rect"
+                          fill={`url(#fb-hatch-${c.key})`}
+                          data-slice-rect
+                        />
+                        <text x={after.cost + W / 2} y={y + c.CUT / 2 + 4} text-anchor="middle" class="fb-key-cut">
+                          {f.k}
+                        </text>
+                      </g>
+                    );
+                  })
+                }
+                <g class="fb-wide">
+                  <path d={`M${after.rev - 10} ${c.newTop} h-5 V${c.costAfterTop} h5`} class="fb-bracket fb-bracket-after" />
+                  <text x={after.rev - 20} y={(c.newTop + c.costAfterTop) / 2 - 3} text-anchor="end" class="fb-ann fb-ann-hot">
+                    <tspan x={after.rev - 20}>New</tspan>
+                    <tspan x={after.rev - 20} dy={c.line + 1}>margin</tspan>
+                  </text>
+                </g>
+                <g class="fb-under">
+                  <text x={after.rev + W / 2} y={c.BASE + c.lab} text-anchor="middle" class="fb-axis-label">Revenue</text>
+                  <text x={after.cost + W / 2} y={c.BASE + c.lab} text-anchor="middle" class="fb-axis-label">Costs</text>
+                  <text x={(after.rev + after.cost + W) / 2} y={c.BASE + c.grp} text-anchor="middle" class="fb-group">After</text>
+                </g>
+              </svg>
+            ))
+          }
         </div>
       </figure>
 
@@ -239,7 +274,7 @@ const sets = [
       if (root.dataset.ready) return;
       root.dataset.ready = '1';
       const stage = root.querySelector<HTMLElement>('[data-fb-stage]')!;
-      const chart = root.querySelector<SVGSVGElement>('[data-fb-svg]')!;
+      const chart = root.querySelector<SVGSVGElement>('[data-fb-svg="wide"]')!;
       const chartFig = root.querySelector<HTMLElement>('.fb-chart')!;
       const links = root.querySelector<SVGSVGElement>('[data-fb-links]')!;
       const cardsBox = root.querySelector<HTMLElement>('[data-fb-cards]')!;
@@ -290,10 +325,10 @@ const sets = [
           const b = rect.getBBox();
           const sx = m.a * (b.x + b.width) + m.e - box.left + 4;
           const sy = m.d * (b.y + b.height / 2) + m.f - box.top;
-          // End level with the row's dash (drawn 2px tall from the middle of its key), just short of it
-          const key = (card.querySelector<HTMLElement>('.fb-key') ?? headOf(card)).getBoundingClientRect();
-          const ex = key.left - box.left - 6;
-          const ey = key.top + key.height / 2 + 1 - box.top;
+          // End just short of the case study's bar, level with its middle
+          const head = headOf(card).getBoundingClientRect();
+          const ex = head.left - box.left - 6;
+          const ey = head.top + head.height / 2 - box.top;
           // Each line curves straight out of its slice to its case study
           const dx = Math.max(24, (ex - sx) * 0.55);
           const { g, path } = lineFor(card);
@@ -313,23 +348,17 @@ const sets = [
         follow = requestAnimationFrame(step);
       };
 
-      /* ---------- The drawing sits level with the list (laptops) ----------
-         Its middle, from the top of the new revenue down to the Before and After labels, lines
-         up with the middle of the case studies, from the first heading to the last row. */
-      const vb = chart.viewBox.baseVal;
-      const VBW = vb.width;
-      const VBH = vb.height;
+      /* ---------- The drawing is as tall as the list (laptops) ----------
+         The tall drawing is cropped to itself, from the top of the new revenue down to the
+         Before and After labels, and stretched from the first case study to the last. */
       const centre = () => {
-        chart.setAttribute('viewBox', `0 0 ${VBW} ${VBH}`);
         if (!wide.matches) return;
-        const top = chart.querySelector('.fb-bracket-after')?.getBoundingClientRect().top;
-        const bottom = Math.max(...Array.from(chart.querySelectorAll('.fb-group')).map((t) => t.getBoundingClientRect().bottom));
-        const head = root.querySelector('.fb-set-head')?.getBoundingClientRect().top;
-        const m = chart.getScreenCTM();
-        if (top === undefined || head === undefined || !m || !m.d) return;
-        const listMid = (head + cardsBox.getBoundingClientRect().bottom) / 2;
-        const dy = (listMid - (top + bottom) / 2) / m.d;
-        chart.setAttribute('viewBox', `0 ${(-dy).toFixed(2)} ${VBW} ${VBH}`);
+        chart.setAttribute('viewBox', chart.dataset.crop!);
+        const first = cards[0].getBoundingClientRect();
+        const last = cards[cards.length - 1].getBoundingClientRect();
+        chart.style.marginTop = '0px';
+        chart.style.height = `${(last.bottom - first.top).toFixed(1)}px`;
+        chart.style.marginTop = `${(first.top - chart.getBoundingClientRect().top).toFixed(1)}px`;
       };
 
       /* ---------- Thumbnails: each graphic, scaled down to a still frame ---------- */
@@ -554,7 +583,7 @@ const sets = [
   .fb-cost-after { transform-box: fill-box; transform-origin: bottom; transform: scaleY(var(--cost-after)); }
   .fb-add-rect { fill: #a9d1ee; stroke: #173f5c; stroke-width: 2; }
   .fb-key-add { font-family: var(--font-body); font-size: 13px; font-weight: 700; fill: #133650; }
-  .fb-cut-rect { fill: url(#fb-hatch); stroke: #d98a82; stroke-width: 1; stroke-dasharray: 3 2.5; }
+  .fb-cut-rect { stroke: #d98a82; stroke-width: 1; stroke-dasharray: 3 2.5; }
   .fb-hatch-line { stroke: rgb(217 138 130 / 0.28); stroke-width: 2; }
   .fb-key-cut { font-family: var(--font-body); font-size: 12px; font-weight: 700; fill: #e7a59e; }
   .fb-add { transform-box: fill-box; transform-origin: bottom; }
@@ -791,8 +820,8 @@ const sets = [
   }
   .fb-dots { display: none; }
   .fb-svg { padding: 1rem 0 0; }
-  .fb-grid { stroke: rgb(var(--hair) / 0.05); }
-  .fb-axis { stroke: rgb(var(--hair) / 0.18); }
+  .fb-grid { stroke: rgb(var(--hair) / 0.07); }
+  .fb-axis { stroke: rgb(var(--hair) / 0.3); }
   .fb-divider { stroke: rgb(var(--hair) / 0.07); }
   .fb-axis-label { font-size: 10.5px; letter-spacing: 0.18em; fill: var(--muted); }
   .fb-group { font-size: 19px; fill: var(--ink); }
@@ -801,7 +830,7 @@ const sets = [
   .fb-bracket { stroke: rgb(var(--hair) / 0.3); }
   .fb-bracket-after { stroke: rgb(var(--hair) / 0.5); }
   .fb-rev { fill: var(--c-rev-dull); }
-  .fb-cost { fill: rgb(var(--c-cost) / 0.42); }
+  .fb-cost { fill: rgb(var(--c-cost) / 0.4); }
   .fb-add-rect { fill: rgb(var(--hl-rgb) / 0.2); stroke: rgb(var(--hl-rgb) / 0.65); stroke-width: 1; }
   .fb-key-add { font-size: 12px; font-weight: 600; fill: var(--hot); }
   .fb-cut-rect { stroke: rgb(var(--warm-rgb) / 0.6); stroke-width: 1; }
@@ -867,9 +896,9 @@ const sets = [
      the After bars start just as muted and fill to full colour once our work is built on them
      (costs once the cuts land, revenue once the new slices stack up). */
   .fb {
-    --c-rev: 74 138 186;
-    --c-cost: 196 116 108;
-    --c-rev-dull: rgb(74 138 186 / 0.36);
+    --c-rev: 47 111 166;
+    --c-cost: 192 98 88;
+    --c-rev-dull: rgb(47 111 166 / 0.4);
   }
   @media (prefers-color-scheme: dark) {
     .fb {
@@ -879,17 +908,17 @@ const sets = [
     }
   }
   .fb-chart { color: var(--ink); }
-  .fb-rev-after { fill: rgb(var(--c-rev) / 0.82); }
-  .fb-cost-after { fill: rgb(var(--c-cost) / 0.72); }
-  .fb-add-rect { fill: rgb(var(--c-rev) / 0.18); stroke: rgb(var(--c-rev) / 0.75); stroke-width: 1; }
-  .fb-add.is-on .fb-add-rect { fill: rgb(var(--c-rev) / 0.36); }
+  .fb-rev-after { fill: rgb(var(--c-rev) / 0.92); }
+  .fb-cost-after { fill: rgb(var(--c-cost) / 0.88); }
+  .fb-add-rect { fill: rgb(var(--c-rev) / 0.2); stroke: rgb(var(--c-rev)); stroke-width: 1.25; }
+  .fb-add.is-on .fb-add-rect { fill: rgb(var(--c-rev) / 0.4); }
   .fb-key-add { fill: var(--ink); }
-  .fb-cut-rect { stroke: rgb(var(--c-cost) / 0.65); stroke-width: 1; }
-  .fb-hatch-line { stroke: rgb(var(--c-cost) / 0.24); }
+  .fb-cut-rect { stroke: rgb(var(--c-cost) / 0.9); stroke-width: 1.25; }
+  .fb-hatch-line { stroke: rgb(var(--c-cost) / 0.4); }
   .fb-key-cut { fill: var(--warm); }
   .fb-bracket-after { stroke: rgb(var(--hair) / 0.5); }
   .fb-ann-hot { fill: var(--hot); }
-  :global(.fb-link) { opacity: 0.5; }
+  :global(.fb-link) { opacity: 0.8; }
   :global(.fb-link-build) { stroke: var(--hl); }
   :global(.fb-link-fix) { stroke: var(--warm); }
   .fb-card-build { --c: var(--hl); }
@@ -972,5 +1001,62 @@ const sets = [
     .fb-cs { grid-area: cs; gap: 1rem; }
     .fb-graphic { grid-area: graphic; border-radius: var(--radius); }
     .fb-headline { font-size: 1.125rem; line-height: 1.55; }
+  }
+  /* ==========================================================================
+     Laptops: each case study is a bar, with its graphic as a small still on the left, a
+     coloured key, the one-line result, its status and the chevron. The dropdown is as before.
+     The chart beside them is drawn tall, from the first bar to the last.
+     ========================================================================== */
+  .fb {
+    --key-build: #2c5f8a;
+    --key-fix: #a9524a;
+    --bar-bg: #ffffff;
+    --bar-line: rgb(27 42 61 / 0.1);
+    --bar-shadow: 0 1px 2px rgb(27 42 61 / 0.05);
+  }
+  @media (prefers-color-scheme: dark) {
+    .fb {
+      --key-build: #3c78aa;
+      --key-fix: #a65a52;
+      --bar-bg: rgb(255 255 255 / 0.035);
+      --bar-line: rgb(255 255 255 / 0.1);
+      --bar-shadow: none;
+    }
+  }
+  @media (max-width: 1099px) {
+    .fb-svg-wide { display: none; }
+  }
+  @media (min-width: 1100px) {
+    .fb-stage { grid-template-columns: minmax(0, 0.46fr) minmax(0, 1fr); }
+    .fb-svg-narrow { display: none; }
+    .fb-svg-wide { flex: none; width: 100%; padding: 0; }
+    .fb-axis-label { font-size: 13px; }
+    .fb-group { font-size: 24px; }
+    .fb-ann { font-size: 15px; }
+    .fb-key-add { font-size: 17px; }
+    .fb-key-cut { font-size: 15px; }
+
+    .fb-set { gap: 0.6rem; }
+    .fb-set + .fb-set { margin-top: 0.9rem; }
+    .fb-row { gap: 0.5rem; }
+    .fb-card { border: 1px solid var(--bar-line); border-radius: var(--radius-lg); background: var(--bar-bg); box-shadow: var(--bar-shadow); }
+    .fb-card.is-open { border-color: rgb(var(--hair) / 0.2); }
+    .fb-head { grid-template-columns: auto minmax(0, 1fr) auto; gap: 0.85rem; padding: 0.45rem 0.75rem 0.45rem 0.45rem; }
+    .fb-media { display: block; width: 74px; height: 44px; border-radius: 4px; }
+    .fb-body { gap: 0.75rem; }
+    .fb-key {
+      display: grid;
+      place-items: center;
+      width: 22px;
+      height: 22px;
+      padding: 0;
+      border-radius: 5px;
+      font-size: 0.6875rem;
+      letter-spacing: 0;
+      color: #fff;
+    }
+    .fb-key::before { display: none; }
+    .fb-card-build .fb-key { background: var(--key-build) !important; }
+    .fb-card-fix .fb-key { background: var(--key-fix) !important; }
   }
 </style>

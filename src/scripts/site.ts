@@ -20,14 +20,14 @@ function initHeader() {
   const update = () => {
     header.classList.toggle('is-scrolled', window.scrollY > 8);
     const mid = header.offsetHeight / 2;
-    const dark = darkMode.matches ? alwaysDark.concat(body) : alwaysDark;
-    header.classList.toggle(
-      'over-dark',
-      dark.some((el) => {
-        const r = el.getBoundingClientRect();
-        return r.top <= mid && r.bottom > mid;
-      }),
-    );
+    const under = (el: HTMLElement) => {
+      const r = el.getBoundingClientRect();
+      return r.top <= mid && r.bottom > mid;
+    };
+    // The part below a hero sits on top of it (the home hero holds still under it), so it decides
+    // first; otherwise any always-dark area under the header does
+    const onBody = body.some(under);
+    header.classList.toggle('over-dark', onBody ? darkMode.matches : alwaysDark.some(under));
     ticking = false;
   };
   update();
