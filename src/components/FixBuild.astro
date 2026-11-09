@@ -838,83 +838,60 @@ const sets = [
     .fb-note { display: none; }
     .fb-cs { border-top-color: rgb(255 255 255 / 0.1); }
   }
-  /* After glows: lightsaber blue for revenue, red for costs, like the hero readout, so the
-     improvement reads at a glance. Before stays dull. The lines and the list's keys carry the
-     same light. */
+  /* Restrained, like a printed annual report: flat colour, hairlines, no glow. Before is muted;
+     the After bars start just as muted and fill to full colour once our work is built on them
+     (costs once the cuts land, revenue once the new slices stack up). */
   .fb {
-    --neon-blue: #3fd0ff;
-    --neon-red: #ff3d5e;
+    --c-rev: 156 200 234;
+    --c-cost: 226 163 154;
   }
-  .fb-rev-after { fill: rgb(63 208 255 / 0.13); stroke: var(--neon-blue); stroke-width: 1.5; filter: drop-shadow(0 0 6px rgb(63 208 255 / 0.55)); }
-  .fb-cost-after { fill: rgb(255 42 77 / 0.13); stroke: var(--neon-red); stroke-width: 1.5; vector-effect: non-scaling-stroke; filter: drop-shadow(0 0 6px rgb(255 42 77 / 0.55)); }
-  .fb-add-rect { fill: rgb(63 208 255 / 0.2); stroke: var(--neon-blue); stroke-width: 1.5; filter: drop-shadow(0 0 7px rgb(63 208 255 / 0.65)); }
-  .fb-add.is-on .fb-add-rect { fill: rgb(63 208 255 / 0.4); }
-  .fb-key-add { fill: #eafaff; }
-  .fb-cut-rect { stroke: rgb(255 61 94 / 0.8); stroke-width: 1.25; }
-  .fb-hatch-line { stroke: rgb(255 61 94 / 0.3); }
-  .fb-key-cut { fill: #ff8a9d; }
-  .fb-bracket-after { stroke: var(--neon-blue); filter: drop-shadow(0 0 4px rgb(63 208 255 / 0.7)); }
-  .fb-ann-hot { fill: #bfefff; }
-  :global(.fb-link) { opacity: 0.6; }
-  :global(.fb-link-build) { stroke: var(--neon-blue); filter: drop-shadow(0 0 3px rgb(63 208 255 / 0.6)); }
-  :global(.fb-link-fix) { stroke: var(--neon-red); filter: drop-shadow(0 0 3px rgb(255 42 77 / 0.6)); }
-  .fb-card-build { --c: var(--neon-blue); }
-  .fb-card-fix { --c: var(--neon-red); }
-  .fb-key::before { box-shadow: 0 0 6px var(--c); }
-  .fb-set-build .fb-set-note { color: var(--neon-blue); }
-  .fb-set-fix .fb-set-note { color: var(--neon-red); }
+  .fb-rev-after { fill: rgb(var(--c-rev) / 0.82); }
+  .fb-cost-after { fill: rgb(var(--c-cost) / 0.72); }
+  .fb-add-rect { fill: rgb(var(--c-rev) / 0.18); stroke: rgb(var(--c-rev) / 0.75); stroke-width: 1; }
+  .fb-add.is-on .fb-add-rect { fill: rgb(var(--c-rev) / 0.36); }
+  .fb-key-add { fill: #eef3f8; }
+  .fb-cut-rect { stroke: rgb(var(--c-cost) / 0.65); stroke-width: 1; }
+  .fb-hatch-line { stroke: rgb(var(--c-cost) / 0.24); }
+  .fb-key-cut { fill: #e2a39a; }
+  .fb-bracket-after { stroke: rgb(238 243 248 / 0.5); }
+  .fb-ann-hot { fill: #d9e6f2; }
+  :global(.fb-link) { opacity: 0.5; }
+  :global(.fb-link-build) { stroke: #9cc8ea; }
+  :global(.fb-link-fix) { stroke: #e2a39a; }
+  .fb-card-build { --c: #9cc8ea; }
+  .fb-card-fix { --c: #e2a39a; }
+  .fb-set-build .fb-set-note { color: #9cc8ea; }
+  .fb-set-fix .fb-set-note { color: #e2a39a; }
+  @media (prefers-reduced-motion: no-preference) {
+    .fb-cost-after { transition: transform 2200ms var(--ease-out) 300ms, fill 1400ms var(--ease) 2700ms; }
+    .fb-rev-after { transition: fill 1400ms var(--ease) 4000ms; }
+    .fb-pre .fb-cost-after { fill: rgb(var(--c-cost) / 0.42); transition: transform 700ms var(--ease), fill 600ms var(--ease); }
+    .fb-pre .fb-rev-after { fill: rgb(110 160 205 / 0.5); transition: fill 600ms var(--ease); }
+    .fb-hold .fb-rev-after { transition: none !important; }
+  }
 
-  /* Status pills, in neon: green when delivered, yellow while it is being built (that one pulses) */
+  /* Status: a hairline pill, quiet type, a small coloured dot. Nothing glows or pulses. */
   .fb-text { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem 0.85rem; }
   .fb-pill {
     display: inline-flex;
     align-items: center;
     gap: 0.45rem;
-    padding: 0.22rem 0.6rem 0.22rem 0.5rem;
-    border: 1px solid rgb(var(--neon) / 0.5);
+    padding: 0.2rem 0.6rem 0.2rem 0.5rem;
+    border: 1px solid rgb(255 255 255 / 0.12);
     border-radius: 999px;
-    background: rgb(var(--neon) / 0.07);
-    box-shadow: 0 0 10px rgb(var(--neon) / 0.18);
     font-family: var(--font-body);
     font-size: 0.6875rem;
-    font-weight: 600;
-    letter-spacing: 0.12em;
+    font-weight: 500;
+    letter-spacing: 0.1em;
     line-height: 1.2;
     text-transform: uppercase;
     white-space: nowrap;
-    color: rgb(var(--neon));
-    text-shadow: 0 0 8px rgb(var(--neon) / 0.55);
+    color: var(--ink-3);
   }
-  .fb-pill i { width: 6px; height: 6px; border-radius: 50%; background: rgb(var(--neon)); box-shadow: 0 0 7px rgb(var(--neon)); flex: none; }
-  .fb-pill-done { --neon: 57 255 136; }
-  .fb-pill-progress { --neon: 255 226 61; }
-  @media (prefers-reduced-motion: no-preference) {
-    .fb-pill-progress i { animation: fb-pulse 2.4s ease-in-out infinite; }
-    @keyframes fb-pulse { 50% { opacity: 0.35; box-shadow: 0 0 2px rgb(var(--neon)); } }
-  }
+  .fb-pill i { width: 5px; height: 5px; border-radius: 50%; background: var(--dot); flex: none; }
+  .fb-pill-done { --dot: #7fbf9a; }
+  .fb-pill-progress { --dot: #d9b56a; }
   @media (max-width: 1099px) {
-    .fb-pill { font-size: 0.625rem; padding: 0.18rem 0.5rem 0.18rem 0.42rem; }
-  }
-
-  /* The After bars start as dull as the Before ones and light up once our systems are built on
-     them: costs once the cuts have landed, revenue once the new slices have stacked up. */
-  @media (prefers-reduced-motion: no-preference) {
-    .fb-cost-after {
-      transition: transform 2200ms var(--ease-out) 300ms, fill 1300ms var(--ease) 2700ms, stroke 1300ms var(--ease) 2700ms, filter 1300ms var(--ease) 2700ms;
-    }
-    .fb-rev-after { transition: fill 1300ms var(--ease) 4000ms, stroke 1300ms var(--ease) 4000ms, filter 1300ms var(--ease) 4000ms; }
-    .fb-pre .fb-cost-after {
-      fill: rgb(226 163 154 / 0.42);
-      stroke: rgb(255 61 94 / 0);
-      filter: drop-shadow(0 0 0 rgb(255 42 77 / 0));
-      transition: transform 700ms var(--ease), fill 600ms var(--ease), stroke 600ms var(--ease), filter 600ms var(--ease);
-    }
-    .fb-pre .fb-rev-after {
-      fill: rgb(110 160 205 / 0.5);
-      stroke: rgb(63 208 255 / 0);
-      filter: drop-shadow(0 0 0 rgb(63 208 255 / 0));
-      transition: fill 600ms var(--ease), stroke 600ms var(--ease), filter 600ms var(--ease);
-    }
-    .fb-hold .fb-rev-after { transition: none !important; }
+    .fb-pill { font-size: 0.625rem; padding: 0.16rem 0.5rem 0.16rem 0.42rem; }
   }
 </style>

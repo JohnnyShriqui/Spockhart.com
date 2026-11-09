@@ -331,13 +331,12 @@ const iconFill = (i: number) => Math.max(0, Math.min(1, fteIcons - i));
   .calc-head h2 { font-weight: 400; }
   .slider-head label { font-weight: 500; }
   .slider-head output { font-weight: 400; color: #eef3f8; }
-  /* The controls glow lightsaber blue */
-  input[type='range']::-webkit-slider-runnable-track { height: 2px; background: linear-gradient(to right, #3fd0ff 0 var(--p), rgb(255 255 255 / 0.12) var(--p) 100%); }
-  input[type='range']::-moz-range-track { height: 2px; background: rgb(255 255 255 / 0.12); }
-  input[type='range']::-moz-range-progress { height: 2px; background: #3fd0ff; box-shadow: 0 0 8px rgb(63 208 255 / 0.7); }
-  input[type='range']::-webkit-slider-thumb { width: 16px; height: 16px; margin-top: -7px; background: #f2fbff; border: 0; box-shadow: 0 0 0 4px rgb(63 208 255 / 0.16), 0 0 14px rgb(63 208 255 / 0.65); }
-  input[type='range']::-moz-range-thumb { width: 16px; height: 16px; background: #f2fbff; border: 0; box-shadow: 0 0 0 4px rgb(63 208 255 / 0.16), 0 0 14px rgb(63 208 255 / 0.65); }
-  input[type='range']:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 6px rgb(63 208 255 / 0.28), 0 0 16px rgb(63 208 255 / 0.8); }
+  input[type='range']::-webkit-slider-runnable-track { height: 2px; background: linear-gradient(to right, #9cc8ea 0 var(--p), rgb(255 255 255 / 0.14) var(--p) 100%); }
+  input[type='range']::-moz-range-track { height: 2px; background: rgb(255 255 255 / 0.14); }
+  input[type='range']::-moz-range-progress { height: 2px; background: #9cc8ea; }
+  input[type='range']::-webkit-slider-thumb { width: 16px; height: 16px; margin-top: -7px; background: #eef3f8; border: 0; box-shadow: 0 0 0 4px rgb(156 200 234 / 0.18); }
+  input[type='range']::-moz-range-thumb { width: 16px; height: 16px; background: #eef3f8; border: 0; }
+  input[type='range']:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 6px rgb(156 200 234 / 0.3); }
   .calc-right { background: none; border-left: 1px solid rgb(255 255 255 / 0.1); padding-right: 0; }
   .calc-right::before { display: none; }
   .r-label { color: var(--ink-3); }
