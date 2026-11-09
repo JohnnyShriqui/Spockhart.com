@@ -6,9 +6,8 @@
  * by four slices (1 to 4). Each slice is a real result our team delivered, drawn out to its case
  * study on the right. The After builds itself on a loop while the chart is on screen.
  *
- * Laptops: pointing at a case study (and resting there for a moment) lights up its slice and
- * opens the case study in place: it grows toward the chart and downward, pushing the others
- * down, with its graphic playing on the left and the words on the right.
+ * Laptops: each case study opens like a dropdown when clicked, with its words on top and its
+ * graphic underneath, playing. Pointing at one only tints it slightly.
  * Phones and tablets: the chart, then two rows to swipe; each graphic plays as it comes into view.
  *
  * The chart is illustrative: the bars show direction, not client figures.
@@ -30,7 +29,7 @@ interface Item {
 const build: Item[] = [
   { k: 'A', id: 'sales-performance-system', value: '+$316K a month', label: 'We lifted average sales with a new analytics system' },
   { k: 'B', id: 'digital-practice-growth', value: '$150K → $1M', label: 'We grew a consulting practice in under a year' },
-  { k: 'C', id: 'lead-generation-engine', value: 'A $1B+ market', label: 'We turned a division’s expertise into a digital service' },
+  { k: 'C', id: 'lead-generation-engine', value: 'A $1B+ market', label: 'We digitized a division’s expertise to open a new market' },
 ];
 const fix: Item[] = [
   { k: '1', id: 'commission-automation', value: 'Excel → Automated', label: 'We’re automating commissions for a $1.2B manufacturer' },
@@ -154,38 +153,52 @@ const sets = [
               </p>
               <div class="fb-row">
                 {set.items.map((it) => (
-                  <div class:list={['fb-card', `fb-card-${set.key}`]} tabindex="0" data-card={it.k}>
-                    <div class="fb-media" aria-hidden="true">
-                      <div class="fb-live" data-manual data-live>
-                        <ResultVisual id={it.id} />
+                  <div class:list={['fb-card', `fb-card-${set.key}`]} data-card={it.k}>
+                    <div class="fb-head" role="button" tabindex="0" aria-expanded="false" aria-controls={`fb-panel-${it.k}`} data-head>
+                      <div class="fb-media" aria-hidden="true">
+                        <div class="fb-live" data-manual data-thumb>
+                          <ResultVisual id={it.id} />
+                        </div>
                       </div>
-                    </div>
-                    <div class="fb-body">
-                      <span class="fb-key">{it.k}</span>
-                      <span class="fb-note">Our Work</span>
-                      <span class="fb-text">
-                        <span class="fb-v">{it.value}</span>
-                        <span class="fb-l">{it.label}</span>
-                        <span class="fb-cs">
-                          <span class="fb-client">
-                            <span class="fb-client-mark" aria-hidden="true">
-                              <svg viewBox="0 0 24 24">
-                                <path d={iconFor(it.id)} />
-                              </svg>
-                            </span>
-                            {work[it.id]?.client}
-                          </span>
-                          <span class="fb-headline">
-                            {headline(work[it.id]?.title ?? '').map((part, n) => (n % 2 ? <span class="hl">{part}</span> : part))}
-                          </span>
+                      <div class="fb-body">
+                        <span class="fb-key">{it.k}</span>
+                        <span class="fb-note">Our Work</span>
+                        <span class="fb-text">
+                          <span class="fb-v">{it.value}</span>
+                          <span class="fb-l">{it.label}</span>
                         </span>
+                      </div>
+                      <span class="fb-caret" aria-hidden="true">
+                        <svg viewBox="0 0 16 16">
+                          <path d="M3.5 6l4.5 4.5L12.5 6" />
+                        </svg>
                       </span>
                     </div>
-                    <span class="fb-caret" aria-hidden="true">
-                      <svg viewBox="0 0 16 16">
-                        <path d="M3.5 6l4.5 4.5L12.5 6" />
-                      </svg>
-                    </span>
+                    <div class="fb-panel" id={`fb-panel-${it.k}`} data-panel>
+                      <div class="fb-panel-inner">
+                        <div class="fb-panel-body">
+                          <span class="fb-pnote">Our Work</span>
+                          <div class="fb-cs">
+                            <p class="fb-client">
+                              <span class="fb-client-mark" aria-hidden="true">
+                                <svg viewBox="0 0 24 24">
+                                  <path d={iconFor(it.id)} />
+                                </svg>
+                              </span>
+                              {work[it.id]?.client}
+                            </p>
+                            <p class="fb-headline">
+                              {headline(work[it.id]?.title ?? '').map((part, n) => (n % 2 ? <span class="hl">{part}</span> : part))}
+                            </p>
+                          </div>
+                          <div class="fb-graphic" aria-hidden="true">
+                            <div class="fb-graphic-live" data-manual data-full>
+                              <ResultVisual id={it.id} />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -199,9 +212,9 @@ const sets = [
 
 <script>
   import { initScenes, sceneController, scenesCanAnimate } from '../scripts/scenes';
-  import { focusOn } from '../scripts/focus';
 
-  const LIVE_W = 640; // the width each case study graphic is laid out at before scaling
+  const LIVE_W = 640; // the width each thumbnail graphic is laid out at before scaling
+  const PHONE_W = 400;
 
   function initFixBuild() {
     initScenes();
@@ -210,17 +223,20 @@ const sets = [
       root.dataset.ready = '1';
       const stage = root.querySelector<HTMLElement>('[data-fb-stage]')!;
       const chart = root.querySelector<SVGSVGElement>('[data-fb-svg]')!;
+      const chartFig = root.querySelector<HTMLElement>('.fb-chart')!;
       const links = root.querySelector<SVGSVGElement>('[data-fb-links]')!;
       const cardsBox = root.querySelector<HTMLElement>('[data-fb-cards]')!;
       const cards = Array.from(root.querySelectorAll<HTMLElement>('[data-card]'));
       const wide = window.matchMedia('(min-width: 1100px)');
-      const pointer = window.matchMedia('(hover: hover) and (pointer: fine)');
       const ns = 'http://www.w3.org/2000/svg';
       const animate = scenesCanAnimate();
 
+      let open: HTMLElement | null = null;
       const slice = (k: string) => chart.querySelector<SVGGElement>(`[data-slice="${k}"]`);
-      const control = (card: Element, how: 'play' | 'loop' | 'pause' | 'stop') => {
-        const sc = card.querySelector<HTMLElement>('[data-live] [data-scene]');
+      const headOf = (card: HTMLElement) => card.querySelector<HTMLElement>('[data-head]')!;
+      const panelOf = (card: HTMLElement) => card.querySelector<HTMLElement>('[data-panel]')!;
+      const control = (card: Element, which: 'thumb' | 'full', how: 'play' | 'loop' | 'pause' | 'stop') => {
+        const sc = card.querySelector<HTMLElement>(`[data-${which}] [data-scene]`);
         const ctrl = sc ? sceneController(sc) : undefined;
         if (ctrl && (how === 'stop' || animate)) ctrl[how]();
       };
@@ -237,17 +253,16 @@ const sets = [
           const k = card.dataset.card!;
           const rect = slice(k)?.querySelector<SVGRectElement>('[data-slice-rect]');
           if (!rect) continue;
-          const on = card.classList.contains('is-on');
           const b = rect.getBBox();
           const sx = m.a * (b.x + b.width) + m.e - box.left + 4;
           const sy = m.d * (b.y + b.height / 2) + m.f - box.top;
-          const c = card.getBoundingClientRect();
-          const ex = c.left - box.left - 9;
-          const ey = on ? c.top - box.top + 40 : c.top + c.height / 2 - box.top;
+          const h = headOf(card).getBoundingClientRect();
+          const ex = h.left - box.left - 9;
+          const ey = h.top + h.height / 2 - box.top;
           const dx = Math.max(24, (ex - sx) * 0.55);
           const kind = /\d/.test(k) ? 'fix' : 'build';
           const g = document.createElementNS(ns, 'g');
-          g.setAttribute('class', `fb-link-g fb-link-g-${kind}${on ? ' is-on' : ''}`);
+          g.setAttribute('class', `fb-link-g fb-link-g-${kind}${card === open ? ' is-open' : ''}`);
           const path = document.createElementNS(ns, 'path');
           path.setAttribute('d', `M${sx.toFixed(1)} ${sy.toFixed(1)} C${(sx + dx).toFixed(1)} ${sy.toFixed(1)} ${(ex - dx).toFixed(1)} ${ey.toFixed(1)} ${ex.toFixed(1)} ${ey.toFixed(1)}`);
           path.setAttribute('pathLength', '1');
@@ -256,7 +271,7 @@ const sets = [
           links.append(g);
         }
       };
-      // Keep the lines attached while cards open, close and move
+      // Keep the lines attached while a case study opens or closes and the others move
       let follow = 0;
       const track = (ms = 600) => {
         const until = performance.now() + ms;
@@ -269,10 +284,6 @@ const sets = [
       };
 
       /* ---------- Thumbnails: each graphic, scaled down to a still frame ---------- */
-      const chartFig = root.querySelector<HTMLElement>('.fb-chart')!;
-      // Laptops lay each graphic out at 640px wide and scale it down; phones at 400px, scaled
-      // to fit a box of the same height on every card, so every card is the same size.
-      const PHONE_W = 400;
       const size = () => {
         // Phones: every card as tall as the tallest; the graphic takes whatever space the
         // words leave, so nothing is left blank
@@ -283,10 +294,9 @@ const sets = [
         }
         for (const card of cards) {
           const media = card.querySelector<HTMLElement>('.fb-media')!;
-          const live = card.querySelector<HTMLElement>('[data-live]')!;
+          const live = card.querySelector<HTMLElement>('[data-thumb]')!;
           const natW = wide.matches ? LIVE_W : PHONE_W;
           const natH = live.offsetHeight;
-          card.dataset.h = String(natH);
           const bw = media.clientWidth;
           const bh = media.clientHeight;
           const sc = wide.matches ? bw / natW : Math.min(bw / natW, bh / natH);
@@ -294,117 +304,75 @@ const sets = [
           card.style.setProperty('--ox', wide.matches ? '0px' : `${((bw - natW * sc) / 2).toFixed(1)}px`);
           card.style.setProperty('--oy', wide.matches ? '0px' : `${((bh - natH * sc) / 2).toFixed(1)}px`);
         }
+        // Dropdown graphics are laid out at the width they have on Our Work, then scaled to fit
+        if (wide.matches) {
+          for (const card of cards) {
+            const box = card.querySelector<HTMLElement>('.fb-graphic')!;
+            const live = card.querySelector<HTMLElement>('[data-full]')!;
+            const gs = box.clientWidth / LIVE_W;
+            box.style.setProperty('--gs', gs.toFixed(4));
+            box.style.height = `${(live.offsetHeight * gs).toFixed(1)}px`;
+          }
+        }
         if (wide.matches) {
           // The chart is exactly as tall as the list of case studies, measured with all closed
-          if (!active) chartFig.style.height = `${cardsBox.offsetHeight}px`;
+          if (!open) chartFig.style.height = `${cardsBox.offsetHeight}px`;
         } else {
           chartFig.style.removeProperty('height');
         }
       };
 
+      /* ---------- Dropdowns (laptops): one case study open at a time ---------- */
+      const setOpen = (card: HTMLElement, on: boolean) => {
+        card.classList.toggle('is-open', on);
+        headOf(card).setAttribute('aria-expanded', String(on));
+        panelOf(card).inert = !on;
+        control(card, 'full', on ? 'play' : 'stop');
+      };
+      const toggle = (card: HTMLElement) => {
+        if (!wide.matches) return;
+        if (open && open !== card) setOpen(open, false);
+        const next = open !== card;
+        setOpen(card, next);
+        open = next ? card : null;
+        root.classList.toggle('has-open', Boolean(open));
+        track(700);
+      };
+      const mode = () => {
+        cards.forEach((card) => {
+          const head = headOf(card);
+          head.tabIndex = wide.matches ? 0 : -1;
+          panelOf(card).inert = wide.matches && !card.classList.contains('is-open');
+        });
+      };
+      cards.forEach((card) => {
+        const head = headOf(card);
+        head.addEventListener('click', () => toggle(card));
+        head.addEventListener('keydown', (e) => {
+          if (e.key !== 'Enter' && e.key !== ' ') return;
+          e.preventDefault();
+          toggle(card);
+        });
+      });
+
       /* ---------- The chart: Before turns into After, over and over ---------- */
       let shown = false;
       let timer = 0;
-      let active: HTMLElement | null = null;
       const toAfter = () => {
         root.classList.remove('fb-pre');
         timer = window.setTimeout(toBefore, 14000);
       };
       const toBefore = () => {
-        if (!shown || active) return;
+        if (!shown) return;
         root.classList.add('fb-pre');
         timer = window.setTimeout(toAfter, 2600);
       };
-      const loop = (delay: number) => {
-        clearTimeout(timer);
-        if (animate && shown && !active) timer = window.setTimeout(toBefore, delay);
-      };
-
-      /* ---------- Open one in place: toward the chart and downward ---------- */
-      const close = () => {
-        if (!active) return;
-        active.classList.remove('is-on');
-        control(active, 'stop');
-        active = null;
-        root.classList.remove('has-active');
-        focusOn(null);
-        chart.querySelectorAll('[data-slice]').forEach((s) => s.classList.remove('is-on'));
-        track();
-        loop(3500);
-      };
-      const open = (card: HTMLElement) => {
-        if (active === card) return;
-        close();
-        // Open wide, over the chart (which steps back behind the veil anyway), so the graphic
-        // and its words can be large enough to read
-        const span = cardsBox.getBoundingClientRect().right - chartFig.getBoundingClientRect().left;
-        const width = Math.round(Math.min(920, span * 0.74));
-        const reach = Math.max(0, width - card.offsetWidth);
-        // Every opened case study is the same size: the graphic is fitted into one box
-        const OPEN_H = 300;
-        const natural = Number(card.dataset.h || 480);
-        // The graphic takes a little under half; the words get the wider share
-        const mw = Math.round(width * 0.45);
-        const s = Math.min(mw / LIVE_W, OPEN_H / natural);
-        card.style.setProperty('--reach', `${reach}px`);
-        card.style.setProperty('--mw', `${mw}px`);
-        card.style.setProperty('--mh', `${OPEN_H}px`);
-        card.style.setProperty('--s-on', s.toFixed(4));
-        card.style.setProperty('--ox-on', `${((mw - LIVE_W * s) / 2).toFixed(1)}px`);
-        card.style.setProperty('--oy-on', `${((OPEN_H - natural * s) / 2).toFixed(1)}px`);
-        // Revenue case studies open downward; cost case studies sit low on the page, so they
-        // grow upward instead and keep their bottom edge where it was
-        if (card.classList.contains('fb-card-fix')) {
-          // Measure the opened height with motion switched off, then open for real
-          const closedH = card.offsetHeight;
-          card.classList.add('fb-measure', 'is-on');
-          const openH = card.offsetHeight;
-          card.classList.remove('is-on');
-          void card.offsetHeight;
-          card.classList.remove('fb-measure');
-          card.style.setProperty('--lift', `${Math.max(0, openH - closedH).toFixed(1)}px`);
-        }
-        card.classList.add('is-on');
-        active = card;
-        root.classList.add('has-active');
-        // Everything else on the page steps back
-        focusOn(card);
-        // Hold the chart on the After while a case study is open
-        clearTimeout(timer);
-        root.classList.remove('fb-pre');
-        chart.querySelectorAll<SVGGElement>('[data-slice]').forEach((el) => el.classList.toggle('is-on', el.dataset.slice === card.dataset.card));
-        control(card, 'play');
-        track();
-      };
-
-      // A short pause before opening, so passing over a case study does not open it. An open case
-      // study stays open until another one is chosen or the pointer leaves the list, so nothing
-      // jumps around under the pointer.
-      let wait = 0;
-      let leave = 0;
-      cards.forEach((card) => {
-        card.addEventListener('pointerenter', () => {
-          if (!wide.matches || !pointer.matches) return;
-          clearTimeout(wait);
-          if (active === card) return;
-          wait = window.setTimeout(() => open(card), 260);
-        });
-        card.addEventListener('pointerleave', () => clearTimeout(wait));
-        card.addEventListener('focus', () => wide.matches && open(card));
-        card.addEventListener('blur', () => active === card && close());
-      });
-      cardsBox.addEventListener('pointerenter', () => clearTimeout(leave));
-      cardsBox.addEventListener('pointerleave', () => {
-        clearTimeout(wait);
-        clearTimeout(leave);
-        leave = window.setTimeout(close, 200);
-      });
 
       /* ---------- Phones and tablets: each graphic plays while it is on screen ---------- */
       const each = new IntersectionObserver(
         (entries) => {
           if (wide.matches) return;
-          for (const e of entries) control(e.target, e.isIntersecting ? 'loop' : 'pause');
+          for (const e of entries) control(e.target, 'thumb', e.isIntersecting ? 'loop' : 'pause');
         },
         { threshold: 0.4 },
       );
@@ -428,15 +396,16 @@ const sets = [
         size();
         requestAnimationFrame(draw);
       };
+      mode();
       refresh();
-      window.addEventListener('resize', () => {
-        close();
-        refresh();
-      });
+      window.addEventListener('resize', refresh);
       document.fonts?.ready.then(refresh);
       wide.addEventListener('change', () => {
-        close();
-        cards.forEach((card) => control(card, 'stop'));
+        if (open) setOpen(open, false);
+        open = null;
+        root.classList.remove('has-open');
+        cards.forEach((card) => control(card, 'thumb', 'stop'));
+        mode();
         refresh();
       });
     });
@@ -520,20 +489,13 @@ const sets = [
   .fb-key-cut { font-family: var(--font-body); font-size: 12px; font-weight: 700; fill: #e7a59e; }
   .fb-add { transform-box: fill-box; transform-origin: bottom; }
 
-  /* One case study open: everything else steps back */
-  .fb-slice text, .fb-slice rect { transition: fill 250ms var(--ease), stroke 250ms var(--ease), opacity 250ms var(--ease); }
-  .has-active .fb-slice:not(.is-on) rect, .has-active .fb-slice:not(.is-on) text { opacity: 0.35; }
-  .fb-add.is-on .fb-add-rect { fill: #fff; }
-  .fb-cut.is-on .fb-cut-rect { fill: rgb(217 138 130 / 0.35); stroke: #f1b8b2; stroke-dasharray: none; stroke-width: 1.5; }
-  .fb-cut.is-on .fb-key-cut { fill: #fff; }
-
   /* ---------- Lines from slices to case studies ---------- */
   :global(.fb-link) { fill: none; stroke-width: 1.25; stroke-linecap: round; opacity: 0.55; transition: opacity 250ms var(--ease), stroke-width 250ms var(--ease); }
   :global(.fb-link-build) { stroke: #4a8aba; }
   :global(.fb-link-fix) { stroke: #c0726b; }
   :global(.fb-link-g) { transition: opacity 250ms var(--ease); }
-  .has-active :global(.fb-link-g:not(.is-on)) { opacity: 0.25; }
-  :global(.fb-link-g.is-on .fb-link) { opacity: 1; stroke-width: 2; }
+  /* With a case study open, only its line stays, so nothing stretches to the cards pushed below */
+  .has-open :global(.fb-link-g:not(.is-open)) { opacity: 0; }
 
   /* ---------- The case studies ---------- */
   .fb-cards { position: relative; display: grid; gap: 0.55rem; }
@@ -549,25 +511,29 @@ const sets = [
   .fb-row { display: grid; gap: 0.35rem; }
 
   .fb-card {
-    --ms: 420ms;
     position: relative;
     z-index: 2;
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    background: var(--surface);
+    overflow: hidden;
+    transition: border-color 250ms var(--ease);
+  }
+  .fb-card.is-open { border-color: var(--rule-2); }
+  .fb-head {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr) auto;
     gap: 0.8rem;
     align-items: center;
-    margin-left: 0;
     padding: 0.35rem 0.75rem 0.35rem 0.35rem;
-    border: 1px solid var(--rule);
-    border-radius: var(--radius);
-    background: var(--surface);
-    color: inherit;
-    text-decoration: none;
-    transition: margin-left var(--ms) var(--ease-out), margin-top var(--ms) var(--ease-out), padding var(--ms) var(--ease-out), border-color 250ms var(--ease), box-shadow 300ms var(--ease), opacity 300ms var(--ease), filter 300ms var(--ease);
+    cursor: pointer;
+    transition: background-color 200ms var(--ease);
   }
-  .fb-card:focus-visible { outline: 2px solid var(--accent-soft); outline-offset: 2px; }
+  /* The only hover: a slight change in colour, so it reads as something to open */
+  .fb-head:hover { background: #edf2f7; }
+  .fb-head:focus-visible { outline: 2px solid var(--accent-soft); outline-offset: -2px; }
 
-  /* The real graphic, shrunk to a still frame; it grows and plays when opened */
+  /* The real graphic, shrunk to a still frame */
   .fb-media {
     position: relative;
     width: 80px;
@@ -575,7 +541,6 @@ const sets = [
     border-radius: 4px;
     overflow: hidden;
     background: var(--brand);
-    transition: width var(--ms) var(--ease-out), height var(--ms) var(--ease-out), border-radius var(--ms) var(--ease);
   }
   .fb-live {
     position: absolute;
@@ -585,7 +550,6 @@ const sets = [
     transform: translate(var(--ox, 0px), var(--oy, 0px)) scale(var(--s, 0.125));
     transform-origin: 0 0;
     pointer-events: none;
-    transition: transform var(--ms) var(--ease-out);
   }
 
   .fb-body { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.75rem; align-items: center; min-width: 0; }
@@ -621,53 +585,41 @@ const sets = [
   .fb-v { font-family: var(--font-display); font-size: 1.125rem; line-height: 1.15; color: var(--ink); font-variant-numeric: lining-nums; }
   .fb-l { font-size: 0.875rem; line-height: 1.3; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   /* A chevron says there is more to see; it turns when the case study opens */
-  .fb-caret { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; color: var(--ink-3); transition: transform var(--ms) var(--ease-out), color 250ms var(--ease), background-color 250ms var(--ease); }
+  .fb-caret { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; color: var(--ink-3); transition: transform 420ms var(--ease-out), color 250ms var(--ease); }
   .fb-caret svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-  .fb-card:hover .fb-caret { color: var(--accent); background: var(--accent-wash); }
+  .fb-head:hover .fb-caret { color: var(--accent); }
+  .fb-card.is-open .fb-caret { transform: rotate(180deg); color: var(--accent); }
   /* On the home page the graphics drop their number rows; the words carry the numbers */
   .fb-live :global(.rv-split) { display: none; }
   .fb-live :global(.rv) { padding: 14px; gap: 0; }
 
-  /* Opened: the same client line and headline as on Our Work */
-  .fb-cs { display: none; gap: 0.5rem; }
+  /* The dropdown: the client line and headline from Our Work on top, the graphic underneath */
+  .fb-panel { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 420ms var(--ease-out); }
+  .fb-card.is-open .fb-panel { grid-template-rows: 1fr; }
+  .fb-panel-inner { min-height: 0; overflow: hidden; }
+  .fb-panel-body { display: grid; gap: 0.8rem; justify-items: start; padding: 0.95rem 1rem 1rem; border-top: 1px solid var(--rule); text-align: left; }
+  .fb-pnote {
+    padding: 0.28rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    line-height: 1.2;
+  }
+  .fb-card-build .fb-pnote { color: var(--accent); background: var(--accent-wash); }
+  .fb-card-fix .fb-pnote { color: #a04f48; background: rgb(160 79 72 / 0.1); }
+  .fb-cs { display: grid; gap: 0.5rem; }
+  .fb-graphic { position: relative; width: 100%; overflow: hidden; border-radius: var(--radius-lg); }
+  .fb-graphic-live { position: absolute; left: 0; top: 0; width: 640px; transform: scale(var(--gs, 0.8)); transform-origin: 0 0; }
+  .fb-graphic :global(.rv-split) { display: none; }
+  .fb-graphic :global(.rv) { gap: 0; }
   .fb-client { display: flex; align-items: center; gap: 0.6rem; font-family: var(--font-display); font-size: 1rem; line-height: 1.2; color: var(--ink); }
   .fb-client-mark { position: relative; flex: none; display: grid; place-items: center; width: 28px; height: 32px; }
   .fb-client-mark::before { content: ''; position: absolute; inset: 0; clip-path: var(--hex); background: var(--ink); }
   .fb-client-mark svg { position: relative; width: 14px; height: 14px; fill: none; stroke: #fff; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
-  .fb-headline { font-family: var(--font-display); font-size: 1.0625rem; line-height: 1.25; color: var(--ink); }
+  .fb-headline { font-family: var(--font-display); font-size: 1.25rem; line-height: 1.25; color: var(--ink); }
   .fb-headline .hl { color: var(--accent); }
-
-  /* Laptops: open in place, toward the chart and down, graphic left and words right */
-  @media (min-width: 1100px) {
-    .fb-card.is-on {
-      margin-left: calc(var(--reach, 0px) * -1);
-      grid-template-columns: auto minmax(0, 1fr);
-      align-items: start;
-      padding: 0.85rem 1.25rem 0.85rem 0.85rem;
-      gap: 1.5rem;
-      border-color: var(--rule-2);
-      box-shadow: 0 30px 60px -34px rgb(27 42 61 / 0.55), 0 10px 20px -14px rgb(27 42 61 / 0.25);
-    }
-    .fb-card-fix.is-on { margin-top: calc(var(--lift, 0px) * -1); }
-    .fb-measure.is-on { margin-top: 0; }
-    .fb-measure, .fb-measure * { transition: none !important; }
-    .fb-card.is-on .fb-media { width: var(--mw); height: var(--mh); border-radius: var(--radius); }
-    .fb-card.is-on .fb-live { transform: translate(var(--ox-on, 0px), var(--oy-on, 0px)) scale(var(--s-on)); }
-    .fb-card.is-on .fb-body { grid-template-columns: minmax(0, 1fr); align-self: center; align-items: start; gap: 0.75rem; }
-    .fb-card.is-on .fb-key { display: none; }
-    .fb-card.is-on .fb-note { display: block; }
-    .fb-card.is-on .fb-text { gap: 0.4rem; }
-    .fb-card.is-on .fb-v { font-size: 2rem; line-height: 1.1; }
-    .fb-card.is-on .fb-client { font-size: 1.25rem; }
-    .fb-card.is-on .fb-client-mark { width: 34px; height: 39px; }
-    .fb-card.is-on .fb-client-mark svg { width: 17px; height: 17px; }
-    .fb-card.is-on .fb-headline { font-size: 1.4375rem; line-height: 1.25; }
-    .fb-card.is-on .fb-l { display: none; }
-    .fb-card.is-on .fb-cs { display: grid; gap: 0.75rem; margin-top: 0.5rem; padding-top: 1rem; border-top: 1px solid var(--rule); }
-    /* The chevron moves to the corner, so the words can use the full width beside the graphic */
-    .fb-card.is-on .fb-caret { position: absolute; top: 0.85rem; right: 0.85rem; transform: rotate(180deg); color: var(--accent); background: var(--accent-wash); }
-    .fb-card.is-on .fb-body { padding-right: 1.75rem; }
-  }
 
   /* The After builds itself, over and over: costs drop, the cut slices appear, new revenue
      stacks up, then the lines draw out to the case studies */
@@ -706,32 +658,25 @@ const sets = [
       scrollbar-width: none;
     }
     .fb-row::-webkit-scrollbar { display: none; }
-    .fb-card {
-      scroll-snap-align: start;
-      grid-template-columns: minmax(0, 1fr);
-      align-items: start;
-      align-content: start;
-      gap: 0.75rem;
-      padding: 0.85rem;
-    }
-    .fb-body { order: -1; align-items: start; grid-template-columns: minmax(0, 1fr); gap: 0.5rem; }
+    /* Phones and tablets: every card shows its case study, no dropdowns. The head and the
+       dropdown open up into the card itself, so the pieces stack: words, then the graphic. */
+    .fb-card { scroll-snap-align: start; display: flex; flex-direction: column; gap: 0.6rem; padding: 0.85rem; }
+    .fb-head, .fb-panel, .fb-panel-inner, .fb-panel-body { display: contents; }
+    .fb-head { cursor: default; }
+    .fb-body { order: 1; align-items: start; grid-template-columns: minmax(0, 1fr); gap: 0.5rem; }
     .fb-key { display: none; }
     .fb-note { display: block; }
-    .fb-card { grid-template-rows: auto 1fr; }
-    /* Phones: the same content as an opened case study on a laptop, every card one size */
-    .fb-l { display: none; }
-    .fb-cs { display: grid; margin-top: 0.35rem; padding-top: 0.6rem; border-top: 1px solid var(--rule); }
-    .fb-media { width: 100%; height: auto; min-height: 210px; align-self: stretch; border-radius: var(--radius); }
-    .fb-live { width: 400px; transition: none; }
-    .fb-card { gap: 0.6rem; }
     .fb-text { gap: 0; }
     .fb-v { font-size: 1.0625rem; }
-    .fb-cs { gap: 0.35rem; margin-top: 0.4rem; padding-top: 0.5rem; }
+    .fb-l { display: none; }
+    .fb-cs { order: 2; gap: 0.35rem; margin-top: 0.4rem; padding-top: 0.5rem; border-top: 1px solid var(--rule); }
+    .fb-media { order: 3; flex: 1; width: 100%; height: auto; min-height: 210px; border-radius: var(--radius); }
+    .fb-live { width: 400px; }
     .fb-client { font-size: 0.875rem; gap: 0.5rem; }
     .fb-client-mark { width: 22px; height: 25px; }
     .fb-client-mark svg { width: 12px; height: 12px; }
     .fb-headline { font-size: 0.9375rem; line-height: 1.25; }
-    .fb-caret { display: none; }
+    .fb-caret, .fb-pnote, .fb-graphic { display: none; }
   }
   @media (max-width: 640px) {
     .fb-title { font-size: clamp(2rem, 1.55rem + 1.5vw, 3rem); }

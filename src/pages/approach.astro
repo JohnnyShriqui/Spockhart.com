@@ -45,13 +45,13 @@ import { site } from '../config/site';
 </Base>
 
 <style>
-  /* Laptops: the title sits close to the bar so the whole engagement fits on one screen */
+  /* Laptops: room under each title before its phases, and more again before the next track */
   @media (min-width: 901px) {
-    .engagement .section-head { gap: var(--s-2); margin-bottom: var(--s-5); max-width: none; }
+    .engagement .section-head { gap: var(--s-2); margin-bottom: var(--s-7); max-width: none; }
     .engagement .section-head h2 { font-size: var(--step-3); max-width: none; }
   }
   /* The two tracks run on one band, one straight after the other */
-  .engagement-fix { padding-bottom: var(--s-8); }
+  .engagement-fix { padding-bottom: var(--s-10); }
   .engagement-grow { padding-top: 0; }
   /* Phones: the bar sits right under the title; the phases run to the bottom of the section */
   @media (max-width: 640px) {

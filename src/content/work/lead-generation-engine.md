@@ -1,13 +1,13 @@
 ---
-title: 'We Transformed a Division’s Expertise Into a [Digital Service], Unlocking a [$1B+ Market] and a New Engine for Lead Generation and Growth.'
-summary: We transformed a division's expertise into a digital service, unlocking a $1B+ market and a new engine for lead generation and growth.
+title: 'We Digitized a Division’s Expertise to Open Up a [$1B+ Market] and Create a New [Lead-Generation Engine].'
+summary: We digitized a division's expertise to open up a $1B+ market and create a new lead-generation engine.
 client: 'A National General Contractor'
 sector: Business development
 scope: Lead-generation platform
 order: 3
 metrics:
   - value: $1B+ market
-    label: Unlocked through one digital service
+    label: Opened up through one digital service
   - value: Lead engine
     label: Every assessment became a conversation with a potential customer
   - value: North America
@@ -20,8 +20,8 @@ One division of a national general contractor had years of expertise in judging 
 
 ## What we did
 
-We transformed that expertise into a digital service anyone in the market could use. Every assessment became a lead, giving the company a new way to start conversations with customers and win business.
+We digitized that expertise into a service anyone in the market could use. Every assessment became a lead, giving the company a new way to start conversations with customers and win business.
 
 ## The result
 
-A $1B+ market unlocked, and a new engine for lead generation and growth, reaching builders, developers and organizations across North America.
+A $1B+ market opened up, and a new lead-generation engine reaching builders, developers and organizations across North America.

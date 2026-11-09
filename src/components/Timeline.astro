@@ -159,8 +159,6 @@ const spans = [
     cursor: default;
     transition: opacity 300ms var(--ease), filter 300ms var(--ease);
   }
-  /* Pointed at: nothing changes on the phase itself; the rest of the page steps back behind the veil */
-  .phase.is-active { z-index: 1; }
   /* Each card's heading block is painted in its segment's colour from the bar above, so the eye
      goes bar, then heading, then (on pointing) the graphic */
   .phase-head {
@@ -187,18 +185,7 @@ const spans = [
   .phase-head .phase-body,
   .phase-head .phase-brief { color: var(--seg-ink-2); }
   .phase-head .phase-meta { color: var(--seg-meta); }
-  /* Laptops: the graphics wait quietly behind the headings until a phase is pointed at */
-  .phase :global(.pg) { position: relative; padding-top: 0; }
-  .phase :global(.pg)::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: rgb(228 234 241 / 0.5);
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 400ms var(--ease);
-  }
-  [data-mode='hover'] .phase:not(.is-active) :global(.pg)::after { opacity: 1; }
+  .phase :global(.pg) { padding-top: 0; }
   .phase-meta {
     display: flex;
     align-items: center;
@@ -245,7 +232,6 @@ const spans = [
     .phase-brief { display: block; margin-top: -0.15rem; font-size: 1rem; line-height: 1.45; }
     .phase-head { margin: 0; padding: 1.1rem 1.15rem 1.2rem; border-radius: var(--radius-lg); }
     .phase-4 .phase-head { border: 1px dashed var(--rule-2); }
-    .phase :global(.pg)::after { display: none; }
     .phases { gap: 0; margin: var(--s-6) calc(var(--gutter) * -1) 0; }
     .phase,
     .phase.is-active {
@@ -264,24 +250,8 @@ const spans = [
 </style>
 
 <script>
+  // Laptops: the phases rest on their finished frame; pointing at one plays its graphic (scripts/scenes.ts)
   import { initScenes } from '../scripts/scenes';
-  import { focusOn } from '../scripts/focus';
   initScenes();
   document.addEventListener('spockhart:view', initScenes);
-
-  // On larger screens, the marker on the scale follows whichever phase is playing.
-  // Laptops: pointing at a phase plays it and the rest of the page steps back
-  function focusPhases() {
-    document.querySelectorAll<HTMLElement>('[data-timeline]').forEach((tl) => {
-      if (tl.dataset.follow) return;
-      tl.dataset.follow = '1';
-      tl.querySelectorAll<HTMLElement>('[data-scene]').forEach((phase) => {
-        const hover = () => phase.closest<HTMLElement>('[data-scene-group]')?.dataset.mode === 'hover';
-        phase.addEventListener('pointerenter', () => hover() && focusOn(phase));
-        phase.addEventListener('pointerleave', () => hover() && focusOn(null));
-      });
-    });
-  }
-  focusPhases();
-  document.addEventListener('spockhart:view', focusPhases);
 </script>
