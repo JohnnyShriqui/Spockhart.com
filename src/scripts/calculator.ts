@@ -93,6 +93,8 @@ export function initCalculator() {
     tween('hours', r.hours, (n) => int.format(n));
     tween('cost', r.cost, (n) => money.format(n));
     tween('half', r.cost / 2, (n) => money.format(n));
+    tween('hours-half', r.hours / 2, (n) => int.format(n));
+    tween('fte-half', r.fte / 2, (n) => one.format(n));
     tween('fte', r.fte, (n) => one.format(n));
     outs('days').forEach((d) => (d.textContent = describeDays(v.hours)));
     const lost = v.hours / 8;
@@ -114,7 +116,7 @@ export function initCalculator() {
 
   // Seed tween state from the server-rendered figures.
   const initial = compute(Object.fromEntries(inputs.map((f) => [f.key, f.value])) as Values);
-  Object.assign(shown, { hours: initial.hours, cost: initial.cost, half: initial.cost / 2, fte: initial.fte });
+  Object.assign(shown, { hours: initial.hours, cost: initial.cost, half: initial.cost / 2, 'hours-half': initial.hours / 2, 'fte-half': initial.fte / 2, fte: initial.fte });
 
   form.addEventListener('input', update);
   form.addEventListener('change', update);
@@ -122,7 +124,7 @@ export function initCalculator() {
 
   // The first time the result comes into view, count up to it.
   if (!reduce && 'IntersectionObserver' in window) {
-    const big = out('cost');
+    const big = out('half');
     if (big && big.getBoundingClientRect().top > window.innerHeight) {
       const io = new IntersectionObserver(
         (entries) => {
@@ -132,6 +134,8 @@ export function initCalculator() {
           tween('hours', r.hours, (n) => int.format(n), 0, 1400);
           tween('cost', r.cost, (n) => money.format(n), 0, 1400);
           tween('half', r.cost / 2, (n) => money.format(n), 0, 1400);
+          tween('hours-half', r.hours / 2, (n) => int.format(n), 0, 1400);
+          tween('fte-half', r.fte / 2, (n) => one.format(n), 0, 1400);
           tween('fte', r.fte, (n) => one.format(n), 0, 1400);
         },
         { threshold: 0.6 },

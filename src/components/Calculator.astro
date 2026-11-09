@@ -1,8 +1,8 @@
 ---
 /**
- * Time calculator. Three inputs; the result leads with what tedious, repetitive tasks cost a year,
- * then the hours behind it, how much of each work week it takes, and how many full-time people
- * it adds up to. Runs entirely in the browser. Model and defaults: src/lib/calc.ts.
+ * Savings calculator. Three inputs; the result shows what tedious, repetitive tasks cost a year,
+ * then, as the focal point, what automating half of that work would save, in dollars, hours and
+ * full-time people. Runs entirely in the browser. Model and defaults: src/lib/calc.ts.
  */
 import { inputs, compute, describeDays, iconScale, WEEKS_PER_YEAR, type Values } from '../lib/calc';
 
@@ -13,7 +13,7 @@ interface Props {
   cta?: string;
 }
 const {
-  title = 'How much time is your team losing?',
+  title = 'How much could your team get back?',
   resultLabel = 'Every year, tedious, repetitive tasks cost you',
   cta = 'Get that time back',
 } = Astro.props;
@@ -39,7 +39,7 @@ const iconFill = (i: number) => Math.max(0, Math.min(1, fteIcons - i));
     <div class="calc" data-calc>
       <div class="calc-left">
         <div class="calc-head">
-          <p class="eyebrow">Waste calculator</p>
+          <p class="eyebrow">Savings calculator</p>
           <h2 id="calc-title">{title}</h2>
         </div>
 
@@ -77,47 +77,15 @@ const iconFill = (i: number) => Math.max(0, Math.min(1, fteIcons - i));
 
       <div class="calc-right">
         <p class="r-label"><span class="t-desk">{resultLabel}</span><span class="t-mob">Lost every year</span></p>
-        <p class="r-big tabular"><span data-out="cost">{money(r.cost)}</span></p>
-        <p class="r-back">If half of this were automated, you’d get <strong class="tabular" data-out="half">{money(r.cost / 2)}</strong> a year back.</p>
+        <p class="r-cost tabular"><span data-out="cost">{money(r.cost)}</span></p>
 
-        <ul class="r-tiles" aria-hidden="true">
-          <li><span class="tile-v tabular" data-out="hours">{num(r.hours)}</span><span class="tile-k">hours a year</span></li>
-          <li><span class="tile-v" data-out="days">{describeDays(start.hours)}</span><span class="tile-k">lost per person, weekly</span></li>
-          <li><span class="tile-v tabular" data-out="fte">{r.fte.toFixed(1)}</span><span class="tile-k">full-time people</span></li>
-        </ul>
-
-        <div class="r-viz">
+        <div class="r-gain">
+          <p class="r-gain-label">If we automated just half of it, you’d save</p>
+          <p class="r-big tabular"><span data-out="half">{money(r.cost / 2)}</span><span class="r-unit"> a year</span></p>
           <p class="r-line">
-            Each person loses <strong data-out="days">{describeDays(start.hours)}</strong> of every work week.
+            That’s <strong><span class="tabular" data-out="hours-half">{num(r.hours / 2)}</span> hours</strong> back every year, the time of{' '}
+            <strong><span class="tabular" data-out="fte-half">{(r.fte / 2).toFixed(1)}</span> full-time people</strong>.
           </p>
-          <div class="week" aria-hidden="true">
-            {
-              days.map((d, i) => (
-                <span class="day" style={`--f:${dayFill(i)}`}>
-                  <span class="day-fill" />
-                  <span class="day-name">{d}</span>
-                </span>
-              ))
-            }
-          </div>
-        </div>
-
-        <div class="r-viz">
-          <p class="r-line">
-            That adds up to <strong><span class="tabular" data-out="fte">{r.fte.toFixed(1)}</span> full-time people</strong> doing
-            nothing else.
-          </p>
-          <div class="team" aria-hidden="true" data-team>
-            {
-              Array.from({ length: scale.icons }, (_, i) => (
-                <span class="person" style={`--f:${iconFill(i)}`}>
-                  <svg viewBox="0 0 12 16"><circle cx="6" cy="4" r="3.2" /><path d="M0.6 16c0-3.6 2.4-6.2 5.4-6.2s5.4 2.6 5.4 6.2z" /></svg>
-                  <svg class="person-fill" viewBox="0 0 12 16"><circle cx="6" cy="4" r="3.2" /><path d="M0.6 16c0-3.6 2.4-6.2 5.4-6.2s5.4 2.6 5.4 6.2z" /></svg>
-                </span>
-              ))
-            }
-          </div>
-          <p class="team-key" data-team-key hidden={scale.per === 1}>Each figure is {scale.per} people</p>
         </div>
 
         <a class="btn btn-on-brand" href="/contact/" data-calc-cta>{cta} <span class="arr" aria-hidden="true">→</span></a>
@@ -387,13 +355,8 @@ const iconFill = (i: number) => Math.max(0, Math.min(1, fteIcons - i));
   /* Laptops: the result uses the full height beside the inputs. The label and figure sit
      together at the top, each picture gets its own room, and the button lines up with the
      bottom of the inputs. */
-  /* What half of it back would be worth: a show of potential, not a promise */
-  .r-back { font-size: 1.0625rem; line-height: 1.45; color: var(--ink-2); }
-  .r-back strong { font-weight: 600; color: var(--ink); white-space: nowrap; }
   @media (min-width: 961px) {
     .calc-right { display: flex; flex-direction: column; gap: 0; }
-    .r-big { margin-top: 0.6rem; padding-bottom: 0.9rem; }
-    .r-back { padding-bottom: 1.5rem; }
     /* Whatever height the inputs give is shared out evenly above each picture and the button */
     .r-viz { gap: 1.1rem; margin-top: auto; padding-block: 1.5rem; }
     .day { height: 44px; }
@@ -407,7 +370,37 @@ const iconFill = (i: number) => Math.max(0, Math.min(1, fteIcons - i));
   }
   @media (max-width: 640px) {
     .calc { border-radius: 12px; }
-    .r-back { font-size: 0.9375rem; }
     .r-tiles li { background: rgb(var(--hair) / 0.05); }
+  }
+
+  /* ==========================================================================
+     The result leads to what you could get back: the yearly cost, smaller, then the saving as
+     the focal point, in the accent blue, with the hours and people behind it
+     ========================================================================== */
+  .r-cost { margin-top: 0.55rem; font-family: var(--font-display); font-size: clamp(1.75rem, 1.4rem + 1vw, 2.375rem); font-weight: 400; line-height: 1; letter-spacing: -0.02em; color: var(--ink-2); }
+  .r-gain { display: grid; gap: 0.5rem; padding-top: 1.6rem; margin-top: 1.6rem; border-top: 1px solid var(--calc-line); }
+  .r-gain-label { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--hl); }
+  .calc-right .r-big {
+    margin: 0.15rem 0 0;
+    padding: 0;
+    font-size: min(clamp(3.75rem, 2.4rem + 4.5vw, 6.25rem), 15cqi);
+    font-weight: 400;
+    line-height: 0.95;
+    letter-spacing: -0.035em;
+    color: var(--hl);
+  }
+  .calc-right .r-unit { font-size: 0.3em; letter-spacing: 0; color: var(--ink-2); }
+  .r-gain .r-line { margin-top: 0.4rem; font-size: 1.0625rem; line-height: 1.45; color: var(--ink-2); }
+  .r-gain .r-line strong { font-weight: 600; color: var(--ink); white-space: nowrap; }
+  @media (min-width: 961px) {
+    /* The saving sits in the middle of the space between the cost and the button */
+    .r-gain { margin-block: auto; }
+    .btn-on-brand { margin-top: 1.75rem; }
+  }
+  @media (max-width: 640px) {
+    .r-cost { font-size: 1.625rem; margin-top: 0.15rem; }
+    .r-gain { padding-top: 1.1rem; margin-top: 1rem; gap: 0.35rem; }
+    .calc-right .r-big { font-size: min(3.5rem, 17cqi); }
+    .r-gain .r-line { font-size: 0.9375rem; }
   }
 </style>
