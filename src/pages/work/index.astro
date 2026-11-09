@@ -17,12 +17,12 @@ const all = (await getCollection('work')).sort((a, b) => a.data.order - b.data.o
 const moods = [
   { name: 'mist', dark: false, base: '#e9f0f8', accent: '#245a86', g1: 'rgb(146 188 228 / 0.5)', g1x: '82%', g2: 'rgb(255 255 255 / 0.6)', g2x: '12%', rv: ['#1f4d6f', '#173f5c', '#133650', '#8ec0e6'] },
   { name: 'petrol', dark: true, base: '#0b2430', accent: '#7fd0d2', g1: 'rgb(30 130 142 / 0.36)', g1x: '22%', g2: 'rgb(40 82 134 / 0.26)', g2x: '90%', rv: ['#155a62', '#0f474e', '#0b3a40', '#7fd0d2'] },
-  { name: 'ivory', dark: false, base: '#f5eee4', accent: '#8a4b2d', g1: 'rgb(242 200 160 / 0.5)', g1x: '82%', g2: 'rgb(210 224 240 / 0.45)', g2x: '10%', rv: ['#7a4632', '#663a29', '#553022', '#f3c6a0'] },
-  { name: 'indigo', dark: true, base: '#141a36', accent: '#b3b8ff', g1: 'rgb(108 98 198 / 0.34)', g1x: '22%', g2: 'rgb(44 100 162 / 0.26)', g2x: '92%', rv: ['#3a3f8f', '#2e3376', '#252964', '#b9bdff'] },
+  { name: 'mint', dark: false, base: '#e5f2ec', accent: '#1d6a58', g1: 'rgb(150 214 190 / 0.5)', g1x: '82%', g2: 'rgb(255 255 255 / 0.6)', g2x: '10%', rv: ['#17594d', '#11493f', '#0d3d35', '#8fdcc6'] },
+  { name: 'plum', dark: true, base: '#140d22', accent: '#c3b4ff', g1: 'rgb(88 60 156 / 0.32)', g1x: '22%', g2: 'rgb(44 60 130 / 0.24)', g2x: '92%', rv: ['#2c1f4d', '#231840', '#1c1334', '#c4b4ff'] },
   { name: 'sky', dark: false, base: '#e1edf9', accent: '#1d5c96', g1: 'rgb(255 255 255 / 0.7)', g1x: '16%', g2: 'rgb(116 174 226 / 0.36)', g2x: '88%', rv: ['#1d5c96', '#174d7f', '#12406b', '#a3d3f7'] },
   { name: 'steel', dark: true, base: '#0c1a2b', accent: '#8ec0e6', g1: 'rgb(52 118 182 / 0.38)', g1x: '24%', g2: 'rgb(28 92 112 / 0.26)', g2x: '92%', rv: ['#1f4a72', '#183c5e', '#13314e', '#8ec0e6'] },
-  { name: 'lavender', dark: false, base: '#eaecfa', accent: '#3c4a9c', g1: 'rgb(184 188 246 / 0.5)', g1x: '82%', g2: 'rgb(255 255 255 / 0.6)', g2x: '10%', rv: ['#434fa3', '#37428b', '#2d3776', '#c8ccff'] },
-  { name: 'copper', dark: true, base: '#16171f', accent: '#f1b98f', g1: 'rgb(196 124 84 / 0.28)', g1x: '22%', g2: 'rgb(58 90 142 / 0.3)', g2x: '92%', rv: ['#6a4334', '#56362a', '#472d23', '#f1b98f'] },
+  { name: 'lavender', dark: false, base: '#eceaf8', accent: '#45368a', g1: 'rgb(178 168 236 / 0.5)', g1x: '82%', g2: 'rgb(255 255 255 / 0.6)', g2x: '10%', rv: ['#2b1f4b', '#22183e', '#1b1332', '#c9bcff'] },
+  { name: 'forest', dark: true, base: '#0b1f1b', accent: '#8fdcc6', g1: 'rgb(34 120 98 / 0.32)', g1x: '22%', g2: 'rgb(40 82 134 / 0.26)', g2x: '92%', rv: ['#14483f', '#0f3a33', '#0b2f29', '#8fdcc6'] },
 ];
 const HERO_END = '#0c1f28'; // the bottom edge of the Our Work hero (it fades to this, see global.css)
 const PAGE = '#f0f3f7'; // the page below the last case study

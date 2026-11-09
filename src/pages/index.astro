@@ -55,6 +55,18 @@ import { hexPath } from '../lib/logo';
     isolation: isolate;
   }
   .hero > .wrap { position: relative; z-index: 1; }
+  /* Laptops: the hero fills the screen, its content centred below the header */
+  @media (min-width: 961px) {
+    .hero {
+      min-height: 100vh;
+      min-height: 100svh;
+      display: flex;
+      align-items: center;
+      padding-top: calc(76px + clamp(1.5rem, 1rem + 2vw, 3rem));
+      padding-bottom: clamp(2.5rem, 1.5rem + 2vw, 4rem);
+    }
+    .hero > .wrap { width: 100%; }
+  }
   .hero-grid {
     display: grid;
     grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);

@@ -340,13 +340,16 @@ a { color: inherit; }
 
 /* Home: midnight blue, the brand's steel glowing behind the mark, deep teal underneath */
 .theme-home {
+  /* Like the Approach hero, blue light rises from the lower corners, easing the hero into the
+     light page below */
   background:
     radial-gradient(52% 72% at 80% 40%, rgb(46 104 152 / 0.5), transparent 72%),
-    radial-gradient(48% 62% at 0% 105%, rgb(20 80 94 / 0.55), transparent 72%),
+    radial-gradient(55% 75% at 100% 105%, rgb(38 96 142 / 0.48), transparent 72%),
+    radial-gradient(50% 70% at 0% 108%, rgb(42 95 142 / 0.42), transparent 72%),
     radial-gradient(42% 46% at 38% -8%, rgb(56 66 132 / 0.32), transparent 72%),
     linear-gradient(165deg, #09131e 0%, #0d1c2d 55%, #10233a 100%);
   --mist-1: #2a6496;
-  --mist-2: #1b5c68;
+  --mist-2: #2a5f8e;
   --mist-3: #3a4c8c;
 }
 /* Approach: indigo dusk, light rising from the lower right */
@@ -379,14 +382,14 @@ a { color: inherit; }
   -webkit-mask-image: linear-gradient(180deg, #000 40%, transparent 92%);
   mask-image: linear-gradient(180deg, #000 40%, transparent 92%);
 }
-/* Contact: a warmer night, a low copper light against the blue */
+/* Contact: a deep night, a dark purple light against the blue */
 .theme-contact {
   background:
-    radial-gradient(46% 56% at 92% 4%, rgb(166 112 86 / 0.24), transparent 72%),
+    radial-gradient(46% 56% at 92% 4%, rgb(70 44 120 / 0.34), transparent 72%),
     radial-gradient(56% 72% at -4% 72%, rgb(40 92 140 / 0.42), transparent 72%),
     radial-gradient(36% 46% at 56% 44%, rgb(94 72 118 / 0.15), transparent 72%),
     linear-gradient(180deg, #0f151f 0%, #131926 60%, #161b28 100%);
-  --mist-1: #8a604c;
+  --mist-1: #3b2a6a;
   --mist-2: #2b5f90;
   --mist-3: #5a4a7a;
 }
@@ -411,15 +414,18 @@ a { color: inherit; }
   --mist-3: #34508a;
 }
 
-/* Nonprofits: deep blue night with a low, warm dawn along the horizon */
+/* Nonprofits: deep blue night */
 .theme-nonprofit {
+  /* Like the Approach hero, blue light rises from the lower corners, easing the hero into the
+     light page below */
   background:
-    radial-gradient(70% 48% at 30% 112%, rgb(196 138 92 / 0.3), transparent 72%),
-    radial-gradient(50% 72% at 88% 22%, rgb(46 102 150 / 0.48), transparent 72%),
+    radial-gradient(50% 72% at 88% 22%, rgb(46 102 150 / 0.44), transparent 72%),
+    radial-gradient(55% 75% at 100% 105%, rgb(38 96 142 / 0.48), transparent 72%),
+    radial-gradient(50% 70% at 0% 108%, rgb(42 95 142 / 0.42), transparent 72%),
     radial-gradient(36% 50% at 8% 6%, rgb(70 84 140 / 0.3), transparent 72%),
-    linear-gradient(185deg, #0b1522 0%, #111d2c 58%, #19212c 100%);
+    linear-gradient(185deg, #0b1522 0%, #111d2c 58%, #131c2e 100%);
   --mist-1: #2c6494;
-  --mist-2: #8a6448;
+  --mist-2: #2a5f8e;
   --mist-3: #3d4f86;
 }
 

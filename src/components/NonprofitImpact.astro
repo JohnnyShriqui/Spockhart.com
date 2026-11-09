@@ -136,8 +136,9 @@ const charts = [
                 <line x1={c.X0} x2={c.X1} y1={c.BASE} y2={c.BASE} class="axis" />
                 <text x={c.X1} y={c.BASE + 24} class="axis-label" text-anchor="end">Time</text>
 
-                <text x={c.X0} y={c.left.demand - 12} class="side-label side-demand">Demand</text>
-                <text x={c.X0} y={c.left.res + 22} class="side-label side-res">Resources</text>
+                <!-- Each line named at its end -->
+                <text x={c.X1 + 8} y={c.ends.demand0 + 4.5} class="fade side-label side-demand" style="--at:3300ms">Demand</text>
+                <text x={c.X1 + 8} y={c.ends.res0 + 4.5} class="fade side-label side-res" style="--at:3300ms">Resources</text>
 
                 <!-- First, without us: demand runs away from resources -->
                 <g class="reveal" style="--at:300ms;--dur:3200ms">
