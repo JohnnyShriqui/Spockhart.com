@@ -1,9 +1,11 @@
 ---
 /**
  * Home hero, bottom right: a small, quiet neon readout of the Costs vs revenue chart from
- * further down the page. No labels but the caption. Costs (red) are cut a slice at a time, new
- * revenue (blue) flickers in a slice at a time, the new margin locks in, it holds, and it runs
- * again. Below, the same chart is broken down case study by case study.
+ * further down the page. It tells the story without words: only today's revenue and costs are
+ * there; a cursor drag-selects them, copies them and pastes a second copy beside them; the
+ * originals dim; then the copy is improved, costs (red) cut a slice at a time and new revenue
+ * (blue) flickering in a slice at a time, until the new margin locks in. It holds, and runs again.
+ * Below, the same chart is broken down case study by case study.
  * Decorative; still on its finished frame with reduced motion; hidden on small screens.
  */
 const VB_W = 560;
@@ -24,35 +26,115 @@ const newTop = revTop - ADD * NB;
 const costAfterTop = costTop + CUT * NC;
 const grid = [50, 122, 194, 266, 338];
 
+/* The selection boxes: around the originals, and around the pasted copy */
+const SEL = { x: before.rev - 14, y: revTop - 14, w: before.cost + W - before.rev + 28, h: BASE - revTop + 22 };
+const SHIFT = after.rev - before.rev;
+
 /* One loop, in percent of LOOP seconds */
-const LOOP = 18;
-const cutAt = (i: number) => 22 + i * 5; // when each cost slice is targeted
-const addAt = (k: number) => 46 + k * 5; // when each new revenue slice arrives (C, then B, then A)
-const LOCK = 62; // the new margin locks in
-const RESET = 91; // everything eases back to Before
+const LOOP = 26;
+const T = {
+  cursorIn: 5,
+  dragStart: 9,
+  dragEnd: 17,
+  copy: 19,
+  toPaste: 22,
+  paste: 26,
+  dim: 28,
+  cursorOut: 32,
+};
+const cutAt = (i: number) => 34 + i * 4.5;
+const addAt = (k: number) => 54 + k * 4.5;
+const LOCK = 68;
+const RESET = 92;
 
 const pct = (n: number) => `${Math.max(0, Math.min(100, n)).toFixed(2)}%`;
 const kf = (name: string, stops: [number, string][]) => `@keyframes ${name}{${stops.map(([p, v]) => `${pct(p)}{${v}}`).join('')}}`;
+const at = (x: number, y: number, s = 1) => `transform:translate(${x}px,${y}px) scale(${s})`;
+
+/* Cursor path (tip at the selection's corners, then over to where it pastes) */
+const P0 = [505, 430];
+const P1 = [SEL.x, SEL.y];
+const P2 = [SEL.x + SEL.w, SEL.y + SEL.h];
+const P3 = [SEL.x + SHIFT + SEL.w / 2, SEL.y + SEL.h / 2];
 
 let css = '';
-/* The cost bar steps down as each slice is cut */
+css += kf('hl-cursor', [
+  [0, `${at(P0[0], P0[1])};opacity:0`],
+  [T.cursorIn, `${at(P0[0], P0[1])};opacity:0`],
+  [T.cursorIn + 1.5, `${at(P0[0] - 20, P0[1] - 20)};opacity:1`],
+  [T.dragStart - 0.6, `${at(P1[0], P1[1])};opacity:1`],
+  [T.dragStart, `${at(P1[0], P1[1], 0.88)};opacity:1`],
+  [T.dragEnd, `${at(P2[0], P2[1], 0.88)};opacity:1`],
+  [T.dragEnd + 0.6, `${at(P2[0], P2[1])};opacity:1`],
+  [T.copy, `${at(P2[0], P2[1])};opacity:1`],
+  [T.toPaste, `${at(P3[0], P3[1])};opacity:1`],
+  [T.paste - 0.5, `${at(P3[0], P3[1])};opacity:1`],
+  [T.paste, `${at(P3[0], P3[1], 0.85)};opacity:1`],
+  [T.paste + 0.6, `${at(P3[0], P3[1])};opacity:1`],
+  [T.cursorOut, `${at(P3[0] + 120, P3[1] + 110)};opacity:0`],
+  [100, `${at(P3[0] + 120, P3[1] + 110)};opacity:0`],
+]);
+/* The drag selection grows from the top-left corner, flashes as it is copied, then clears */
+css += kf('hl-sel', [
+  [0, 'opacity:0;transform:scale(0,0)'],
+  [T.dragStart, 'opacity:1;transform:scale(0,0)'],
+  [T.dragEnd, 'opacity:1;transform:scale(1,1)'],
+  [T.toPaste, 'opacity:1;transform:scale(1,1)'],
+  [T.toPaste + 1.5, 'opacity:0;transform:scale(1,1)'],
+  [100, 'opacity:0;transform:scale(1,1)'],
+]);
+css += kf('hl-copy', [
+  [0, 'opacity:0'],
+  [T.copy - 0.01, 'opacity:0'],
+  [T.copy, 'opacity:1'],
+  [T.copy + 1.6, 'opacity:0'],
+  [100, 'opacity:0'],
+]);
+/* The pasted copy: appears with a short flicker inside its own selection, which then clears */
+css += kf('hl-after', [
+  [0, 'opacity:0'],
+  [T.paste - 0.01, 'opacity:0'],
+  [T.paste, 'opacity:0.9'],
+  [T.paste + 0.4, 'opacity:0.3'],
+  [T.paste + 0.8, 'opacity:1'],
+  [RESET, 'opacity:1'],
+  [RESET + 3, 'opacity:0'],
+  [100, 'opacity:0'],
+]);
+css += kf('hl-psel', [
+  [0, 'opacity:0'],
+  [T.paste - 0.01, 'opacity:0'],
+  [T.paste, 'opacity:1'],
+  [T.dim + 2, 'opacity:1'],
+  [T.dim + 4, 'opacity:0'],
+  [100, 'opacity:0'],
+]);
+/* Once the copy is in, the originals step back */
+css += kf('hl-before', [
+  [0, 'opacity:1'],
+  [T.dim, 'opacity:1'],
+  [T.dim + 3, 'opacity:0.35'],
+  [RESET + 2, 'opacity:0.35'],
+  [RESET + 6, 'opacity:1'],
+  [100, 'opacity:1'],
+]);
+/* Then the copy is improved: the cost bar steps down as each slice is cut */
 css += kf('hl-cost', [
   [0, 'transform:scaleY(1)'],
   ...Array.from({ length: NC }, (_, i) => [
-    [cutAt(i) + 2.4, `transform:scaleY(${((COST - CUT * i) / COST).toFixed(4)})`] as [number, string],
-    [cutAt(i) + 3.4, `transform:scaleY(${((COST - CUT * (i + 1)) / COST).toFixed(4)})`] as [number, string],
+    [cutAt(i), `transform:scaleY(${((COST - CUT * i) / COST).toFixed(4)})`] as [number, string],
+    [cutAt(i) + 1, `transform:scaleY(${((COST - CUT * (i + 1)) / COST).toFixed(4)})`] as [number, string],
   ]).flat(),
-  [RESET, `transform:scaleY(${((COST - CUT * NC) / COST).toFixed(4)})`],
-  [RESET + 4, 'transform:scaleY(1)'],
+  [RESET + 3, `transform:scaleY(${((COST - CUT * NC) / COST).toFixed(4)})`],
+  [RESET + 3.1, 'transform:scaleY(1)'],
   [100, 'transform:scaleY(1)'],
 ]);
 for (let i = 0; i < NC; i++) {
   const a = cutAt(i);
-  /* Targeted: a bright outline blinks, then it settles to the dashed outline of a cost removed */
   css += kf(`hl-cut-${i}`, [
     [0, 'opacity:0'],
-    [a + 3, 'opacity:0'],
-    [a + 4, 'opacity:1'],
+    [a + 0.6, 'opacity:0'],
+    [a + 1.6, 'opacity:1'],
     [RESET, 'opacity:1'],
     [RESET + 3, 'opacity:0'],
     [100, 'opacity:0'],
@@ -60,7 +142,6 @@ for (let i = 0; i < NC; i++) {
 }
 for (let k = 0; k < NB; k++) {
   const b = addAt(k);
-  /* Arrives like it is being rendered: a few quick flickers, then holds */
   css += kf(`hl-add-${k}`, [
     [0, 'opacity:0'],
     [b - 0.01, 'opacity:0'],
@@ -82,17 +163,20 @@ css += kf('hl-lock', [
   [RESET + 3, 'stroke-dashoffset:0;opacity:0'],
   [100, 'stroke-dashoffset:1;opacity:0'],
 ]);
-/* The status light: a slow, calm pulse */
 css += kf('hl-status', [
   [0, 'opacity:0.35'],
   [50, 'opacity:1'],
   [100, 'opacity:0.35'],
 ]);
+const run = (cls: string, name = cls, ease = 'linear') => `.${cls}{animation:${name} ${LOOP}s ${ease} infinite}`;
 const style = `<style>${css}
+${run('hl-cursor', 'hl-cursor', 'cubic-bezier(0.45,0,0.4,1)')}
+${run('hl-sel', 'hl-sel', 'cubic-bezier(0.45,0,0.4,1)')}
+${run('hl-copy')}${run('hl-after')}${run('hl-psel')}${run('hl-before', 'hl-before', 'ease-in-out')}
 .hl-cost-after{animation:hl-cost ${LOOP}s linear infinite}
-${Array.from({ length: NC }, (_, i) => `.hl-cut-${i}{animation:hl-cut-${i} ${LOOP}s linear infinite}`).join('')}
-${Array.from({ length: NB }, (_, k) => `.hl-add-${k}{animation:hl-add-${k} ${LOOP}s linear infinite}`).join('')}
-.hl-lock{animation:hl-lock ${LOOP}s ease-in-out infinite}
+${Array.from({ length: NC }, (_, i) => run(`hl-cut-${i}`)).join('')}
+${Array.from({ length: NB }, (_, k) => run(`hl-add-${k}`)).join('')}
+${run('hl-lock', 'hl-lock', 'ease-in-out')}
 .hl-status{animation:hl-status 4.5s ease-in-out infinite}
 </style>`;
 ---
@@ -111,39 +195,35 @@ ${Array.from({ length: NB }, (_, k) => `.hl-add-${k}{animation:hl-add-${k} ${LOO
 
     {grid.map((y) => <line x1="24" x2="536" y1={y} y2={y} class="hl-grid" />)}
     <line x1="24" x2="536" y1={BASE} y2={BASE} class="hl-axis" />
-    <line x1="280" x2="280" y1="30" y2={BASE + 20} class="hl-divider" />
 
-    <!-- Before -->
-    <rect x={before.rev} y={revTop} width={W} height={REV} rx="2" class="hl-rev" />
-    <rect x={before.cost} y={costTop} width={W} height={COST} rx="2" class="hl-cost" />
-    <path d={`M${before.rev - 10} ${revTop} h-5 V${costTop} h5`} class="hl-bracket" />
+    <!-- Today: the originals -->
+    <g class="hl-before">
+      <rect x={before.rev} y={revTop} width={W} height={REV} rx="2" class="hl-rev" />
+      <rect x={before.cost} y={costTop} width={W} height={COST} rx="2" class="hl-cost" />
+    </g>
 
-    <!-- After: costs cut, then new revenue -->
-    <rect x={after.rev} y={revTop} width={W} height={REV} rx="2" class="hl-rev" />
-    <rect x={after.cost} y={costTop} width={W} height={COST} rx="2" class="hl-cost hl-cost-after" />
-    {
-      Array.from({ length: NC }, (_, i) => {
-        const y = costTop + CUT * i;
-        return (
-          <g>
-            <rect x={after.cost + 0.75} y={y + 0.75} width={W - 1.5} height={CUT - 1.5} class={`hl-cut hl-cut-${i}`} />
-          </g>
-        );
-      })
-    }
-    {
-      Array.from({ length: NB }, (_, k) => {
-        /* C (the lowest) arrives first, then B, then A */
-        const y = revTop - ADD * (k + 1);
-        return (
-          <g>
-            <rect x={after.rev} y={y} width={W} height={ADD} class={`hl-add hl-add-${k}`} />
-          </g>
-        );
-      })
-    }
-    <path d={`M${after.rev - 10} ${newTop} h-5 V${costAfterTop} h5`} pathLength="1" class="hl-bracket hl-bracket-new hl-lock" />
+    <!-- The copy, pasted, then improved -->
+    <g class="hl-after">
+      <rect x={after.rev} y={revTop} width={W} height={REV} rx="2" class="hl-rev" />
+      <rect x={after.cost} y={costTop} width={W} height={COST} rx="2" class="hl-cost hl-cost-after" />
+      {
+        Array.from({ length: NC }, (_, i) => (
+          <rect x={after.cost + 1} y={costTop + CUT * i + 1} width={W - 2} height={CUT - 2} class={`hl-cut hl-cut-${i}`} />
+        ))
+      }
+      {Array.from({ length: NB }, (_, k) => <rect x={after.rev} y={revTop - ADD * (k + 1)} width={W} height={ADD} class={`hl-add hl-add-${k}`} />)}
+      <path d={`M${after.rev - 10} ${newTop} h-5 V${costAfterTop} h5`} pathLength="1" class="hl-bracket-new hl-lock" />
+    </g>
 
+    <!-- Selections -->
+    <rect x={SEL.x} y={SEL.y} width={SEL.w} height={SEL.h} rx="3" class="hl-sel" />
+    <rect x={SEL.x} y={SEL.y} width={SEL.w} height={SEL.h} rx="3" class="hl-sel-flash hl-copy" />
+    <rect x={SEL.x + SHIFT} y={SEL.y} width={SEL.w} height={SEL.h} rx="3" class="hl-sel hl-psel" />
+
+    <!-- The cursor -->
+    <g class="hl-cursor">
+      <path d="M0 0 L0 34 L9 26 L15 40 L21 37 L15 24 L27 24 Z" class="hl-arrow" />
+    </g>
   </svg>
 </figure>
 
@@ -180,15 +260,18 @@ ${Array.from({ length: NB }, (_, k) => `.hl-add-${k}{animation:hl-add-${k} ${LOO
 
   .hl-grid { stroke: rgb(63 208 255 / 0.06); stroke-width: 1; }
   .hl-axis { stroke: rgb(63 208 255 / 0.3); stroke-width: 1.5; }
-  .hl-divider { stroke: rgb(63 208 255 / 0.08); stroke-width: 1; stroke-dasharray: 2 4; }
   .hl-rev { fill: rgb(63 208 255 / 0.1); stroke: var(--blue); stroke-width: 2.5; filter: drop-shadow(0 0 5px rgb(63 208 255 / 0.75)); }
   .hl-cost { fill: rgb(255 42 77 / 0.1); stroke: var(--red); stroke-width: 2.5; filter: drop-shadow(0 0 5px rgb(255 42 77 / 0.75)); }
   .hl-cost-after { transform-box: fill-box; transform-origin: bottom; }
-  .hl-bracket { fill: none; stroke: rgb(150 225 255 / 0.35); stroke-width: 2; }
-  .hl-bracket-new { stroke: var(--blue); stroke-dasharray: 1 1; filter: drop-shadow(0 0 4px rgb(63 208 255 / 0.8)); }
+  .hl-bracket-new { fill: none; stroke: var(--blue); stroke-width: 2; stroke-dasharray: 1 1; filter: drop-shadow(0 0 4px rgb(63 208 255 / 0.8)); }
   .hl-hatch-line { stroke: rgb(255 42 77 / 0.3); stroke-width: 1.5; }
   .hl-cut { fill: url(#hl-hatch); stroke: rgb(255 42 77 / 0.55); stroke-width: 2; stroke-dasharray: 5 4; }
   .hl-add { fill: rgb(63 208 255 / 0.2); stroke: var(--blue); stroke-width: 2.5; filter: drop-shadow(0 0 6px rgb(63 208 255 / 0.85)); }
+
+  .hl-sel { fill: rgb(63 208 255 / 0.06); stroke: rgb(150 225 255 / 0.8); stroke-width: 2; stroke-dasharray: 7 5; transform-box: fill-box; transform-origin: 0 0; opacity: 0; }
+  .hl-sel-flash { fill: rgb(150 225 255 / 0.22); stroke: none; opacity: 0; }
+  .hl-arrow { fill: #eaf8ff; stroke: #0b1622; stroke-width: 2; stroke-linejoin: round; filter: drop-shadow(0 0 5px rgb(63 208 255 / 0.7)); }
+  .hl-cursor { opacity: 0; }
 
   @media (prefers-reduced-motion: no-preference) {
     .live-caret { animation: hl-caret 1.1s steps(1) infinite; }
@@ -196,9 +279,11 @@ ${Array.from({ length: NB }, (_, k) => `.hl-add-${k}{animation:hl-add-${k} ${LOO
   }
   /* Reduced motion: the finished chart, still */
   @media (prefers-reduced-motion: reduce) {
-    .live :is(.hl-cut, .hl-add) { opacity: 1 !important; animation: none !important; }
+    .live :is(.hl-cut, .hl-add, .hl-after) { opacity: 1 !important; animation: none !important; }
+    .live .hl-before { opacity: 0.35 !important; animation: none !important; }
     .live .hl-cost-after { animation: none !important; transform: scaleY(0.5185); }
     .live .hl-bracket-new { animation: none !important; stroke-dashoffset: 0; }
+    .live :is(.hl-cursor, .hl-sel, .hl-sel-flash) { display: none; }
   }
   @media (max-width: 960px) {
     .live { display: none; }

@@ -1,0 +1,73 @@
+---
+/**
+ * The living light behind the dark part of a page (below its hero): soft patches of light and
+ * shadow spread down the whole page, each wandering on its own slow path and glowing up and
+ * down on its own rhythm, so the page never looks quite the same twice. Colours come from the
+ * page (--aura-1 to --aura-3). Decorative; still with reduced motion.
+ */
+interface Props {
+  /** roughly how many screens tall the page is, so the patches cover all of it */
+  span?: number;
+}
+const { span = 4 } = Astro.props;
+const palette = ['var(--aura-1)', 'var(--aura-2)', 'var(--aura-3)'];
+const dark = 'rgb(2 6 14)';
+const count = Math.max(6, Math.round(span * 3));
+const blobs = Array.from({ length: count }, (_, i) => {
+  const r = (n: number) => (Math.sin((i + 1) * n) + 1) / 2; // steady pseudo-random 0..1
+  const isDark = i % 3 === 2;
+  return {
+    c: isDark ? dark : palette[i % 3],
+    o: isDark ? 0.42 + 0.15 * r(5.1) : 0.28 + 0.2 * r(3.7),
+    w: 46 + 30 * r(2.3),
+    x: -18 + 88 * r(7.9),
+    y: (i / count) * 100 - 6 + 6 * r(1.3),
+    d: [29, 37, 43, 53, 31, 47, 41, 59][i % 8],
+    g: [13, 17, 23, 19, 11, 21][i % 6],
+    ax: `${(-18 + 36 * r(4.4)).toFixed(0)}vw`,
+    ay: `${(-10 + 20 * r(6.2)).toFixed(0)}vh`,
+    bx: `${(-18 + 36 * r(8.8)).toFixed(0)}vw`,
+    by: `${(-10 + 20 * r(9.6)).toFixed(0)}vh`,
+    as: (0.9 + 0.3 * r(2.9)).toFixed(2),
+    bs: (0.9 + 0.3 * r(3.3)).toFixed(2),
+  };
+});
+---
+
+<div class="aura" aria-hidden="true">
+  {
+    blobs.map((b) => (
+      <span
+        style={`--c:${b.c};--o:${b.o.toFixed(2)};width:${b.w.toFixed(0)}vw;left:${b.x.toFixed(0)}%;top:${b.y.toFixed(1)}%;--d:${b.d}s;--g:${b.g}s;--ax:${b.ax};--ay:${b.ay};--bx:${b.bx};--by:${b.by};--as:${b.as};--bs:${b.bs}`}
+      />
+    ))
+  }
+</div>
+
+<style>
+  .aura { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: -1; }
+  .aura span {
+    position: absolute;
+    aspect-ratio: 1;
+    max-width: 1300px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--c) 0%, transparent 68%);
+    opacity: var(--o);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .aura span {
+      animation:
+        aura-wander var(--d) ease-in-out infinite,
+        aura-glow var(--g) ease-in-out infinite alternate;
+    }
+    @keyframes aura-wander {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(var(--ax), var(--ay)) scale(var(--as)); }
+      66% { transform: translate(var(--bx), var(--by)) scale(var(--bs)); }
+    }
+    @keyframes aura-glow {
+      from { opacity: calc(var(--o) * 0.5); }
+      to { opacity: var(--o); }
+    }
+  }
+</style>

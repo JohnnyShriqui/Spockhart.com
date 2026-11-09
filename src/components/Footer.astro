@@ -1,11 +1,13 @@
 ---
 import Logo from './Logo.astro';
+import Mist from './Mist.astro';
 import { footerNav, site } from '../config/site';
 
 const year = new Date().getFullYear();
 ---
 
 <footer class="site-footer navy">
+  <Mist />
   <div class="wrap footer-top">
     <div class="footer-statement">
       <Logo size={30} class="footer-logo" />
@@ -40,9 +42,18 @@ const year = new Date().getFullYear();
 
 <style>
   .site-footer {
+    --mist-1: #2a5f8e;
+    --mist-2: #23476e;
+    --mist-3: #34508a;
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    background: #0a131e;
+    border-top: 1px solid rgb(255 255 255 / 0.06);
     padding-top: clamp(4.5rem, 3rem + 5vw, 7rem);
     padding-bottom: calc(var(--s-6) + env(safe-area-inset-bottom, 0px));
   }
+  .site-footer > :not(.mist) { position: relative; z-index: 1; }
   .footer-top {
     display: grid;
     grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
