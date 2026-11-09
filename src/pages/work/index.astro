@@ -77,7 +77,7 @@ const sectionsOf = (body = '') =>
                   </svg>
                 </button>
               </div>
-              <div class="project-visual" data-reveal>
+              <div class="project-visual" data-reveal data-manual>
                 <ResultVisual id={entry.id} />
                 <button class="cs-toggle at-visual" type="button" aria-expanded="false" aria-controls={panelId} data-toggle>
                   <span data-label>See the details</span>
@@ -143,6 +143,63 @@ const sectionsOf = (body = '') =>
 </Base>
 
 <script>
+  import { initScenes, sceneController, scenesCanAnimate } from '../../scripts/scenes';
+
+  // Only one graphic moves at a time: the one nearest the middle of the screen plays from the
+  // start; the rest rest on their finished picture. Several large graphics all moving at once
+  // made the page stutter as it scrolled.
+  function initFocusPlay() {
+    initScenes();
+    const visuals = Array.from(document.querySelectorAll<HTMLElement>('.project-visual[data-manual]'));
+    if (!visuals.length || !scenesCanAnimate() || document.body.dataset.focusPlay) return;
+    document.body.dataset.focusPlay = '1';
+    const ctrl = (v: HTMLElement) => {
+      const sc = v.querySelector<HTMLElement>('[data-scene]');
+      return sc ? sceneController(sc) : undefined;
+    };
+    let current: HTMLElement | null = null;
+    let idle = 0;
+    const pick = () => {
+      const mid = window.innerHeight / 2;
+      let best: HTMLElement | null = null;
+      let bestD = Infinity;
+      for (const v of visuals) {
+        const r = v.getBoundingClientRect();
+        if (r.bottom < 0 || r.top > window.innerHeight) continue;
+        const d = Math.abs((r.top + r.bottom) / 2 - mid);
+        if (d < bestD) {
+          bestD = d;
+          best = v;
+        }
+      }
+      if (best === current) return;
+      if (current) ctrl(current)?.stop();
+      current = best;
+      if (current) ctrl(current)?.play();
+    };
+    // While the page is being scrolled, the graphic holds still and the scroll has the browser
+    // to itself; a moment after scrolling stops, the right graphic carries on
+    const settle = () => {
+      window.clearTimeout(idle);
+      idle = window.setTimeout(() => {
+        pick();
+        if (current) ctrl(current)?.resume();
+      }, 160);
+    };
+    window.addEventListener(
+      'scroll',
+      () => {
+        if (current) ctrl(current)?.pause();
+        settle();
+      },
+      { passive: true },
+    );
+    window.addEventListener('resize', settle, { passive: true });
+    pick();
+  }
+  initFocusPlay();
+  document.addEventListener('spockhart:view', initFocusPlay);
+
   // Each project opens its details in place. A link to /work/#project-id opens that one.
   function initProjects() {
     const root = document.querySelector<HTMLElement>('[data-projects]');
@@ -218,6 +275,7 @@ const sectionsOf = (body = '') =>
     background: radial-gradient(56% 44% at var(--glow-x) 50%, var(--glow), transparent 72%);
   }
   .project.flip { --glow-x: 30%; }
+  .project-visual :global(.scene) { will-change: transform; }
   .project:nth-child(4n + 2), .project:nth-child(4n + 3) { --glow: rgb(36 78 126 / 0.46); }
   .client-mark::before { background: #eef3f8 !important; }
   .client-mark svg { stroke: #14212f !important; }

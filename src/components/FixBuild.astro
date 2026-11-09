@@ -63,7 +63,7 @@ const chartFor = (key: 'wide' | 'narrow') => {
   const costTop = BASE - COST;
   const newTop = revTop - ADD * build.length;
   const costAfterTop = costTop + CUT * fix.length;
-  const x2 = key === 'wide' ? 476 : 536;
+  const x2 = key === 'wide' ? 523 : 536; // the laptop panel reaches further right, and so do its lines
   return {
     key, REV, COST, ADD, CUT, BASE, lab, grp, line, revTop, costTop, newTop, costAfterTop, x2,
     H: BASE + 60,
@@ -1044,6 +1044,7 @@ const sets = [
     /* The dark panel reaches a little further right than the drawing, so the space either side of
        the bars is even (the left side also holds the Old margin note) */
     .fb-chart { margin-right: -3rem; padding-right: 4.25rem; }
+    .fb-win-bar { margin-right: -3rem; }
     .fb-svg-narrow { display: none; }
     .fb-svg-wide { flex: none; width: 100%; padding: 0; }
     .fb-axis-label { font-size: 10.5px; letter-spacing: 0.14em; }

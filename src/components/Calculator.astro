@@ -320,8 +320,9 @@ const iconFill = (i: number) => Math.max(0, Math.min(1, fteIcons - i));
   }
 
   /* ==========================================================================
-     Open and refined, light or dark with the device (.page-body tokens): no box or panel, the inputs and the result side by side,
-     divided by a hairline, the result set as large type
+     A tool on its own card, light or dark with the device (.page-body tokens): rounded, raised
+     off the page with a soft shadow; the inputs on the left, the result on a faintly tinted
+     right-hand side, the result set as large type
      ========================================================================== */
   .calc-section {
     padding-block: clamp(2.5rem, 1.5rem + 3vw, 5rem);
@@ -343,8 +344,21 @@ const iconFill = (i: number) => Math.max(0, Math.min(1, fteIcons - i));
   .day-name { color: var(--day-name); }
   .tile-v { color: var(--ink); }
   .tile-k { color: var(--ink-2); }
-  .calc { border: 0; border-radius: 0; background: none; box-shadow: none; border-top: 1px solid rgb(var(--hair) / 0.1); border-bottom: 1px solid rgb(var(--hair) / 0.1); }
-  .calc-left { padding-left: 0; }
+  .calc-section {
+    --calc-bg: #ffffff;
+    --calc-out: #f5f8fb;
+    --calc-line: rgb(27 42 61 / 0.09);
+    --calc-shadow: 0 1px 2px rgb(27 42 61 / 0.06), 0 34px 70px -34px rgb(27 42 61 / 0.38);
+  }
+  @media (prefers-color-scheme: dark) {
+    .calc-section {
+      --calc-bg: #16263a;
+      --calc-out: #13223a;
+      --calc-line: rgb(255 255 255 / 0.09);
+      --calc-shadow: 0 34px 70px -30px rgb(0 0 0 / 0.7);
+    }
+  }
+  .calc { border: 1px solid var(--calc-line); border-radius: 16px; background: var(--calc-bg); box-shadow: var(--calc-shadow); overflow: hidden; }
   .calc-head .eyebrow { color: var(--ink-3); }
   .calc-head .eyebrow::before { display: none; }
   .calc-head h2 { font-weight: 400; }
@@ -356,11 +370,11 @@ const iconFill = (i: number) => Math.max(0, Math.min(1, fteIcons - i));
   input[type='range']::-webkit-slider-thumb { width: 16px; height: 16px; margin-top: -7px; background: var(--ink); border: 0; box-shadow: 0 0 0 4px rgb(var(--hl-rgb) / 0.18); }
   input[type='range']::-moz-range-thumb { width: 16px; height: 16px; background: var(--ink); border: 0; }
   input[type='range']:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 6px rgb(var(--hl-rgb) / 0.3); }
-  .calc-right { background: none; border-left: 1px solid rgb(var(--hair) / 0.1); padding-right: 0; }
+  .calc-right { background: var(--calc-out); border-left: 1px solid var(--calc-line); }
   .calc-right::before { display: none; }
   .r-label { color: var(--ink-3); }
   .r-big { font-weight: 400; color: var(--ink); }
-  .r-viz { border-top-color: rgb(var(--hair) / 0.1); }
+  .r-viz { border-top-color: var(--calc-line); }
   .r-line { color: var(--ink-2); }
   .day { background: rgb(var(--hair) / 0.06); }
   .day-fill { background: var(--day-fill); }
@@ -384,10 +398,10 @@ const iconFill = (i: number) => Math.max(0, Math.min(1, fteIcons - i));
     .btn-on-brand { align-self: flex-start; margin-top: auto; }
   }
   @media (max-width: 960px) {
-    .calc-right { border-left: 0; border-top: 1px solid rgb(var(--hair) / 0.1); padding-left: 0; }
+    .calc-right { border-left: 0; border-top: 1px solid var(--calc-line); }
   }
   @media (max-width: 640px) {
-    .calc-left, .calc-right { padding-inline: 0; }
+    .calc { border-radius: 12px; }
     .r-tiles li { background: rgb(var(--hair) / 0.05); }
   }
 </style>

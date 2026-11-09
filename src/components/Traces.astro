@@ -1,64 +1,125 @@
 ---
 /**
- * Approach, below the hero: fine lines and dots that seem to run down out of the dark hero into the
- * light page. Short drops across the width fade within a few hundred pixels; a few longer traces
- * run down the margins past both tracks, with small nodes along them; a faint grid of dots sits
- * behind it all. Still, decorative, behind the content. Navy on the light page, white on the dark.
+ * Approach, below the hero: fine lines that run down out of the dark hero and through the page,
+ * drawn to fit the layout, like a circuit. A spine down the left margin branches into each
+ * section's heading marker and ends at the closing line; a quieter one runs down the right margin.
+ * Each set of steps is fed from the spine by a line that drops into the top of every card, and the
+ * first set joins back into the spine below it, so the scroll reads as one connected path.
+ * A light grid of dots sits behind it all. Still, decorative, behind the content.
  */
-const W = 1440;
-const H = 2600;
-// Short drops from the hero's edge: every 64px, lengths that vary without looking random
-const drops = Array.from({ length: 22 }, (_, i) => {
-  const x = 32 + i * 64 + ((i * 37) % 3) * 6;
-  const len = 70 + ((i * 53 + 17) % 9) * 34;
-  return { x, len, dot: i % 3 !== 1 };
-});
-// Long traces down the margins, each with a jog and nodes along the way
-const traces = [
-  { d: 'M44 0 V520 H72 V1180 H44 V2600', nodes: [[44, 260], [72, 520], [72, 860], [72, 1180], [44, 1640], [44, 2120]] },
-  { d: 'M88 0 V340 H112 V1460 H88 V2600', nodes: [[88, 340], [112, 980], [112, 1460], [88, 1900]] },
-  { d: 'M1396 0 V680 H1368 V1320 H1396 V2600', nodes: [[1396, 420], [1368, 680], [1368, 1000], [1396, 1320], [1396, 1780], [1396, 2260]] },
-  { d: 'M1352 0 V260 H1328 V1560 H1352 V2600', nodes: [[1352, 260], [1328, 760], [1328, 1560], [1352, 2020]] },
-];
 ---
 
-<div class="traces" aria-hidden="true">
-  <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMin slice">
-    <defs>
-      <linearGradient id="tr-drop-fade" x1="0" y1="0" x2="0" y2="440" gradientUnits="userSpaceOnUse">
-        <stop offset="0" stop-color="#fff" />
-        <stop offset="1" stop-color="#fff" stop-opacity="0" />
-      </linearGradient>
-      <mask id="tr-drop-mask" maskUnits="userSpaceOnUse" x="0" y="0" width={W} height={H}>
-        <rect width={W} height="440" fill="url(#tr-drop-fade)" />
-      </mask>
-      <linearGradient id="tr-long-fade" x1="0" y1="0" x2="0" y2={H} gradientUnits="userSpaceOnUse">
-        <stop offset="0" stop-color="#fff" />
-        <stop offset="0.55" stop-color="#fff" stop-opacity="0.7" />
-        <stop offset="1" stop-color="#fff" stop-opacity="0.15" />
-      </linearGradient>
-      <mask id="tr-long-mask" maskUnits="userSpaceOnUse" x="0" y="0" width={W} height={H}>
-        <rect width={W} height={H} fill="url(#tr-long-fade)" />
-      </mask>
-    </defs>
-
-    <g mask="url(#tr-drop-mask)" class="tr-drops">
-      {
-        drops.map((p) => (
-          <>
-            <path d={`M${p.x} 0 V${p.len}`} />
-            {p.dot && <circle cx={p.x} cy={p.len} r="2.2" />}
-          </>
-        ))
-      }
-    </g>
-
-    <g mask="url(#tr-long-mask)" class="tr-long">
-      {traces.map((t) => <path d={t.d} />)}
-      {traces.flatMap((t) => t.nodes.map(([x, y]) => <circle cx={x} cy={y} r="3.2" class="tr-node" />))}
-    </g>
-  </svg>
+<div class="traces" aria-hidden="true" data-traces>
+  <svg><g data-traces-draw></g></svg>
 </div>
+
+<script>
+  const NS = 'http://www.w3.org/2000/svg';
+  const el = (name: string, attrs: Record<string, string | number>) => {
+    const n = document.createElementNS(NS, name);
+    for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, String(v));
+    return n;
+  };
+
+  function drawTraces() {
+    const host = document.querySelector<HTMLElement>('[data-traces]');
+    const g = host?.querySelector<SVGGElement>('[data-traces-draw]');
+    if (!host || !g) return;
+    const svg = g.ownerSVGElement!;
+    g.replaceChildren();
+    if (window.matchMedia('(max-width: 900px)').matches) return;
+
+    const box = host.getBoundingClientRect();
+    svg.setAttribute('viewBox', `0 0 ${box.width.toFixed(0)} ${box.height.toFixed(0)}`);
+    const X = (x: number) => +(x - box.left).toFixed(1);
+    const Y = (y: number) => +(y - box.top).toFixed(1);
+
+    // Card positions from the (unmoving) lists, so a card still rising into place is measured
+    // where it will settle
+    const sets = Array.from(document.querySelectorAll<HTMLElement>('.engagement')).map((section) => {
+      const list = section.querySelector<HTMLElement>('.phases')!;
+      const lr = list.getBoundingClientRect();
+      const cards = Array.from(list.children).map((c) => {
+        const card = c as HTMLElement;
+        const left = lr.left + card.offsetLeft - list.offsetLeft;
+        return { cx: X(left + card.offsetWidth / 2), top: Y(lr.top + card.offsetTop - list.offsetTop), bottom: Y(lr.top + card.offsetTop - list.offsetTop + card.offsetHeight) };
+      });
+      const brow = section.querySelector<HTMLElement>('.eyebrow')!.getBoundingClientRect();
+      return { cards, left: X(lr.left), right: X(lr.right), mark: { x: X(brow.left) + 3, y: Y(brow.top + brow.height / 2) } };
+    });
+    if (!sets.length) return;
+    const closing = document.querySelector<HTMLElement>('.closing h2')?.getBoundingClientRect();
+
+    const path = (d: string, cls: string) => g.append(el('path', { d, class: cls }));
+    const node = (x: number, y: number, cls = 'tr-node', r = 3.2) => g.append(el('circle', { cx: x, cy: y, r, class: cls }));
+
+    // The left spine: down from the hero, a branch into each heading marker, ending at the closing
+    const sx = Math.max(14, sets[0].left - 34);
+    const stops = sets.map((s) => s.mark);
+    if (closing) stops.push({ x: X(closing.left) - 4, y: Y(closing.top + closing.height / 2) });
+    path(`M${sx} 0 V${stops[stops.length - 1].y}`, 'tr-spine');
+    stops.forEach((s, i) => {
+      path(`M${sx} ${s.y} H${s.x - (i < sets.length ? 9 : 10)}`, 'tr-branch');
+      node(sx, s.y);
+    });
+
+    // The right spine, quieter: nodes level with the top and bottom of each set of steps
+    const rx = Math.min(box.width - 14, sets[0].right + 34);
+    const last = sets[sets.length - 1];
+    path(`M${rx} 0 V${last.cards[0].bottom}`, 'tr-spine tr-quiet');
+    sets.forEach((s) => {
+      node(rx, s.cards[0].top + 28, 'tr-node tr-quiet');
+      node(rx, s.cards[0].bottom - 28, 'tr-node tr-quiet');
+    });
+
+    // Short lines fall from the hero above each step of the first set and fade
+    sets[0].cards.forEach((c, i) => {
+      const end = 58 + ((i * 37) % 4) * 18;
+      path(`M${c.cx} 0 V${end}`, 'tr-drop');
+      node(c.cx, end, 'tr-dot', 2);
+    });
+
+    // Each set of steps is fed from the spine: a line branches off just above the cards and drops
+    // into the top of each one. The first set's cards then join back into the spine below them,
+    // so the path runs on to the second set.
+    sets.forEach((s, k) => {
+      const lastX = s.cards[s.cards.length - 1].cx;
+      const inY = s.cards[0].top - 30;
+      path(`M${sx} ${inY} H${lastX}`, 'tr-bus');
+      node(sx, inY, 'tr-node', 2.6);
+      s.cards.forEach((c) => {
+        path(`M${c.cx} ${inY} V${c.top}`, 'tr-stub');
+        node(c.cx, c.top, 'tr-dot', 2.4);
+      });
+      if (k < sets.length - 1) {
+        const outY = s.cards[0].bottom + 44;
+        path(`M${lastX} ${outY} H${sx}`, 'tr-bus');
+        node(sx, outY, 'tr-node', 2.6);
+        s.cards.forEach((c) => {
+          path(`M${c.cx} ${c.bottom} V${outY}`, 'tr-stub');
+          node(c.cx, c.bottom, 'tr-dot', 2.4);
+        });
+      }
+    });
+  }
+
+  function initTraces() {
+    const host = document.querySelector<HTMLElement>('[data-traces]');
+    if (!host || host.dataset.ready) return;
+    host.dataset.ready = '1';
+    let raf = 0;
+    const soon = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(drawTraces);
+    };
+    drawTraces();
+    document.fonts?.ready.then(soon);
+    if ('ResizeObserver' in window) new ResizeObserver(soon).observe(host);
+    window.addEventListener('resize', soon, { passive: true });
+  }
+  initTraces();
+  document.addEventListener('spockhart:view', initTraces);
+</script>
 
 <style>
   .traces {
@@ -67,32 +128,27 @@ const traces = [
     z-index: -1;
     overflow: hidden;
     pointer-events: none;
-    color: #1b2a3d;
-    /* A faint grid of dots, strongest near the hero and fading down the page */
-    background-image: radial-gradient(circle, rgb(27 42 61 / 0.13) 1px, transparent 1.4px);
+    --tr: 27 42 61;
+    --tr-ground: var(--paper);
+    /* A light grid of dots, a little stronger near the hero */
+    background-image: radial-gradient(circle, rgb(var(--tr) / 0.1) 1px, transparent 1.4px);
     background-size: 28px 28px;
     background-position: 14px 6px;
-    -webkit-mask-image: linear-gradient(180deg, #000 0, rgb(0 0 0 / 0.55) 26%, rgb(0 0 0 / 0.4) 70%, transparent 100%);
-    mask-image: linear-gradient(180deg, #000 0, rgb(0 0 0 / 0.55) 26%, rgb(0 0 0 / 0.4) 70%, transparent 100%);
+    -webkit-mask-image: linear-gradient(180deg, #000 0, rgb(0 0 0 / 0.5) 22%, rgb(0 0 0 / 0.35) 80%, transparent 100%);
+    mask-image: linear-gradient(180deg, #000 0, rgb(0 0 0 / 0.5) 22%, rgb(0 0 0 / 0.35) 80%, transparent 100%);
   }
-  .traces svg { position: absolute; inset: 0; width: 100%; height: 100%; }
-  .traces path { fill: none; stroke: currentColor; stroke-width: 1; vector-effect: non-scaling-stroke; }
-  .tr-drops path { stroke-opacity: 0.28; }
-  .tr-drops circle { fill: currentColor; fill-opacity: 0.3; }
-  .tr-long path { stroke-opacity: 0.16; }
-  .tr-node { fill: var(--paper); stroke: currentColor; stroke-opacity: 0.32; stroke-width: 1; vector-effect: non-scaling-stroke; }
   @media (prefers-color-scheme: dark) {
-    .traces {
-      color: #eef3f8;
-      background-image: radial-gradient(circle, rgb(255 255 255 / 0.07) 1px, transparent 1.4px);
-    }
-    .tr-drops path { stroke-opacity: 0.16; }
-    .tr-drops circle { fill-opacity: 0.2; }
-    .tr-long path { stroke-opacity: 0.1; }
-    .tr-node { fill: #111930; stroke-opacity: 0.22; }
+    .traces { --tr: 238 243 248; --tr-ground: #111930; background-image: radial-gradient(circle, rgb(var(--tr) / 0.06) 1px, transparent 1.4px); }
   }
-  /* Phones and small tablets: the dots only */
-  @media (max-width: 900px) {
-    .traces svg { display: none; }
-  }
+  .traces svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  .traces :global(path) { fill: none; stroke-width: 1; }
+  .traces :global(.tr-spine) { stroke: rgb(var(--tr) / 0.28); }
+  .traces :global(.tr-branch) { stroke: rgb(var(--tr) / 0.34); }
+  .traces :global(.tr-quiet) { stroke-opacity: 0.55; }
+  .traces :global(.tr-drop) { stroke: rgb(var(--tr) / 0.3); }
+  .traces :global(.tr-bus) { stroke: rgb(var(--tr) / 0.2); }
+  .traces :global(.tr-stub) { stroke: rgb(var(--tr) / 0.28); }
+  .traces :global(.tr-node) { fill: var(--tr-ground); stroke: rgb(var(--tr) / 0.5); stroke-width: 1; }
+  .traces :global(.tr-node.tr-quiet) { stroke: rgb(var(--tr) / 0.28); }
+  .traces :global(.tr-dot) { fill: rgb(var(--tr) / 0.45); }
 </style>
