@@ -831,22 +831,10 @@ html.is-focusing .focus-veil { opacity: 1; }
 /* The dark areas clip anything at their edges */
 .page-body, .work-dark { overflow-x: clip; }
 
-/* Headlines: a soft shadow beneath them, and hero headlines float very gently. The backgrounds
-   themselves are completely still. */
+/* Headlines: a soft shadow beneath them. They hold still once they have come in. */
 .work-dark h2 { text-shadow: 0 18px 44px rgb(0 0 0 / 0.35); }
 .hero-dark h1 {
   text-shadow: 0 14px 22px rgb(0 0 0 / 0.5), 0 34px 60px rgb(0 0 0 / 0.3);
-}
-@media (prefers-reduced-motion: no-preference) {
-  .hero-dark h1.load-in {
-    animation:
-      rise 1000ms var(--ease-out) calc(120ms + var(--i, 0) * 90ms) both,
-      float 9s ease-in-out 1.2s infinite;
-  }
-  @keyframes float {
-    0%, 100% { translate: 0 0; text-shadow: 0 14px 22px rgb(0 0 0 / 0.5), 0 34px 60px rgb(0 0 0 / 0.3); }
-    50% { translate: 0 -7px; text-shadow: 0 22px 30px rgb(0 0 0 / 0.38), 0 46px 72px rgb(0 0 0 / 0.24); }
-  }
 }
 
 /* The Our Work honeycomb keeps its own colours inside the dark hero */
