@@ -589,7 +589,7 @@ const tick = (x: number, y: number, s = 1) => `M${x - 3.5 * s} ${y}l${2.4 * s} $
   .win-bar { fill: #e9eef4; }
   .win-dot { fill: var(--rule-2); }
   .win-title { font-size: 10px; font-weight: 700; fill: var(--ink); }
-  .win-day { font-family: var(--font-display); font-size: 11px; font-weight: 600; fill: var(--accent); font-variant-numeric: lining-nums proportional-nums; }
+  .win-day { font-family: var(--font-display); font-size: 11px; font-weight: 600; fill: var(--accent); font-variant-numeric: lining-nums tabular-nums; }
   .sk rect { fill: #dfe6ee; }
   .sk { opacity: calc(clamp(0, (var(--t) - var(--a)) * 6, 1) * clamp(0, (var(--d) - var(--t)) * 6, 1)); }
   .cell { font-size: 9.5px; fill: var(--ink-2); }
@@ -691,7 +691,7 @@ const tick = (x: number, y: number, s = 1) => `M${x - 3.5 * s} ${y}l${2.4 * s} $
   .mini-row { fill: #dfe6ee; }
 
   /* Growth 3. Develop */
-  .counter { font-family: var(--font-display); font-size: 13px; font-weight: 600; fill: var(--accent); font-variant-numeric: lining-nums proportional-nums; }
+  .counter { font-family: var(--font-display); font-size: 13px; font-weight: 600; fill: var(--accent); font-variant-numeric: lining-nums tabular-nums; }
   .axis-line { fill: none; stroke: var(--rule-2); stroke-width: 1.2; }
   .quad-line { fill: none; stroke: var(--rule-2); stroke-width: 1; stroke-dasharray: 3 3; }
   .trend-line {

@@ -5,43 +5,21 @@ import Mark from '../components/Mark.astro';
 
 <Base title="Page not found" noindex>
   <section class="nf">
-    <div class="wrap">
-      <div class="nf-top load-in" style="--i:0"><p class="eyebrow">404</p></div>
-      <div class="nf-grid">
-        <div class="nf-copy">
-          <h1 class="load-in" style="--i:2">This page is not here.</h1>
-          <p class="lead load-in" style="--i:3">The link may be old, or the address may have a typo.</p>
-          <div class="btn-row load-in" style="--i:4">
-            <a class="btn" href="/">Go to the home page <span class="arr" aria-hidden="true">→</span></a>
-            <a class="btn btn-ghost" href="/contact/">Contact us</a>
-          </div>
-        </div>
-        <!-- The piece that should be here: an empty slot, and the mark set down beside it -->
-        <div class="nf-figure load-in" style="--i:1" aria-hidden="true">
-          <svg viewBox="-130 -130 260 260" class="nf-slot">
-            <polygon points="0,-118 102,-59 102,59 0,118 -102,59 -102,-59" />
-          </svg>
-          <div class="nf-piece"><Mark size="100%" tone="brand" /></div>
-        </div>
+    <div class="wrap nf-inner">
+      <div class="load-in" style="--i:0"><Mark size={84} tone="brand" assemble tilt /></div>
+      <p class="eyebrow load-in" style="--i:1">404</p>
+      <h1 class="load-in" style="--i:2">This page is not here.</h1>
+      <p class="lead load-in" style="--i:3">The link may be old, or the address may have a typo.</p>
+      <div class="btn-row load-in" style="--i:4">
+        <a class="btn" href="/">Go to the home page <span class="arr" aria-hidden="true">→</span></a>
+        <a class="btn btn-ghost" href="/contact/">Contact us</a>
       </div>
     </div>
   </section>
 </Base>
 
 <style>
-  .nf { padding-top: clamp(7rem, 5rem + 5vw, 9.5rem); padding-bottom: var(--section); }
-  .nf-top { padding-bottom: var(--s-3); margin-bottom: clamp(2rem, 1rem + 3vw, 3.5rem); border-bottom: 1px solid var(--rule-2); }
-  .nf-top .eyebrow { color: var(--ink-2); }
-  .nf-grid { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--s-7); align-items: center; }
-  .nf-copy { display: grid; gap: var(--s-5); justify-items: start; }
-  .nf h1 { font-size: clamp(3rem, 1.6rem + 5vw, 6.5rem); line-height: 0.92; letter-spacing: -0.05em; max-width: 10ch; }
-  .nf-figure { position: relative; width: min(100%, 340px); aspect-ratio: 1; justify-self: center; }
-  .nf-slot { position: absolute; inset: 0; width: 100%; height: 100%; }
-  .nf-slot polygon { fill: var(--surface); stroke: var(--ink-3); stroke-width: 1.5; stroke-dasharray: 6 6; vector-effect: non-scaling-stroke; }
-  .nf-piece { position: absolute; width: 44%; aspect-ratio: 1; right: -6%; bottom: -4%; transform: rotate(14deg); }
-  @media (max-width: 760px) {
-    .nf { padding-top: 6.5rem; }
-    .nf-grid { grid-template-columns: minmax(0, 1fr); gap: var(--s-5); }
-    .nf-figure { width: 180px; justify-self: start; order: -1; }
-  }
+  .nf { padding-top: clamp(9rem, 6rem + 8vw, 13rem); padding-bottom: var(--section); }
+  .nf-inner { display: grid; gap: var(--s-5); justify-items: start; }
+  .nf h1 { font-size: var(--step-5); max-width: 14ch; }
 </style>
