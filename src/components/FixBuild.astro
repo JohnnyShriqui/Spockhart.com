@@ -923,4 +923,22 @@ const sets = [
   @media (max-width: 1099px) {
     .fb-pill { font-size: 0.625rem; padding: 0.16rem 0.5rem 0.16rem 0.42rem; }
   }
+
+  /* The dropdown (laptops): the words on the left with room around them, lined up with the
+     row's sentence, and the graphic small beside them. */
+  @media (min-width: 1100px) {
+    .fb-panel-body {
+      grid-template-columns: minmax(0, 1fr) 15rem;
+      grid-template-areas: 'note graphic' 'cs graphic';
+      grid-template-rows: auto 1fr;
+      column-gap: 3rem;
+      row-gap: 1.25rem;
+      align-items: start;
+      padding: 1.5rem 0.5rem 2.25rem 2.9rem;
+    }
+    .fb-pnote { grid-area: note; }
+    .fb-cs { grid-area: cs; gap: 1rem; }
+    .fb-graphic { grid-area: graphic; border-radius: var(--radius); }
+    .fb-headline { font-size: 1.125rem; line-height: 1.55; }
+  }
 </style>

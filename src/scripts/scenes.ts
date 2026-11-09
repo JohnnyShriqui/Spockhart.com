@@ -264,16 +264,17 @@ function initScene(scene: HTMLElement) {
     if (canAnimate()) ctrl.stop();
     return;
   }
-  // [data-always]: loops from the moment the page opens and never pauses (the Approach phases)
+  // Scenes inside a group are played one at a time by the group (below).
+  if (scene.closest('[data-scene-group]')) {
+    if (canAnimate()) ctrl.stop();
+    return;
+  }
+  // [data-always]: loops from the moment the page opens and never pauses
   if (scene.closest('[data-always]')) {
     if (canAnimate()) ctrl.loop();
     return;
   }
-  // Scenes inside a group are played one at a time by the group (below).
-  if (!canAnimate() || scene.closest('[data-scene-group]')) {
-    if (scene.closest('[data-scene-group]') && canAnimate()) ctrl.stop();
-    return;
-  }
+  if (!canAnimate()) return;
   new IntersectionObserver(
     (entries) => {
       if (entries.some((e) => e.isIntersecting)) ctrl.resume();
@@ -290,6 +291,9 @@ function initScene(scene: HTMLElement) {
  * The attribute can hold a media query, e.g. data-scene-group="(min-width: 901px)".
  * Where the query does not match (phones), the scenes simply loop on their own while
  * they are on screen, like any other scene.
+ *
+ * With data-always on the group, the turn-taking starts as the page opens and never stops,
+ * whether the group is on screen or not (the Approach phases).
  */
 function initGroup(group: HTMLElement) {
   if (group.dataset.groupReady || !canAnimate()) return;
@@ -302,8 +306,9 @@ function initGroup(group: HTMLElement) {
   const hoverMq = group.dataset.hover ? window.matchMedia(group.dataset.hover) : null;
   const hovering = () => Boolean(hoverMq?.matches);
   const sequenced = () => (!mq || mq.matches) && !hovering();
+  const always = group.hasAttribute('data-always');
   let index = 0;
-  let visible = false;
+  let visible = always;
   let timer = 0;
   let running = false;
   const onScreen = new Set<number>();
@@ -345,6 +350,7 @@ function initGroup(group: HTMLElement) {
 
   new IntersectionObserver(
     (entries) => {
+      if (always) return;
       visible = entries.some((e) => e.isIntersecting);
       if (!sequenced()) return;
       if (visible && !running) next();
@@ -383,6 +389,7 @@ function initGroup(group: HTMLElement) {
   });
 
   group.dataset.mode = modeName();
+  if (always && sequenced()) next();
   mq?.addEventListener('change', setMode);
   hoverMq?.addEventListener('change', setMode);
 }
