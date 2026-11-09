@@ -86,8 +86,9 @@ const sets = [
 
     <ExamplesStrip />
 
-    <!-- Then our own results: the same size as the opening line, so it reads as a second part -->
-    <h3 class="fb-built" data-reveal>What we’ve built so far</h3>
+    <!-- Then our own results: the same size as the opening line, so it reads as a second part.
+         Laptops show it above the case studies; phones, which leave the list out, above the chart. -->
+    <h3 class="fb-built fb-built-narrow" data-reveal>What we’ve built so far</h3>
 
     <div class="fb-stage" data-fb-stage>
       <svg class="fb-links" aria-hidden="true" data-fb-links></svg>
@@ -198,6 +199,7 @@ const sets = [
 
       <!-- The case studies, grouped the way they sit on the chart -->
       <div class="fb-cards" data-fb-cards>
+        <h3 class="fb-built fb-built-wide">What we’ve built so far</h3>
         {
           sets.map((set) => (
             <div class:list={['fb-set', `fb-set-${set.key}`]}>
@@ -1125,6 +1127,13 @@ const sets = [
   }
   .fb .fb-title { margin-bottom: clamp(1.25rem, 0.75rem + 1.2vw, 1.75rem); }
   .fb .fb-built { margin-bottom: clamp(1.25rem, 0.75rem + 1.2vw, 1.75rem); }
+  .fb .fb-built-wide { margin-bottom: 0.4rem; }
+  @media (min-width: 1100px) {
+    .fb-built-narrow { display: none; }
+  }
+  @media (max-width: 1099px) {
+    .fb-built-wide { display: none; }
+  }
   @media (min-width: 1100px) {
     .fb { padding-top: clamp(2.5rem, 1.5rem + 2.5vw, 4rem); }
   }
