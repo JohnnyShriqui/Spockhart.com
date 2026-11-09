@@ -181,6 +181,7 @@ const sets = [
                             <i aria-hidden="true"></i>
                             {STATUS[it.status]}
                           </span>
+                          <span class="fb-l">{it.label}</span>
                         </span>
                       </div>
                       <span class="fb-caret" aria-hidden="true">
@@ -825,7 +826,7 @@ const sets = [
     .fb-row { gap: 0; }
     .fb-card { border: 0; border-bottom: 1px solid rgb(255 255 255 / 0.1); border-radius: 0; background: none; }
     .fb-card.is-open { border-color: rgb(255 255 255 / 0.1); }
-    .fb-head { grid-template-columns: minmax(0, 1fr) auto; padding: 1.05rem 0.5rem 1.05rem 0; }
+    .fb-head { grid-template-columns: minmax(0, 1fr) auto; padding: 0.85rem 0.5rem 0.85rem 0; }
     .fb-v { font-size: 1.3125rem; }
     /* The words carry each row; the graphic opens in the dropdown */
     .fb-media { display: none; }
@@ -871,7 +872,13 @@ const sets = [
   }
 
   /* Status: a hairline pill, quiet type, a small coloured dot. Nothing glows or pulses. */
-  .fb-text { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem 0.85rem; }
+  .fb-text { display: flex; flex-wrap: wrap; align-items: center; gap: 0.2rem 0.85rem; }
+  /* The one-line description under each figure */
+  .fb-l { flex-basis: 100%; font-size: 0.9375rem; line-height: 1.35; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  /* On smaller screens each case study is a card that already shows its headline */
+  @media (max-width: 1099px) {
+    .fb-l { display: none; }
+  }
   .fb-pill {
     display: inline-flex;
     align-items: center;
