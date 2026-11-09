@@ -309,11 +309,10 @@ const pct = (d: number) => `${(d / SCALE) * 100}%`;
     cursor: default;
     transition: transform 500ms var(--ease-out), box-shadow 500ms var(--ease), border-color 400ms var(--ease), opacity 300ms var(--ease), filter 300ms var(--ease);
   }
+  /* Pointed at: the phase stays where it is and the rest of the page steps back behind the veil */
   .phase.is-active {
     z-index: 1;
     border-color: rgb(44 95 138 / 0.55);
-    transform: translateY(-8px) scale(1.2);
-    box-shadow: 0 26px 44px -30px rgb(27 42 61 / 0.6);
   }
   /* Time running through the phase that is playing */
   .phase::after {
