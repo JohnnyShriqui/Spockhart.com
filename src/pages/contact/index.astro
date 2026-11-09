@@ -20,7 +20,7 @@ import { site } from '../../config/site';
         </div>
       </div>
 
-      <div class="contact-form-wrap load-in" style="--i:2">
+      <div class="contact-form-wrap on-light load-in" style="--i:2">
         <form class="contact-form" data-contact-form data-endpoint={site.formEndpoint} novalidate>
           <div class="row-2">
             <div class="field">
@@ -106,17 +106,12 @@ import { site } from '../../config/site';
   .contact-direct { display: grid; gap: var(--s-3); justify-items: start; margin-top: var(--s-4); }
   .label { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); }
 
-  /* The form sits on the dark hero as a quiet panel; its fields are dark too */
   .contact-form-wrap {
-    --surface: rgb(255 255 255 / 0.05);
-    --paper: rgb(255 255 255 / 0.04);
     padding: clamp(1.25rem, 0.9rem + 1.6vw, 2.25rem);
-    border: 1px solid rgb(255 255 255 / 0.12);
+    border: 1px solid var(--rule);
     border-radius: var(--radius-lg);
-    background: rgb(255 255 255 / 0.035);
-    color-scheme: dark;
+    background: var(--surface);
   }
-  .contact-form-wrap :global(.select option) { background: #161b28; color: #eef3f8; }
   .contact-form { display: grid; gap: var(--s-4); }
   .row-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-4); }
   .row-org { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); }
