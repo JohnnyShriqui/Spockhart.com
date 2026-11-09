@@ -450,8 +450,8 @@ const sets = [
 </script>
 
 <style>
-  .fb { padding-block: clamp(2rem, 1.25rem + 1.4vw, 2.75rem); background: var(--paper-2); overflow-x: clip; }
-  .fb-title { font-size: clamp(2.25rem, 1.6rem + 1.6vw, 3.25rem); text-align: center; text-wrap: balance; margin: 0 auto var(--s-5); }
+  .fb { padding-block: clamp(3.5rem, 2.5rem + 2.5vw, 5rem) clamp(2rem, 1.25rem + 1.4vw, 2.75rem); background: var(--paper-2); overflow-x: clip; }
+  .fb-title { font-size: clamp(2.25rem, 1.6rem + 1.6vw, 3.25rem); text-align: center; text-wrap: balance; margin: 0 auto clamp(2.25rem, 1.5rem + 1.6vw, 3.25rem); }
 
   .fb-stage {
     position: relative;
@@ -678,7 +678,7 @@ const sets = [
 
   /* ---------- Tablets and phones: chart first, then two rows to swipe ---------- */
   @media (max-width: 1099px) {
-    .fb-title { margin-bottom: var(--s-6); }
+    .fb-title { margin-bottom: var(--s-7); }
     .fb-stage { grid-template-columns: minmax(0, 1fr); row-gap: var(--s-6); }
     .fb-links { display: none; }
     .fb-cards { gap: var(--s-5); }
