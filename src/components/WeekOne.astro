@@ -1,0 +1,172 @@
+---
+/**
+ * Approach hero image: "Embedded from day one", shown as your team's first week with us.
+ * Your team's usual meetings sit in grey; our sessions are woven in among them, starting with
+ * a kickoff at 9:00 on Monday. An illustration, not a real calendar.
+ */
+const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+const START = 9; // first hour shown
+const HOURS = 7; // 9:00 to 16:00
+
+type Block = { day: number; from: number; to: number; label: string; us?: boolean };
+const blocks: Block[] = [
+  { day: 0, from: 9, to: 10, label: 'Kickoff with your team', us: true },
+  { day: 0, from: 11, to: 13, label: 'Shadow your team', us: true },
+  { day: 0, from: 14, to: 15, label: 'Ops meeting' },
+  { day: 1, from: 9, to: 10, label: 'Stand-up' },
+  { day: 1, from: 10, to: 12, label: 'Map the process', us: true },
+  { day: 1, from: 13, to: 15, label: 'Interviews with staff', us: true },
+  { day: 2, from: 9, to: 10, label: 'Stand-up' },
+  { day: 2, from: 11, to: 13, label: 'Find the bottlenecks', us: true },
+  { day: 2, from: 14, to: 15, label: 'Board prep' },
+  { day: 3, from: 9, to: 10, label: 'Stand-up' },
+  { day: 3, from: 10, to: 12, label: 'Working session', us: true },
+  { day: 3, from: 13, to: 14, label: 'Payroll' },
+  { day: 4, from: 9, to: 10, label: 'Stand-up' },
+  { day: 4, from: 11, to: 12, label: 'First findings', us: true },
+];
+let n = 0;
+const placed = blocks.map((b) => ({ ...b, i: b.us ? n++ : 0 }));
+const hours = Array.from({ length: HOURS }, (_, i) => START + i);
+---
+
+<figure class="week on-light" aria-label="Illustration: your team's first week, with Spockhart's sessions woven in among your usual meetings, starting with a kickoff at 9:00 on Monday.">
+  <div class="week-head">
+    <span class="week-title">Week 1</span>
+    <span class="week-key" aria-hidden="true">
+      <span><i class="key-us"></i>Spockhart</span>
+      <span><i class="key-team"></i>Your team</span>
+    </span>
+  </div>
+
+  <div class="week-grid" aria-hidden="true" style={`--hours:${HOURS}`}>
+    <span class="corner"></span>
+    {
+      days.map((d, i) => (
+        <span class:list={['day', `d${i}`, { today: i === 0 }]} style={`grid-column:${i + 2}`}>
+          {d}
+          {i === 0 && <b class="day-one">Day 1</b>}
+        </span>
+      ))
+    }
+    {
+      hours.map((h, i) => (
+        <span class="hour" style={`grid-row:${i + 2}`}>
+          {h}:00
+        </span>
+      ))
+    }
+    {days.map((_, i) => <span class:list={['col', `d${i}`]} style={`grid-column:${i + 2}`} />)}
+    {
+      placed.map((b) => (
+        <span
+          class:list={['block', `d${b.day}`, b.us ? 'us' : 'team']}
+          style={`grid-column:${b.day + 2};grid-row:${b.from - START + 2} / ${b.to - START + 2};--i:${b.i}`}
+        >
+          {b.label}
+        </span>
+      ))
+    }
+  </div>
+</figure>
+
+<style>
+  .week {
+    margin: 0;
+    width: 100%;
+    border-radius: 12px;
+    background: #f7f9fc;
+    box-shadow: 0 30px 60px -30px rgb(0 0 0 / 0.6), 0 0 0 1px rgb(255 255 255 / 0.06);
+    overflow: hidden;
+    color: #1b2a3d;
+  }
+  .week-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.85rem 1rem 0.7rem;
+    border-bottom: 1px solid #e1e7ef;
+  }
+  .week-title { font-family: var(--font-display); font-size: 1.125rem; line-height: 1; color: #1b2a3d; }
+  .week-key { display: flex; gap: 0.9rem; font-size: 0.75rem; font-weight: 600; color: #586b80; }
+  .week-key span { display: inline-flex; align-items: center; gap: 0.35rem; }
+  .week-key i { width: 10px; height: 10px; border-radius: 3px; }
+  .key-us { background: #2c5f8a; }
+  .key-team { background: #dfe5ec; box-shadow: inset 0 0 0 1px #cdd6e0; }
+
+  .week-grid {
+    --row: 2.4rem;
+    position: relative;
+    display: grid;
+    grid-template-columns: 2.6rem repeat(5, minmax(0, 1fr));
+    grid-template-rows: 2rem repeat(var(--hours), var(--row));
+    padding: 0 0.6rem 0.75rem 0;
+  }
+  .day {
+    grid-row: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding-left: 0.45rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #586b80;
+  }
+  .day.today { color: #1b2a3d; }
+  .day-one {
+    padding: 0.08rem 0.4rem;
+    border-radius: 999px;
+    background: #2c5f8a;
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: #fff;
+  }
+  .hour {
+    grid-column: 1;
+    align-self: start;
+    margin-top: -0.45rem;
+    padding-right: 0.45rem;
+    text-align: right;
+    font-size: 0.6875rem;
+    color: #8193a6;
+    font-variant-numeric: tabular-nums;
+  }
+  /* Each day is a column with hour lines across it */
+  .col {
+    grid-row: 2 / span var(--hours);
+    border-left: 1px solid #e1e7ef;
+    background-image: linear-gradient(#e8edf3 1px, transparent 1px);
+    background-size: 100% var(--row);
+  }
+  .col.d0 { background-color: rgb(44 95 138 / 0.045); }
+
+  .block {
+    z-index: 1;
+    margin: 2px 3px 2px 4px;
+    padding: 0.28rem 0.4rem;
+    border-radius: 5px;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    line-height: 1.2;
+    overflow: hidden;
+  }
+  .team { background: #e9edf2; color: #6a7c90; box-shadow: inset 0 0 0 1px #dbe2ea; }
+  .us { background: #2c5f8a; color: #fff; box-shadow: 0 6px 12px -8px rgb(31 77 111 / 0.7); }
+
+  /* Our sessions arrive one after another, through the week, once */
+  @media (prefers-reduced-motion: no-preference) {
+    .us { animation: arrive 700ms var(--ease-out) both; animation-delay: calc(900ms + var(--i) * 220ms); }
+    @keyframes arrive {
+      from { opacity: 0; transform: translateY(6px) scale(0.96); }
+    }
+  }
+
+  /* Phones: the first three days */
+  @media (max-width: 640px) {
+    .week-grid { grid-template-columns: 2.4rem repeat(3, minmax(0, 1fr)); --row: 2.3rem; }
+    .d3, .d4 { display: none; }
+    .block { font-size: 0.6875rem; }
+  }
+</style>
