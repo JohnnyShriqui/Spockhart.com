@@ -25,21 +25,21 @@ interface Item {
   id: string;
   value: string;
   label: string;
-  /** Shown as a small pill beside the figure: still running for the client, or being built now */
-  status: 'live' | 'progress';
+  /** Shown as a small pill beside the figure: delivered, or being built now */
+  status: 'done' | 'progress';
 }
-const STATUS = { live: 'Live', progress: 'In progress' } as const;
+const STATUS = { done: 'Delivered', progress: 'In progress' } as const;
 
 const build: Item[] = [
-  { k: 'A', id: 'sales-performance-system', value: '+$316K A Month', label: 'We lifted average sales with a new analytics system', status: 'live' },
-  { k: 'B', id: 'digital-practice-growth', value: '$150K → $1M', label: 'We grew a consulting practice in under a year', status: 'live' },
-  { k: 'C', id: 'lead-generation-engine', value: '+$1B Market', label: 'We digitized a division’s expertise to open a new market', status: 'live' },
+  { k: 'A', id: 'sales-performance-system', value: '+$316K A Month', label: 'We lifted average sales with a new analytics system', status: 'done' },
+  { k: 'B', id: 'digital-practice-growth', value: '$150K → $1M', label: 'We grew a consulting practice in under a year', status: 'done' },
+  { k: 'C', id: 'lead-generation-engine', value: '+$1B Market', label: 'We digitized a division’s expertise to open a new market', status: 'done' },
 ];
 const fix: Item[] = [
   { k: '1', id: 'commission-automation', value: 'Excel → Automated', label: 'We’re automating commissions for a $1.2B manufacturer', status: 'progress' },
-  { k: '2', id: 'project-feasibility-platform', value: '12 Months → Minutes', label: 'We cut feasibility assessments from $100K+ each to $0', status: 'live' },
-  { k: '3', id: 'momentum-exchange-prototype', value: '↑ 83% More Fuel Efficient', label: 'In a prototype we built', status: 'live' },
-  { k: '4', id: 'subcontractor-financing-marketplace', value: '6+ Months → Weeks', label: 'We cut financing approvals for subcontractors', status: 'live' },
+  { k: '2', id: 'project-feasibility-platform', value: '12 Months → Minutes', label: 'We cut feasibility assessments from $100K+ each to $0', status: 'done' },
+  { k: '3', id: 'momentum-exchange-prototype', value: '↑ 83% More Fuel Efficient', label: 'In a prototype we built', status: 'done' },
+  { k: '4', id: 'subcontractor-financing-marketplace', value: '6+ Months → Weeks', label: 'We cut financing approvals for subcontractors', status: 'done' },
 ];
 
 /* Chart geometry (viewBox 0 0 560 470). Heights are illustrative. */
@@ -864,15 +864,17 @@ const sets = [
   .fb-set-build .fb-set-note { color: var(--neon-blue); }
   .fb-set-fix .fb-set-note { color: var(--neon-red); }
 
-  /* Status pills: whether the work is live for the client now or being built */
+  /* Status pills, in neon: green when delivered, yellow while it is being built (that one pulses) */
   .fb-text { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem 0.85rem; }
   .fb-pill {
     display: inline-flex;
     align-items: center;
     gap: 0.45rem;
     padding: 0.22rem 0.6rem 0.22rem 0.5rem;
-    border: 1px solid rgb(255 255 255 / 0.14);
+    border: 1px solid rgb(var(--neon) / 0.5);
     border-radius: 999px;
+    background: rgb(var(--neon) / 0.07);
+    box-shadow: 0 0 10px rgb(var(--neon) / 0.18);
     font-family: var(--font-body);
     font-size: 0.6875rem;
     font-weight: 600;
@@ -880,14 +882,15 @@ const sets = [
     line-height: 1.2;
     text-transform: uppercase;
     white-space: nowrap;
-    color: var(--ink-2);
+    color: rgb(var(--neon));
+    text-shadow: 0 0 8px rgb(var(--neon) / 0.55);
   }
-  .fb-pill i { width: 6px; height: 6px; border-radius: 50%; background: var(--dot); box-shadow: 0 0 6px var(--dot); flex: none; }
-  .fb-pill-live { --dot: #4ade80; }
-  .fb-pill-progress { --dot: #fbbf24; }
+  .fb-pill i { width: 6px; height: 6px; border-radius: 50%; background: rgb(var(--neon)); box-shadow: 0 0 7px rgb(var(--neon)); flex: none; }
+  .fb-pill-done { --neon: 57 255 136; }
+  .fb-pill-progress { --neon: 255 226 61; }
   @media (prefers-reduced-motion: no-preference) {
-    .fb-pill-live i { animation: fb-live 3.2s ease-in-out infinite; }
-    @keyframes fb-live { 50% { opacity: 0.4; box-shadow: 0 0 2px var(--dot); } }
+    .fb-pill-progress i { animation: fb-pulse 2.4s ease-in-out infinite; }
+    @keyframes fb-pulse { 50% { opacity: 0.35; box-shadow: 0 0 2px rgb(var(--neon)); } }
   }
   @media (max-width: 1099px) {
     .fb-pill { font-size: 0.625rem; padding: 0.18rem 0.5rem 0.18rem 0.42rem; }
