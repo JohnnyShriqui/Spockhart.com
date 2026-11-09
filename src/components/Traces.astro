@@ -42,7 +42,8 @@
         const left = lr.left + card.offsetLeft - list.offsetLeft;
         return { cx: X(left + card.offsetWidth / 2), top: Y(lr.top + card.offsetTop - list.offsetTop), bottom: Y(lr.top + card.offsetTop - list.offsetTop + card.offsetHeight) };
       });
-      return { cards, left: X(lr.left), right: X(lr.right) };
+      const head = section.querySelector<HTMLElement>('.section-head')!.getBoundingClientRect();
+      return { cards, left: X(lr.left), right: X(lr.right), headBottom: Y(head.bottom) };
     });
     if (!sets.length) return;
 
@@ -50,19 +51,21 @@
     const node = (x: number, y: number, cls = 'tr-node', r = 3.2) => g.append(el('circle', { cx: x, cy: y, r, class: cls }));
 
     // The left spine: down from the hero to the line that feeds the last set of steps
-    const sx = Math.max(14, sets[0].left - 34);
-    path(`M${sx} 0 V${sets[sets.length - 1].cards[0].top - 30}`, 'tr-spine');
+    const sx = Math.max(16, sets[0].left - 46);
+    const lastSet = sets[sets.length - 1];
+    path(`M${sx} 0 V${((lastSet.headBottom + lastSet.cards[0].top) / 2).toFixed(1)}`, 'tr-spine');
 
     // Each set of steps is fed from the spine: a line branches off just above the cards and drops
     // into the top of each one
     sets.forEach((s) => {
       const lastX = s.cards[s.cards.length - 1].cx;
-      const inY = s.cards[0].top - 30;
+      // Halfway between the heading and the cards, so it has room on both sides
+      const inY = +((s.headBottom + s.cards[0].top) / 2).toFixed(1);
       path(`M${sx} ${inY} H${lastX}`, 'tr-bus');
-      node(sx, inY, 'tr-node', 2.6);
+      node(sx, inY, 'tr-node', 3.4);
       s.cards.forEach((c) => {
         path(`M${c.cx} ${inY} V${c.top}`, 'tr-stub');
-        node(c.cx, c.top, 'tr-dot', 2.4);
+        node(c.cx, c.top, 'tr-dot', 3);
       });
     });
   }
@@ -105,10 +108,10 @@
     .traces { --tr: 238 243 248; --tr-ground: #111930; background-image: radial-gradient(circle, rgb(var(--tr) / 0.06) 1px, transparent 1.4px); }
   }
   .traces svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-  .traces :global(path) { fill: none; stroke-width: 1; }
+  .traces :global(path) { fill: none; stroke-width: 1.6; stroke-linecap: round; }
   .traces :global(.tr-spine) { stroke: rgb(var(--tr) / 0.28); }
         .traces :global(.tr-bus) { stroke: rgb(var(--tr) / 0.2); }
   .traces :global(.tr-stub) { stroke: rgb(var(--tr) / 0.28); }
-  .traces :global(.tr-node) { fill: var(--tr-ground); stroke: rgb(var(--tr) / 0.5); stroke-width: 1; }
+  .traces :global(.tr-node) { fill: var(--tr-ground); stroke: rgb(var(--tr) / 0.5); stroke-width: 1.6; }
     .traces :global(.tr-dot) { fill: rgb(var(--tr) / 0.45); }
 </style>
