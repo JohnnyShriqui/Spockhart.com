@@ -87,7 +87,7 @@ const sets = [
             <rect x={before.cost} y={costTop} width={W} height={COST} rx="2" class="fb-cost" />
             <path d={`M${before.rev - 10} ${revTop} h-5 V${costTop} h5`} class="fb-bracket" />
             <text x={before.rev - 20} y={revTop + 4} text-anchor="end" class="fb-ann">
-              <tspan x={before.rev - 20}>Thin</tspan>
+              <tspan x={before.rev - 20}>Old</tspan>
               <tspan x={before.rev - 20} dy="14">margin</tspan>
             </text>
             <g class="fb-under">
@@ -136,7 +136,7 @@ const sets = [
             <g class="fb-wide">
               <path d={`M${after.rev - 10} ${newTop} h-5 V${costAfterTop} h5`} class="fb-bracket fb-bracket-after" />
               <text x={after.rev - 20} y={(newTop + costAfterTop) / 2 - 3} text-anchor="end" class="fb-ann fb-ann-hot">
-                <tspan x={after.rev - 20}>Wider</tspan>
+                <tspan x={after.rev - 20}>New</tspan>
                 <tspan x={after.rev - 20} dy="15">margin</tspan>
               </text>
             </g>
