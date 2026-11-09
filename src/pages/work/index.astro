@@ -15,14 +15,14 @@ const all = (await getCollection('work')).sort((a, b) => a.data.order - b.data.o
  * in OKLab, so the blends stay clean rather than passing through grey.
  */
 const moods = [
-  { name: 'mist', dark: false, base: '#e9f0f8', accent: '#245a86', g1: 'rgb(146 188 228 / 0.55)', g1x: '82%', g2: 'rgb(255 255 255 / 0.7)', g2x: '12%' },
-  { name: 'petrol', dark: true, base: '#0b2430', accent: '#7fd0d2', g1: 'rgb(30 130 142 / 0.42)', g1x: '22%', g2: 'rgb(40 82 134 / 0.3)', g2x: '90%' },
-  { name: 'ivory', dark: false, base: '#f5eee4', accent: '#8a4b2d', g1: 'rgb(242 200 160 / 0.6)', g1x: '82%', g2: 'rgb(210 224 240 / 0.55)', g2x: '10%' },
-  { name: 'indigo', dark: true, base: '#141a36', accent: '#b3b8ff', g1: 'rgb(108 98 198 / 0.4)', g1x: '22%', g2: 'rgb(44 100 162 / 0.3)', g2x: '92%' },
-  { name: 'sky', dark: false, base: '#e1edf9', accent: '#1d5c96', g1: 'rgb(255 255 255 / 0.8)', g1x: '16%', g2: 'rgb(116 174 226 / 0.42)', g2x: '88%' },
-  { name: 'steel', dark: true, base: '#0c1a2b', accent: '#8ec0e6', g1: 'rgb(52 118 182 / 0.45)', g1x: '24%', g2: 'rgb(28 92 112 / 0.3)', g2x: '92%' },
-  { name: 'lavender', dark: false, base: '#eaecfa', accent: '#3c4a9c', g1: 'rgb(184 188 246 / 0.6)', g1x: '82%', g2: 'rgb(255 255 255 / 0.7)', g2x: '10%' },
-  { name: 'copper', dark: true, base: '#16171f', accent: '#f1b98f', g1: 'rgb(196 124 84 / 0.32)', g1x: '22%', g2: 'rgb(58 90 142 / 0.34)', g2x: '92%' },
+  { name: 'mist', dark: false, base: '#e9f0f8', accent: '#245a86', g1: 'rgb(146 188 228 / 0.5)', g1x: '82%', g2: 'rgb(255 255 255 / 0.6)', g2x: '12%', rv: ['#1f4d6f', '#173f5c', '#133650', '#8ec0e6'] },
+  { name: 'petrol', dark: true, base: '#0b2430', accent: '#7fd0d2', g1: 'rgb(30 130 142 / 0.36)', g1x: '22%', g2: 'rgb(40 82 134 / 0.26)', g2x: '90%', rv: ['#155a62', '#0f474e', '#0b3a40', '#7fd0d2'] },
+  { name: 'ivory', dark: false, base: '#f5eee4', accent: '#8a4b2d', g1: 'rgb(242 200 160 / 0.5)', g1x: '82%', g2: 'rgb(210 224 240 / 0.45)', g2x: '10%', rv: ['#7a4632', '#663a29', '#553022', '#f3c6a0'] },
+  { name: 'indigo', dark: true, base: '#141a36', accent: '#b3b8ff', g1: 'rgb(108 98 198 / 0.34)', g1x: '22%', g2: 'rgb(44 100 162 / 0.26)', g2x: '92%', rv: ['#3a3f8f', '#2e3376', '#252964', '#b9bdff'] },
+  { name: 'sky', dark: false, base: '#e1edf9', accent: '#1d5c96', g1: 'rgb(255 255 255 / 0.7)', g1x: '16%', g2: 'rgb(116 174 226 / 0.36)', g2x: '88%', rv: ['#1d5c96', '#174d7f', '#12406b', '#a3d3f7'] },
+  { name: 'steel', dark: true, base: '#0c1a2b', accent: '#8ec0e6', g1: 'rgb(52 118 182 / 0.38)', g1x: '24%', g2: 'rgb(28 92 112 / 0.26)', g2x: '92%', rv: ['#1f4a72', '#183c5e', '#13314e', '#8ec0e6'] },
+  { name: 'lavender', dark: false, base: '#eaecfa', accent: '#3c4a9c', g1: 'rgb(184 188 246 / 0.5)', g1x: '82%', g2: 'rgb(255 255 255 / 0.6)', g2x: '10%', rv: ['#434fa3', '#37428b', '#2d3776', '#c8ccff'] },
+  { name: 'copper', dark: true, base: '#16171f', accent: '#f1b98f', g1: 'rgb(196 124 84 / 0.28)', g1x: '22%', g2: 'rgb(58 90 142 / 0.3)', g2x: '92%', rv: ['#6a4334', '#56362a', '#472d23', '#f1b98f'] },
 ];
 const HERO_END = '#0c1f28'; // the bottom edge of the Our Work hero (it fades to this, see global.css)
 const PAGE = '#f0f3f7'; // the page below the last case study
@@ -44,26 +44,41 @@ const fromOklab = ([L, a, b]: number[]) => {
   const rgb = [4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s, -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s, -0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s];
   return '#' + rgb.map((c) => Math.round(Math.min(1, Math.max(0, fromLin(c))) * 255).toString(16).padStart(2, '0')).join('');
 };
-const lerp = (a: string, b: string, t: number) => {
+/* Blending between two moods passes through a slightly richer middle colour (a touch more
+   chroma, leaning to the stronger colour's hue), so the blend glows instead of turning grey.
+   The path is a smooth curve through that middle, with no corner anywhere. */
+const blend = (a: string, b: string, t: number) => {
   const A = toOklab(a);
   const B = toOklab(b);
-  return fromOklab(A.map((v, i) => v + (B[i] - v) * t));
+  const cA = Math.hypot(A[1], A[2]);
+  const cB = Math.hypot(B[1], B[2]);
+  const M = A.map((v, i) => (v + B[i]) / 2);
+  const D = cA > cB ? A : B;
+  const dc = Math.hypot(D[1], D[2]) || 1;
+  let dir = [D[1] / dc, D[2] / dc];
+  const mc = Math.hypot(M[1], M[2]);
+  if (mc > 1e-4) {
+    dir = [0.5 * dir[0] + (0.5 * M[1]) / mc, 0.5 * dir[1] + (0.5 * M[2]) / mc];
+    const n = Math.hypot(dir[0], dir[1]) || 1;
+    dir = [dir[0] / n, dir[1] / n];
+  }
+  const c = (cA + cB) / 2 + 0.035;
+  const mid = [M[0], dir[0] * c, dir[1] * c];
+  const C = mid.map((v, i) => 2 * v - 0.5 * A[i] - 0.5 * B[i]);
+  return fromOklab(A.map((v, i) => (1 - t) ** 2 * v + 2 * t * (1 - t) * C[i] + t * t * B[i]));
 };
-/* One eased blend runs across each boundary: it eases out of one mood, is steepest right at the
-   boundary, and eases into the next. Each section draws its half, with many small steps, so
-   there is no edge where the blend starts, stops or meets the next section. */
 const ease = (t: number) => t * t * (3 - 2 * t);
-const STEPS = 16;
+const STEPS = 20;
 const at = (k: number) => `calc(var(--band) * ${(k / STEPS).toFixed(2)})`;
 // The first case study takes the whole blend from the hero, and the last the whole blend into the page
 const fade = (prev: string, base: string, next: string, first: boolean, last: boolean) => {
   const top = Array.from({ length: STEPS + 1 }, (_, k) => {
     const u = k / STEPS;
-    return `${lerp(prev, base, ease(first ? u : 0.5 + 0.5 * u))} ${at(k)}`;
+    return `${blend(prev, base, ease(first ? u : 0.5 + 0.5 * u))} ${at(k)}`;
   });
   const bottom = Array.from({ length: STEPS + 1 }, (_, k) => {
     const u = k / STEPS;
-    return `${lerp(base, next, ease(last ? u : 0.5 * u))} calc(100% - var(--band) + ${at(k)})`;
+    return `${blend(base, next, ease(last ? u : 0.5 * u))} calc(100% - var(--band) + ${at(k)})`;
   });
   return `linear-gradient(180deg, ${top.join(', ')}, ${bottom.join(', ')})`;
 };
@@ -73,7 +88,7 @@ const moodStyle = (i: number) => {
   const next = i === all.length - 1 ? PAGE : moods[(i + 1) % moods.length].base;
   return {
     m,
-    style: `--fade:${fade(prev, m.base, next, i === 0, i === all.length - 1)};--g1:${m.g1};--g1x:${m.g1x};--g2:${m.g2};--g2x:${m.g2x};--accent:${m.accent};--accent-soft:${m.accent}`,
+    style: `--fade:${fade(prev, m.base, next, i === 0, i === all.length - 1)};--rv-frame:${m.rv[0]};--rv-win:${m.rv[1]};--rv-bar:${m.rv[2]};--rv-hot:${m.rv[3]};--g1:${m.g1};--g1x:${m.g1x};--g2:${m.g2};--g2x:${m.g2x};--accent:${m.accent};--accent-soft:${m.accent}`,
   };
 };
 
@@ -262,7 +277,7 @@ const sectionsOf = (body = '') =>
       var(--fade);
     /* Each colour is only at full strength through the middle of its section; the rest is
        one long blend into its neighbours, so the page reads as one continuous wash */
-    --band: 45%;
+    --band: 50%;
   }
   /* Every other case study is set deep and dark, so the page changes as you scroll. The light
      detail sheet stays light inside it. */
@@ -280,7 +295,7 @@ const sectionsOf = (body = '') =>
   }
   /* Stacked layouts start the words near the top, so the blends are shorter there */
   @media (max-width: 960px) {
-    .project { --band: 25%; }
+    .project { --band: 32%; }
   }
 
   /* The closing section follows on from the last case study with no rule between them */

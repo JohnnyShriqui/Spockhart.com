@@ -691,11 +691,14 @@ const building = 'M-6 7V-4l6-4 6 4v11zM-3 -1h2M1 -1h2M-3 3h2M1 3h2';
     margin: 0;
     padding: clamp(1rem, 0.6rem + 1.6vw, 2rem);
     border-radius: var(--radius-lg);
+    /* A page can tint these to match where they sit (--rv-frame, --rv-win, --rv-bar, --rv-hot);
+       otherwise they are the brand blues */
+    --brand: var(--rv-frame, #1f4d6f);
     background: var(--brand);
     color: #fff;
     overflow: hidden;
     isolation: isolate;
-    --hot: #8ec0e6;
+    --hot: var(--rv-hot, #8ec0e6);
     --dim: rgb(255 255 255 / 0.2);
     --soft: #d9e6f2;
     --muted: #9fb6cb;
@@ -715,7 +718,7 @@ const building = 'M-6 7V-4l6-4 6 4v11zM-3 -1h2M1 -1h2M-3 3h2M1 3h2';
   /* ---------- The window ---------- */
   .win {
     border-radius: 10px;
-    background: #173f5c;
+    background: var(--rv-win, #173f5c);
     border: 1px solid rgb(255 255 255 / 0.12);
     box-shadow: 0 24px 48px -28px rgb(4 18 30 / 0.7);
     overflow: hidden;
@@ -725,7 +728,7 @@ const building = 'M-6 7V-4l6-4 6 4v11zM-3 -1h2M1 -1h2M-3 3h2M1 3h2';
     align-items: center;
     gap: 0.75rem;
     padding: 0.55rem 0.9rem;
-    background: #133650;
+    background: var(--rv-bar, #133650);
     border-bottom: 1px solid rgb(255 255 255 / 0.08);
     font-size: 0.75rem;
     font-weight: 600;
@@ -807,7 +810,7 @@ const building = 'M-6 7V-4l6-4 6 4v11zM-3 -1h2M1 -1h2M-3 3h2M1 3h2';
 
   /* Shared SVG pieces */
   .lane-svg, .pane-svg, .chain-svg { width: 100%; height: auto; overflow: visible; }
-  .node { fill: #21506f; stroke: rgb(255 255 255 / 0.3); stroke-width: 1.2; }
+  .node { fill: rgb(255 255 255 / 0.1); stroke: rgb(255 255 255 / 0.3); stroke-width: 1.2; }
   .node-on { fill: var(--hot); }
   .node-tick { fill: none; stroke: var(--brand); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
   .node-label { font-family: var(--font-body); font-size: 12px; fill: var(--muted); }

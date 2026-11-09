@@ -275,10 +275,6 @@ const sets = [
         links.setAttribute('viewBox', `0 0 ${box.width} ${box.height}`);
         const m = chart.getScreenCTM();
         if (!m) return;
-        // Every line runs straight out to the chart's right edge, then curves across the gap to
-        // its case study. All the curves start and end at the same x with the same shape, so
-        // keeping them in the same order top to bottom means they can never cross.
-        const gx = chartFig.getBoundingClientRect().right - box.left;
         for (const card of cards) {
           const rect = slice(card.dataset.card!)?.querySelector<SVGRectElement>('[data-slice-rect]');
           if (!rect) continue;
@@ -288,10 +284,11 @@ const sets = [
           const h = headOf(card).getBoundingClientRect();
           const ex = h.left - box.left - 9;
           const ey = h.top + h.height / 2 - box.top;
-          const dx = (ex - gx) * 0.5;
+          // Each line curves straight out of its slice to its case study
+          const dx = Math.max(24, (ex - sx) * 0.55);
           const { g, path } = lineFor(card);
           g.setAttribute('class', `fb-link-g${card === open ? ' is-open' : ''}`);
-          path.setAttribute('d', `M${sx.toFixed(1)} ${sy.toFixed(1)} H${gx.toFixed(1)} C${(gx + dx).toFixed(1)} ${sy.toFixed(1)} ${(ex - dx).toFixed(1)} ${ey.toFixed(1)} ${ex.toFixed(1)} ${ey.toFixed(1)}`);
+          path.setAttribute('d', `M${sx.toFixed(1)} ${sy.toFixed(1)} C${(sx + dx).toFixed(1)} ${sy.toFixed(1)} ${(ex - dx).toFixed(1)} ${ey.toFixed(1)} ${ex.toFixed(1)} ${ey.toFixed(1)}`);
         }
       };
       // While a case study opens or closes, the lines follow their case studies frame by frame

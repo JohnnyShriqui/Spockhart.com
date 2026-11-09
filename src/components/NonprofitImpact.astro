@@ -3,7 +3,7 @@
  * Nonprofits: more impact per dollar. One line chart in the same window style as the chart on
  * the home page. Each line keeps one colour all the way across: demand in coral (like costs),
  * resources in blue (like revenue). Each runs two ways from the start: dashed is where it goes
- * without us, solid is where it goes with us, and every line end says which. Arrows show what we
+ * without us, solid is where it goes with us. A bracket marks the smaller gap. Arrows show what we
  * do to each: demand pushed down, resources pushed up, in three numbered parts that match the
  * cards beside the chart. An illustration, not data.
  *
@@ -94,8 +94,6 @@ function draw(d: Dims) {
     left: { demand: y(f0(d.X0)), res: y(r0(d.X0)) },
     gap: { x: gx, y: y((f0(gx) + r0(gx)) / 2) },
     smaller: { x: gapAt, y: y((fW(gapAt) + rW(gapAt)) / 2) },
-    /* The middle of the gap that is left, for "Smaller gap" to follow */
-    gapMid: pts((x) => (fW(x) + rW(x)) / 2),
   };
 }
 
@@ -147,17 +145,6 @@ const charts = [
                   <path d={c.without.res} class="l-without l-without-res" />
                 </g>
                 <text x={c.gap.x} y={c.gap.y + 4} class="fade gap-label" text-anchor="middle" style="--at:1800ms">The gap</text>
-                <g class="fade" style="--at:3300ms">
-                  <text x={c.X1 + 8} y={c.ends.demand0 - 3} class="end-label end-without">
-                    <tspan x={c.X1 + 8} class="end-demand-soft">Demand</tspan>
-                    <tspan x={c.X1 + 8} dy="13">without us</tspan>
-                  </text>
-                  <text x={c.X1 + 8} y={c.ends.res0 - 3} class="end-label end-without">
-                    <tspan x={c.X1 + 8} class="end-res-soft">Resources</tspan>
-                    <tspan x={c.X1 + 8} dy="13">without us</tspan>
-                  </text>
-                </g>
-
                 <!-- Then, with us: the lines and the colour under them move together -->
                 <g class="reveal" style="--at:4600ms;--dur:5200ms">
                   <path d={c.regions.demand} fill={`url(#npi-hatch-${c.cls})`} />
@@ -167,20 +154,14 @@ const charts = [
                   <path d={c.withUs.res} class="l-res" />
                   <path d={c.withUs.demand} class="l-demand" />
                 </g>
-                <g class="fade" style="--at:9600ms">
-                  <text x={c.X1 + 8} y={c.ends.demand - 3} class="end-label end-with">
-                    <tspan x={c.X1 + 8} class="end-demand">Demand</tspan>
-                    <tspan x={c.X1 + 8} dy="13">with Spockhart</tspan>
-                  </text>
-                  <text x={c.X1 + 8} y={c.ends.res + 7} class="end-label end-with">
-                    <tspan x={c.X1 + 8} class="end-res">Resources</tspan>
-                    <tspan x={c.X1 + 8} dy="13">with Spockhart</tspan>
+                <!-- The gap that is left, marked like the margin on the home page's chart -->
+                <g class="fade" style="--at:11800ms">
+                  <path d={`M${c.X1 + 10} ${c.ends.demand + 1} h5 V${c.ends.res - 1} h-5`} class="bracket" />
+                  <text x={c.X1 + 22} y={(c.ends.demand + c.ends.res) / 2 - 3} class="bracket-label">
+                    <tspan x={c.X1 + 22}>Smaller</tspan>
+                    <tspan x={c.X1 + 22} dy="15">gap</tspan>
                   </text>
                 </g>
-                <path id={`npi-gapmid-${c.cls}`} d={c.gapMid} fill="none" />
-                <text class="fade gap-label" dy="0.35em" style="--at:11800ms">
-                  <textPath href={`#npi-gapmid-${c.cls}`} startOffset="56%" text-anchor="middle">Smaller gap</textPath>
-                </text>
 
                 <!-- Arrows: demand pushed down, resources pushed up -->
                 <g class="fade" style="--at:10200ms">
@@ -313,7 +294,7 @@ const charts = [
   .npi-legend { display: flex; gap: 1rem; margin-left: auto; font-weight: 600; letter-spacing: 0.02em; color: #9fb6cb; }
   .npi-legend span { display: inline-flex; align-items: center; gap: 0.5rem; }
   .npi-legend i { display: inline-block; width: 20px; border-top: 3px solid #d9e6f2; border-radius: 2px; }
-  .npi-legend .lg-without { border-top: 2px dashed rgb(217 230 242 / 0.55); }
+  .npi-legend .lg-without { border-top: 0; height: 2px; background: repeating-linear-gradient(90deg, rgb(217 230 242 / 0.7) 0 5px, transparent 5px 9px); }
   .npi-svg { display: block; width: 100%; height: auto; padding: 0.75rem 0.5rem 0.6rem; box-sizing: border-box; overflow: visible; }
   .npi-narrow { display: none; }
 
@@ -333,20 +314,14 @@ const charts = [
   .side-demand { fill: #f1b3ac; }
   .side-res { fill: #bcdcf3; }
   .gap-label { font-family: var(--font-body); font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; fill: #9fb6cb; }
-  .end-label { font-family: var(--font-body); font-size: 11px; font-weight: 600; }
-  .end-without { fill: #8ea6bc; }
-  .end-with { fill: #d9e6f2; }
-  .end-demand, .end-res, .end-demand-soft, .end-res-soft { font-size: 12.5px; font-weight: 700; }
-  .end-demand { fill: #f1b3ac; }
-  .end-res { fill: #bcdcf3; }
-  .end-demand-soft { fill: rgb(241 179 172 / 0.7); }
-  .end-res-soft { fill: rgb(188 220 243 / 0.7); }
 
   /* What Spockhart changes: resources added in the revenue blues, demand taken away in coral */
   .r-further { fill: #6f9fc6; }
   .r-funding { fill: #a9d1ee; }
   .seam { fill: none; stroke: #173f5c; stroke-width: 2; }
   .hatch-line { stroke: rgb(217 138 130 / 0.38); stroke-width: 2; }
+  .bracket { fill: none; stroke: rgb(255 255 255 / 0.6); stroke-width: 1; }
+  .bracket-label { font-family: var(--font-body); font-size: 12.5px; font-weight: 600; fill: #d9e6f2; }
   .arrow { fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
   .arrow-up { stroke: #133650; }
   .arrow-down { stroke: #f1b3ac; }
