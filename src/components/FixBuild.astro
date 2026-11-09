@@ -258,7 +258,7 @@ const sets = [
 <script>
   import { initScenes, sceneController, scenesCanAnimate } from '../scripts/scenes';
 
-  const LIVE_W = 640; // the width each thumbnail graphic is laid out at before scaling
+  const LIVE_W = 340; // the width each graphic (its After only) is laid out at before scaling
   const PHONE_W = 400;
 
   function initFixBuild() {
@@ -657,7 +657,7 @@ const sets = [
     position: absolute;
     left: 0;
     top: 0;
-    width: 640px;
+    width: 340px;
     transform: translate(var(--ox, 0px), var(--oy, 0px)) scale(var(--s, 0.125));
     transform-origin: 0 0;
     pointer-events: none;
@@ -699,6 +699,14 @@ const sets = [
   .fb-caret svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
   .fb-head:hover .fb-caret { color: var(--accent); }
   .fb-card.is-open .fb-caret { transform: rotate(180deg); color: var(--accent); }
+  /* On the home page each graphic shows only its After (and, for the practice, the services it
+     added), laid out narrow so it can be drawn larger. Our Work keeps the full Before and After. */
+  .fb-live :global(.scene > .lane:first-child),
+  .fb-graphic-live :global(.scene > .lane:first-child) { display: none; }
+  .fb-live :global(.panes),
+  .fb-graphic-live :global(.panes) { grid-template-columns: minmax(0, 1fr); }
+  .fb-live :global(.lane + .lane),
+  .fb-graphic-live :global(.lane + .lane) { border: 0; }
   /* On the home page the graphics drop their number rows; the words carry the numbers */
   .fb-live :global(.rv-split) { display: none; }
   .fb-live :global(.rv) { padding: 14px; gap: 0; }
@@ -721,7 +729,7 @@ const sets = [
   .fb-card-fix .fb-pnote { color: #a04f48; background: rgb(160 79 72 / 0.1); }
   .fb-cs { display: grid; gap: 0.5rem; }
   .fb-graphic { position: relative; width: 100%; overflow: hidden; border-radius: var(--radius-lg); }
-  .fb-graphic-live { position: absolute; left: 0; top: 0; width: 640px; transform: scale(var(--gs, 0.8)); transform-origin: 0 0; }
+  .fb-graphic-live { position: absolute; left: 0; top: 0; width: 340px; transform: scale(var(--gs, 0.8)); transform-origin: 0 0; }
   .fb-graphic :global(.rv-split) { display: none; }
   .fb-graphic :global(.rv) { gap: 0; }
   .fb-client { display: flex; align-items: center; gap: 0.6rem; font-family: var(--font-display); font-size: 1rem; line-height: 1.2; color: var(--ink); }
