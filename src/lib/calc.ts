@@ -62,6 +62,16 @@ export function compute(v: Values) {
   return { hours, cost, fte, daysPerWeek, weekShare };
 }
 
+const bound = (k: InputDef['key'], end: 'min' | 'max') => inputs.find((f) => f.key === k)![end];
+const LEAST = bound('people', 'min') * bound('hours', 'min') * WEEKS_PER_YEAR * bound('rate', 'min');
+const MOST = bound('people', 'max') * bound('hours', 'max') * WEEKS_PER_YEAR * bound('rate', 'max');
+
+/** How hot the result glows, 0 (the smallest possible loss) to 1 (the largest), on a log scale */
+export function heat(cost: number): number {
+  const h = Math.log(cost / LEAST) / Math.log(MOST / LEAST);
+  return Math.round(Math.max(0, Math.min(1, h)) * 1000) / 1000;
+}
+
 /** "1 full day", "half a day", "1.5 days", "6 hours" */
 export function describeDays(hours: number): string {
   const d = hours / 8;
