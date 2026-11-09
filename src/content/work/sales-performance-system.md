@@ -1,6 +1,6 @@
 ---
-title: '[$316K Increase] in Average Monthly Sales Through [Sales Intelligence and Performance Insights].'
-summary: A centralized performance tracking system that gave a 16-person sales team clear, consistent metrics, followed by a $316K increase in average monthly team sales.
+title: 'We Delivered a [$316K Increase] in Average Monthly Sales Through [Sales Intelligence and Performance Insights].'
+summary: We implemented a centralized performance tracking system that gave a 16-person sales team clear, consistent metrics, and average monthly team sales rose by $316K.
 client: 'A Multi-$M Sales Organization'
 sector: Sales operations
 scope: Sales operations and performance tracking

@@ -1,8 +1,8 @@
 ---
 /**
  * Nonprofits: more impact per dollar. One quiet chart of the gap closing from both sides,
- * and beside it the five ways it closes, grouped by what each one moves:
- * resources go further, more funding comes in, demand comes down.
+ * and beside it the three ways it closes: resources go further, more funding comes in,
+ * demand comes down.
  * An illustration, not data. Nothing moves.
  */
 
@@ -16,50 +16,24 @@ interface Dims {
   labels: boolean;
 }
 
-/* The three groups, top of the chart's right edge to bottom */
+/* The three ways the gap closes. Each one names a bracket on the chart's right edge. */
 const groups = [
   {
     key: 'further',
     name: 'Take resources further',
-    items: [
-      {
-        title: 'Intake, entered once',
-        body: 'People share their details once, and case files, referrals and reports all draw from that one record.',
-      },
-      {
-        title: 'Funder reports from live data',
-        body: 'Outcomes are recorded as the work happens, so grant reports come from live numbers, not quarterly spreadsheet rebuilds.',
-      },
-      {
-        title: 'Volunteer scheduling that runs itself',
-        body: 'Sign-ups, reminders and hours tracking run automatically, so coordinators spend time with volunteers, not chasing them.',
-      },
-    ],
+    body: 'We take the repetitive work off your team, like intake, scheduling and reporting, so the same staff and budget serve more people.',
   },
   {
     key: 'funding',
     name: 'Bring in more funding',
-    items: [
-      {
-        title: 'Donors who give again',
-        body: 'Receipts, thank-yous and updates on what each gift achieved go out automatically, so more first-time donors give again.',
-      },
-    ],
+    body: 'We help you keep donors close with timely thank-yous and updates on what their gifts achieved, so more first-time donors become lasting supporters.',
   },
   {
     key: 'demand',
     name: 'Bring demand down',
-    items: [
-      {
-        title: 'Support that prevents the next crisis',
-        body: 'We help you add services beyond the program, like self-serve resources and automatic check-ins, so fewer people return in crisis.',
-      },
-    ],
+    body: 'We help you add services beyond your core program that work upstream, so needs are met early and fewer people reach your door in crisis.',
   },
 ];
-
-let n = 0;
-const numbered = groups.map((g) => ({ ...g, items: g.items.map((it) => ({ ...it, n: String(++n).padStart(2, '0') })) }));
 
 function draw(d: Dims) {
   const N = 90;
@@ -121,7 +95,7 @@ function draw(d: Dims) {
 }
 
 const charts = [
-  { cls: 'npi-wide', ...draw({ W: 640, H: 520, X0: 10, X1: 452, TOP: 20, BASE: 470, labels: true }) },
+  { cls: 'npi-wide', ...draw({ W: 640, H: 430, X0: 10, X1: 452, TOP: 18, BASE: 380, labels: true }) },
   { cls: 'npi-narrow', ...draw({ W: 352, H: 320, X0: 6, X1: 326, TOP: 14, BASE: 272, labels: false }) },
 ];
 ---
@@ -189,29 +163,16 @@ const charts = [
         }
       </figure>
 
-      <div class="npi-ledger">
+      <ol class="npi-ledger">
         {
-          numbered.map((g) => (
-            <div class:list={['npi-group', `g-${g.key}`]}>
-              <h3 class="npi-group-name">
-                <span class="npi-bar" aria-hidden="true" />
-                {g.name}
-              </h3>
-              <ol class="npi-items">
-                {g.items.map((it) => (
-                  <li class="npi-item">
-                    <span class="npi-n">{it.n}</span>
-                    <div>
-                      <h4 class="npi-item-title">{it.title}</h4>
-                      <p class="npi-item-body">{it.body}</p>
-                    </div>
-                  </li>
-                ))}
-              </ol>
-            </div>
+          groups.map((g) => (
+            <li class:list={['npi-item', `g-${g.key}`]}>
+              <h3 class="npi-item-title">{g.name}</h3>
+              <p class="npi-item-body">{g.body}</p>
+            </li>
           ))
         }
-      </div>
+      </ol>
     </div>
   </div>
 </section>
@@ -221,7 +182,7 @@ const charts = [
     --c-further: #2c5f8a;
     --c-funding: #6f9fc8;
     --c-demand: #7a8ca0;
-    padding-block: clamp(3rem, 2rem + 3vw, 4.5rem);
+    padding-block: clamp(2.5rem, 1.75rem + 2.2vw, 3.75rem);
     background: var(--paper-2);
   }
   .npi-title {
@@ -288,49 +249,37 @@ const charts = [
   .br-demand path { stroke: var(--c-demand); }
   .br-label { font-family: var(--font-body); font-size: 13.5px; font-weight: 600; fill: var(--ink); }
 
-  /* ---------- Ledger ---------- */
-  .npi-ledger { display: grid; gap: clamp(1.25rem, 0.9rem + 0.8vw, 1.6rem); }
-  .npi-group-name {
-    display: flex;
-    align-items: center;
-    gap: 0.7rem;
-    font-family: var(--font-body);
-    font-size: 0.78rem;
-    font-weight: 600;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--ink-2);
-    padding-bottom: 0.55rem;
+  /* ---------- The three ways ---------- */
+  .npi-ledger { list-style: none; padding: 0; display: grid; }
+  .npi-item {
+    position: relative;
+    padding: clamp(1rem, 0.8rem + 0.6vw, 1.4rem) 0 clamp(1rem, 0.8rem + 0.6vw, 1.4rem) 1.25rem;
+    border-top: 1px solid var(--rule-2);
   }
-  .npi-bar { width: 3px; height: 1.1rem; border-radius: 2px; background: var(--c); flex: none; }
+  .npi-item:last-child { border-bottom: 1px solid var(--rule-2); }
+  /* The same mark as the item's bracket on the chart */
+  .npi-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: clamp(1.15rem, 0.95rem + 0.6vw, 1.55rem);
+    bottom: clamp(1.15rem, 0.95rem + 0.6vw, 1.55rem);
+    width: 3px;
+    border-radius: 2px;
+    background: var(--c);
+  }
   .g-further { --c: var(--c-further); }
   .g-funding { --c: var(--c-funding); }
   .g-demand { --c: var(--c-demand); }
-
-  .npi-items { list-style: none; padding: 0; }
-  .npi-item {
-    display: grid;
-    grid-template-columns: 2.4rem minmax(0, 1fr);
-    gap: 0.25rem;
-    padding-block: 0.8rem;
-    border-top: 1px solid var(--rule-2);
-  }
-  .npi-n {
-    font-variant-numeric: lining-nums tabular-nums;
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--accent);
-    padding-top: 0.2rem;
-  }
   .npi-item-title {
     font-family: var(--font-display);
-    font-size: clamp(1.125rem, 1.05rem + 0.3vw, 1.3rem);
+    font-size: clamp(1.3rem, 1.15rem + 0.5vw, 1.6rem);
     font-weight: 500;
     letter-spacing: -0.01em;
-    line-height: 1.25;
+    line-height: 1.2;
     color: var(--ink);
   }
-  .npi-item-body { margin-top: 0.3rem; font-size: 0.9688rem; line-height: 1.55; color: var(--ink-2); max-width: 62ch; }
+  .npi-item-body { margin-top: 0.4rem; font-size: 1rem; line-height: 1.55; color: var(--ink-2); max-width: 52ch; }
 
   @media (max-width: 1080px) {
     .npi-grid { grid-template-columns: minmax(0, 1fr); }
@@ -341,6 +290,5 @@ const charts = [
     .npi-wide { display: none; }
     .npi-narrow { display: block; }
     .npi-legend { font-size: 0.75rem; gap: 1rem; }
-    .npi-item { grid-template-columns: 2rem minmax(0, 1fr); padding-block: 0.8rem; }
   }
 </style>

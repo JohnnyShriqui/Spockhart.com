@@ -3,7 +3,7 @@ import Mist from './Mist.astro';
 interface Props {
   title: string;
   lead?: string;
-  /** Each page's own hero colours (see "Hero themes" in global.css). Every theme is dark except 'nonprofit'. */
+  /** Each page's own hero colours (see "Hero themes" in global.css). */
   theme?: 'approach' | 'work' | 'security' | 'nonprofit' | 'quiet';
   /** On phones, hide the lead and keep just the heading */
   terse?: boolean;
@@ -11,12 +11,11 @@ interface Props {
 }
 const { title, lead, theme = 'quiet', terse = false, class: className = '' } = Astro.props;
 const hasFigure = Astro.slots.has('figure');
-const dark = theme !== 'nonprofit';
 ---
 
 <section
-  class:list={['page-hero', `theme-${theme}`, className, { 'hero-dark': dark, 'with-figure': hasFigure, terse }]}
-  data-hero-dark={dark ? '' : undefined}
+  class:list={['page-hero', 'hero-dark', `theme-${theme}`, className, { 'with-figure': hasFigure, terse }]}
+  data-hero-dark
 >
   <Mist />
   <div class="wrap hero-layout">

@@ -318,6 +318,7 @@ a { color: inherit; }
   --btn-fg: #14212f;
   --btn-bg-hover: #ffffff;
   --selection: rgb(142 192 230 / 0.3);
+  --paper: #101c2a;
   position: relative;
   isolation: isolate;
   overflow: hidden;
@@ -326,8 +327,7 @@ a { color: inherit; }
   border-bottom: 0;
 }
 .hero-dark > .wrap { position: relative; z-index: 1; }
-.hero-dark::after,
-.theme-nonprofit::after {
+.hero-dark::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -403,20 +403,17 @@ a { color: inherit; }
   --mist-3: #34508a;
 }
 
-/* Nonprofits stays light: warm paper in the corner, cool morning light opposite,
-   a fine grain like good stock, fading into the page below */
+/* Nonprofits: deep blue night with a low, warm dawn along the horizon */
 .theme-nonprofit {
   background:
-    radial-gradient(58% 85% at -2% -4%, rgb(242 226 204 / 0.85), transparent 72%),
-    radial-gradient(50% 75% at 102% 24%, rgb(204 221 238 / 0.75), transparent 72%),
-    radial-gradient(44% 60% at 52% 108%, rgb(236 227 214 / 0.55), transparent 72%),
-    linear-gradient(180deg, #f6f2eb 0%, #f3f2ef 60%, var(--paper) 100%);
-  --mist-1: #e8d5bc;
-  --mist-2: #dbc8b2;
-  --mist-3: #cadcec;
-  border-bottom: 0;
+    radial-gradient(70% 48% at 30% 112%, rgb(196 138 92 / 0.3), transparent 72%),
+    radial-gradient(50% 72% at 88% 22%, rgb(46 102 150 / 0.48), transparent 72%),
+    radial-gradient(36% 50% at 8% 6%, rgb(70 84 140 / 0.3), transparent 72%),
+    linear-gradient(185deg, #0b1522 0%, #111d2c 58%, #19212c 100%);
+  --mist-1: #2c6494;
+  --mist-2: #8a6448;
+  --mist-3: #3d4f86;
 }
-.theme-nonprofit::after { opacity: 0.06; mix-blend-mode: multiply; }
 
 /* Light panels that sit inside a dark hero (the contact form) */
 .on-light {
@@ -433,6 +430,7 @@ a { color: inherit; }
   --btn-fg: #f0f3f7;
   --btn-bg-hover: #2c4a6a;
   --selection: rgb(74 138 186 / 0.25);
+  --paper: #f0f3f7;
   color: var(--ink);
 }
 

@@ -28,15 +28,15 @@ interface Item {
 }
 
 const build: Item[] = [
-  { k: 'A', id: 'sales-performance-system', value: '+$316K a month', label: 'In average sales, after a new sales analytics system' },
-  { k: 'B', id: 'digital-practice-growth', value: '$150K → $1M', label: 'New services grew a consulting practice in under a year' },
-  { k: 'C', id: 'project-feasibility-platform', value: 'A new market', label: 'A feasibility tool that became a lead-generation engine' },
+  { k: 'A', id: 'sales-performance-system', value: '+$316K a month', label: 'We lifted average sales with a new analytics system' },
+  { k: 'B', id: 'digital-practice-growth', value: '$150K → $1M', label: 'We grew a consulting practice in under a year' },
+  { k: 'C', id: 'project-feasibility-platform', value: 'A new market', label: 'We built a feasibility tool that now generates leads' },
 ];
 const fix: Item[] = [
-  { k: '1', id: 'commission-automation', value: 'Excel → Automated', label: 'Commissions for a $1.2B manufacturer, live January 2027' },
-  { k: '2', id: 'project-feasibility-platform', value: '12 months → Minutes', label: 'Feasibility assessments, from $100K+ each to $0' },
-  { k: '3', id: 'momentum-exchange-prototype', value: 'Up to 83% more cargo', label: 'Per trip on the same fuel, shown on a working prototype' },
-  { k: '4', id: 'subcontractor-financing-marketplace', value: '6+ months → Weeks', label: 'Financing approvals for subcontractors' },
+  { k: '1', id: 'commission-automation', value: 'Excel → Automated', label: 'We’re automating commissions for a $1.2B manufacturer' },
+  { k: '2', id: 'project-feasibility-platform', value: '12 months → Minutes', label: 'We cut feasibility assessments from $100K+ each to $0' },
+  { k: '3', id: 'momentum-exchange-prototype', value: 'Up to 83% more cargo', label: 'Per trip on the same fuel, in a prototype we built' },
+  { k: '4', id: 'subcontractor-financing-marketplace', value: '6+ months → Weeks', label: 'We cut financing approvals for subcontractors' },
 ];
 
 /* Chart geometry (viewBox 0 0 560 470). Heights are illustrative. */
@@ -162,6 +162,7 @@ const sets = [
                     </div>
                     <div class="fb-body">
                       <span class="fb-key">{it.k}</span>
+                      <span class="fb-note">Our Work</span>
                       <span class="fb-text">
                         <span class="fb-v">{it.value}</span>
                         <span class="fb-l">{it.label}</span>
@@ -432,8 +433,8 @@ const sets = [
 </script>
 
 <style>
-  .fb { padding-block: clamp(3rem, 2rem + 2.5vw, 4.5rem); background: var(--paper-2); overflow-x: clip; }
-  .fb-title { font-size: clamp(2.25rem, 1.6rem + 1.6vw, 3.25rem); text-align: center; text-wrap: balance; margin: 0 auto var(--s-6); }
+  .fb { padding-block: clamp(2rem, 1.25rem + 1.4vw, 2.75rem); background: var(--paper-2); overflow-x: clip; }
+  .fb-title { font-size: clamp(2.25rem, 1.6rem + 1.6vw, 3.25rem); text-align: center; text-wrap: balance; margin: 0 auto var(--s-5); }
 
   .fb-stage {
     position: relative;
@@ -522,17 +523,17 @@ const sets = [
   :global(.fb-link-g.is-on .fb-link) { opacity: 1; stroke-width: 2; }
 
   /* ---------- The case studies ---------- */
-  .fb-cards { position: relative; display: grid; gap: 0.7rem; }
+  .fb-cards { position: relative; display: grid; gap: 0.55rem; }
   .fb-eyebrow { margin-bottom: calc(var(--s-2) * -1); }
   .fb-eyebrow, .fb-set-head { transition: opacity 300ms var(--ease), filter 300ms var(--ease); }
-  .fb-set { display: grid; gap: 0.45rem; }
-  .fb-set + .fb-set { margin-top: 0.35rem; }
-  .fb-set-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s-3); padding-bottom: 0.3rem; border-bottom: 1px solid var(--rule-2); }
-  .fb-set-title { font-family: var(--font-display); font-size: 1.125rem; color: var(--ink); }
+  .fb-set { display: grid; gap: 0.35rem; }
+  .fb-set + .fb-set { margin-top: 0.25rem; }
+  .fb-set-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s-3); padding-bottom: 0.2rem; border-bottom: 1px solid var(--rule-2); }
+  .fb-set-title { font-family: var(--font-display); font-size: 1.0625rem; color: var(--ink); }
   .fb-set-note { font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; }
   .fb-set-build .fb-set-note { color: var(--accent); }
   .fb-set-fix .fb-set-note { color: #a04f48; }
-  .fb-row { display: grid; gap: 0.4rem; }
+  .fb-row { display: grid; gap: 0.35rem; }
 
   .fb-card {
     --ms: 420ms;
@@ -543,7 +544,7 @@ const sets = [
     gap: 0.8rem;
     align-items: center;
     margin-left: 0;
-    padding: 0.5rem 0.8rem 0.5rem 0.5rem;
+    padding: 0.35rem 0.75rem 0.35rem 0.35rem;
     border: 1px solid var(--rule);
     border-radius: var(--radius);
     background: var(--surface);
@@ -556,9 +557,9 @@ const sets = [
   /* The real graphic, shrunk to a still frame; it grows and plays when opened */
   .fb-media {
     position: relative;
-    width: 92px;
-    height: 56px;
-    border-radius: 5px;
+    width: 80px;
+    height: 48px;
+    border-radius: 4px;
     overflow: hidden;
     background: var(--brand);
     transition: width var(--ms) var(--ease-out), height var(--ms) var(--ease-out), border-radius var(--ms) var(--ease);
@@ -588,9 +589,24 @@ const sets = [
   }
   .fb-card-build .fb-key { background: var(--accent); }
   .fb-card-fix .fb-key { background: #a04f48; }
+  /* Opened (and on phones) the letter gives way to a note that this is our team's own work */
+  .fb-note {
+    display: none;
+    justify-self: start;
+    padding: 0.28rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+  .fb-card-build .fb-note { color: var(--accent); background: var(--accent-wash); }
+  .fb-card-fix .fb-note { color: #a04f48; background: rgb(160 79 72 / 0.1); }
   .fb-text { display: grid; gap: 0.1rem; min-width: 0; }
-  .fb-v { font-family: var(--font-display); font-size: 1.1875rem; line-height: 1.15; color: var(--ink); font-variant-numeric: lining-nums; }
-  .fb-l { font-size: 0.875rem; line-height: 1.3; color: var(--ink-2); }
+  .fb-v { font-family: var(--font-display); font-size: 1.125rem; line-height: 1.15; color: var(--ink); font-variant-numeric: lining-nums; }
+  .fb-l { font-size: 0.875rem; line-height: 1.3; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   /* A chevron says there is more to see; it turns when the case study opens */
   .fb-caret { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; color: var(--ink-3); transition: transform var(--ms) var(--ease-out), color 250ms var(--ease), background-color 250ms var(--ease); }
   .fb-caret svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
@@ -621,6 +637,8 @@ const sets = [
     .fb-card.is-on .fb-media { width: var(--mw); height: var(--mh); border-radius: var(--radius); }
     .fb-card.is-on .fb-live { transform: translate(var(--ox-on, 0px), var(--oy-on, 0px)) scale(var(--s-on)); }
     .fb-card.is-on .fb-body { grid-template-columns: minmax(0, 1fr); align-self: center; align-items: start; gap: 0.75rem; }
+    .fb-card.is-on .fb-key { display: none; }
+    .fb-card.is-on .fb-note { display: block; }
     .fb-card.is-on .fb-text { gap: 0.4rem; }
     .fb-card.is-on .fb-v { font-size: 2rem; line-height: 1.1; }
     .fb-card.is-on .fb-client { font-size: 1.25rem; }
@@ -677,7 +695,9 @@ const sets = [
       gap: 0.75rem;
       padding: 0.85rem;
     }
-    .fb-body { order: -1; align-items: start; }
+    .fb-body { order: -1; align-items: start; grid-template-columns: minmax(0, 1fr); gap: 0.5rem; }
+    .fb-key { display: none; }
+    .fb-note { display: block; }
     .fb-card { grid-template-rows: auto 1fr; }
     /* Phones: the same content as an opened case study on a laptop, every card one size */
     .fb-l { display: none; }
