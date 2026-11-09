@@ -71,7 +71,7 @@ const sets = [
       <figure class="fb-chart" aria-label="Before, costs are just under revenue. After, revenue is up three slices and costs are down four.">
         <div class="fb-win">
           <div class="fb-win-bar"><span class="fb-dots"><i></i><i></i><i></i></span>Costs vs revenue</div>
-          <svg viewBox={`0 0 560 ${VB_H}`} class="fb-svg" data-fb-svg aria-hidden="true" preserveAspectRatio="xMidYMin meet">
+          <svg viewBox={`0 0 560 ${VB_H}`} class="fb-svg" data-fb-svg aria-hidden="true" preserveAspectRatio="none">
             <defs>
               <pattern id="fb-hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
                 <line x1="0" y1="0" x2="0" y2="7" class="fb-hatch-line" />
@@ -86,11 +86,15 @@ const sets = [
             <rect x={before.rev} y={revTop} width={W} height={REV} rx="2" class="fb-rev" />
             <rect x={before.cost} y={costTop} width={W} height={COST} rx="2" class="fb-cost" />
             <path d={`M${before.rev - 10} ${revTop} h-5 V${costTop} h5`} class="fb-bracket" />
-            <text x={before.rev - 20} y={revTop + 4} text-anchor="end" class="fb-ann">Thin</text>
-            <text x={before.rev - 20} y={revTop + 18} text-anchor="end" class="fb-ann">margin</text>
-            <text x={before.rev + W / 2} y={BASE + 22} text-anchor="middle" class="fb-axis-label">Revenue</text>
-            <text x={before.cost + W / 2} y={BASE + 22} text-anchor="middle" class="fb-axis-label">Costs</text>
-            <text x={(before.rev + before.cost + W) / 2} y={BASE + 48} text-anchor="middle" class="fb-group">Before</text>
+            <text x={before.rev - 20} y={revTop + 4} text-anchor="end" class="fb-ann">
+              <tspan x={before.rev - 20}>Thin</tspan>
+              <tspan x={before.rev - 20} dy="14">margin</tspan>
+            </text>
+            <g class="fb-under">
+              <text x={before.rev + W / 2} y={BASE + 22} text-anchor="middle" class="fb-axis-label">Revenue</text>
+              <text x={before.cost + W / 2} y={BASE + 22} text-anchor="middle" class="fb-axis-label">Costs</text>
+              <text x={(before.rev + before.cost + W) / 2} y={BASE + 48} text-anchor="middle" class="fb-group">Before</text>
+            </g>
 
             <!-- After: revenue up by A to C, costs down by 1 to 4 -->
             <rect x={after.rev} y={revTop} width={W} height={REV} rx="2" class="fb-rev" />
@@ -131,12 +135,16 @@ const sets = [
             }
             <g class="fb-wide">
               <path d={`M${after.rev - 10} ${newTop} h-5 V${costAfterTop} h5`} class="fb-bracket fb-bracket-after" />
-              <text x={after.rev - 20} y={(newTop + costAfterTop) / 2 - 3} text-anchor="end" class="fb-ann fb-ann-hot">Wider</text>
-              <text x={after.rev - 20} y={(newTop + costAfterTop) / 2 + 12} text-anchor="end" class="fb-ann fb-ann-hot">margin</text>
+              <text x={after.rev - 20} y={(newTop + costAfterTop) / 2 - 3} text-anchor="end" class="fb-ann fb-ann-hot">
+                <tspan x={after.rev - 20}>Wider</tspan>
+                <tspan x={after.rev - 20} dy="15">margin</tspan>
+              </text>
             </g>
-            <text x={after.rev + W / 2} y={BASE + 22} text-anchor="middle" class="fb-axis-label">Revenue</text>
-            <text x={after.cost + W / 2} y={BASE + 22} text-anchor="middle" class="fb-axis-label">Costs</text>
-            <text x={(after.rev + after.cost + W) / 2} y={BASE + 48} text-anchor="middle" class="fb-group">After</text>
+            <g class="fb-under">
+              <text x={after.rev + W / 2} y={BASE + 22} text-anchor="middle" class="fb-axis-label">Revenue</text>
+              <text x={after.cost + W / 2} y={BASE + 22} text-anchor="middle" class="fb-axis-label">Costs</text>
+              <text x={(after.rev + after.cost + W) / 2} y={BASE + 48} text-anchor="middle" class="fb-group">After</text>
+            </g>
           </svg>
         </div>
       </figure>
@@ -282,6 +290,13 @@ const sets = [
           path.setAttribute('d', `M${sx.toFixed(1)} ${sy.toFixed(1)} C${(sx + dx).toFixed(1)} ${sy.toFixed(1)} ${(ex - dx).toFixed(1)} ${ey.toFixed(1)} ${ex.toFixed(1)} ${ey.toFixed(1)}`);
         }
       };
+      // The bars stretch to the chart's height, so each slice stays level with its case study.
+      // Text is scaled back by the same amount so it never looks squashed or stretched.
+      const stretch = () => {
+        const m = chart.getScreenCTM();
+        if (!m || !m.a || !m.d) return;
+        chart.style.setProperty('--ik', (m.a / m.d).toFixed(4));
+      };
       // While a case study opens or closes, the chart grows or shrinks with the list, frame by
       // frame, and the lines stay attached to every case study
       let follow = 0;
@@ -290,6 +305,7 @@ const sets = [
         cancelAnimationFrame(follow);
         const step = () => {
           if (wide.matches) chartFig.style.height = `${cardsBox.offsetHeight}px`;
+          stretch();
           draw();
           if (performance.now() < until) follow = requestAnimationFrame(step);
         };
@@ -420,6 +436,7 @@ const sets = [
 
       const refresh = () => {
         size();
+        stretch();
         requestAnimationFrame(draw);
       };
       mode();
@@ -495,6 +512,12 @@ const sets = [
   .fb-dots { display: flex; gap: 5px; }
   .fb-dots i { width: 8px; height: 8px; border-radius: 50%; background: rgb(255 255 255 / 0.18); }
   .fb-svg { display: block; flex: 1; min-height: 0; width: 100%; height: auto; padding: 0.5rem 0.25rem; box-sizing: border-box; overflow: visible; }
+  /* The chart stretches with the list (laptops); strokes keep their width and text keeps its shape */
+  .fb-svg :is(line, rect, path) { vector-effect: non-scaling-stroke; }
+  .fb-svg text { transform-box: fill-box; transform-origin: center; transform: scaleY(var(--ik, 1)); }
+  /* The labels under each pair of bars stay together, tucked under the baseline */
+  .fb-svg .fb-under { transform-box: fill-box; transform-origin: center top; transform: scaleY(var(--ik, 1)); }
+  .fb-svg .fb-under text { transform: none; }
 
   .fb-grid { stroke: rgb(255 255 255 / 0.06); stroke-width: 1; }
   .fb-axis { stroke: rgb(255 255 255 / 0.28); stroke-width: 1; }
