@@ -381,70 +381,101 @@ a { color: inherit; }
   --mist-3: #d6ccef;
 }
 
-/* A page that runs dark below its hero: the same tokens as a dark hero, one deep ground, and the
-   hero's fine grain. Light panels inside it use .on-light. */
-.page-dark {
-  --ink: #eef3f8;
-  --ink-2: #b5c4d3;
-  --ink-3: #94a8bc;
-  --rule: rgb(255 255 255 / 0.1);
-  --rule-2: rgb(255 255 255 / 0.22);
-  --accent: #8ec0e6;
-  --accent-soft: #6fa8d6;
-  --accent-wash: rgb(142 192 230 / 0.14);
-  --btn-bg: #eef3f8;
-  --btn-fg: #14212f;
-  --btn-bg-hover: #ffffff;
-  --selection: rgb(142 192 230 / 0.3);
+/* Below the hero (Home, Approach, Nonprofits): light, or dark when the visitor's device is in
+   dark mode (many switch to it at sunset). The hero above always stays dark. The components
+   in here read these tokens, so the same markup works on either ground. */
+.page-body {
+  /* Shared by the components below the hero: hairlines and tints are drawn in --hair at a low
+     alpha; --hl and --warm are the blue (revenue) and red (costs) of the charts */
+  --hair: 27 42 61;
+  --hl: #2c5f8a;
+  --hl-rgb: 44 95 138;
+  --warm: #a9524a;
+  --warm-rgb: 169 82 74;
+  --muted: #66788c;
+  --hot: #1b2a3d;
+  --on-ink: #ffffff;
+  --ok: #3d8f62;
+  --wip: #b58424;
+  --card-bg: #ffffff;
   position: relative;
   isolation: isolate;
   color: var(--ink);
+  background: var(--paper);
+  color-scheme: light;
 }
-.page-dark::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background-image: var(--grain);
-  background-size: 200px;
-  opacity: 0.13;
-  mix-blend-mode: overlay;
-}
-.page-dark .closing { border-top: 0 !important; }
-.page-dark .band-recessed { background: transparent; }
-/* Home below its hero: the hero's deep blue, soft light well clear of the top edge */
-.dark-home {
-  background:
-    radial-gradient(45% 14% at 100% 30%, rgb(46 104 152 / 0.28), transparent 72%),
-    radial-gradient(45% 14% at 0% 62%, rgb(42 95 142 / 0.24), transparent 72%),
-    radial-gradient(40% 12% at 100% 88%, rgb(56 66 132 / 0.2), transparent 72%),
-    linear-gradient(180deg, #0e1f32 0%, #0d1c2d 50%, #0c1a29 100%);
+.page-body .closing { border-top: 0 !important; }
+.page-body .band-recessed { background: transparent; }
+
+@media (prefers-color-scheme: dark) {
+  .page-body {
+    --ink: #eef3f8;
+    --ink-2: #b5c4d3;
+    --ink-3: #94a8bc;
+    --rule: rgb(255 255 255 / 0.1);
+    --rule-2: rgb(255 255 255 / 0.22);
+    --accent: #8ec0e6;
+    --accent-soft: #6fa8d6;
+    --accent-wash: rgb(142 192 230 / 0.14);
+    --btn-bg: #eef3f8;
+    --btn-fg: #14212f;
+    --btn-bg-hover: #ffffff;
+    --selection: rgb(142 192 230 / 0.3);
+    --hair: 255 255 255;
+    --hl: #9cc8ea;
+    --hl-rgb: 156 200 234;
+    --warm: #e2a39a;
+    --warm-rgb: 226 163 154;
+    --muted: #8fa1b4;
+    --hot: #d9e6f2;
+    --on-ink: #14212f;
+    --ok: #7fbf9a;
+    --wip: #d9b56a;
+    --card-bg: rgb(255 255 255 / 0.03);
+    color-scheme: dark;
+  }
+  /* The hero's fine grain carries on down a dark page */
+  .page-body::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image: var(--grain);
+    background-size: 200px;
+    opacity: 0.13;
+    mix-blend-mode: overlay;
+  }
+  .page-body h2 { text-shadow: 0 18px 44px rgb(0 0 0 / 0.35); }
+  /* Home below its hero: the hero's deep blue, soft light well clear of the top edge */
+  .body-home {
+    background:
+      radial-gradient(45% 14% at 100% 30%, rgb(46 104 152 / 0.28), transparent 72%),
+      radial-gradient(45% 14% at 0% 62%, rgb(42 95 142 / 0.24), transparent 72%),
+      radial-gradient(40% 12% at 100% 88%, rgb(56 66 132 / 0.2), transparent 72%),
+      linear-gradient(180deg, #0e1f32 0%, #0d1c2d 50%, #0c1a29 100%);
+  }
+  /* Nonprofits below its hero: the hero's deep blue, with the same soft light */
+  .body-nonprofit {
+    background:
+      radial-gradient(45% 20% at 100% 42%, rgb(46 102 150 / 0.3), transparent 72%),
+      radial-gradient(45% 20% at 0% 74%, rgb(42 95 142 / 0.26), transparent 72%),
+      linear-gradient(180deg, #121c2c 0%, #121b2b 60%, #111a29 100%);
+  }
+  /* Approach below its hero: the indigo dusk of the old hero, soft light in the corners */
+  .body-approach {
+    background:
+      radial-gradient(45% 16% at 0% 26%, rgb(72 78 152 / 0.3), transparent 72%),
+      radial-gradient(45% 16% at 100% 52%, rgb(38 96 142 / 0.3), transparent 72%),
+      radial-gradient(40% 14% at 10% 84%, rgb(80 70 140 / 0.22), transparent 72%),
+      linear-gradient(180deg, #0f1528 0%, #111930 55%, #121a30 100%);
+  }
 }
 .theme-home .mist,
-.theme-approach .mist {
-  -webkit-mask-image: linear-gradient(180deg, #000 45%, transparent 90%);
-  mask-image: linear-gradient(180deg, #000 45%, transparent 90%);
-}
-/* Nonprofits below its hero: the hero's deep blue, with the same soft light */
-.dark-nonprofit {
-  background:
-    /* Glows sit well inside, clear of the top edge where the hero joins */
-    radial-gradient(45% 20% at 100% 42%, rgb(46 102 150 / 0.3), transparent 72%),
-    radial-gradient(45% 20% at 0% 74%, rgb(42 95 142 / 0.26), transparent 72%),
-    linear-gradient(180deg, #121c2c 0%, #121b2b 60%, #111a29 100%);
-}
+.theme-approach .mist,
 .theme-nonprofit .mist {
   -webkit-mask-image: linear-gradient(180deg, #000 45%, transparent 90%);
   mask-image: linear-gradient(180deg, #000 45%, transparent 90%);
-}
-/* Approach below its hero: the indigo dusk of the old hero, soft light in the corners */
-.dark-approach {
-  background:
-    radial-gradient(45% 16% at 0% 26%, rgb(72 78 152 / 0.3), transparent 72%),
-    radial-gradient(45% 16% at 100% 52%, rgb(38 96 142 / 0.3), transparent 72%),
-    radial-gradient(40% 14% at 10% 84%, rgb(80 70 140 / 0.22), transparent 72%),
-    linear-gradient(180deg, #0f1528 0%, #111930 55%, #121a30 100%);
 }
 
 /* Approach: indigo dusk, light rising from the lower right, easing at the bottom into the
@@ -798,11 +829,10 @@ html.is-focusing .focus-veil { opacity: 1; }
 }
 
 /* The dark areas clip anything at their edges */
-.page-dark, .work-dark { overflow-x: clip; }
+.page-body, .work-dark { overflow-x: clip; }
 
 /* Headlines: a soft shadow beneath them, and hero headlines float very gently. The backgrounds
    themselves are completely still. */
-.page-dark h2,
 .work-dark h2 { text-shadow: 0 18px 44px rgb(0 0 0 / 0.35); }
 .hero-dark h1 {
   text-shadow: 0 14px 22px rgb(0 0 0 / 0.5), 0 34px 60px rgb(0 0 0 / 0.3);

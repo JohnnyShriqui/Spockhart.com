@@ -11,13 +11,16 @@ const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 function initHeader() {
   const header = document.querySelector<HTMLElement>('[data-header]');
   if (!header) return;
-  // The header is light-on-dark whenever it sits over a dark area: a dark hero, or a page that
-  // runs dark below its hero
-  const dark = Array.from(document.querySelectorAll<HTMLElement>('[data-hero-dark], [data-dark-page]'));
+  // The header is light-on-dark whenever it sits over a dark area: a dark hero, a page that is
+  // dark throughout (Our Work), or the part below a hero when the device is in dark mode
+  const alwaysDark = Array.from(document.querySelectorAll<HTMLElement>('[data-hero-dark], [data-dark-page]'));
+  const body = Array.from(document.querySelectorAll<HTMLElement>('[data-body]'));
+  const darkMode = window.matchMedia('(prefers-color-scheme: dark)');
   let ticking = false;
   const update = () => {
     header.classList.toggle('is-scrolled', window.scrollY > 8);
     const mid = header.offsetHeight / 2;
+    const dark = darkMode.matches ? alwaysDark.concat(body) : alwaysDark;
     header.classList.toggle(
       'over-dark',
       dark.some((el) => {
@@ -28,6 +31,7 @@ function initHeader() {
     ticking = false;
   };
   update();
+  darkMode.addEventListener('change', update);
   window.addEventListener(
     'scroll',
     () => {

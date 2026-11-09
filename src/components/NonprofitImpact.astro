@@ -239,12 +239,27 @@ const charts = [
 </script>
 
 <style>
-  /* Sits on the page's dark ground, straight on from the hero */
+  /* Light, or dark with the device (.page-body tokens) */
   .npi {
-    --c-demand: #e2a39a;
-    --c-res: #9cc8ea;
-    --c-further: #6ea0cd;
+    --c-demand: #b4584f;
+    --c-res: #2f6e9f;
+    --c-further: #6c9fcb;
+    --demand-rgb: 180 88 79;
+    --res-rgb: 47 110 159;
+    --further-rgb: 108 159 203;
+    --ground: var(--paper);
     padding-block: clamp(3rem, 2.25rem + 2.75vw, 5.25rem) clamp(2.5rem, 1.5rem + 2.75vw, 4.5rem);
+  }
+  @media (prefers-color-scheme: dark) {
+    .npi {
+      --c-demand: #e2a39a;
+      --c-res: #9cc8ea;
+      --c-further: #6ea0cd;
+      --demand-rgb: 226 163 154;
+      --res-rgb: 156 200 234;
+      --further-rgb: 110 160 205;
+      --ground: #121b2b;
+    }
   }
   .npi-title {
     font-size: clamp(2.25rem, 1.6rem + 2vw, 3.75rem);
@@ -269,42 +284,42 @@ const charts = [
     gap: 0.5rem 1.5rem;
     margin-bottom: 1rem;
     padding-bottom: 0.8rem;
-    border-bottom: 1px solid rgb(255 255 255 / 0.1);
+    border-bottom: 1px solid rgb(var(--hair) / 0.1);
   }
   .npi-cap-title { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-3); }
   .npi-legend { display: flex; gap: 1.25rem; font-size: 0.8125rem; color: var(--ink-2); }
   .npi-legend span { display: inline-flex; align-items: center; gap: 0.5rem; }
-  .npi-legend i { display: inline-block; width: 18px; height: 0; border-top: 2px solid #d9e6f2; border-radius: 1px; }
-  .npi-legend .lg-without { border-top: 1.5px dashed rgb(217 230 242 / 0.6); }
+  .npi-legend i { display: inline-block; width: 18px; height: 0; border-top: 2px solid var(--hot); border-radius: 1px; }
+  .npi-legend .lg-without { border-top: 1.5px dashed rgb(var(--hair) / 0.6); }
 
   .npi-svg { display: block; width: 100%; height: auto; overflow: visible; }
   .npi-narrow { display: none; }
 
-  .axis { fill: none; stroke: rgb(255 255 255 / 0.18); stroke-width: 1; }
-  .axis-label { font-family: var(--font-body); font-size: 10.5px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; fill: #8fa1b4; }
+  .axis { fill: none; stroke: rgb(var(--hair) / 0.18); stroke-width: 1; }
+  .axis-label { font-family: var(--font-body); font-size: 10.5px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; fill: var(--muted); }
 
   /* Without: thin and dashed. With: solid, with soft light under it */
   .l-without { fill: none; stroke-width: 1.5; stroke-dasharray: 4 5; stroke-linecap: round; }
-  .l-without-demand { stroke: rgb(226 163 154 / 0.55); }
-  .l-without-res { stroke: rgb(156 200 234 / 0.5); }
+  .l-without-demand { stroke: rgb(var(--demand-rgb) / 0.55); }
+  .l-without-res { stroke: rgb(var(--res-rgb) / 0.5); }
   .l-demand, .l-res { fill: none; stroke-width: 2.25; stroke-linecap: round; stroke-linejoin: round; }
   .l-demand { stroke: var(--c-demand); }
   .l-res { stroke: var(--c-res); }
   .dot-demand { fill: var(--c-demand); }
   .dot-res { fill: var(--c-res); }
-  .r-further { fill: rgb(110 160 205 / 0.3); }
-  .r-funding { fill: rgb(156 200 234 / 0.16); }
-  .seam { fill: none; stroke: rgb(156 200 234 / 0.45); stroke-width: 1; }
-  .hatch-line { stroke: rgb(226 163 154 / 0.24); stroke-width: 1; }
+  .r-further { fill: rgb(var(--further-rgb) / 0.3); }
+  .r-funding { fill: rgb(var(--res-rgb) / 0.16); }
+  .seam { fill: none; stroke: rgb(var(--res-rgb) / 0.45); stroke-width: 1; }
+  .hatch-line { stroke: rgb(var(--demand-rgb) / 0.24); stroke-width: 1; }
 
   .end-label { font-family: var(--font-body); font-size: 12.5px; font-weight: 600; letter-spacing: 0.01em; }
   .end-demand { fill: var(--c-demand); }
   .end-res { fill: var(--c-res); }
-  .arrow { fill: none; stroke: rgb(238 243 248 / 0.55); stroke-width: 1; stroke-linecap: round; stroke-linejoin: round; }
-  .key circle { fill: #121b2b; stroke: rgb(238 243 248 / 0.35); stroke-width: 1; }
-  .key text { font-family: var(--font-body); font-size: 10px; font-weight: 600; fill: #d9e6f2; }
-  .bracket { fill: none; stroke: rgb(238 243 248 / 0.45); stroke-width: 1; }
-  .bracket-label { font-family: var(--font-body); font-size: 12px; font-weight: 500; fill: #d9e6f2; }
+  .arrow { fill: none; stroke: rgb(var(--hair) / 0.55); stroke-width: 1; stroke-linecap: round; stroke-linejoin: round; }
+  .key circle { fill: var(--ground); stroke: rgb(var(--hair) / 0.35); stroke-width: 1; }
+  .key text { font-family: var(--font-body); font-size: 10px; font-weight: 600; fill: var(--hot); }
+  .bracket { fill: none; stroke: rgb(var(--hair) / 0.45); stroke-width: 1; }
+  .bracket-label { font-family: var(--font-body); font-size: 12px; font-weight: 500; fill: var(--hot); }
 
   /* ---------- Motion ----------
      At rest (and with reduced motion) the chart shows the finished picture. On screen it plays
@@ -331,8 +346,8 @@ const charts = [
 
   /* ---------- The three ways: typographic, hairline-ruled, keyed to the chart ---------- */
   .npi-ways { list-style: none; padding: 0; display: grid; }
-  .npi-way { padding-block: clamp(1.05rem, 0.85rem + 0.65vw, 1.5rem); border-top: 1px solid rgb(255 255 255 / 0.12); }
-  .npi-way:last-child { border-bottom: 1px solid rgb(255 255 255 / 0.12); }
+  .npi-way { padding-block: clamp(1.05rem, 0.85rem + 0.65vw, 1.5rem); border-top: 1px solid rgb(var(--hair) / 0.12); }
+  .npi-way:last-child { border-bottom: 1px solid rgb(var(--hair) / 0.12); }
   .npi-n {
     display: flex;
     align-items: center;

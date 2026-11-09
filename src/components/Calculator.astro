@@ -320,41 +320,74 @@ const iconFill = (i: number) => Math.max(0, Math.min(1, fteIcons - i));
   }
 
   /* ==========================================================================
-     Dark and refined (on .page-dark): no box or panel, the inputs and the result side by side,
+     Open and refined, light or dark with the device (.page-body tokens): no box or panel, the inputs and the result side by side,
      divided by a hairline, the result set as large type
      ========================================================================== */
-  .calc-section { padding-block: clamp(2.5rem, 1.5rem + 3vw, 5rem); }
-  .calc { border: 0; border-radius: 0; background: none; box-shadow: none; border-top: 1px solid rgb(255 255 255 / 0.1); border-bottom: 1px solid rgb(255 255 255 / 0.1); }
+  .calc-section {
+    padding-block: clamp(2.5rem, 1.5rem + 3vw, 5rem);
+    --day-fill: rgb(74 138 186 / 0.34);
+    --day-name: var(--ink);
+    --person-fill: rgb(74 138 186 / 0.9);
+  }
+  @media (prefers-color-scheme: dark) {
+    .calc-section {
+      --day-fill: rgb(156 200 234 / 0.75);
+      --day-name: #fff;
+      --person-fill: rgb(156 200 234 / 0.85);
+    }
+  }
+  /* The result's words, which were white on the old blue panel, now follow the page */
+  .calc-right { color: var(--ink); }
+  .r-unit { color: var(--ink-2); }
+  .r-line strong { color: var(--ink); }
+  .day-name { color: var(--day-name); }
+  .tile-v { color: var(--ink); }
+  .tile-k { color: var(--ink-2); }
+  .calc { border: 0; border-radius: 0; background: none; box-shadow: none; border-top: 1px solid rgb(var(--hair) / 0.1); border-bottom: 1px solid rgb(var(--hair) / 0.1); }
   .calc-left { padding-left: 0; }
   .calc-head .eyebrow { color: var(--ink-3); }
   .calc-head .eyebrow::before { display: none; }
   .calc-head h2 { font-weight: 400; }
   .slider-head label { font-weight: 500; }
-  .slider-head output { font-weight: 400; color: #eef3f8; }
-  input[type='range']::-webkit-slider-runnable-track { height: 2px; background: linear-gradient(to right, #9cc8ea 0 var(--p), rgb(255 255 255 / 0.14) var(--p) 100%); }
-  input[type='range']::-moz-range-track { height: 2px; background: rgb(255 255 255 / 0.14); }
-  input[type='range']::-moz-range-progress { height: 2px; background: #9cc8ea; }
-  input[type='range']::-webkit-slider-thumb { width: 16px; height: 16px; margin-top: -7px; background: #eef3f8; border: 0; box-shadow: 0 0 0 4px rgb(156 200 234 / 0.18); }
-  input[type='range']::-moz-range-thumb { width: 16px; height: 16px; background: #eef3f8; border: 0; }
-  input[type='range']:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 6px rgb(156 200 234 / 0.3); }
-  .calc-right { background: none; border-left: 1px solid rgb(255 255 255 / 0.1); padding-right: 0; }
+  .slider-head output { font-weight: 400; color: var(--ink); }
+  input[type='range']::-webkit-slider-runnable-track { height: 2px; background: linear-gradient(to right, var(--hl) 0 var(--p), rgb(var(--hair) / 0.14) var(--p) 100%); }
+  input[type='range']::-moz-range-track { height: 2px; background: rgb(var(--hair) / 0.14); }
+  input[type='range']::-moz-range-progress { height: 2px; background: var(--hl); }
+  input[type='range']::-webkit-slider-thumb { width: 16px; height: 16px; margin-top: -7px; background: var(--ink); border: 0; box-shadow: 0 0 0 4px rgb(var(--hl-rgb) / 0.18); }
+  input[type='range']::-moz-range-thumb { width: 16px; height: 16px; background: var(--ink); border: 0; }
+  input[type='range']:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 6px rgb(var(--hl-rgb) / 0.3); }
+  .calc-right { background: none; border-left: 1px solid rgb(var(--hair) / 0.1); padding-right: 0; }
   .calc-right::before { display: none; }
   .r-label { color: var(--ink-3); }
-  .r-big { font-weight: 400; color: #eef3f8; }
-  .r-viz { border-top-color: rgb(255 255 255 / 0.1); }
+  .r-big { font-weight: 400; color: var(--ink); }
+  .r-viz { border-top-color: rgb(var(--hair) / 0.1); }
   .r-line { color: var(--ink-2); }
-  .day { background: rgb(255 255 255 / 0.06); }
-  .day-fill { background: rgb(156 200 234 / 0.75); }
-  .person svg { fill: rgb(255 255 255 / 0.14); }
-  .person .person-fill { fill: rgb(156 200 234 / 0.85); }
+  .day { background: rgb(var(--hair) / 0.06); }
+  .day-fill { background: var(--day-fill); }
+  .person svg { fill: rgb(var(--hair) / 0.14); }
+  .person .person-fill { fill: var(--person-fill); }
   .team-key { color: var(--ink-3); }
-  .btn-on-brand { background: #eef3f8; color: #14212f; border-color: #eef3f8; }
-  .btn-on-brand:hover { background: #fff; border-color: #fff; }
+  .btn-on-brand { background: var(--btn-bg); color: var(--btn-fg); border-color: var(--btn-bg); }
+  .btn-on-brand:hover { background: var(--btn-bg-hover); border-color: var(--btn-bg-hover); }
+  /* Laptops: the result uses the full height beside the inputs. The label and figure sit
+     together at the top, each picture gets its own room, and the button lines up with the
+     bottom of the inputs. */
+  @media (min-width: 961px) {
+    .calc-right { display: flex; flex-direction: column; gap: 0; }
+    .r-big { margin-top: 0.6rem; padding-bottom: 1.5rem; }
+    /* Whatever height the inputs give is shared out evenly above each picture and the button */
+    .r-viz { gap: 1.1rem; margin-top: auto; padding-block: 1.5rem; }
+    .day { height: 44px; }
+    .team { gap: 8px 7px; }
+    .person { width: 21px; height: 28px; }
+    .team-key { margin-top: -0.25rem; }
+    .btn-on-brand { align-self: flex-start; margin-top: auto; }
+  }
   @media (max-width: 960px) {
-    .calc-right { border-left: 0; border-top: 1px solid rgb(255 255 255 / 0.1); padding-left: 0; }
+    .calc-right { border-left: 0; border-top: 1px solid rgb(var(--hair) / 0.1); padding-left: 0; }
   }
   @media (max-width: 640px) {
     .calc-left, .calc-right { padding-inline: 0; }
-    .r-tiles li { background: rgb(255 255 255 / 0.05); }
+    .r-tiles li { background: rgb(var(--hair) / 0.05); }
   }
 </style>

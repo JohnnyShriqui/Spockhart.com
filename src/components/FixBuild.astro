@@ -313,6 +313,25 @@ const sets = [
         follow = requestAnimationFrame(step);
       };
 
+      /* ---------- The drawing sits level with the list (laptops) ----------
+         Its middle, from the top of the new revenue down to the Before and After labels, lines
+         up with the middle of the case studies, from the first heading to the last row. */
+      const vb = chart.viewBox.baseVal;
+      const VBW = vb.width;
+      const VBH = vb.height;
+      const centre = () => {
+        chart.setAttribute('viewBox', `0 0 ${VBW} ${VBH}`);
+        if (!wide.matches) return;
+        const top = chart.querySelector('.fb-bracket-after')?.getBoundingClientRect().top;
+        const bottom = Math.max(...Array.from(chart.querySelectorAll('.fb-group')).map((t) => t.getBoundingClientRect().bottom));
+        const head = root.querySelector('.fb-set-head')?.getBoundingClientRect().top;
+        const m = chart.getScreenCTM();
+        if (top === undefined || head === undefined || !m || !m.d) return;
+        const listMid = (head + cardsBox.getBoundingClientRect().bottom) / 2;
+        const dy = (listMid - (top + bottom) / 2) / m.d;
+        chart.setAttribute('viewBox', `0 ${(-dy).toFixed(2)} ${VBW} ${VBH}`);
+      };
+
       /* ---------- Thumbnails: each graphic, scaled down to a still frame ---------- */
       const size = () => {
         // Phones: every card as tall as the tallest; the graphic takes whatever space the
@@ -347,9 +366,13 @@ const sets = [
         if (wide.matches) {
           // The chart is exactly as tall as the list of case studies with all of them closed,
           // and stays that size
-          if (!open) chartFig.style.height = `${cardsBox.offsetHeight}px`;
+          if (!open) {
+            chartFig.style.height = `${cardsBox.offsetHeight}px`;
+            centre();
+          }
         } else {
           chartFig.style.removeProperty('height');
+          centre();
         }
       };
 
@@ -741,7 +764,7 @@ const sets = [
 
   /* ==========================================================================
      Dark and refined, in the same language as the Nonprofits page: no frames, thin lines,
-     soft light, and a typographic list. Sits on the page's dark ground (.page-dark).
+     soft light, and a typographic list. Light, or dark with the device (.page-body tokens).
      ========================================================================== */
   .fb { background: transparent; padding-block: clamp(4rem, 3rem + 3vw, 6.5rem) clamp(2.5rem, 1.5rem + 3vw, 5rem); }
   .fb-title {
@@ -760,7 +783,7 @@ const sets = [
   .fb-win-bar {
     padding: 0 0 0.85rem;
     background: none;
-    border-bottom: 1px solid rgb(255 255 255 / 0.1);
+    border-bottom: 1px solid rgb(var(--hair) / 0.1);
     font-size: 0.75rem;
     letter-spacing: 0.16em;
     text-transform: uppercase;
@@ -768,33 +791,33 @@ const sets = [
   }
   .fb-dots { display: none; }
   .fb-svg { padding: 1rem 0 0; }
-  .fb-grid { stroke: rgb(255 255 255 / 0.05); }
-  .fb-axis { stroke: rgb(255 255 255 / 0.18); }
-  .fb-divider { stroke: rgb(255 255 255 / 0.07); }
-  .fb-axis-label { font-size: 10.5px; letter-spacing: 0.18em; fill: #8fa1b4; }
-  .fb-group { font-size: 19px; fill: #eef3f8; }
-  .fb-ann { fill: #8fa1b4; }
-  .fb-ann-hot { fill: #d9e6f2; font-weight: 500; }
-  .fb-bracket { stroke: rgb(238 243 248 / 0.3); }
-  .fb-bracket-after { stroke: rgb(238 243 248 / 0.5); }
-  .fb-rev { fill: rgb(110 160 205 / 0.5); }
-  .fb-cost { fill: rgb(226 163 154 / 0.42); }
-  .fb-add-rect { fill: rgb(156 200 234 / 0.2); stroke: rgb(156 200 234 / 0.65); stroke-width: 1; }
-  .fb-key-add { font-size: 12px; font-weight: 600; fill: #d9e6f2; }
-  .fb-cut-rect { stroke: rgb(226 163 154 / 0.6); stroke-width: 1; }
-  .fb-hatch-line { stroke: rgb(226 163 154 / 0.24); stroke-width: 1; }
-  .fb-key-cut { font-size: 11px; font-weight: 600; fill: #e2a39a; }
-  .fb-add.is-on .fb-add-rect { fill: rgb(156 200 234 / 0.45); }
+  .fb-grid { stroke: rgb(var(--hair) / 0.05); }
+  .fb-axis { stroke: rgb(var(--hair) / 0.18); }
+  .fb-divider { stroke: rgb(var(--hair) / 0.07); }
+  .fb-axis-label { font-size: 10.5px; letter-spacing: 0.18em; fill: var(--muted); }
+  .fb-group { font-size: 19px; fill: var(--ink); }
+  .fb-ann { fill: var(--muted); }
+  .fb-ann-hot { fill: var(--hot); font-weight: 500; }
+  .fb-bracket { stroke: rgb(var(--hair) / 0.3); }
+  .fb-bracket-after { stroke: rgb(var(--hair) / 0.5); }
+  .fb-rev { fill: var(--c-rev-dull); }
+  .fb-cost { fill: rgb(var(--c-cost) / 0.42); }
+  .fb-add-rect { fill: rgb(var(--hl-rgb) / 0.2); stroke: rgb(var(--hl-rgb) / 0.65); stroke-width: 1; }
+  .fb-key-add { font-size: 12px; font-weight: 600; fill: var(--hot); }
+  .fb-cut-rect { stroke: rgb(var(--warm-rgb) / 0.6); stroke-width: 1; }
+  .fb-hatch-line { stroke: rgb(var(--warm-rgb) / 0.24); stroke-width: 1; }
+  .fb-key-cut { font-size: 11px; font-weight: 600; fill: var(--warm); }
+  .fb-add.is-on .fb-add-rect { fill: rgb(var(--hl-rgb) / 0.45); }
   :global(.fb-link) { stroke-width: 1; opacity: 0.5; }
-  :global(.fb-link-build) { stroke: #9cc8ea; }
-  :global(.fb-link-fix) { stroke: #e2a39a; }
+  :global(.fb-link-build) { stroke: var(--hl); }
+  :global(.fb-link-fix) { stroke: var(--warm); }
 
   /* The case studies: hairline-ruled rows, one line each, no boxes */
   .fb-eyebrow { margin-bottom: 0.35rem; }
-  .fb-set-head { border-bottom-color: rgb(255 255 255 / 0.22); }
+  .fb-set-head { border-bottom-color: rgb(var(--hair) / 0.22); }
   .fb-set-title { color: var(--ink); }
-  .fb-set-build .fb-set-note { color: #9cc8ea; }
-  .fb-set-fix .fb-set-note { color: #e2a39a; }
+  .fb-set-build .fb-set-note { color: var(--hl); }
+  .fb-set-fix .fb-set-note { color: var(--warm); }
   .fb-key {
     position: relative;
     width: auto;
@@ -808,25 +831,25 @@ const sets = [
     color: var(--ink-3);
   }
   .fb-key::before { content: ''; position: absolute; left: 0; top: 50%; width: 1.1rem; height: 2px; border-radius: 1px; background: var(--c); }
-  .fb-card-build { --c: #9cc8ea; }
-  .fb-card-fix { --c: #e2a39a; }
+  .fb-card-build { --c: var(--hl); }
+  .fb-card-fix { --c: var(--warm); }
   .fb-v { color: var(--ink); font-weight: 400; }
   .fb-caret { color: var(--ink-3); }
-  .fb-head:hover { background: rgb(255 255 255 / 0.035); }
-  .fb-head:hover .fb-caret, .fb-card.is-open .fb-caret { color: #9cc8ea; }
-  .fb-panel-body { border-top-color: rgb(255 255 255 / 0.1); }
-  .fb-card-build .fb-pnote { color: #9cc8ea; background: rgb(156 200 234 / 0.12); }
-  .fb-card-fix .fb-pnote { color: #e2a39a; background: rgb(226 163 154 / 0.12); }
+  .fb-head:hover { background: rgb(var(--hair) / 0.035); }
+  .fb-head:hover .fb-caret, .fb-card.is-open .fb-caret { color: var(--hl); }
+  .fb-panel-body { border-top-color: rgb(var(--hair) / 0.1); }
+  .fb-card-build .fb-pnote { color: var(--hl); background: rgb(var(--hl-rgb) / 0.12); }
+  .fb-card-fix .fb-pnote { color: var(--warm); background: rgb(var(--warm-rgb) / 0.12); }
   .fb-client { color: var(--ink); }
-  .fb-client-mark::before { background: #eef3f8; }
-  .fb-client-mark svg { stroke: #14212f; }
+  .fb-client-mark::before { background: var(--ink); }
+  .fb-client-mark svg { stroke: var(--on-ink); }
   .fb-headline { color: var(--ink); font-weight: 400; }
-  .fb-headline .hl { color: #9cc8ea; }
+  .fb-headline .hl { color: var(--hl); }
 
   @media (min-width: 1100px) {
     .fb-row { gap: 0; }
-    .fb-card { border: 0; border-bottom: 1px solid rgb(255 255 255 / 0.1); border-radius: 0; background: none; }
-    .fb-card.is-open { border-color: rgb(255 255 255 / 0.1); }
+    .fb-card { border: 0; border-bottom: 1px solid rgb(var(--hair) / 0.1); border-radius: 0; background: none; }
+    .fb-card.is-open { border-color: rgb(var(--hair) / 0.1); }
     .fb-head { grid-template-columns: minmax(0, 1fr) auto; padding: 0.85rem 0.5rem 0.85rem 0; }
     .fb-v { font-size: 1.3125rem; }
     /* The words carry each row; the graphic opens in the dropdown */
@@ -835,40 +858,49 @@ const sets = [
   }
   /* Phones and tablets: the swipe cards, quiet on the dark ground */
   @media (max-width: 1099px) {
-    .fb-card { border: 1px solid rgb(255 255 255 / 0.1); background: rgb(255 255 255 / 0.03); }
+    .fb-card { border: 1px solid rgb(var(--hair) / 0.1); background: var(--card-bg); }
     .fb-key { display: block; }
     .fb-note { display: none; }
-    .fb-cs { border-top-color: rgb(255 255 255 / 0.1); }
+    .fb-cs { border-top-color: rgb(var(--hair) / 0.1); }
   }
   /* Restrained, like a printed annual report: flat colour, hairlines, no glow. Before is muted;
      the After bars start just as muted and fill to full colour once our work is built on them
      (costs once the cuts land, revenue once the new slices stack up). */
   .fb {
-    --c-rev: 156 200 234;
-    --c-cost: 226 163 154;
+    --c-rev: 74 138 186;
+    --c-cost: 196 116 108;
+    --c-rev-dull: rgb(74 138 186 / 0.36);
   }
+  @media (prefers-color-scheme: dark) {
+    .fb {
+      --c-rev: 156 200 234;
+      --c-cost: 226 163 154;
+      --c-rev-dull: rgb(110 160 205 / 0.5);
+    }
+  }
+  .fb-chart { color: var(--ink); }
   .fb-rev-after { fill: rgb(var(--c-rev) / 0.82); }
   .fb-cost-after { fill: rgb(var(--c-cost) / 0.72); }
   .fb-add-rect { fill: rgb(var(--c-rev) / 0.18); stroke: rgb(var(--c-rev) / 0.75); stroke-width: 1; }
   .fb-add.is-on .fb-add-rect { fill: rgb(var(--c-rev) / 0.36); }
-  .fb-key-add { fill: #eef3f8; }
+  .fb-key-add { fill: var(--ink); }
   .fb-cut-rect { stroke: rgb(var(--c-cost) / 0.65); stroke-width: 1; }
   .fb-hatch-line { stroke: rgb(var(--c-cost) / 0.24); }
-  .fb-key-cut { fill: #e2a39a; }
-  .fb-bracket-after { stroke: rgb(238 243 248 / 0.5); }
-  .fb-ann-hot { fill: #d9e6f2; }
+  .fb-key-cut { fill: var(--warm); }
+  .fb-bracket-after { stroke: rgb(var(--hair) / 0.5); }
+  .fb-ann-hot { fill: var(--hot); }
   :global(.fb-link) { opacity: 0.5; }
-  :global(.fb-link-build) { stroke: #9cc8ea; }
-  :global(.fb-link-fix) { stroke: #e2a39a; }
-  .fb-card-build { --c: #9cc8ea; }
-  .fb-card-fix { --c: #e2a39a; }
-  .fb-set-build .fb-set-note { color: #9cc8ea; }
-  .fb-set-fix .fb-set-note { color: #e2a39a; }
+  :global(.fb-link-build) { stroke: var(--hl); }
+  :global(.fb-link-fix) { stroke: var(--warm); }
+  .fb-card-build { --c: var(--hl); }
+  .fb-card-fix { --c: var(--warm); }
+  .fb-set-build .fb-set-note { color: var(--hl); }
+  .fb-set-fix .fb-set-note { color: var(--warm); }
   @media (prefers-reduced-motion: no-preference) {
     .fb-cost-after { transition: transform 2200ms var(--ease-out) 300ms, fill 1400ms var(--ease) 2700ms; }
     .fb-rev-after { transition: fill 1400ms var(--ease) 4000ms; }
     .fb-pre .fb-cost-after { fill: rgb(var(--c-cost) / 0.42); transition: transform 700ms var(--ease), fill 600ms var(--ease); }
-    .fb-pre .fb-rev-after { fill: rgb(110 160 205 / 0.5); transition: fill 600ms var(--ease); }
+    .fb-pre .fb-rev-after { fill: var(--c-rev-dull); transition: fill 600ms var(--ease); }
     .fb-hold .fb-rev-after { transition: none !important; }
   }
 
@@ -906,7 +938,7 @@ const sets = [
     align-items: center;
     gap: 0.45rem;
     padding: 0.2rem 0.6rem 0.2rem 0.5rem;
-    border: 1px solid rgb(255 255 255 / 0.12);
+    border: 1px solid rgb(var(--hair) / 0.12);
     border-radius: 999px;
     font-family: var(--font-body);
     font-size: 0.6875rem;
@@ -918,8 +950,8 @@ const sets = [
     color: var(--ink-3);
   }
   .fb-pill i { width: 5px; height: 5px; border-radius: 50%; background: var(--dot); flex: none; }
-  .fb-pill-done { --dot: #7fbf9a; }
-  .fb-pill-progress { --dot: #d9b56a; }
+  .fb-pill-done { --dot: var(--ok); }
+  .fb-pill-progress { --dot: var(--wip); }
   @media (max-width: 1099px) {
     .fb-pill { font-size: 0.625rem; padding: 0.16rem 0.5rem 0.16rem 0.42rem; }
   }
