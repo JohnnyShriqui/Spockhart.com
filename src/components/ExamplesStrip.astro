@@ -2,7 +2,7 @@
 /**
  * Home, under the section's opening line: everyday work we take on, as cards in the same two
  * groups (and colours) as the case studies below. A small line icon, the name, and one short line.
- * Laptops: the two groups side by side, each a 2 x 2 grid. Phones: 2 x 2 grids, names only.
+ * Laptops: the two groups side by side, each a 2 x 2 grid. Phones: one card per line.
  */
 const groups = [
   {
@@ -63,23 +63,23 @@ const groups = [
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     column-gap: clamp(2rem, 1rem + 2.5vw, 3.5rem);
-    margin-bottom: clamp(3.5rem, 2.25rem + 3.5vw, 5.5rem);
+    margin-bottom: clamp(4.5rem, 3rem + 4vw, 7rem);
   }
   .ex-build { --c: var(--hl); --c-rgb: var(--hl-rgb); }
   .ex-fix { --c: var(--warm); --c-rgb: var(--warm-rgb); }
   /* The same heads as the case study list: title, a coloured note, a firm rule */
-  .ex-head { display: flex; align-items: baseline; justify-content: space-between; gap: 0.75rem; padding-bottom: 0.35rem; margin-bottom: 0.55rem; border-bottom: 1px solid var(--rule-2); }
+  .ex-head { display: flex; align-items: baseline; justify-content: space-between; gap: 0.75rem; padding-bottom: 0.5rem; margin-bottom: 0.9rem; border-bottom: 1px solid var(--rule-2); }
   .ex-title { font-family: var(--font-display); font-size: 1.0625rem; color: var(--ink); }
   .ex-note { font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; white-space: nowrap; color: var(--c); }
 
-  .ex-cards { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 1fr; gap: 0.4rem; }
+  .ex-cards { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 1fr; gap: 0.65rem; }
   .ex-card {
     position: relative;
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
-    gap: 0.75rem;
+    gap: 0.9rem;
     align-items: center;
-    padding: 0.55rem 0.8rem 0.6rem;
+    padding: 0.95rem 1.05rem 1rem;
     border: 1px solid var(--bar-line, rgb(27 42 61 / 0.1));
     border-radius: var(--radius-lg);
     background: var(--bar-bg, #fff);
@@ -91,30 +91,35 @@ const groups = [
   .ex-icon {
     display: grid;
     place-items: center;
-    width: 30px;
-    height: 30px;
+    width: 36px;
+    height: 36px;
     border-radius: 8px;
     background: rgb(var(--c-rgb) / 0.1);
   }
-  .ex-icon svg { width: 18px; height: 18px; fill: none; stroke: var(--c); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
-  .ex-text { display: grid; gap: 0.1rem; min-width: 0; }
-  .ex-name { font-family: var(--font-display); font-size: 1rem; line-height: 1.25; color: var(--ink); }
-  .ex-line { font-size: 0.8125rem; line-height: 1.35; color: var(--ink-2); }
+  .ex-icon svg { width: 19px; height: 19px; fill: none; stroke: var(--c); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+  .ex-text { display: grid; gap: 0.2rem; min-width: 0; }
+  .ex-name { font-family: var(--font-display); font-size: 1.0625rem; line-height: 1.25; color: var(--ink); }
+  .ex-line { font-size: 0.875rem; line-height: 1.4; color: var(--ink-2); }
 
   @media (max-width: 1099px) {
-    .ex { grid-template-columns: minmax(0, 1fr); row-gap: 1.75rem; }
+    .ex { grid-template-columns: minmax(0, 1fr); row-gap: 2.5rem; }
   }
-  /* Smaller laptops: every card the same height in both groups */
+  /* Laptops: every card the same height in both groups */
+  @media (min-width: 1100px) {
+    .ex-card { min-height: 5.5rem; }
+    .ex-name { font-size: 1rem; }
+  }
   @media (min-width: 1100px) and (max-width: 1399px) {
-    .ex-card { min-height: 3.75rem; }
+    .ex-card { min-height: 6rem; }
   }
-  /* Phones: 2 x 2 grids of compact cards, the name alone under the coloured line */
+  /* Phones: one card per line, each with its icon, name and short line */
   @media (max-width: 640px) {
-    .ex { row-gap: 1.25rem; margin-bottom: 2rem; }
-    .ex-head { margin-bottom: 0.6rem; }
-    .ex-cards { gap: 0.45rem; }
-    .ex-card { grid-template-columns: minmax(0, 1fr); align-items: center; padding: 0.6rem 0.7rem 0.6rem; }
-    .ex-icon, .ex-line { display: none; }
-    .ex-name { font-size: 0.875rem; line-height: 1.25; }
+    .ex { row-gap: 2.25rem; margin-bottom: 3.5rem; }
+    .ex-head { margin-bottom: 0.75rem; }
+    .ex-cards { grid-template-columns: minmax(0, 1fr); grid-auto-rows: auto; gap: 0.55rem; }
+    .ex-card { padding: 0.85rem 0.95rem 0.9rem; gap: 0.85rem; }
+    .ex-icon { width: 34px; height: 34px; }
+    .ex-name { font-size: 1rem; }
+    .ex-line { font-size: 0.875rem; }
   }
 </style>

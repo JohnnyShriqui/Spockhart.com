@@ -118,6 +118,9 @@
 html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+  /* No elastic bounce past the top or bottom on phones: pulled past the footer, the page showed
+     an empty stretch of dark background that looked like the footer running on */
+  overscroll-behavior-y: none;
   scroll-padding-top: 96px;
   interpolate-size: allow-keywords;
 }
@@ -125,6 +128,7 @@ html {
   html { scroll-behavior: smooth; }
 }
 body {
+  overscroll-behavior-y: none;
   min-height: 100dvh;
   /* Every page is dark; the ground under everything is too */
   background: #0b1520;
