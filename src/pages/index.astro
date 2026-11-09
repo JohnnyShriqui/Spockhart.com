@@ -1,7 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
 import Mark from '../components/Mark.astro';
-import Mist from '../components/Mist.astro';
 import Calculator from '../components/Calculator.astro';
 import FixBuild from '../components/FixBuild.astro';
 import ClosingCTA from '../components/ClosingCTA.astro';
@@ -12,31 +11,39 @@ import { hexPath } from '../lib/logo';
 
 <Base>
   <section class="hero">
-    <Mist />
-    <div class="wrap hero-grid">
-      <div class="hero-copy">
-        <p class="eyebrow load-in" style="--i:0">Engineering impact</p>
-        <h1 class="load-in" style="--i:1">We optimize <em class="display-em">operations.</em></h1>
-        <div class="accent-rule load-in" style="--i:2"></div>
-        <p class="lead load-in" style="--i:2">
-          Spockhart works alongside your team to optimize existing processes, automate repetitive tasks, and develop new capabilities.
-          Within {site.offer.prototypeDays} days, you’ll have a working first version.
-        </p>
-        <div class="btn-row load-in" style="--i:3">
-          <a class="btn" href="/contact/">Start a conversation <span class="arr" aria-hidden="true">→</span></a>
+    <div class="wrap">
+      <div class="hero-top load-in" style="--i:0">
+        <p class="eyebrow">Engineering impact</p>
+      </div>
+      <div class="hero-grid">
+        <div class="hero-copy">
+          <h1 class="load-in" style="--i:1">We optimize <em class="display-em">operations.</em></h1>
+          <p class="lead load-in" style="--i:2">
+            Spockhart works alongside your team to optimize existing processes, automate repetitive tasks, and develop new capabilities.
+            Within {site.offer.prototypeDays} days, you’ll have a working first version.
+          </p>
+          <div class="btn-row load-in" style="--i:3">
+            <a class="btn" href="/contact/">Start a conversation <span class="arr" aria-hidden="true">→</span></a>
+          </div>
+        </div>
+
+        <!-- The mark, drawn up like a plate from an engineer's notebook -->
+        <div class="plate load-fade" aria-hidden="true">
+          <span class="crop crop-tl"></span><span class="crop crop-tr"></span><span class="crop crop-bl"></span><span class="crop crop-br"></span>
+          <svg class="construction" viewBox="-180 -180 360 360">
+            <path d="M-180 0H180M0 -180V180" class="c-axis" />
+            <path d={hexPath} transform="scale(1.24)" class="c-hex" />
+            <path d={hexPath} transform="scale(1.1)" class="c-hex-inner" />
+            <circle r="146" class="c-circle" />
+            <!-- dimensions -->
+            <path d="M-137.6 80V170M137.6 80V170M0 -152H170M0 152H170" class="c-ext" />
+            <path d="M-137.6 164H137.6M164 -146.3V146.3" class="c-dim" />
+            <path d="M-131 160.5L-137.6 164L-131 167.5M131 160.5L137.6 164L131 167.5M160.5 -139.7L164 -146.3L167.5 -139.7M160.5 139.7L164 146.3L167.5 139.7" class="c-arrow" />
+          </svg>
+          <Mark size="56%" tone="brand" assemble tilt class="hero-mark" />
         </div>
       </div>
-
-      <div class="hero-figure" aria-hidden="true">
-        <svg class="construction load-fade" viewBox="-160 -160 320 320">
-          <path d={hexPath} transform="scale(1.24)" class="c-hex" />
-          <path d={hexPath} transform="scale(1.1)" class="c-hex-inner" />
-          <path d="M-160 0H160M0 -160V160" class="c-axis" />
-        </svg>
-        <Mark size="64%" tone="brand" assemble tilt class="hero-mark" />
-      </div>
     </div>
-
   </section>
 
 
@@ -50,45 +57,63 @@ import { hexPath } from '../lib/logo';
 <style>
   .hero {
     position: relative;
-    padding-top: clamp(7.5rem, 5rem + 6vw, 10rem);
-    padding-bottom: clamp(2rem, 1rem + 3vw, 3.5rem);
-    overflow: hidden;
-    isolation: isolate;
+    padding-top: clamp(7rem, 5rem + 5vw, 9.5rem);
+    padding-bottom: clamp(3rem, 2rem + 3vw, 5rem);
   }
-  .hero > .wrap { position: relative; z-index: 1; }
+  /* A document's header: a hairline, with the label above it */
+  .hero-top { padding-bottom: var(--s-3); margin-bottom: clamp(2rem, 1rem + 3vw, 3.5rem); border-bottom: 1px solid var(--rule-2); }
+  .hero-top .eyebrow { color: var(--ink-2); }
   .hero-grid {
     display: grid;
     grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-    gap: var(--s-7);
+    gap: clamp(2rem, 1rem + 4vw, 5rem);
     align-items: center;
   }
-  .hero-copy { display: grid; gap: var(--s-5); justify-items: start; }
-  .hero-copy h1 { font-size: clamp(3rem, 1.6rem + 6vw, 6.75rem); max-width: 10ch; }
-  .hero-copy .lead { max-width: 48ch; }
-  .hero-copy .btn-row { margin-top: var(--s-3); }
+  .hero-copy { display: grid; gap: var(--s-6); justify-items: start; }
+  .hero-copy h1 { font-size: clamp(3.5rem, 1.5rem + 7vw, 8.25rem); line-height: 0.9; letter-spacing: -0.055em; max-width: 9ch; }
+  .hero-copy h1 :global(.display-em) { display: block; font-weight: 400; letter-spacing: -0.035em; margin-top: 0.04em; }
+  .hero-copy .lead { max-width: 44ch; font-size: clamp(1.125rem, 1rem + 0.4vw, 1.3125rem); color: var(--ink-2); }
 
-  .hero-figure {
+  /* The plate: squared paper, crop marks, the mark with its construction lines */
+  .plate {
     position: relative;
     display: grid;
     place-items: center;
     aspect-ratio: 1;
     width: 100%;
-    max-width: 460px;
+    max-width: 480px;
     justify-self: end;
+    background-color: var(--surface);
+    background-image:
+      linear-gradient(rgb(44 95 138 / 0.07) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(44 95 138 / 0.07) 1px, transparent 1px);
+    background-size: 24px 24px;
+    background-position: center;
+    border: 1px solid var(--rule-2);
   }
-  .construction { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  .crop { position: absolute; width: 14px; height: 14px; border-color: var(--ink-3); border-style: solid; border-width: 0; }
+  .crop-tl { left: -8px; top: -8px; border-left-width: 1px; border-top-width: 1px; }
+  .crop-tr { right: -8px; top: -8px; border-right-width: 1px; border-top-width: 1px; }
+  .crop-bl { left: -8px; bottom: -8px; border-left-width: 1px; border-bottom-width: 1px; }
+  .crop-br { right: -8px; bottom: -8px; border-right-width: 1px; border-bottom-width: 1px; }
+  .construction { position: absolute; inset: 6%; width: 88%; height: 88%; overflow: visible; }
   .construction * { fill: none; vector-effect: non-scaling-stroke; stroke-width: 1; }
-  .c-hex { stroke: var(--rule-2); }
-  .c-hex-inner { stroke: var(--rule-2); stroke-dasharray: 2 6; }
-  .c-axis { stroke: var(--rule); }
+  .c-hex { stroke: var(--ink-3); }
+  .c-hex-inner { stroke: var(--ink-3); stroke-dasharray: 2 6; }
+  .c-circle { stroke: var(--rule-2); stroke-dasharray: 1 5; }
+  .c-axis { stroke: var(--rule-2); }
+  .c-ext { stroke: var(--rule-2); }
+  .c-dim, .c-arrow { stroke: var(--accent); }
   :global(.hero-mark) { position: relative; will-change: transform; }
-
 
   @media (max-width: 960px) {
     .hero-grid { grid-template-columns: minmax(0, 1fr); }
-    .hero-figure { max-width: 300px; justify-self: start; order: -1; margin-bottom: calc(var(--s-4) * -1); }
+    .plate { max-width: 300px; justify-self: start; order: -1; }
   }
   @media (max-width: 640px) {
-    .hero-figure { max-width: 190px; }
+    .hero { padding-top: 6.5rem; }
+    .hero-top { margin-bottom: var(--s-5); }
+    .plate { max-width: 200px; }
+    .hero-copy { gap: var(--s-5); }
   }
 </style>

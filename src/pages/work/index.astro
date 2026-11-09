@@ -2,7 +2,7 @@
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import PageHero from '../../components/PageHero.astro';
-import Honeycomb from '../../components/Honeycomb.astro';
+import WorkLedger from '../../components/WorkLedger.astro';
 import ResultVisual from '../../components/ResultVisual.astro';
 import ClosingCTA from '../../components/ClosingCTA.astro';
 import { iconFor, headline, plainTitle as plain } from '../../lib/work';
@@ -37,11 +37,12 @@ const sectionsOf = (body = '') =>
 >
   <PageHero
     class="work-hero"
+    variant="index"
     eyebrow="Our Work"
     title="Our team’s experience."
     lead="Spockhart is a new firm built on years of experience. Our team has transformed operations and built technology at some of North America’s largest organizations, with the examples below drawn from previous roles."
   >
-    <Honeycomb slot="figure" />
+    <WorkLedger slot="figure" />
   </PageHero>
 
   <section class="projects" aria-label="Projects" data-projects>
@@ -290,7 +291,7 @@ const sectionsOf = (body = '') =>
   }
   .cs-col h3 { padding-top: 0.3rem; font-family: var(--font-body); font-size: 0.75rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); }
   .cs-text { display: grid; gap: var(--s-2); }
-  .cs-text p { color: var(--ink-2); font-size: 0.9375rem; line-height: 1.55; }
+  .cs-text p { font-family: var(--font-text); color: var(--ink-2); font-size: 1rem; line-height: 1.55; }
   .cs-foot {
     display: flex;
     flex-wrap: wrap;
@@ -325,6 +326,6 @@ const sectionsOf = (body = '') =>
     .cs-m-label { font-size: 0.8125rem; }
     .cs-col { grid-template-columns: minmax(0, 1fr); gap: var(--s-1); padding-block: var(--s-3); }
     .cs-text p { font-size: 0.9375rem; }
-    :global(.work-hero .hero-figure) { display: none; }
+    :global(.work-hero .ph-figure) { display: none; }
   }
 </style>

@@ -6,9 +6,10 @@ import { site } from '../../config/site';
 
 <Base title="Contact" description="Start a conversation with Spockhart. Tell us what your team could accomplish with more time and we will reply within one business day.">
   <section class="contact">
-    <div class="wrap contact-grid">
+    <div class="wrap">
+    <div class="c-top load-in" style="--i:0"><p class="eyebrow">Contact</p></div>
+    <div class="contact-grid">
       <div class="contact-intro">
-        <p class="eyebrow load-in" style="--i:0">Contact</p>
         <h1 class="load-in" style="--i:1">Start a conversation.</h1>
         <p class="lead load-in" style="--i:2">Tell us what your team could accomplish with more time. We reply within {site.offer.replyWithin}.</p>
 
@@ -19,7 +20,8 @@ import { site } from '../../config/site';
         </div>
       </div>
 
-      <div class="contact-form-wrap load-in" style="--i:2">
+      <div class="letter load-in" style="--i:2">
+      <div class="contact-form-wrap">
         <form class="contact-form" data-contact-form data-endpoint={site.formEndpoint} novalidate>
           <div class="row-2">
             <div class="field">
@@ -80,6 +82,8 @@ import { site } from '../../config/site';
           </div>
         </div>
       </div>
+      </div>
+    </div>
     </div>
   </section>
 </Base>
@@ -91,33 +95,80 @@ import { site } from '../../config/site';
 
 <style>
   .contact {
-    padding-top: clamp(8.5rem, 6rem + 6vw, 11.5rem);
+    padding-top: clamp(7rem, 5rem + 5vw, 9.5rem);
     padding-bottom: var(--section);
   }
+  /* A document's header: a hairline, with the label above it */
+  .c-top { padding-bottom: var(--s-3); margin-bottom: clamp(2rem, 1rem + 3vw, 3.5rem); border-bottom: 1px solid var(--rule-2); }
+  .c-top .eyebrow { color: var(--ink-2); }
   .contact-grid {
     display: grid;
     grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-    gap: var(--s-8);
+    gap: clamp(2rem, 1rem + 4vw, 5rem);
     align-items: start;
   }
   .contact-intro { display: grid; gap: var(--s-5); align-content: start; }
-  .contact-intro h1 { font-size: var(--step-5); max-width: 9ch; }
-  .contact-direct { display: grid; gap: var(--s-3); justify-items: start; margin-top: var(--s-4); }
-  .label { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); }
+  .contact-intro h1 { font-size: clamp(3rem, 1.6rem + 3.8vw, 5.25rem); line-height: 0.92; letter-spacing: -0.05em; max-width: 8ch; }
+  .contact-intro .lead { max-width: 30ch; }
+  .contact-direct { display: grid; gap: var(--s-3); justify-items: start; margin-top: var(--s-4); padding-top: var(--s-4); border-top: 1px solid var(--rule); }
+  .label { font-family: var(--font-mono); font-size: 0.8125rem; color: var(--ink-3); }
 
+  /* The form reads like a letter: a sheet of paper, answers written on the lines */
   .contact-form-wrap {
-    padding: clamp(1.25rem, 0.9rem + 1.6vw, 2.25rem);
-    border: 1px solid var(--rule);
-    border-radius: var(--radius-lg);
+    position: relative;
+    padding: clamp(1.5rem, 1rem + 2vw, 2.75rem);
+    border: 1px solid var(--rule-2);
+    border-radius: 2px;
     background: var(--surface);
+    box-shadow: 0 1px 0 var(--rule), 0 24px 48px -36px rgb(27 42 61 / 0.45);
   }
-  .contact-form { display: grid; gap: var(--s-4); }
-  .row-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-4); }
+  .letter { position: relative; isolation: isolate; }
+  .letter::before {
+    /* the sheet beneath, slightly askew */
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    background: var(--paper-2);
+    transform: rotate(1.2deg) translate(6px, 6px);
+  }
+  .contact-form-wrap { z-index: 1; }
+  .contact-form { display: grid; gap: var(--s-5); }
+  .row-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-5); }
   .row-org { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); }
-  .contact-form .textarea { min-height: 6.5rem; }
+  .contact-form .field { gap: 0.2rem; }
+  .contact-form label { font-family: var(--font-mono); font-size: 0.8125rem; font-weight: 400; color: var(--ink-3); }
+  .contact-form .input,
+  .contact-form .select,
+  .contact-form .textarea {
+    padding: 0.35rem 0 0.45rem;
+    border: 0;
+    border-bottom: 1px solid var(--ink-3);
+    border-radius: 0;
+    background-color: transparent;
+    font-family: var(--font-text);
+    font-size: 1.1875rem;
+    color: var(--ink);
+  }
+  .contact-form .select { padding-right: 1.6rem; background-position: calc(100% - 0.45rem) 55%, calc(100% - 0.1rem) 55%; }
+  .contact-form .input:focus,
+  .contact-form .select:focus,
+  .contact-form .textarea:focus { border-bottom-color: var(--accent); box-shadow: 0 1px 0 var(--accent); }
+  /* Ruled lines to write on */
+  .contact-form .textarea {
+    min-height: 8.4rem;
+    border-bottom: 0;
+    padding: 0;
+    line-height: 2.1rem;
+    background-image: repeating-linear-gradient(transparent 0 calc(2.1rem - 1px), var(--rule-2) calc(2.1rem - 1px) 2.1rem);
+    background-attachment: local;
+  }
+  .contact-form .textarea:focus { box-shadow: none; }
   .optional { font-weight: 400; color: var(--ink-3); margin-left: 0.35rem; font-size: 0.8125rem; }
   .hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
-  .form-foot { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-4); }
+  .form-foot { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-4); margin-top: var(--s-2); }
   .form-foot .small { max-width: 34ch; }
   .form-error { color: #b4483c; font-size: 0.9375rem; }
   .btn[aria-busy='true'] { opacity: 0.7; pointer-events: none; }
@@ -127,8 +178,8 @@ import { site } from '../../config/site';
   .compose-body {
     white-space: pre-wrap;
     word-break: break-word;
-    font-family: var(--font-body);
-    font-size: 0.9375rem;
+    font-family: var(--font-text);
+    font-size: 1rem;
     line-height: 1.6;
     padding: var(--s-4);
     border: 1px solid var(--rule);
@@ -141,21 +192,19 @@ import { site } from '../../config/site';
 
   /* Tablets and phones: the heading, then the form, then the email option */
   @media (max-width: 960px) {
-    .contact { padding-top: clamp(6.5rem, 5rem + 4vw, 8.5rem); }
+    .contact { padding-top: 6.5rem; }
     .contact-grid { grid-template-columns: minmax(0, 1fr); gap: var(--s-4); }
     .contact-intro { display: contents; }
-    .contact-intro h1 { font-size: clamp(2.25rem, 1.6rem + 3vw, 3.5rem); max-width: none; }
-    .contact-form-wrap { order: 1; margin-top: var(--s-2); }
-    .contact-direct { order: 2; margin-top: var(--s-4); }
+    .contact-intro h1 { font-size: clamp(2.5rem, 1.6rem + 3vw, 3.75rem); max-width: none; }
+    .contact-intro .lead { max-width: 44ch; }
+    .letter { order: 1; margin-top: var(--s-3); }
+    .contact-direct { order: 2; margin-top: var(--s-6); }
   }
-  /* Phones: name and email stay side by side; organization and size share a row */
   @media (max-width: 560px) {
-    .contact-form { gap: 0.85rem; }
-    .row-2 { gap: 0.6rem; }
-    .contact-form .field { gap: 0.3rem; }
-    .contact-form label { font-size: 0.8125rem; }
-    .contact-form .input, .contact-form .select { padding-block: 0.6rem; }
-    .contact-form .textarea { min-height: 5.5rem; }
-    .form-foot { gap: var(--s-3); }
+    .c-top { margin-bottom: var(--s-5); }
+    .contact-form { gap: var(--s-4); }
+    .row-2 { gap: var(--s-4); }
+    .contact-form .input, .contact-form .select { font-size: 1.0625rem; }
+    .letter::before { transform: rotate(1deg) translate(4px, 5px); }
   }
 </style>

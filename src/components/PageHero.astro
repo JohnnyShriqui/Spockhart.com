@@ -1,56 +1,205 @@
 ---
-import Mist from './Mist.astro';
+/**
+ * The opening of an interior page. Each page has its own treatment (variant), set like the
+ * first page of a document rather than a template: a hairline header with the page's label,
+ * a large plain headline, and the lead in the book serif.
+ *
+ *   editorial  headline across the page, the lead as a note in the right margin, a 30-day rule
+ *   index      headline and lead, with a ledger of results beside them (slot "figure")
+ *   statement  the lead set large, its last sentence on a line of its own
+ *   seal       headline and lead beside a stamped mark, like a signed document
+ */
+import Mark from './Mark.astro';
+
 interface Props {
   eyebrow?: string;
   title: string;
   lead?: string;
   /** On phones, hide the lead and keep just the heading */
   terse?: boolean;
+  variant?: 'editorial' | 'index' | 'statement' | 'seal';
   class?: string;
 }
-const { eyebrow, title, lead, terse = false, class: className = '' } = Astro.props;
-const hasFigure = Astro.slots.has('figure');
+const { eyebrow, title, lead, terse = false, variant = 'editorial', class: className = '' } = Astro.props;
+
+/* statement: the last sentence of the lead gets its own line */
+const sentences = (lead ?? '').match(/[^.!?]+[.!?]+/g)?.map((t) => t.trim()) ?? [];
+const leadBody = sentences.slice(0, -1).join(' ');
+const leadLast = sentences.at(-1) ?? '';
+
+/* editorial: the first 30 days, as a rule */
+const days = Array.from({ length: 31 }, (_, d) => d);
 ---
 
-<section class:list={['page-hero', className, { 'with-figure': hasFigure, terse }]}>
-  <Mist />
-  <div class="wrap hero-layout">
-    <div class="hero-text">
-      {eyebrow && <p class="eyebrow load-in" style="--i:0">{eyebrow}</p>}
-      <h1 class="load-in" style="--i:1" set:html={title} />
-      <div class="accent-rule load-in" style="--i:2"></div>
-      {lead && <p class="lead load-in" style="--i:2">{lead}</p>}
-      {Astro.slots.has('default') && (
-        <div class="load-in hero-extra" style="--i:3">
-          <slot />
+<section class:list={['page-hero', `ph-${variant}`, className, { terse }]}>
+  <div class="wrap">
+    {eyebrow && (
+      <div class="ph-top load-in" style="--i:0">
+        <p class="eyebrow">{eyebrow}</p>
+      </div>
+    )}
+
+    {
+      variant === 'editorial' && (
+        <>
+          <div class="ph-grid">
+            <h1 class="load-in" style="--i:1" set:html={title} />
+            {lead && (
+              <p class="lead ph-note load-in" style="--i:2">
+                {lead}
+              </p>
+            )}
+          </div>
+          <div class="ph-rule load-fade" aria-hidden="true">
+            {days.map((d) => (
+              <span class:list={['tick', { major: d % 10 === 0, end: d === 30 }]} style={`--d:${d}`}>
+                {d % 10 === 0 && <b>{d}</b>}
+              </span>
+            ))}
+            <span class="ph-rule-mark" />
+          </div>
+        </>
+      )
+    }
+
+    {
+      variant === 'index' && (
+        <div class="ph-grid">
+          <div class="ph-text">
+            <h1 class="load-in" style="--i:1" set:html={title} />
+            {lead && (
+              <p class="lead load-in" style="--i:2">
+                {lead}
+              </p>
+            )}
+          </div>
+          <div class="ph-figure load-fade">
+            <slot name="figure" />
+          </div>
         </div>
-      )}
-    </div>
-    {hasFigure && (
-      <div class="hero-figure load-fade">
-        <slot name="figure" />
+      )
+    }
+
+    {
+      variant === 'statement' && (
+        <div class="ph-grid">
+          <h1 class="load-in" style="--i:1" set:html={title} />
+          {lead && (
+            <p class="ph-says load-in" style="--i:2">
+              {leadBody} <span class="ph-last">{leadLast}</span>
+            </p>
+          )}
+        </div>
+      )
+    }
+
+    {
+      variant === 'seal' && (
+        <div class="ph-grid">
+          <div class="ph-text">
+            <h1 class="load-in" style="--i:1" set:html={title} />
+            {lead && (
+              <p class="lead load-in" style="--i:2">
+                {lead}
+              </p>
+            )}
+          </div>
+          <div class="seal load-fade" aria-hidden="true">
+            <svg viewBox="0 0 220 220" class="seal-svg">
+              <defs>
+                <filter id="seal-ink" x="-10%" y="-10%" width="120%" height="120%">
+                  <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="7" result="n" />
+                  <feDisplacementMap in="SourceGraphic" in2="n" scale="1.6" result="d" />
+                  <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="3" result="g" />
+                  <feColorMatrix in="g" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -11 8.1" result="speckle" />
+                  <feComposite in="d" in2="speckle" operator="in" />
+                </filter>
+              </defs>
+              <g filter="url(#seal-ink)" class="seal-ink">
+                <polygon points="110,8 198,59 198,161 110,212 22,161 22,59" class="seal-ring" />
+                <polygon points="110,22 186,66 186,154 110,198 34,154 34,66" class="seal-ring seal-ring-in" />
+              </g>
+            </svg>
+            <div class="seal-mark">
+              <Mark size="100%" tone="current" />
+            </div>
+          </div>
+        </div>
+      )
+    }
+
+    {Astro.slots.has('default') && (
+      <div class="load-in hero-extra" style="--i:3">
+        <slot />
       </div>
     )}
   </div>
 </section>
 
 <style>
-  .page-hero { position: relative; overflow: hidden; isolation: isolate; }
-  .page-hero > .wrap { position: relative; z-index: 1; }
-  .hero-text { display: grid; gap: var(--s-5); }
-  .hero-extra { margin-top: var(--s-2); }
-  .with-figure .hero-layout {
-    display: grid;
-    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
-    gap: var(--s-7);
-    align-items: center;
+  .page-hero { position: relative; }
+  @media (max-width: 640px) {
+    .page-hero { padding-top: 6.5rem; }
   }
-  .hero-figure { width: 100%; max-width: 480px; justify-self: end; }
+  .hero-extra { margin-top: var(--s-5); }
+
+  /* A document's header: a hairline, with the page's label above it */
+  .ph-top { display: flex; align-items: baseline; justify-content: space-between; padding-bottom: var(--s-3); margin-bottom: clamp(1.75rem, 1rem + 2.5vw, 3rem); border-bottom: 1px solid var(--rule-2); }
+  .ph-top .eyebrow { color: var(--ink-2); }
+  .page-hero h1 { max-width: none; }
+
+  /* ---------- editorial: headline across, lead in the margin, a 30-day rule ---------- */
+  .ph-editorial .ph-grid { display: grid; grid-template-columns: minmax(0, 8fr) minmax(0, 4fr); gap: var(--s-7); align-items: end; }
+  .ph-editorial h1 { font-size: clamp(3.25rem, 1.6rem + 6vw, 7.5rem); line-height: 0.92; letter-spacing: -0.05em; }
+  .ph-note { font-size: 1.1875rem; line-height: 1.5; color: var(--ink-2); max-width: 34ch; padding-left: var(--s-4); border-left: 2px solid var(--accent); }
+  .ph-rule { position: relative; height: 40px; margin-top: clamp(2.5rem, 1.5rem + 3vw, 4rem); }
+  .ph-rule::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 1px; background: var(--ink-3); }
+  .tick { position: absolute; top: 0; left: calc(var(--d) / 30 * 100%); width: 1px; height: 7px; background: var(--ink-3); }
+  .tick.major { height: 14px; background: var(--ink-2); }
+  .tick b { position: absolute; top: 18px; left: 0; transform: translateX(-50%); font-family: var(--font-mono); font-size: 0.75rem; font-weight: 400; color: var(--ink-3); }
+  .tick:first-child b { transform: none; }
+  .tick.end b { transform: translateX(-100%); color: var(--accent); font-weight: 500; }
+  .tick.end { background: var(--accent); width: 2px; height: 16px; }
+  .ph-rule-mark { position: absolute; right: -6px; top: -20px; width: 13px; height: 14px; background: var(--accent); clip-path: var(--hex); }
+
+  /* ---------- index: words left, a ledger of results right ---------- */
+  .ph-index .ph-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: clamp(2rem, 1rem + 4vw, 5rem); align-items: start; }
+  .ph-index .ph-text { display: grid; gap: var(--s-5); }
+  .ph-index h1 { font-size: clamp(2.75rem, 1.6rem + 4vw, 5.25rem); letter-spacing: -0.045em; }
+  .ph-index .lead { max-width: 44ch; }
+
+  /* ---------- statement: the lead, set large ---------- */
+  .ph-statement .ph-grid { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: clamp(2rem, 1rem + 4vw, 5rem); align-items: start; }
+  .ph-statement h1 { font-size: clamp(2.25rem, 1.5rem + 2.6vw, 3.75rem); letter-spacing: -0.04em; line-height: 1; }
+  .ph-says { font-family: var(--font-text); font-size: clamp(1.625rem, 1.2rem + 1.6vw, 2.625rem); line-height: 1.22; letter-spacing: -0.012em; color: var(--ink); }
+  .ph-last { display: block; margin-top: 0.5em; font-style: italic; color: var(--accent); }
+
+  /* ---------- seal: a signed commitment ---------- */
+  .ph-seal .ph-grid { display: grid; grid-template-columns: minmax(0, 8fr) minmax(0, 4fr); gap: var(--s-7); align-items: center; }
+  .ph-seal .ph-text { display: grid; gap: var(--s-5); }
+  .ph-seal h1 { font-size: clamp(3rem, 1.6rem + 5vw, 6.25rem); letter-spacing: -0.05em; line-height: 0.94; }
+  .ph-seal .lead { max-width: 46ch; }
+  .seal { position: relative; justify-self: center; width: min(100%, 220px); aspect-ratio: 1; color: var(--brand); transform: rotate(-8deg); }
+  .seal-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .seal-ring { fill: none; stroke: var(--brand); stroke-width: 6; stroke-linejoin: round; }
+  .seal-ring-in { stroke-width: 2; }
+  .seal-ink { opacity: 0.9; }
+  .seal-mark { position: absolute; inset: 27%; filter: url(#seal-ink); opacity: 0.92; }
+
+  @media (max-width: 960px) {
+    .ph-editorial .ph-grid,
+    .ph-index .ph-grid,
+    .ph-statement .ph-grid,
+    .ph-seal .ph-grid { grid-template-columns: minmax(0, 1fr); gap: var(--s-5); align-items: start; }
+    .ph-note { max-width: 46ch; }
+    .seal { justify-self: start; width: 140px; order: -1; }
+  }
   @media (max-width: 640px) {
     .terse .lead { display: none; }
-  }
-  @media (max-width: 960px) {
-    .with-figure .hero-layout { grid-template-columns: minmax(0, 1fr); }
-    .hero-figure { justify-self: start; max-width: 420px; }
+    .ph-top { margin-bottom: var(--s-5); }
+    .ph-rule { margin-top: var(--s-6); }
+    .tick:not(.major) { height: 5px; }
+    .ph-says { font-size: 1.375rem; }
+    .seal { width: 110px; }
   }
 </style>

@@ -5,49 +5,16 @@
    mission and the footer. Brass is used sparingly, as the light-catching facet.
    ========================================================================== */
 
-@import '@fontsource-variable/fraunces/opsz.css';
-@import '@fontsource-variable/fraunces/opsz-italic.css';
-@import '@fontsource-variable/source-sans-3/index.css';
+/* Type: a plain-spoken grotesk for headlines and the interface, a book serif for reading,
+   and a mono for small notes and figures. */
+@import '@fontsource-variable/schibsted-grotesk/wght.css';
+@import '@fontsource-variable/schibsted-grotesk/wght-italic.css';
+@import '@fontsource-variable/source-serif-4/opsz.css';
+@import '@fontsource-variable/source-serif-4/opsz-italic.css';
+@import '@fontsource/ibm-plex-mono/latin-400.css';
+@import '@fontsource/ibm-plex-mono/latin-500.css';
 
 @import '@fontsource/michroma/400.css';
-
-/* Calmer f, j and J for the display face. Fraunces draws these with a curl;
-   these few glyphs come from Newsreader (OFL, see fonts/Newsreader-OFL.txt),
-   subset to just those letters. Everything else stays Fraunces. */
-@font-face {
-  font-family: 'Display Swap';
-  font-style: normal;
-  font-weight: 200 800;
-  font-display: swap;
-  src: url('./fonts/newsreader-fj-normal.woff2') format('woff2');
-  unicode-range: U+0066, U+006A;
-}
-@font-face {
-  font-family: 'Display Swap';
-  font-style: normal;
-  font-weight: 200 800;
-  font-display: swap;
-  src: url('./fonts/newsreader-fj-normal.woff2') format('woff2');
-  unicode-range: U+004A;
-  size-adjust: 104%;
-}
-@font-face {
-  font-family: 'Display Swap';
-  font-style: italic;
-  font-weight: 200 800;
-  font-display: swap;
-  src: url('./fonts/newsreader-fj-italic.woff2') format('woff2');
-  unicode-range: U+0066, U+006A;
-}
-@font-face {
-  font-family: 'Display Swap';
-  font-style: italic;
-  font-weight: 200 800;
-  font-display: swap;
-  src: url('./fonts/newsreader-fj-italic.woff2') format('woff2');
-  unicode-range: U+004A;
-  size-adjust: 104%;
-}
 
 :root {
   /* Color: the palette of the original spockhart.com and the logo. One light look, by design. */
@@ -82,8 +49,10 @@
   --mark: var(--brand);
 
   /* Type */
-  --font-display: 'Display Swap', 'Fraunces Variable','Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
-  --font-body: 'Source Sans 3 Variable', 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  --font-display: 'Schibsted Grotesk Variable', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-body: 'Schibsted Grotesk Variable', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-text: 'Source Serif 4 Variable', 'Source Serif Pro', Georgia, 'Times New Roman', serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
   --font-wordmark: 'Michroma', 'Eurostile', 'Microgramma', 'Arial Black', sans-serif;
 
   --step--1: clamp(0.8125rem, 0.79rem + 0.1vw, 0.875rem);
@@ -163,52 +132,47 @@ button { cursor: pointer; }
 h1, h2, h3, h4 {
   font-family: var(--font-display);
   font-variant-numeric: lining-nums;
-  font-weight: 500;
-  line-height: 1.08;
-  letter-spacing: -0.015em;
+  font-weight: 600;
+  line-height: 1.06;
+  letter-spacing: -0.022em;
   text-wrap: balance;
   color: var(--ink);
 }
-h1 { font-size: var(--step-5); font-weight: 450; letter-spacing: -0.025em; line-height: 1.02; }
-h2 { font-size: var(--step-4); }
-h3 { font-size: var(--step-2); line-height: 1.2; letter-spacing: -0.01em; }
-h4 { font-size: var(--step-1); line-height: 1.3; letter-spacing: 0; }
+h1 { font-size: var(--step-5); font-weight: 650; letter-spacing: -0.04em; line-height: 0.98; }
+h2 { font-size: var(--step-4); letter-spacing: -0.032em; line-height: 1.02; }
+h3 { font-size: var(--step-2); line-height: 1.15; letter-spacing: -0.018em; }
+h4 { font-size: var(--step-1); line-height: 1.3; letter-spacing: -0.01em; }
 p { text-wrap: pretty; }
 strong { font-weight: 600; }
 em { font-style: italic; }
 
-.display-em { font-style: italic; font-weight: 400; color: var(--accent); }
+/* The one word set apart in a headline: the book serif, in italic */
+.display-em { font-family: var(--font-text); font-style: italic; font-weight: 500; letter-spacing: -0.02em; color: var(--accent); }
+
+/* Reading text is set in the book serif; the interface stays in the grotesk */
+.serif, .lead, .prose { font-family: var(--font-text); }
 
 .lead {
   font-size: var(--step-1);
-  line-height: 1.55;
+  line-height: 1.5;
   color: var(--ink-2);
   max-width: 54ch;
 }
 .muted { color: var(--ink-2); }
 .small { font-size: var(--step--1); }
-.tabular { font-variant-numeric: lining-nums tabular-nums; }
+.tabular { font-variant-numeric: lining-nums proportional-nums; }
 
+/* Small labels read like a note in the margin: mono, as written */
 .eyebrow {
   display: inline-flex;
   align-items: center;
-  gap: 0.6em;
-  font-family: var(--font-body);
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
   color: var(--accent);
 }
-.eyebrow::before {
-  content: '';
-  width: 0.55em;
-  height: 0.55em;
-  background: currentColor;
-  clip-path: var(--hex);
-  flex: none;
-}
-.eyebrow.plain::before { display: none; }
 
 a { color: inherit; }
 .link {
@@ -300,7 +264,7 @@ a { color: inherit; }
 /* ---------- Section heads ---------- */
 .section-head { display: grid; gap: var(--s-4); margin-bottom: var(--s-8); max-width: 760px; }
 .section-head h2 { max-width: 20ch; }
-.section-head > p:not(.eyebrow) { color: var(--ink-2); font-size: var(--step-1); max-width: 56ch; }
+.section-head > p:not(.eyebrow) { font-family: var(--font-text); color: var(--ink-2); font-size: var(--step-1); max-width: 56ch; }
 .section-head .stack > p:not(.eyebrow) { color: var(--ink-2); font-size: var(--step-1); max-width: 56ch; }
 
 /* ---------- Buttons ---------- */
