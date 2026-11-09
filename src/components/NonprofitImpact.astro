@@ -105,9 +105,10 @@ const charts = [
 
 <section class="npi" aria-labelledby="npi-title" data-npi>
   <div class="wrap">
-    <h2 id="npi-title" class="npi-title">More Impact per Dollar</h2>
-
     <div class="npi-grid">
+      <!-- The title sits directly above the chart; the two together line up with the bottom of the list -->
+      <div class="npi-left">
+      <h2 id="npi-title" class="npi-title">More Impact per Dollar</h2>
       <figure
         data-npi-chart
         class="npi-chart"
@@ -180,6 +181,7 @@ const charts = [
           ))
         }
       </figure>
+      </div>
 
       <ol class="npi-ways">
         {
@@ -239,7 +241,7 @@ const charts = [
 </script>
 
 <style>
-  /* Light, or dark with the device (.page-body tokens) */
+  /* On the light page; the chart itself sits on a dark panel, like the chart on the home page */
   .npi {
     --c-demand: #b4584f;
     --c-res: #2f6e9f;
@@ -254,17 +256,38 @@ const charts = [
     font-size: clamp(2.25rem, 1.6rem + 2vw, 3.75rem);
     font-weight: 400;
     letter-spacing: -0.02em;
-    margin-bottom: clamp(2rem, 1.4rem + 2vw, 3.25rem);
+    margin-bottom: clamp(1.25rem, 0.9rem + 1vw, 1.75rem);
   }
   .npi-grid {
     display: grid;
     grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
     gap: clamp(2.75rem, 1rem + 4.5vw, 6rem);
-    align-items: center;
+    align-items: end;
   }
+  .npi-left { min-width: 0; }
 
-  /* ---------- The chart, unframed ---------- */
-  .npi-chart { margin: 0; }
+  /* ---------- The chart, on its own dark panel (as on the home page) ---------- */
+  .npi-chart {
+    --ink: #eef3f8;
+    --ink-2: #b5c4d3;
+    --ink-3: #94a8bc;
+    --muted: #8fa1b4;
+    --hot: #d9e6f2;
+    --hair: 255 255 255;
+    --c-demand: #e2a39a;
+    --c-res: #9cc8ea;
+    --c-further: #6ea0cd;
+    --demand-rgb: 226 163 154;
+    --res-rgb: 156 200 234;
+    --further-rgb: 110 160 205;
+    --ground: #0d1a28;
+    margin: 0;
+    padding: clamp(1.1rem, 0.8rem + 1vw, 1.6rem) clamp(1.1rem, 0.8rem + 1vw, 1.6rem) clamp(1.25rem, 0.9rem + 1vw, 1.75rem);
+    border-radius: var(--radius-lg);
+    background: linear-gradient(165deg, #0e1c2c 0%, #0a1521 100%);
+    box-shadow: 0 24px 48px -30px rgb(4 18 30 / 0.55);
+    color: var(--ink);
+  }
   .npi-cap {
     display: flex;
     flex-wrap: wrap;
@@ -364,7 +387,7 @@ const charts = [
 
   @media (max-width: 1080px) {
     .npi-grid { grid-template-columns: minmax(0, 1fr); }
-    .npi-chart, .npi-ways { max-width: 720px; width: 100%; }
+    .npi-left, .npi-ways { max-width: 720px; width: 100%; }
   }
   @media (max-width: 640px) {
     .npi-wide { display: none; }
