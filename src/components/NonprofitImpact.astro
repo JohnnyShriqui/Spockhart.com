@@ -99,7 +99,7 @@ function draw(d: Dims) {
 }
 
 const charts = [
-  { cls: 'npi-wide', ...draw({ W: 560, H: 380, X0: 22, X1: 452, TOP: 20, BASE: 330 }) },
+  { cls: 'npi-wide', ...draw({ W: 560, H: 330, X0: 22, X1: 452, TOP: 16, BASE: 286 }) },
   { cls: 'npi-narrow', ...draw({ W: 352, H: 304, X0: 8, X1: 262, TOP: 16, BASE: 262 }) },
 ];
 ---
@@ -241,18 +241,18 @@ const charts = [
     --c-demand: #e2a39a;
     --c-res: #9cc8ea;
     --c-further: #6ea0cd;
-    padding-block: clamp(3.5rem, 2.5rem + 3vw, 6rem) clamp(2.5rem, 1.5rem + 3vw, 5rem);
+    padding-block: clamp(2.75rem, 2rem + 2.5vw, 4.5rem) clamp(2.25rem, 1.5rem + 2.5vw, 4rem);
   }
   .npi-title {
     font-size: clamp(2.25rem, 1.6rem + 2vw, 3.75rem);
     font-weight: 400;
     letter-spacing: -0.02em;
-    margin-bottom: clamp(2.5rem, 1.75rem + 2.5vw, 4.25rem);
+    margin-bottom: clamp(1.5rem, 1rem + 1.5vw, 2.5rem);
   }
   .npi-grid {
     display: grid;
     grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
-    gap: clamp(3rem, 1rem + 5vw, 6.5rem);
+    gap: clamp(2.5rem, 1rem + 4vw, 5.5rem);
     align-items: center;
   }
 
@@ -264,8 +264,8 @@ const charts = [
     align-items: baseline;
     justify-content: space-between;
     gap: 0.5rem 1.5rem;
-    margin-bottom: 1.25rem;
-    padding-bottom: 0.85rem;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.7rem;
     border-bottom: 1px solid rgb(255 255 255 / 0.1);
   }
   .npi-cap-title { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-3); }
@@ -317,7 +317,7 @@ const charts = [
 
   /* ---------- The three ways: typographic, hairline-ruled, keyed to the chart ---------- */
   .npi-ways { list-style: none; padding: 0; display: grid; }
-  .npi-way { padding-block: clamp(1.25rem, 1rem + 0.8vw, 1.75rem); border-top: 1px solid rgb(255 255 255 / 0.12); }
+  .npi-way { padding-block: clamp(0.85rem, 0.7rem + 0.5vw, 1.2rem); border-top: 1px solid rgb(255 255 255 / 0.12); }
   .npi-way:last-child { border-bottom: 1px solid rgb(255 255 255 / 0.12); }
   .npi-n {
     display: flex;
@@ -334,15 +334,15 @@ const charts = [
   .way-2 { --c: var(--c-res); }
   .way-3 { --c: var(--c-demand); }
   .npi-way-title {
-    margin-top: 0.55rem;
+    margin-top: 0.35rem;
     font-family: var(--font-display);
-    font-size: clamp(1.4rem, 1.2rem + 0.6vw, 1.75rem);
+    font-size: clamp(1.35rem, 1.2rem + 0.45vw, 1.625rem);
     font-weight: 400;
     letter-spacing: -0.01em;
     line-height: 1.15;
     color: var(--ink);
   }
-  .npi-way-body { margin-top: 0.45rem; font-size: 1rem; line-height: 1.6; color: var(--ink-2); max-width: 46ch; }
+  .npi-way-body { margin-top: 0.3rem; font-size: 0.975rem; line-height: 1.5; color: var(--ink-2); max-width: 54ch; }
 
   @media (max-width: 1080px) {
     .npi-grid { grid-template-columns: minmax(0, 1fr); }
