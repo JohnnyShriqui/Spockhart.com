@@ -4,7 +4,8 @@
  * hero: thin lines on the dark ground, soft fills, small labels, no frame. One line chart in the same window style as the chart on
  * the home page. Each line keeps one colour all the way across: demand in coral (like costs),
  * resources in blue (like revenue). Each runs two ways from the start: dashed is where it goes
- * without us, solid is where it goes with us. A bracket marks the smaller gap. Arrows show what we
+ * without us, solid is where it goes with us. A bracket marks the gap without us, then fades as our
+ * lines come in, and a second bracket marks the reduced gap. Arrows show what we
  * do to each: demand pushed down, resources pushed up, in three numbered parts that match the
  * cards beside the chart. An illustration, not data.
  *
@@ -67,7 +68,6 @@ function draw(d: Dims) {
 
   const kx = d.X1 - 40;
   const mid = (a: (x: number) => number, b: (x: number) => number) => y((a(kx) + b(kx)) / 2);
-  const gx = d.X0 + (d.X1 - d.X0) * 0.14;
 
   /* The arrows: from where each line would be without us to where it is with us */
   const ax = d.X1 - 58;
@@ -93,7 +93,6 @@ function draw(d: Dims) {
     ],
     ends: { demand: y(fW(d.X1)), res: y(rW(d.X1)), demand0: y(f0(d.X1)), res0: y(r0(d.X1)) },
     left: { demand: y(f0(d.X0)), res: y(r0(d.X0)) },
-    gap: { x: gx, y: y((f0(gx) + r0(gx)) / 2) },
     smaller: { x: gapAt, y: y((fW(gapAt) + rW(gapAt)) / 2) },
   };
 }
@@ -138,9 +137,13 @@ const charts = [
                 <path d={c.without.demand} class="l-without l-without-demand" />
                 <path d={c.without.res} class="l-without l-without-res" />
               </g>
-              <text x={c.gap.x} y={c.gap.y + 4} class="fade gap-label" text-anchor="middle" style="--at:2000ms">The gap</text>
-              <text x={c.X1 + 10} y={c.ends.demand0 + 4} class="fade end-label end-demand" style="--at:3600ms">Demand</text>
-              <text x={c.X1 + 10} y={c.ends.res0 + 4} class="fade end-label end-res" style="--at:3600ms">Resources</text>
+              <text x={c.X1 + 22} y={c.ends.demand0 + 4} class="fade end-label end-demand" style="--at:3600ms">Demand</text>
+              <text x={c.X1 + 22} y={c.ends.res0 + 4} class="fade end-label end-res" style="--at:3600ms">Resources</text>
+              <!-- The gap without us, marked the same way as the reduced gap later; it fades as our lines come in -->
+              <g class="gap-then">
+                <path d={`M${c.X1 + 10} ${c.ends.demand0 + 1} h4 V${c.ends.res0 - 1} h-4`} class="bracket" />
+                <text x={c.X1 + 22} y={(c.ends.demand0 + c.ends.res0) / 2 + 4} class="bracket-label">The gap</text>
+              </g>
 
               <!-- Then, with us: the lines and the light under them move together -->
               <g class="reveal" style="--at:5000ms;--dur:5600ms">
@@ -169,9 +172,9 @@ const charts = [
               ))}
 
               <!-- The gap that is left -->
-              <g class="fade" style="--at:12200ms">
+              <g class="fade" style="--at:11800ms">
                 <path d={`M${c.X1 + 10} ${c.ends.demand + 1} h4 V${c.ends.res - 1} h-4`} class="bracket" />
-                <text x={c.X1 + 21} y={(c.ends.demand + c.ends.res) / 2 + 4} class="bracket-label">Smaller gap</text>
+                <text x={c.X1 + 22} y={(c.ends.demand + c.ends.res) / 2 + 4} class="bracket-label">Reduced gap</text>
               </g>
             </svg>
           ))
@@ -279,7 +282,6 @@ const charts = [
 
   .axis { fill: none; stroke: rgb(255 255 255 / 0.18); stroke-width: 1; }
   .axis-label { font-family: var(--font-body); font-size: 10.5px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; fill: #8fa1b4; }
-  .gap-label { font-family: var(--font-body); font-size: 10.5px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; fill: #8fa1b4; }
 
   /* Without: thin and dashed. With: solid, with soft light under it */
   .l-without { fill: none; stroke-width: 1.5; stroke-dasharray: 4 5; stroke-linecap: round; }
@@ -313,7 +315,17 @@ const charts = [
     .fade { opacity: 1; transition: opacity 1200ms var(--ease) var(--at); }
     .npi-pre .reveal { clip-path: inset(-20px calc(100% + 20px) -20px -20px); transition: clip-path 900ms var(--ease); }
     .npi-pre .fade { opacity: 0; transition: opacity 700ms var(--ease); }
+    /* The first gap: in once the lines without us reach the end, out as ours come in */
+    .gap-then { animation: npi-gap-then 3400ms var(--ease) 3800ms both; }
+    .npi-pre .gap-then { animation: none; opacity: 0; }
+    @keyframes npi-gap-then {
+      0% { opacity: 0; }
+      23%, 45% { opacity: 1; }
+      100% { opacity: 0; }
+    }
   }
+  /* At rest the chart shows the finished picture, so the first gap is not there */
+  .gap-then { opacity: 0; }
 
   /* ---------- The three ways: typographic, hairline-ruled, keyed to the chart ---------- */
   .npi-ways { list-style: none; padding: 0; display: grid; }
