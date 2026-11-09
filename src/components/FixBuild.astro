@@ -338,14 +338,31 @@ const sets = [
       /* ---------- The drawing is as tall as the list (laptops) ----------
          The tall drawing is cropped to itself, from the top of the new revenue down to the
          Before and After labels, and stretched from the first case study to the last. */
+      // Where a slice's middle sits on screen (from its geometry, so the build-up does not move it)
+      const sliceMid = (k: string) => {
+        const r = slice(k)?.querySelector<SVGRectElement>('[data-slice-rect]');
+        const m = chart.getScreenCTM();
+        if (!r || !m) return 0;
+        const b = r.getBBox();
+        return m.d * (b.y + b.height / 2) + m.f;
+      };
       const centre = () => {
-        if (!wide.matches) return;
+        if (!wide.matches) return 0;
         chart.setAttribute('viewBox', chart.dataset.crop!);
         const first = cards[0].getBoundingClientRect();
         const last = cards[cards.length - 1].getBoundingClientRect();
         chart.style.marginTop = '0px';
         chart.style.height = `${(last.bottom - first.top).toFixed(1)}px`;
-        chart.style.marginTop = `${(first.top - chart.getBoundingClientRect().top).toFixed(1)}px`;
+        const top = first.top - chart.getBoundingClientRect().top;
+        chart.style.marginTop = `${top.toFixed(1)}px`;
+        // Then down a little, so every new revenue slice sits below its case study (its line rises
+        // to it) and every cost slice above its own (its line falls to it)
+        const card = cards.filter((c) => !/\d/.test(c.dataset.card!)).pop();
+        if (!card) return 0;
+        const r = headOf(card).getBoundingClientRect();
+        const drop = Math.max(0, r.top + r.height / 2 - sliceMid(card.dataset.card!) + 30);
+        chart.style.marginTop = `${(top + drop).toFixed(1)}px`;
+        return drop;
       };
 
       /* ---------- Thumbnails: each graphic, scaled down to a still frame ---------- */
@@ -384,7 +401,9 @@ const sets = [
           // and stays that size
           if (!open) {
             chartFig.style.height = `${cardsBox.offsetHeight}px`;
-            centre();
+            const drop = centre();
+            // The chart now reaches a little below the last case study; the section makes room
+            if (drop) chartFig.style.height = `${(cardsBox.offsetHeight + drop).toFixed(1)}px`;
           }
         } else {
           chartFig.style.removeProperty('height');
