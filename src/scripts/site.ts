@@ -24,8 +24,15 @@ function initHeader() {
       const r = el.getBoundingClientRect();
       return r.top <= mid && r.bottom > mid;
     };
+    // A hero that fades into the light page is only dark down to the middle of its fade
+    const underDark = (el: HTMLElement) => {
+      const r = el.getBoundingClientRect();
+      const fade = el.querySelector<HTMLElement>('[data-hero-fade]')?.getBoundingClientRect();
+      const bottom = fade ? fade.top + fade.height * 0.5 : r.bottom;
+      return r.top <= mid && bottom > mid;
+    };
     const onBody = body.some(under);
-    header.classList.toggle('over-dark', !onBody && alwaysDark.some(under));
+    header.classList.toggle('over-dark', !onBody && alwaysDark.some(underDark));
     ticking = false;
   };
   update();
