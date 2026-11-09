@@ -220,6 +220,7 @@ const sets = [
 
 <script>
   import { initScenes, sceneController, scenesCanAnimate } from '../scripts/scenes';
+  import { focusOn } from '../scripts/focus';
 
   const LIVE_W = 640; // the width each thumbnail graphic is laid out at before scaling
   const PHONE_W = 400;
@@ -366,6 +367,8 @@ const sets = [
         open = next ? card : null;
         root.classList.toggle('has-open', Boolean(open));
         hold(Boolean(open));
+        // The open case study stays sharp; everything else dims and blurs behind it
+        focusOn(open);
         track(700);
       };
       const mode = () => {
@@ -375,6 +378,13 @@ const sets = [
           panelOf(card).inert = wide.matches && !card.classList.contains('is-open');
         });
       };
+      // A click anywhere outside the open case study, or Escape, closes it
+      document.addEventListener('click', (e) => {
+        if (open && !open.contains(e.target as Node)) toggle(open);
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && open) toggle(open);
+      });
       cards.forEach((card) => {
         const head = headOf(card);
         head.addEventListener('click', () => toggle(card));
@@ -447,6 +457,7 @@ const sets = [
         if (open) setOpen(open, false);
         open = null;
         root.classList.remove('has-open');
+        focusOn(null);
         hold(false);
         cards.forEach((card) => control(card, 'thumb', 'stop'));
         mode();
