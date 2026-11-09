@@ -20,11 +20,14 @@ import NonprofitImpact from '../components/NonprofitImpact.astro';
     <GapChart slot="figure" />
   </PageHero>
 
-  <NonprofitImpact />
+  <!-- The page carries on in the hero's deep blue -->
+  <div class="page-dark dark-nonprofit" data-dark-page>
+    <NonprofitImpact />
 
-  <ClosingCTA
-    terse
-    title="Let’s close the gap."
-    body="Tell us where your team’s time goes. We’ll show you how much of it could go back to the mission."
-  />
+    <ClosingCTA
+      terse
+      title="Let’s close the gap."
+      body="Tell us where your team’s time goes. We’ll show you how much of it could go back to the mission."
+    />
+  </div>
 </Base>
