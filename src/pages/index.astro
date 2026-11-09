@@ -11,13 +11,11 @@ import ClosingCTA from '../components/ClosingCTA.astro';
 <Base>
   <section class="hero hero-dark theme-home" data-hero-dark>
     <Mist />
+    <HeroLive />
     <div class="wrap hero-grid">
       <div class="hero-copy">
         <h1 class="load-in" style="--i:1">We optimize <em class="display-em">operations.</em></h1>
         <div class="accent-rule load-in" style="--i:2"></div>
-      </div>
-      <div class="hero-live load-fade">
-        <HeroLive />
       </div>
 
     </div>
@@ -59,14 +57,8 @@ import ClosingCTA from '../components/ClosingCTA.astro';
   }
   .hero-grid {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: var(--s-8);
+    grid-template-columns: minmax(0, 1fr);
     align-items: center;
-  }
-  .hero-live { display: grid; }
-  @media (max-width: 960px) {
-    .hero-grid { grid-template-columns: minmax(0, 1fr); }
-    .hero-live { display: none; }
   }
   .hero-copy { display: grid; gap: var(--s-5); justify-items: start; }
   .hero-copy h1 { font-size: clamp(3rem, 1.6rem + 6vw, 6.75rem); max-width: 10ch; }

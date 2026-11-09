@@ -813,9 +813,13 @@ html.is-focusing .focus-veil { opacity: 1; }
     radial-gradient(50% 18% at 78% 84%, rgb(90 140 190 / 0.12), transparent 72%);
   opacity: 0.5;
 }
-.hero-dark h1,
 .page-dark h2,
 .work-dark h2 { text-shadow: 0 18px 44px rgb(0 0 0 / 0.35); }
+/* Hero headlines float: a soft shadow sits beneath them, drifting a little further away and
+   softer as the words rise */
+.hero-dark h1 {
+  text-shadow: 0 14px 22px rgb(0 0 0 / 0.5), 0 34px 60px rgb(0 0 0 / 0.3);
+}
 @media (prefers-reduced-motion: no-preference) {
   .page-dark::before,
   .work-dark::before { animation: breathe 9s ease-in-out infinite; }
@@ -828,12 +832,14 @@ html.is-focusing .focus-veil { opacity: 1; }
     0%, 100% { opacity: 0.5; transform: scale(1); }
     50% { opacity: 1; transform: scale(1.035); }
   }
-  .hero-dark .hero-text,
-  .hero-dark .hero-copy,
-  .hero-dark .contact-intro { animation: float 9s ease-in-out infinite; }
+  .hero-dark h1.load-in {
+    animation:
+      rise 1000ms var(--ease-out) calc(120ms + var(--i, 0) * 90ms) both,
+      float 9s ease-in-out 1.2s infinite;
+  }
   @keyframes float {
-    0%, 100% { translate: 0 0; }
-    50% { translate: 0 -4px; }
+    0%, 100% { translate: 0 0; text-shadow: 0 14px 22px rgb(0 0 0 / 0.5), 0 34px 60px rgb(0 0 0 / 0.3); }
+    50% { translate: 0 -7px; text-shadow: 0 22px 30px rgb(0 0 0 / 0.38), 0 46px 72px rgb(0 0 0 / 0.24); }
   }
 }
 
