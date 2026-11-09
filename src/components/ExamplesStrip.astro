@@ -1,10 +1,29 @@
 ---
 /**
- * Home, under the section's opening line: everyday work we take on, as cards in the same two
- * groups (and colours) as the case studies below. A small line icon, the name, and one short line.
+ * Home: cards in the same two groups (and colours) as the case studies. A small line icon, a name,
+ * and one short line. By default, the everyday work we take on (under the section's opening line),
+ * with a note that these are only examples. Given its own groups (the case studies, on phones),
+ * each card links to its case study and shows an arrow.
  * Laptops: the two groups side by side, each a 2 x 2 grid. Phones: one card per line.
  */
-const groups = [
+interface Item {
+  name: string;
+  line: string;
+  icon: string;
+  href?: string;
+}
+interface Group {
+  key: 'build' | 'fix';
+  title: string;
+  note: string;
+  items: Item[];
+}
+interface Props {
+  groups?: Group[];
+  note?: string;
+  class?: string;
+}
+const examples: Group[] = [
   {
     key: 'build',
     title: 'Revenue Development',
@@ -28,9 +47,14 @@ const groups = [
     ],
   },
 ];
+const {
+  groups = examples,
+  note = 'These are a few examples, not the full list. If it slows your team down or holds back growth, we can build for it.',
+  class: className = '',
+} = Astro.props;
 ---
 
-<div class="ex">
+<div class:list={['ex', className]}>
   {
     groups.map((g) => (
       <section class:list={['ex-group', `ex-${g.key}`]} aria-label={g.title}>
@@ -39,23 +63,34 @@ const groups = [
           <span class="ex-note">{g.note}</span>
         </p>
         <ul class="ex-cards">
-          {g.items.map((it) => (
-            <li class="ex-card">
-              <span class="ex-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24">
-                  <path d={it.icon} />
-                </svg>
-              </span>
-              <span class="ex-text">
-                <span class="ex-name">{it.name}</span>
-                <span class="ex-line">{it.line}</span>
-              </span>
-            </li>
-          ))}
+          {g.items.map((it) => {
+            const Tag = it.href ? 'a' : 'div';
+            return (
+              <li>
+                <Tag class:list={['ex-card', { 'ex-link': it.href }]} href={it.href}>
+                  <span class="ex-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                      <path d={it.icon} />
+                    </svg>
+                  </span>
+                  <span class="ex-text">
+                    <span class="ex-name">{it.name}</span>
+                    <span class="ex-line">{it.line}</span>
+                  </span>
+                  {it.href && (
+                    <span class="ex-arr" aria-hidden="true">
+                      →
+                    </span>
+                  )}
+                </Tag>
+              </li>
+            );
+          })}
         </ul>
       </section>
     ))
   }
+  {note && <p class="ex-more">{note}</p>}
 </div>
 
 <style>
@@ -97,6 +132,14 @@ const groups = [
     background: rgb(var(--c-rgb) / 0.1);
   }
   .ex-icon svg { width: 19px; height: 19px; fill: none; stroke: var(--c); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+  .ex-cards > li { display: grid; }
+  /* Cards that open a case study: an arrow on the right, and a slight lift on hover */
+  .ex-link { grid-template-columns: auto minmax(0, 1fr) auto; text-decoration: none; color: inherit; transition: border-color 200ms var(--ease), transform 200ms var(--ease); }
+  .ex-link:hover { border-color: rgb(var(--c-rgb) / 0.45); transform: translateY(-1px); }
+  .ex-arr { color: var(--c); font-size: 1rem; transition: transform 200ms var(--ease); }
+  .ex-link:hover .ex-arr { transform: translateX(3px); }
+  /* The examples are only examples */
+  .ex-more { grid-column: 1 / -1; margin-top: 1.1rem; font-size: 0.9375rem; line-height: 1.5; color: var(--ink-2); }
   .ex-text { display: grid; gap: 0.2rem; min-width: 0; }
   .ex-name { font-family: var(--font-display); font-size: 1.0625rem; line-height: 1.25; color: var(--ink); }
   .ex-line { font-size: 0.875rem; line-height: 1.4; color: var(--ink-2); }
@@ -121,5 +164,14 @@ const groups = [
     .ex-icon { width: 34px; height: 34px; }
     .ex-name { font-size: 1rem; }
     .ex-line { font-size: 0.875rem; }
+  }
+  /* Small phones: a little smaller, so each card keeps to two lines and they all match */
+  @media (max-width: 380px) {
+    .ex-card { gap: 0.7rem; padding: 0.75rem 0.8rem 0.8rem; }
+    .ex-icon { width: 30px; height: 30px; }
+    .ex-icon svg { width: 16px; height: 16px; }
+    .ex-name { font-size: 0.9375rem; }
+    .ex-line { font-size: 0.8125rem; }
+    .ex-link { gap: 0.6rem; }
   }
 </style>

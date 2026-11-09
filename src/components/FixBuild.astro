@@ -27,6 +27,8 @@ interface Item {
       smaller-screen cards only the result shows, since the card carries the headline. */
   value: string;
   rest: string;
+  /** A shorter line for the phone cards, where the full one would wrap */
+  brief?: string;
 }
 
 const build: Item[] = [
@@ -35,7 +37,7 @@ const build: Item[] = [
   { k: 'C', id: 'lead-generation-engine', value: 'A $1B+ market opened', rest: ' through a new digital service' },
 ];
 const fix: Item[] = [
-  { k: '1', id: 'commission-automation', value: '80% less time', rest: ' processing commissions for a $1.2B manufacturer' },
+  { k: '1', id: 'commission-automation', value: '80% less time', rest: ' processing commissions for a $1.2B manufacturer', brief: 'Commissions at a $1.2B manufacturer' },
   { k: '2', id: 'project-feasibility-platform', value: '12 months → minutes', rest: ', eliminating $100K+ assessment costs' },
   { k: '3', id: 'momentum-exchange-prototype', value: '83% greater fuel efficiency', rest: ' with a new momentum-transfer system' },
   { k: '4', id: 'subcontractor-financing-marketplace', value: '6+ months → weeks', rest: ' for subcontractor financing approvals' },
@@ -73,6 +75,17 @@ const chartFor = (key: 'wide' | 'narrow') => {
   };
 };
 const charts = [chartFor('wide'), chartFor('narrow')];
+
+/* Phones and tablets leave the case study list out of the chart's column, so they list the case
+   studies under the chart instead, as cards like the examples above, each opening its case study */
+const card = (it: Item) => {
+  const rest = (it.brief ?? it.rest).replace(/^[,\s]+/, '');
+  return { name: it.value.charAt(0).toUpperCase() + it.value.slice(1), line: rest.charAt(0).toUpperCase() + rest.slice(1), icon: iconFor(it.id), href: `/work/#${it.id}` };
+};
+const proofGroups = [
+  { key: 'build' as const, title: 'Revenue Development', note: 'Revenue up', items: build.map(card) },
+  { key: 'fix' as const, title: 'Operations Efficiency', note: 'Costs down', items: fix.map(card) },
+];
 
 const sets = [
   { key: 'build', title: 'Revenue Development', note: 'Revenue up', items: build },
@@ -193,6 +206,9 @@ const sets = [
           }
         </div>
       </figure>
+
+      <!-- Phones and tablets: the case studies, as cards under the chart -->
+      <ExamplesStrip class="fb-proof" groups={proofGroups} note="" />
 
       <!-- Phones and tablets: the case studies are left out, so the chart points to them -->
       <a class="fb-more" href="/work/"><span class="fb-more-l">See <mark class="fb-hl">our work</mark> in action</span> <span class="arr" aria-hidden="true">→</span></a>
@@ -1139,5 +1155,12 @@ const sets = [
   }
   @media (max-width: 1099px) {
     .fb { padding-top: 3.5rem; }
+  }
+  /* The case studies as cards, on phones and tablets only */
+  @media (min-width: 1100px) {
+    .fb :global(.fb-proof) { display: none; }
+  }
+  @media (max-width: 1099px) {
+    .fb :global(.fb-proof) { margin: 0.5rem 0 0; }
   }
 </style>
