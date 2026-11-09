@@ -895,4 +895,26 @@ const sets = [
   @media (max-width: 1099px) {
     .fb-pill { font-size: 0.625rem; padding: 0.18rem 0.5rem 0.18rem 0.42rem; }
   }
+
+  /* The After bars start as dull as the Before ones and light up once our systems are built on
+     them: costs once the cuts have landed, revenue once the new slices have stacked up. */
+  @media (prefers-reduced-motion: no-preference) {
+    .fb-cost-after {
+      transition: transform 2200ms var(--ease-out) 300ms, fill 1300ms var(--ease) 2700ms, stroke 1300ms var(--ease) 2700ms, filter 1300ms var(--ease) 2700ms;
+    }
+    .fb-rev-after { transition: fill 1300ms var(--ease) 4000ms, stroke 1300ms var(--ease) 4000ms, filter 1300ms var(--ease) 4000ms; }
+    .fb-pre .fb-cost-after {
+      fill: rgb(226 163 154 / 0.42);
+      stroke: rgb(255 61 94 / 0);
+      filter: drop-shadow(0 0 0 rgb(255 42 77 / 0));
+      transition: transform 700ms var(--ease), fill 600ms var(--ease), stroke 600ms var(--ease), filter 600ms var(--ease);
+    }
+    .fb-pre .fb-rev-after {
+      fill: rgb(110 160 205 / 0.5);
+      stroke: rgb(63 208 255 / 0);
+      filter: drop-shadow(0 0 0 rgb(63 208 255 / 0));
+      transition: fill 600ms var(--ease), stroke 600ms var(--ease), filter 600ms var(--ease);
+    }
+    .fb-hold .fb-rev-after { transition: none !important; }
+  }
 </style>
