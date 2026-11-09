@@ -264,6 +264,11 @@ function initScene(scene: HTMLElement) {
     if (canAnimate()) ctrl.stop();
     return;
   }
+  // [data-always]: loops from the moment the page opens and never pauses (the Approach phases)
+  if (scene.closest('[data-always]')) {
+    if (canAnimate()) ctrl.loop();
+    return;
+  }
   // Scenes inside a group are played one at a time by the group (below).
   if (!canAnimate() || scene.closest('[data-scene-group]')) {
     if (scene.closest('[data-scene-group]') && canAnimate()) ctrl.stop();
