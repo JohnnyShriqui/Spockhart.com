@@ -795,6 +795,48 @@ html.is-focusing .focus-veil { opacity: 1; }
   body { background: #fff; color: #000; }
 }
 
+/* ==========================================================================
+   Breathing: the whole site is alive but calm. The light in every dark hero and every dark
+   page slowly breathes in and out, and the headlines float gently above it, a few pixels at
+   most, on the same nine-second breath.
+   ========================================================================== */
+.page-dark::before,
+.work-dark::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(50% 18% at 82% 22%, rgb(90 140 190 / 0.14), transparent 72%),
+    radial-gradient(48% 16% at 14% 52%, rgb(80 120 180 / 0.12), transparent 72%),
+    radial-gradient(50% 18% at 78% 84%, rgb(90 140 190 / 0.12), transparent 72%);
+  opacity: 0.5;
+}
+.hero-dark h1,
+.page-dark h2,
+.work-dark h2 { text-shadow: 0 18px 44px rgb(0 0 0 / 0.35); }
+@media (prefers-reduced-motion: no-preference) {
+  .page-dark::before,
+  .work-dark::before { animation: breathe 9s ease-in-out infinite; }
+  .hero-dark .mist { transform-origin: 60% 60%; animation: breathe-soft 9s ease-in-out infinite; }
+  @keyframes breathe-soft {
+    0%, 100% { opacity: 0.72; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.04); }
+  }
+  @keyframes breathe {
+    0%, 100% { opacity: 0.5; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.035); }
+  }
+  .hero-dark .hero-text,
+  .hero-dark .hero-copy,
+  .hero-dark .contact-intro { animation: float 9s ease-in-out infinite; }
+  @keyframes float {
+    0%, 100% { translate: 0 0; }
+    50% { translate: 0 -4px; }
+  }
+}
+
 /* The Our Work honeycomb keeps its own colours inside the dark hero */
 .hero-dark .comb {
   --brand: #1f4d6f;

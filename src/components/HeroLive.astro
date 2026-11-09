@@ -1,0 +1,258 @@
+---
+/**
+ * Home hero: the Costs vs revenue chart from further down the page, shown as a live session.
+ * No labels but the caption. A scan sweeps across, each cost slice is targeted and cut with a
+ * small ping, the new revenue slices flicker in one by one, the new margin locks in, it holds,
+ * and it runs again. Below, the same chart is broken down case study by case study.
+ * Decorative; still on its finished frame with reduced motion; hidden on small screens.
+ */
+const VB_W = 560;
+const VB_H = 440;
+const BASE = 410;
+const W = 60;
+const before = { rev: 92, cost: 160 };
+const after = { rev: 330, cost: 398 };
+const REV = 230;
+const COST = 216;
+const ADD = 46;
+const CUT = 26;
+const NB = 3;
+const NC = 4;
+const revTop = BASE - REV;
+const costTop = BASE - COST;
+const newTop = revTop - ADD * NB;
+const costAfterTop = costTop + CUT * NC;
+const grid = [50, 122, 194, 266, 338];
+
+/* One loop, in percent of LOOP seconds */
+const LOOP = 18;
+const cutAt = (i: number) => 22 + i * 5; // when each cost slice is targeted
+const addAt = (k: number) => 46 + k * 5; // when each new revenue slice arrives (C, then B, then A)
+const LOCK = 62; // the new margin locks in
+const RESET = 91; // everything eases back to Before
+
+const pct = (n: number) => `${Math.max(0, Math.min(100, n)).toFixed(2)}%`;
+const kf = (name: string, stops: [number, string][]) => `@keyframes ${name}{${stops.map(([p, v]) => `${pct(p)}{${v}}`).join('')}}`;
+
+let css = '';
+/* The cost bar steps down as each slice is cut */
+css += kf('hl-cost', [
+  [0, 'transform:scaleY(1)'],
+  ...Array.from({ length: NC }, (_, i) => [
+    [cutAt(i) + 2.4, `transform:scaleY(${((COST - CUT * i) / COST).toFixed(4)})`] as [number, string],
+    [cutAt(i) + 3.4, `transform:scaleY(${((COST - CUT * (i + 1)) / COST).toFixed(4)})`] as [number, string],
+  ]).flat(),
+  [RESET, `transform:scaleY(${((COST - CUT * NC) / COST).toFixed(4)})`],
+  [RESET + 4, 'transform:scaleY(1)'],
+  [100, 'transform:scaleY(1)'],
+]);
+for (let i = 0; i < NC; i++) {
+  const a = cutAt(i);
+  /* Targeted: a bright outline blinks, then it settles to the dashed outline of a cost removed */
+  css += kf(`hl-tgt-${i}`, [
+    [0, 'opacity:0'],
+    [a - 0.01, 'opacity:0'],
+    [a, 'opacity:1'],
+    [a + 0.6, 'opacity:0.15'],
+    [a + 1.2, 'opacity:1'],
+    [a + 1.8, 'opacity:0.15'],
+    [a + 2.4, 'opacity:1'],
+    [a + 3.4, 'opacity:0'],
+    [100, 'opacity:0'],
+  ]);
+  css += kf(`hl-cut-${i}`, [
+    [0, 'opacity:0'],
+    [a + 3, 'opacity:0'],
+    [a + 4, 'opacity:1'],
+    [RESET, 'opacity:1'],
+    [RESET + 3, 'opacity:0'],
+    [100, 'opacity:0'],
+  ]);
+  css += kf(`hl-pc-${i}`, [
+    [0, 'opacity:0;transform:scale(0.2)'],
+    [a + 2.4, 'opacity:0;transform:scale(0.2)'],
+    [a + 2.6, 'opacity:0.9;transform:scale(0.3)'],
+    [a + 6, 'opacity:0;transform:scale(1.6)'],
+    [100, 'opacity:0;transform:scale(1.6)'],
+  ]);
+}
+for (let k = 0; k < NB; k++) {
+  const b = addAt(k);
+  /* Arrives like it is being rendered: a few quick flickers, then holds */
+  css += kf(`hl-add-${k}`, [
+    [0, 'opacity:0'],
+    [b - 0.01, 'opacity:0'],
+    [b, 'opacity:0.9'],
+    [b + 0.4, 'opacity:0.1'],
+    [b + 0.8, 'opacity:0.8'],
+    [b + 1.2, 'opacity:0.25'],
+    [b + 1.8, 'opacity:1'],
+    [RESET, 'opacity:1'],
+    [RESET + 3, 'opacity:0'],
+    [100, 'opacity:0'],
+  ]);
+  css += kf(`hl-pa-${k}`, [
+    [0, 'opacity:0;transform:scale(0.2)'],
+    [b + 1.8, 'opacity:0;transform:scale(0.2)'],
+    [b + 2, 'opacity:0.9;transform:scale(0.3)'],
+    [b + 5.5, 'opacity:0;transform:scale(1.6)'],
+    [100, 'opacity:0;transform:scale(1.6)'],
+  ]);
+}
+css += kf('hl-scan', [
+  [0, 'opacity:0;transform:translateX(0)'],
+  [6, 'opacity:0;transform:translateX(0)'],
+  [8, 'opacity:1;transform:translateX(0)'],
+  [19, 'opacity:1;transform:translateX(500px)'],
+  [21, 'opacity:0;transform:translateX(500px)'],
+  [100, 'opacity:0;transform:translateX(500px)'],
+]);
+css += kf('hl-lock', [
+  [0, 'stroke-dashoffset:1;opacity:1'],
+  [LOCK, 'stroke-dashoffset:1;opacity:1'],
+  [LOCK + 4, 'stroke-dashoffset:0;opacity:1'],
+  [RESET, 'stroke-dashoffset:0;opacity:1'],
+  [RESET + 3, 'stroke-dashoffset:0;opacity:0'],
+  [100, 'stroke-dashoffset:1;opacity:0'],
+]);
+css += kf('hl-done', [
+  [0, 'opacity:0;transform:scale(0.2)'],
+  [LOCK + 4, 'opacity:0;transform:scale(0.2)'],
+  [LOCK + 4.3, 'opacity:0.9;transform:scale(0.3)'],
+  [LOCK + 10, 'opacity:0;transform:scale(2.2)'],
+  [100, 'opacity:0;transform:scale(2.2)'],
+]);
+/* The status light: blinks fast while working, slow and calm while it holds */
+css += kf('hl-status', [
+  [0, 'opacity:0.35'],
+  ...Array.from({ length: 28 }, (_, j) => [8 + j * 2, `opacity:${j % 2 ? 0.25 : 1}`] as [number, string]),
+  [LOCK + 4, 'opacity:1'],
+  [75, 'opacity:0.45'],
+  [84, 'opacity:1'],
+  [RESET, 'opacity:0.45'],
+  [100, 'opacity:0.35'],
+]);
+const style = `<style>${css}
+.hl-cost-after{animation:hl-cost ${LOOP}s linear infinite}
+${Array.from({ length: NC }, (_, i) => `.hl-tgt-${i}{animation:hl-tgt-${i} ${LOOP}s linear infinite}.hl-cut-${i}{animation:hl-cut-${i} ${LOOP}s linear infinite}.hl-pc-${i}{animation:hl-pc-${i} ${LOOP}s linear infinite}`).join('')}
+${Array.from({ length: NB }, (_, k) => `.hl-add-${k}{animation:hl-add-${k} ${LOOP}s linear infinite}.hl-pa-${k}{animation:hl-pa-${k} ${LOOP}s linear infinite}`).join('')}
+.hl-scan{animation:hl-scan ${LOOP}s cubic-bezier(0.45,0,0.4,1) infinite}
+.hl-lock{animation:hl-lock ${LOOP}s ease-in-out infinite}
+.hl-done{animation:hl-done ${LOOP}s ease-out infinite}
+.hl-status{animation:hl-status ${LOOP}s linear infinite}
+</style>`;
+---
+
+<figure class="live" aria-hidden="true">
+  <figcaption class="live-cap">
+    <span class="live-status hl-status"></span>
+    Costs vs revenue<span class="live-caret"></span>
+  </figcaption>
+  <svg viewBox={`0 0 ${VB_W} ${VB_H}`} class="live-svg">
+    <defs>
+      <pattern id="hl-hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+        <line x1="0" y1="0" x2="0" y2="7" class="hl-hatch-line" />
+      </pattern>
+      <linearGradient id="hl-scan-grad" x1="0" x2="1" y1="0" y2="0">
+        <stop offset="0" stop-color="#9cc8ea" stop-opacity="0" />
+        <stop offset="0.85" stop-color="#9cc8ea" stop-opacity="0.16" />
+        <stop offset="1" stop-color="#9cc8ea" stop-opacity="0" />
+      </linearGradient>
+    </defs>
+
+    {grid.map((y) => <line x1="24" x2="536" y1={y} y2={y} class="hl-grid" />)}
+    <line x1="24" x2="536" y1={BASE} y2={BASE} class="hl-axis" />
+    <line x1="280" x2="280" y1="30" y2={BASE + 20} class="hl-divider" />
+
+    <!-- Before -->
+    <rect x={before.rev} y={revTop} width={W} height={REV} rx="2" class="hl-rev" />
+    <rect x={before.cost} y={costTop} width={W} height={COST} rx="2" class="hl-cost" />
+    <path d={`M${before.rev - 10} ${revTop} h-5 V${costTop} h5`} class="hl-bracket" />
+
+    <!-- After: costs cut, then new revenue -->
+    <rect x={after.rev} y={revTop} width={W} height={REV} rx="2" class="hl-rev" />
+    <rect x={after.cost} y={costTop} width={W} height={COST} rx="2" class="hl-cost hl-cost-after" />
+    {
+      Array.from({ length: NC }, (_, i) => {
+        const y = costTop + CUT * i;
+        return (
+          <g>
+            <rect x={after.cost + 0.75} y={y + 0.75} width={W - 1.5} height={CUT - 1.5} class={`hl-cut hl-cut-${i}`} />
+            <rect x={after.cost - 3} y={y - 2} width={W + 6} height={CUT + 4} rx="2" class={`hl-tgt hl-tgt-${i}`} />
+            <circle cx={after.cost + W / 2} cy={y + CUT / 2} r="22" class={`hl-ping hl-ping-cut hl-pc-${i}`} />
+          </g>
+        );
+      })
+    }
+    {
+      Array.from({ length: NB }, (_, k) => {
+        /* C (the lowest) arrives first, then B, then A */
+        const y = revTop - ADD * (k + 1);
+        return (
+          <g>
+            <rect x={after.rev} y={y} width={W} height={ADD} class={`hl-add hl-add-${k}`} />
+            <circle cx={after.rev + W / 2} cy={y + ADD / 2} r="26" class={`hl-ping hl-pa-${k}`} />
+          </g>
+        );
+      })
+    }
+    <path d={`M${after.rev - 10} ${newTop} h-5 V${costAfterTop} h5`} pathLength="1" class="hl-bracket hl-bracket-new hl-lock" />
+    <circle cx={after.rev - 15} cy={(newTop + costAfterTop) / 2} r="30" class="hl-ping hl-done" />
+
+    <!-- The scan -->
+    <g class="hl-scan">
+      <rect x="-20" y="30" width="60" height={BASE - 30} fill="url(#hl-scan-grad)" />
+      <line x1="40" x2="40" y1="30" y2={BASE} class="hl-scan-line" />
+    </g>
+  </svg>
+</figure>
+
+<Fragment set:html={style} />
+
+<style>
+  .live { margin: 0; width: 100%; max-width: 500px; justify-self: end; }
+  .live-cap {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding-bottom: 0.85rem;
+    border-bottom: 1px solid rgb(255 255 255 / 0.1);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #8fa1b4;
+  }
+  .live-status { width: 6px; height: 6px; border-radius: 50%; background: #6fd29d; box-shadow: 0 0 8px rgb(111 210 157 / 0.8); }
+  .live-caret { width: 0.55em; height: 1.05em; margin-left: 0.15em; background: #9cc8ea; opacity: 0.85; }
+  .live-svg { display: block; width: 100%; height: auto; margin-top: 1rem; overflow: visible; }
+
+  .hl-grid { stroke: rgb(255 255 255 / 0.05); stroke-width: 1; }
+  .hl-axis { stroke: rgb(255 255 255 / 0.18); stroke-width: 1; }
+  .hl-divider { stroke: rgb(255 255 255 / 0.07); stroke-width: 1; stroke-dasharray: 2 4; }
+  .hl-rev { fill: rgb(110 160 205 / 0.5); }
+  .hl-cost { fill: rgb(226 163 154 / 0.42); }
+  .hl-cost-after { transform-box: fill-box; transform-origin: bottom; }
+  .hl-bracket { fill: none; stroke: rgb(238 243 248 / 0.3); stroke-width: 1; }
+  .hl-bracket-new { stroke: rgb(238 243 248 / 0.55); stroke-dasharray: 1 1; }
+  .hl-hatch-line { stroke: rgb(226 163 154 / 0.24); stroke-width: 1; }
+  .hl-cut { fill: url(#hl-hatch); stroke: rgb(226 163 154 / 0.6); stroke-width: 1; stroke-dasharray: 3 2.5; }
+  .hl-tgt { fill: rgb(226 163 154 / 0.08); stroke: #f1c6c0; stroke-width: 1.25; opacity: 0; }
+  .hl-add { fill: rgb(156 200 234 / 0.2); stroke: rgb(156 200 234 / 0.65); stroke-width: 1; }
+  .hl-ping { fill: none; stroke: #9cc8ea; stroke-width: 1; opacity: 0; transform-box: fill-box; transform-origin: center; }
+  .hl-ping-cut { stroke: #e2a39a; }
+  .hl-scan-line { stroke: rgb(207 230 248 / 0.55); stroke-width: 1; }
+  .hl-scan { opacity: 0; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .live-caret { animation: hl-caret 1.1s steps(1) infinite; }
+    @keyframes hl-caret { 50% { opacity: 0; } }
+  }
+  /* Reduced motion: the finished chart, still */
+  @media (prefers-reduced-motion: reduce) {
+    .live :is(.hl-cut, .hl-add) { opacity: 1 !important; animation: none !important; }
+    .live .hl-cost-after { animation: none !important; transform: scaleY(0.5185); }
+    .live .hl-bracket-new { animation: none !important; stroke-dashoffset: 0; }
+    .live :is(.hl-tgt, .hl-ping, .hl-scan) { display: none; }
+  }
+</style>
