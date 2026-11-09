@@ -146,7 +146,8 @@ body::before {
   z-index: 60;
   background: var(--paper);
 }
-main { flex: 1; }
+/* Nothing on any page can ever push it sideways */
+main { flex: 1; overflow-x: clip; }
 img, svg, video { display: block; max-width: 100%; }
 [hidden] { display: none !important; }
 img { height: auto; }
@@ -800,6 +801,8 @@ html.is-focusing .focus-veil { opacity: 1; }
    page slowly breathes in and out, and the headlines float gently above it, a few pixels at
    most, on the same nine-second breath.
    ========================================================================== */
+/* The breathing light swells a little, so the dark areas clip it at their edges */
+.page-dark, .work-dark { overflow-x: clip; }
 .page-dark::before,
 .work-dark::before {
   content: '';
