@@ -63,8 +63,8 @@ const hasFigure = Astro.slots.has('figure');
       align-items: center;
       padding-top: calc(88px + clamp(1.5rem, 1rem + 2vw, 3rem));
       /* Room for the fade below, so the content sits in the dark part */
-      padding-bottom: 22vh;
-      padding-bottom: 22svh;
+      padding-bottom: 27vh;
+      padding-bottom: 27svh;
     }
     .hero-full > .wrap { width: 100%; }
   }
@@ -76,26 +76,35 @@ const hasFigure = Astro.slots.has('figure');
     height: 30%;
     z-index: 0;
     pointer-events: none;
-    /* Through a soft steel blue on the way, rather than grey */
+    /* A long, eased fade (gentle at both ends), through a soft steel blue rather than grey */
     background: linear-gradient(
       180deg,
-      rgb(96 130 166 / 0) 0%,
-      rgb(96 130 166 / 0.1) 18%,
-      rgb(138 164 192 / 0.32) 38%,
-      rgb(186 203 221 / 0.62) 60%,
-      rgb(222 230 239 / 0.88) 80%,
-      rgb(237 241 246 / 0.97) 93%,
+      rgb(58 90 128 / 0) 0%,
+      rgb(83 111 144 / 0.02) 8.3%,
+      rgb(101 126 156 / 0.074) 16.7%,
+      rgb(118 140 167 / 0.156) 25%,
+      rgb(134 154 177 / 0.259) 33.3%,
+      rgb(148 166 187 / 0.376) 41.7%,
+      rgb(163 178 196 / 0.5) 50%,
+      rgb(176 189 205 / 0.624) 58.3%,
+      rgb(190 201 214 / 0.741) 66.7%,
+      rgb(203 212 223 / 0.844) 75%,
+      rgb(215 222 231 / 0.926) 83.3%,
+      rgb(228 233 239 / 0.98) 91.7%,
       #f0f3f7 100%
     );
   }
-  /* The grain stays in the dark part */
+  /* The grain thins out through the fade */
   .hero-full::after {
-    -webkit-mask-image: linear-gradient(180deg, #000 68%, transparent 95%);
-    mask-image: linear-gradient(180deg, #000 68%, transparent 95%);
+    -webkit-mask-image: linear-gradient(180deg, #000 54%, transparent 92%);
+    mask-image: linear-gradient(180deg, #000 54%, transparent 92%);
+  }
+  @media (min-width: 961px) {
+    .hero-fade { height: 46%; }
   }
   @media (max-width: 960px) {
-    .hero-full { padding-bottom: clamp(7rem, 6rem + 3vw, 8rem); }
-    .hero-fade { height: 9rem; }
+    .hero-full { padding-bottom: clamp(9rem, 8rem + 3vw, 10rem); }
+    .hero-fade { height: 13rem; }
   }
   @media (max-width: 640px) {
     .terse .lead { display: none; }

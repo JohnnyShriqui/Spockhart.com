@@ -481,9 +481,8 @@ a { color: inherit; }
 
 /* Nonprofits: deep blue night */
 .theme-nonprofit {
-  /* The bottom eases into the page's deep blue below, so the hero flows straight on into it */
+  /* No darkening at the bottom: the hero fades into the light page below (see PageHero) */
   background:
-    linear-gradient(180deg, rgb(18 28 44 / 0) 55%, rgb(18 28 44 / 0.3) 72%, rgb(18 28 44 / 0.75) 90%, #121c2c 100%),
     radial-gradient(50% 72% at 88% 22%, rgb(46 102 150 / 0.44), transparent 72%),
     radial-gradient(55% 75% at 100% 105%, rgb(38 96 142 / 0.48), transparent 72%),
     radial-gradient(50% 70% at 0% 108%, rgb(42 95 142 / 0.42), transparent 72%),
