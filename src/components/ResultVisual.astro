@@ -53,8 +53,6 @@ const suppliers = [
 
 /* Practice growth: two charts on the same $0 to $1M scale. In the after chart the area under the
    curve is stacked by service, so each new service fills in its own band as revenue climbs. */
-const GW = wide ? 420 : 236; // the growth chart's width
-const gx = (m: number) => 6 + m * (wide ? 34 : 18.8);
 const gy = (v: number) => 138 - (v / 1000) * 122;
 const ramp = (x: number) => Math.pow(Math.min(1, Math.max(0, x)), 1.25);
 const advisory = (m: number) => 150 + 7 * Math.sin((m * Math.PI) / 3);
@@ -69,16 +67,28 @@ const steps12 = Array.from({ length: 49 }, (_, i) => i / 4);
 const layers = [advisory, ...services.map((sv) => (m: number) => sv.max * ramp((m - sv.start) / (12 - sv.start)))];
 const stackAt = (m: number) => layers.reduce<number[]>((acc, f) => [...acc, (acc[acc.length - 1] ?? 0) + f(m)], []);
 const stacks = steps12.map((m) => stackAt(m));
-const pts = (k: number) => steps12.map((m, i) => `${gx(m).toFixed(1)} ${gy(stacks[i][k]).toFixed(1)}`);
-const bandD = (k: number) => {
-  const top = pts(k);
-  const bottom = k === 0 ? [`${gx(12).toFixed(1)} ${gy(0)}`, `${gx(0).toFixed(1)} ${gy(0)}`] : pts(k - 1).reverse();
-  return `M${top.join(' L')} L${bottom.join(' L')}Z`;
+// The chart in two shapes: its usual one, and a wide one (the home page, and phones, where each
+// half of the graphic takes the full width)
+const growthGeo = (w: boolean) => {
+  const gx = (m: number) => 6 + m * (w ? 34 : 18.8);
+  const pts = (k: number) => steps12.map((m, i) => `${gx(m).toFixed(1)} ${gy(stacks[i][k]).toFixed(1)}`);
+  const bandD = (k: number) => {
+    const top = pts(k);
+    const bottom = k === 0 ? [`${gx(12).toFixed(1)} ${gy(0)}`, `${gx(0).toFixed(1)} ${gy(0)}`] : pts(k - 1).reverse();
+    return `M${top.join(' L')} L${bottom.join(' L')}Z`;
+  };
+  const bands = layers.map((_, k) => bandD(k));
+  return {
+    GW: w ? 420 : 236,
+    gx,
+    cls: wide ? '' : w ? 'growth-wide' : 'growth-narrow',
+    bands,
+    line: `M${pts(layers.length - 1).join(' L')}`,
+    advLine: `M${pts(0).join(' L')}`,
+    advArea: bands[0],
+  };
 };
-const growthBands = layers.map((_, k) => bandD(k));
-const growthLine = `M${pts(layers.length - 1).join(' L')}`;
-const advisoryLine = `M${pts(0).join(' L')}`;
-const advisoryArea = growthBands[0];
+const growthGeos = wide ? [growthGeo(true)] : [growthGeo(false), growthGeo(true)];
 const growthTime = (m: number) => 0.4 + (6.6 * m) / 12;
 const growthCount = Array.from({ length: 13 }, (_, m) => `${growthTime(m).toFixed(2)} ${Math.min(990, Math.round(stackAt(m)[layers.length - 1]))}`).join(', ');
 
@@ -494,19 +504,21 @@ const building = 'M-6 7V-4l6-4 6 4v11zM-3 -1h2M1 -1h2M-3 3h2M1 3h2';
                 <span class="tag">Before</span>
                 <span class="readout tabular">~$150K</span>
               </div>
-              <svg class="pane-svg growth" viewBox={`0 0 ${GW} 152`} aria-hidden="true">
-                {[250, 500, 750, 1000].map((v) => <path d={`M${gx(0)} ${gy(v)} H${gx(12)}`} class="grid" />)}
-                <text x={gx(0)} y={gy(1000) - 4} class="axis">$1M</text>
-                <text x={gx(0)} y={gy(500) - 4} class="axis">$500K</text>
-                <path d={`M${gx(0)} ${gy(0)} H${gx(12)}`} class="baseline" />
-                <g class="reveal ends" style="--a:0.4;--b:7">
-                  <rect x="0" y="0" width={GW} height="152" fill="none" />
-                  <path d={advisoryArea} class="band-base" />
-                  <path d={advisoryLine} class="growth-line growth-line-dim" />
-                </g>
-                <text x={gx(0)} y="151" class="axis">Month 1</text>
-                <text x={gx(12)} y="151" class="axis" text-anchor="end">12</text>
-              </svg>
+              {growthGeos.map((g) => (
+                <svg class:list={['pane-svg growth', g.cls]} viewBox={`0 0 ${g.GW} 152`} aria-hidden="true">
+                  {[250, 500, 750, 1000].map((v) => <path d={`M${g.gx(0)} ${gy(v)} H${g.gx(12)}`} class="grid" />)}
+                  <text x={g.gx(0)} y={gy(1000) - 4} class="axis">$1M</text>
+                  <text x={g.gx(0)} y={gy(500) - 4} class="axis">$500K</text>
+                  <path d={`M${g.gx(0)} ${gy(0)} H${g.gx(12)}`} class="baseline" />
+                  <g class="reveal ends" style="--a:0.4;--b:7">
+                    <rect x="0" y="0" width={g.GW} height="152" fill="none" />
+                    <path d={g.advArea} class="band-base" />
+                    <path d={g.advLine} class="growth-line growth-line-dim" />
+                  </g>
+                  <text x={g.gx(0)} y="151" class="axis">Month 1</text>
+                  <text x={g.gx(12)} y="151" class="axis" text-anchor="end">12</text>
+                </svg>
+              ))}
               <p class="lane-foot">Traditional advisory work</p>
             </div>
             <div class="lane">
@@ -517,21 +529,23 @@ const building = 'M-6 7V-4l6-4 6 4v11zM-3 -1h2M1 -1h2M-3 3h2M1 3h2';
                   <span class="ap" style="--a:7.05">~$1M</span>
                 </span>
               </div>
-              <svg class="pane-svg growth" viewBox={`0 0 ${GW} 152`} aria-hidden="true">
-                {[250, 500, 750, 1000].map((v) => <path d={`M${gx(0)} ${gy(v)} H${gx(12)}`} class="grid" />)}
-                <text x={gx(0)} y={gy(1000) - 4} class="axis">$1M</text>
-                <text x={gx(0)} y={gy(500) - 4} class="axis">$500K</text>
-                <path d={`M${gx(0)} ${gy(0)} H${gx(12)}`} class="baseline" />
-                <g class="reveal ends" style="--a:0.4;--b:7">
-                  <rect x="0" y="0" width={GW} height="152" fill="none" />
-                  {growthBands.map((d, k) => (
-                    <path d={d} class={k === 0 ? 'band-base' : 'band'} style={k > 0 ? `--c:var(--svc-${k - 1}, ${services[k - 1].color})` : undefined} />
-                  ))}
-                  <path d={growthLine} class="growth-line" />
-                </g>
-                <text x={gx(0)} y="151" class="axis">Month 1</text>
-                <text x={gx(12)} y="151" class="axis" text-anchor="end">12</text>
-              </svg>
+              {growthGeos.map((g) => (
+                <svg class:list={['pane-svg growth', g.cls]} viewBox={`0 0 ${g.GW} 152`} aria-hidden="true">
+                  {[250, 500, 750, 1000].map((v) => <path d={`M${g.gx(0)} ${gy(v)} H${g.gx(12)}`} class="grid" />)}
+                  <text x={g.gx(0)} y={gy(1000) - 4} class="axis">$1M</text>
+                  <text x={g.gx(0)} y={gy(500) - 4} class="axis">$500K</text>
+                  <path d={`M${g.gx(0)} ${gy(0)} H${g.gx(12)}`} class="baseline" />
+                  <g class="reveal ends" style="--a:0.4;--b:7">
+                    <rect x="0" y="0" width={g.GW} height="152" fill="none" />
+                    {g.bands.map((d, k) => (
+                      <path d={d} class={k === 0 ? 'band-base' : 'band'} style={k > 0 ? `--c:var(--svc-${k - 1}, ${services[k - 1].color})` : undefined} />
+                    ))}
+                    <path d={g.line} class="growth-line" />
+                  </g>
+                  <text x={g.gx(0)} y="151" class="axis">Month 1</text>
+                  <text x={g.gx(12)} y="151" class="axis" text-anchor="end">12</text>
+                </svg>
+              ))}
               <p class="lane-foot lane-foot-hot ends"><span class="ap" style="--a:7.05">In under a year.</span></p>
             </div>
             <ul class="chips legend ends" aria-hidden="true">
@@ -931,6 +945,7 @@ const building = 'M-6 7V-4l6-4 6 4v11zM-3 -1h2M1 -1h2M-3 3h2M1 3h2';
   .band { fill: var(--c); fill-opacity: 0.9; }
   .growth-line { fill: none; stroke: var(--fg-solid); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
   .growth-line-dim { stroke: rgb(var(--fg) / 0.6); }
+  .growth-wide { display: none; }
   .chips { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 0.4rem; min-height: 1.6rem; }
   .chip { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.2rem 0.6rem; border-radius: 999px; background: rgb(var(--hot-rgb) / 0.18); box-shadow: inset 0 0 0 1px rgb(var(--hot-rgb) / 0.5); font-size: 0.75rem; font-weight: 600; color: var(--soft); }
   .chip::before { content: ''; width: 8px; height: 8px; border-radius: 2px; background: var(--c, rgb(var(--fg) / 0.3)); }
@@ -1015,19 +1030,35 @@ const building = 'M-6 7V-4l6-4 6 4v11zM-3 -1h2M1 -1h2M-3 3h2M1 3h2';
   @media (max-width: 560px) {
     .panes { grid-template-columns: minmax(0, 1fr); }
     .panes .lane + .lane { border-left: 0; border-top: 1px solid rgb(var(--fg) / 0.08); }
-    /* Phones: the Before and After halves stack, so to keep the whole graphic on one screen each
-       half puts its picture and what goes with it (a trend line, a note) side by side */
-    .panes > .lane {
-      grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+    /* Phones: the Before and After halves stack, and each half's picture takes the full width.
+       Sales and the lead engine move their trend line up beside the tag, in place of the title. */
+    .rv-sales-performance-system .panes > .lane,
+    .rv-lead-generation-engine .panes > .lane {
+      grid-template-columns: auto minmax(0, 1fr);
       grid-template-rows: auto auto;
-      column-gap: 0.9rem;
-      row-gap: 0.45rem;
+      column-gap: 1.25rem;
+      row-gap: 0.55rem;
       padding: 0.7rem 0.85rem 0.75rem;
     }
-    .panes > .lane > .lane-head { grid-column: 1 / -1; }
-    .panes > .lane > :nth-child(2) { grid-column: 1; grid-row: 2; }
-    .panes > .lane > :nth-child(n + 3) { grid-column: 2; grid-row: 2; align-self: end; margin: 0; }
-    .panes .lane-foot { align-self: center !important; }
+    .rv-sales-performance-system .lane-head,
+    .rv-lead-generation-engine .lane-head { display: contents; }
+    .rv-sales-performance-system .readout,
+    .rv-lead-generation-engine .readout { display: none; }
+    .rv-sales-performance-system .tag,
+    .rv-lead-generation-engine .tag { grid-column: 1; grid-row: 1; align-self: start; justify-self: start; }
+    .rv-sales-performance-system .spark,
+    .rv-lead-generation-engine .spark { grid-column: 2; grid-row: 1; margin: 0; gap: 0.1rem; }
+    .rv-sales-performance-system .board,
+    .rv-sales-performance-system .pane-svg,
+    .rv-lead-generation-engine .pane-svg { grid-column: 1 / -1; grid-row: 2; }
+    .rv-sales-performance-system .pane-svg { max-height: 125px; }
+    .rv-lead-generation-engine .pane-svg { max-height: 138px; }
+    .rv-sales-performance-system .spark svg,
+    .rv-lead-generation-engine .spark svg { max-height: 30px; }
+    /* The practice: each chart drawn wide, across the full width */
+    .growth-narrow { display: none; }
+    .growth-wide { display: block; }
+    .rv-digital-practice-growth .panes > .lane { padding: 0.75rem 0.85rem 0.8rem; gap: 0.5rem; }
     .panes .legend { padding: 0.6rem 0.85rem 0.7rem; }
     .panes .chip { font-size: 0.625rem; }
     /* The sales leaderboard, a little tighter */
