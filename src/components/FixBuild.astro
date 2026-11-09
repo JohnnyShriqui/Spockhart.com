@@ -203,8 +203,8 @@ const sets = [
                   <div class:list={['fb-card', `fb-card-${set.key}`]} data-card={it.k}>
                     <div class="fb-head" role="button" tabindex="0" aria-expanded="false" aria-controls={`fb-panel-${it.k}`} data-head>
                       <div class="fb-media" aria-hidden="true">
-                        <div class="fb-live fb-after" data-manual data-thumb>
-                          <ResultVisual id={it.id} />
+                        <div class:list={['fb-live', { 'fb-after': set.key === 'build' }]} data-manual data-thumb>
+                          <ResultVisual id={it.id} wide={set.key === 'build'} />
                         </div>
                       </div>
                       <div class="fb-body">
@@ -237,8 +237,8 @@ const sets = [
                             </p>
                           </div>
                           <div class="fb-graphic" aria-hidden="true">
-                            <div class="fb-graphic-live fb-after" data-manual data-full>
-                              <ResultVisual id={it.id} />
+                            <div class:list={['fb-graphic-live', { 'fb-after': set.key === 'build' }]} data-manual data-full>
+                              <ResultVisual id={it.id} wide={set.key === 'build'} />
                             </div>
                           </div>
                         </div>
@@ -258,8 +258,6 @@ const sets = [
 <script>
   import { initScenes, sceneController, scenesCanAnimate } from '../scripts/scenes';
 
-  const LIVE_W = 440; // the width each graphic (its After only) is laid out at before scaling
-  const PHONE_W = 400;
 
   function initFixBuild() {
     initScenes();
@@ -383,7 +381,7 @@ const sets = [
         for (const card of cards) {
           const media = card.querySelector<HTMLElement>('.fb-media')!;
           const live = card.querySelector<HTMLElement>('[data-thumb]')!;
-          const natW = wide.matches ? LIVE_W : PHONE_W;
+          const natW = live.offsetWidth;
           const natH = live.offsetHeight;
           const bw = media.clientWidth;
           const bh = media.clientHeight;
@@ -397,7 +395,7 @@ const sets = [
           for (const card of cards) {
             const box = card.querySelector<HTMLElement>('.fb-graphic')!;
             const live = card.querySelector<HTMLElement>('[data-full]')!;
-            const gs = box.clientWidth / LIVE_W;
+            const gs = box.clientWidth / live.offsetWidth;
             box.style.setProperty('--gs', gs.toFixed(4));
             box.style.height = `${(live.offsetHeight * gs).toFixed(1)}px`;
           }
@@ -657,7 +655,7 @@ const sets = [
     position: absolute;
     left: 0;
     top: 0;
-    width: 440px;
+    width: 640px;
     transform: translate(var(--ox, 0px), var(--oy, 0px)) scale(var(--s, 0.125));
     transform-origin: 0 0;
     pointer-events: none;
@@ -699,30 +697,33 @@ const sets = [
   .fb-caret svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
   .fb-head:hover .fb-caret { color: var(--accent); }
   .fb-card.is-open .fb-caret { transform: rotate(180deg); color: var(--accent); }
-  /* On the home page each graphic shows only its After (and, for the practice, the services it
-     added), so it can be drawn larger. To keep it short, a picture and what goes with it sit side
-     by side: the picture on the left, its trend line (or the services) on the right. Our Work
-     keeps the full Before and After. */
+  /* Revenue Development, on the home page: each graphic shows only its After, so it can be drawn
+     larger. Operations Efficiency and Our Work keep the full Before and After. */
+  @media (min-width: 1100px) {
+    .fb-live.fb-after, .fb-graphic-live.fb-after { width: 440px; }
+  }
   .fb-after :global(.scene > .lane:first-child) { display: none; }
   .fb-after :global(.lane + .lane) { border: 0; }
   .fb-after :global(.panes) { grid-template-columns: minmax(0, 1fr); }
-  .fb-after :global(.panes:not(:has(> .legend)) > .lane) {
-    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
-    grid-template-rows: auto 1fr;
-    column-gap: 1.25rem;
+  /* Sales: the team's sales trend top right, beside the tag; the reps run the full width below */
+  .fb-after :global(.rv-sales-performance-system .panes > .lane) {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    column-gap: 1.5rem;
+    row-gap: 0.85rem;
   }
-  .fb-after :global(.panes:not(:has(> .legend)) > .lane > .lane-head) { grid-column: 1 / -1; }
-  .fb-after :global(.panes:not(:has(> .legend)) > .lane > :nth-child(2)) { grid-column: 1; grid-row: 2; }
-  .fb-after :global(.panes:not(:has(> .legend)) > .lane > :nth-child(n + 3)) { grid-column: 2; grid-row: 2; align-self: end; margin: 0; }
-  .fb-after :global(.panes:has(> .legend)) { grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); }
-  .fb-after :global(.panes > .legend) {
-    grid-column: auto;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: center;
-    padding: 1rem 1rem 1rem 0;
-    border-top: 0;
-  }
+  .fb-after :global(.rv-sales-performance-system .lane-head) { display: contents; }
+  .fb-after :global(.rv-sales-performance-system .readout) { display: none; }
+  .fb-after :global(.rv-sales-performance-system .tag) { grid-column: 1; grid-row: 1; align-self: start; }
+  .fb-after :global(.rv-sales-performance-system .spark) { grid-column: 2; grid-row: 1; margin: 0; }
+  .fb-after :global(.rv-sales-performance-system .board) { grid-column: 1 / -1; grid-row: 2; }
+  /* New market: just the network of builders, developers and organizations, larger */
+  .fb-after :global(.rv-lead-generation-engine .spark) { display: none; }
+  .fb-after :global(.rv-lead-generation-engine .panes > .lane) { grid-template-rows: auto auto; }
+  .fb-after :global(.rv-lead-generation-engine .pane-svg) { max-height: 220px; }
+  /* The practice: its growth chart across the full width, the services listed underneath */
+  .fb-after :global(.rv-digital-practice-growth .panes > .lane) { grid-template-rows: auto auto auto; }
+  .fb-after :global(.rv-digital-practice-growth .legend) { padding-top: 0.75rem; }
   /* On the home page the graphics drop their number rows; the words carry the numbers */
   .fb-live :global(.rv-split) { display: none; }
   .fb-live :global(.rv) { padding: 14px; gap: 0; }
@@ -745,7 +746,7 @@ const sets = [
   .fb-card-fix .fb-pnote { color: #a04f48; background: rgb(160 79 72 / 0.1); }
   .fb-cs { display: grid; gap: 0.5rem; }
   .fb-graphic { position: relative; width: 100%; overflow: hidden; border-radius: var(--radius-lg); }
-  .fb-graphic-live { position: absolute; left: 0; top: 0; width: 440px; transform: scale(var(--gs, 0.8)); transform-origin: 0 0; }
+  .fb-graphic-live { position: absolute; left: 0; top: 0; width: 640px; transform: scale(var(--gs, 0.8)); transform-origin: 0 0; }
   .fb-graphic :global(.rv-split) { display: none; }
   .fb-graphic :global(.rv) { gap: 0; }
   .fb-client { display: flex; align-items: center; gap: 0.6rem; font-family: var(--font-display); font-size: 1rem; line-height: 1.2; color: var(--ink); }
