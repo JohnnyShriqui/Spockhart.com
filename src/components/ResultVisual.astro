@@ -1015,6 +1015,26 @@ const building = 'M-6 7V-4l6-4 6 4v11zM-3 -1h2M1 -1h2M-3 3h2M1 3h2';
   @media (max-width: 560px) {
     .panes { grid-template-columns: minmax(0, 1fr); }
     .panes .lane + .lane { border-left: 0; border-top: 1px solid rgb(var(--fg) / 0.08); }
+    /* Phones: the Before and After halves stack, so to keep the whole graphic on one screen each
+       half puts its picture and what goes with it (a trend line, a note) side by side */
+    .panes > .lane {
+      grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+      grid-template-rows: auto auto;
+      column-gap: 0.9rem;
+      row-gap: 0.45rem;
+      padding: 0.7rem 0.85rem 0.75rem;
+    }
+    .panes > .lane > .lane-head { grid-column: 1 / -1; }
+    .panes > .lane > :nth-child(2) { grid-column: 1; grid-row: 2; }
+    .panes > .lane > :nth-child(n + 3) { grid-column: 2; grid-row: 2; align-self: end; margin: 0; }
+    .panes .lane-foot { align-self: center !important; }
+    .panes .legend { padding: 0.6rem 0.85rem 0.7rem; }
+    .panes .chip { font-size: 0.625rem; }
+    /* The sales leaderboard, a little tighter */
+    .board { height: calc(6 * 19px); }
+    .board li { height: 15px; gap: 7px; grid-template-columns: 10px minmax(0, 1fr); transform: translateY(calc(var(--rank) * 19px)); }
+    .board svg { width: 10px; height: 13px; }
+    .board-track { height: 9px; }
     .lane { padding: 0.85rem 0.9rem 1rem; }
     .readout { font-size: 1rem; }
     .cells { gap: 3px; }
