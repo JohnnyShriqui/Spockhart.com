@@ -937,18 +937,20 @@ const sets = [
   /* The dropdown (laptops): the words on the left with room around them, lined up with the
      row's sentence, and the graphic small beside them. */
   @media (min-width: 1100px) {
+    /* The words take a fixed column; the graphic sits in the middle of the space between them
+       and the right edge of the bar */
     .fb-panel-body {
-      grid-template-columns: minmax(0, 1fr) 15rem;
+      grid-template-columns: minmax(0, 18rem) minmax(0, 1fr);
       grid-template-areas: 'note graphic' 'cs graphic';
       grid-template-rows: auto 1fr;
-      column-gap: 3rem;
+      column-gap: 0;
       row-gap: 1.25rem;
       align-items: start;
-      padding: 1.5rem 0.5rem 2.25rem 2.9rem;
+      padding: 1.5rem 0 2.25rem 2.9rem;
     }
     .fb-pnote { grid-area: note; }
     .fb-cs { grid-area: cs; gap: 1rem; }
-    .fb-graphic { grid-area: graphic; border-radius: var(--radius); }
+    .fb-graphic { grid-area: graphic; justify-self: center; width: 15rem; border-radius: var(--radius); }
     .fb-headline { font-size: 1.125rem; line-height: 1.55; }
   }
   /* ==========================================================================
