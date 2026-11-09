@@ -7,15 +7,18 @@ import { site } from '../config/site';
 ---
 
 <Base
+  lightHero
   title="Approach"
   description={`How Spockhart works: embedded with your team, a working prototype in ${site.offer.prototypeDays} days, and systems you own.`}
 >
   <PageHero
     theme="approach"
+    light
     title="Embedded from day one."
     lead="From workflow automation to building entirely new digital offerings, we turn great opportunities into working solutions."
   />
 
+  <div class="page-dark dark-approach" data-dark-page>
   <section class="section band-recessed engagement engagement-fix" aria-labelledby="engagement-title">
     <div class="wrap">
       <div class="section-head" data-reveal>
@@ -42,6 +45,7 @@ import { site } from '../config/site';
     body="Tell us where you’d like to see your team improve. We’ll walk you through what the diagnosis and first prototype would look like for your team."
     primary={{ label: 'Plan the first 30 days', href: '/contact/' }}
   />
+  </div>
 </Base>
 
 <style>

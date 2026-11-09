@@ -11,16 +11,20 @@ const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 function initHeader() {
   const header = document.querySelector<HTMLElement>('[data-header]');
   if (!header) return;
-  // Pages that open on a dark hero keep the header light-on-dark until the hero has scrolled past
-  const hero = document.querySelector<HTMLElement>('[data-hero-dark]');
-  // A page that stays dark below its hero (Our Work) keeps the header light-on-dark throughout
-  const darkPage = document.querySelector<HTMLElement>('[data-dark-page]');
+  // The header is light-on-dark whenever it sits over a dark area: a dark hero, or a page that
+  // runs dark below its hero
+  const dark = Array.from(document.querySelectorAll<HTMLElement>('[data-hero-dark], [data-dark-page]'));
   let ticking = false;
   const update = () => {
     header.classList.toggle('is-scrolled', window.scrollY > 8);
-    if (darkPage) header.classList.add('over-dark');
-    else if (hero) header.classList.toggle('over-dark', hero.getBoundingClientRect().bottom > header.offsetHeight / 2);
-    else header.classList.remove('over-dark');
+    const mid = header.offsetHeight / 2;
+    header.classList.toggle(
+      'over-dark',
+      dark.some((el) => {
+        const r = el.getBoundingClientRect();
+        return r.top <= mid && r.bottom > mid;
+      }),
+    );
     ticking = false;
   };
   update();
@@ -69,7 +73,7 @@ function initMenu() {
   panel.addEventListener('click', (e) => {
     if ((e.target as HTMLElement).closest('a')) close(false);
   });
-  window.matchMedia('(min-width: 901px)').addEventListener('change', (e) => {
+  window.matchMedia('(min-width: 1024px)').addEventListener('change', (e) => {
     if (e.matches) close(false);
   });
 }

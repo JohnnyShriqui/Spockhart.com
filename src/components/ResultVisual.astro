@@ -522,7 +522,7 @@ const building = 'M-6 7V-4l6-4 6 4v11zM-3 -1h2M1 -1h2M-3 3h2M1 3h2';
                 <g class="reveal ends" style="--a:0.4;--b:7">
                   <rect x="0" y="0" width="236" height="152" fill="none" />
                   {growthBands.map((d, k) => (
-                    <path d={d} class={k === 0 ? 'band-base' : 'band'} style={k > 0 ? `--c:${services[k - 1].color}` : undefined} />
+                    <path d={d} class={k === 0 ? 'band-base' : 'band'} style={k > 0 ? `--c:var(--svc-${k - 1}, ${services[k - 1].color})` : undefined} />
                   ))}
                   <path d={growthLine} class="growth-line" />
                 </g>
@@ -534,7 +534,7 @@ const building = 'M-6 7V-4l6-4 6 4v11zM-3 -1h2M1 -1h2M-3 3h2M1 3h2';
             <ul class="chips legend ends" aria-hidden="true">
               <li class="chip chip-base">Advisory</li>
               {services.map((sv) => (
-                <li class="chip pop" style={`--a:${growthTime(sv.start + 0.2 * (12 - sv.start)).toFixed(2)};--c:${sv.color}`}>{sv.name}</li>
+                <li class="chip pop" style={`--a:${growthTime(sv.start + 0.2 * (12 - sv.start)).toFixed(2)};--c:var(--svc-${services.indexOf(sv)}, ${sv.color})`}>{sv.name}</li>
               ))}
             </ul>
           </div>
@@ -695,13 +695,17 @@ const building = 'M-6 7V-4l6-4 6 4v11zM-3 -1h2M1 -1h2M-3 3h2M1 3h2';
        otherwise they are the brand blues */
     --brand: var(--rv-frame, #1f4d6f);
     background: var(--brand);
-    color: #fff;
+    color: var(--fg-solid);
     overflow: hidden;
     isolation: isolate;
     --hot: var(--rv-hot, #8ec0e6);
-    --dim: rgb(255 255 255 / 0.2);
-    --soft: #d9e6f2;
-    --muted: #9fb6cb;
+    --dim: rgb(var(--fg) / 0.2);
+    --soft: var(--rv-soft, #d9e6f2);
+    --muted: var(--rv-muted, #9fb6cb);
+    /* Foreground: white on the dark graphics, navy when a page sets them light */
+    --fg: var(--rv-fg, 255 255 255);
+    --fg-solid: var(--rv-fg-solid, #fff);
+    --hot-rgb: var(--rv-hot-rgb, 142 192 230);
   }
   .rv::before {
     content: '';
@@ -719,8 +723,8 @@ const building = 'M-6 7V-4l6-4 6 4v11zM-3 -1h2M1 -1h2M-3 3h2M1 3h2';
   .win {
     border-radius: 10px;
     background: var(--rv-win, #173f5c);
-    border: 1px solid rgb(255 255 255 / 0.12);
-    box-shadow: 0 24px 48px -28px rgb(4 18 30 / 0.7);
+    border: 1px solid rgb(var(--fg) / 0.12);
+    box-shadow: var(--rv-win-shadow, 0 24px 48px -28px rgb(4 18 30 / 0.7));
     overflow: hidden;
   }
   .win-bar {
@@ -729,14 +733,14 @@ const building = 'M-6 7V-4l6-4 6 4v11zM-3 -1h2M1 -1h2M-3 3h2M1 3h2';
     gap: 0.75rem;
     padding: 0.55rem 0.9rem;
     background: var(--rv-bar, #133650);
-    border-bottom: 1px solid rgb(255 255 255 / 0.08);
+    border-bottom: 1px solid rgb(var(--fg) / 0.08);
     font-size: 0.75rem;
     font-weight: 600;
     letter-spacing: 0.04em;
     color: var(--muted);
   }
   .win-dots { display: flex; gap: 5px; }
-  .win-dots i { width: 8px; height: 8px; border-radius: 50%; background: rgb(255 255 255 / 0.18); }
+  .win-dots i { width: 8px; height: 8px; border-radius: 50%; background: rgb(var(--fg) / 0.18); }
 
   /* ---------- Scene timing helpers ---------- */
   .scene { --t: var(--still, 0); display: grid; }
@@ -761,17 +765,17 @@ const building = 'M-6 7V-4l6-4 6 4v11zM-3 -1h2M1 -1h2M-3 3h2M1 3h2';
 
   /* ---------- Lanes ---------- */
   .lane { display: grid; gap: 0.75rem; align-content: start; padding: 1rem 1.1rem 1.1rem; min-width: 0; }
-  .lane + .lane { border-top: 1px solid rgb(255 255 255 / 0.08); }
+  .lane + .lane { border-top: 1px solid rgb(var(--fg) / 0.08); }
   .panes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   /* Keep meters and sparklines level across the two panes */
   .panes .lane { grid-template-rows: auto 1fr auto; }
-  .panes .lane + .lane { border-top: 0; border-left: 1px solid rgb(255 255 255 / 0.08); }
+  .panes .lane + .lane { border-top: 0; border-left: 1px solid rgb(var(--fg) / 0.08); }
   .lane-head { display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; min-height: 1.75rem; }
   .tag {
     flex: none;
     padding: 0.2rem 0.6rem;
     border-radius: 999px;
-    background: rgb(255 255 255 / 0.1);
+    background: rgb(var(--fg) / 0.1);
     color: var(--muted);
     font-size: 0.6875rem;
     font-weight: 700;
@@ -788,43 +792,43 @@ const building = 'M-6 7V-4l6-4 6 4v11zM-3 -1h2M1 -1h2M-3 3h2M1 3h2';
     text-align: right;
     white-space: nowrap;
   }
-  .readout-hot { color: #fff; font-weight: 550; }
+  .readout-hot { color: var(--fg-solid); font-weight: 550; }
   .sep { opacity: 0.6; }
   .lane-foot { font-size: 0.8125rem; color: var(--muted); min-height: 1.2em; }
   .lane-foot-hot { color: var(--soft); }
 
   /* Feasibility: twelve months vs twelve finished assessments */
   .cells { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 4px; }
-  .cell { position: relative; height: 34px; border-radius: 3px; background: rgb(255 255 255 / 0.06); overflow: hidden; }
+  .cell { position: relative; height: 34px; border-radius: 3px; background: rgb(var(--fg) / 0.06); overflow: hidden; }
   .cell-fill {
     position: absolute;
     inset: 0;
-    background: rgb(255 255 255 / 0.22);
+    background: rgb(var(--fg) / 0.22);
     transform-origin: left center;
     transform: scaleX(clamp(0, (var(--t) - 0.3 - var(--i) * 0.9) / 0.9, 1));
   }
-  .cell-hot { display: grid; place-items: center; background: rgb(142 192 230 / calc(0.08 + 0.14 * clamp(0, (var(--t) - var(--a)) * 4, 1))); }
+  .cell-hot { display: grid; place-items: center; background: rgb(var(--hot-rgb) / calc(0.08 + 0.14 * clamp(0, (var(--t) - var(--a)) * 4, 1))); }
   .cell-doc { width: 58%; max-width: 16px; height: auto; overflow: visible; }
   .cell-doc path { fill: var(--hot); }
   .cell-doc .tick { fill: none; stroke: var(--brand); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
 
   /* Shared SVG pieces */
   .lane-svg, .pane-svg, .chain-svg { width: 100%; height: auto; overflow: visible; }
-  .node { fill: rgb(255 255 255 / 0.1); stroke: rgb(255 255 255 / 0.3); stroke-width: 1.2; }
+  .node { fill: rgb(var(--fg) / 0.1); stroke: rgb(var(--fg) / 0.3); stroke-width: 1.2; }
   .node-on { fill: var(--hot); }
   .node-tick { fill: none; stroke: var(--brand); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
   .node-label { font-family: var(--font-body); font-size: 12px; fill: var(--muted); }
   .node-label-hot { fill: var(--soft); }
-  .arc { fill: none; stroke: rgb(255 255 255 / 0.18); stroke-width: 1.2; stroke-dasharray: 3 5; }
-  .doc-dim { fill: #e3ecf4; }
-  .doc-hot { fill: #fff; }
-  .pipe { fill: none; stroke: rgb(255 255 255 / 0.15); stroke-width: 3; stroke-linecap: round; }
+  .arc { fill: none; stroke: rgb(var(--fg) / 0.18); stroke-width: 1.2; stroke-dasharray: 3 5; }
+  .doc-dim { fill: var(--rv-doc-dim, #e3ecf4); }
+  .doc-hot { fill: var(--fg-solid); }
+  .pipe { fill: none; stroke: rgb(var(--fg) / 0.15); stroke-width: 3; stroke-linecap: round; }
   .pipe-on { fill: none; stroke: var(--hot); stroke-width: 3; stroke-linecap: round; }
 
   /* Meters */
   .meter { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.6rem; align-items: center; }
   .meter-k { font-size: 0.75rem; color: var(--muted); }
-  .meter-track { position: relative; height: 10px; border-radius: 5px; background: rgb(255 255 255 / 0.08); }
+  .meter-track { position: relative; height: 10px; border-radius: 5px; background: rgb(var(--fg) / 0.08); }
   .panes .meter { margin-top: 0.75rem; }
 
   /* Supply chain */
@@ -836,7 +840,7 @@ const building = 'M-6 7V-4l6-4 6 4v11zM-3 -1h2M1 -1h2M-3 3h2M1 3h2';
     gap: 0.4rem;
     padding: 0.25rem 0.7rem 0.25rem 0.3rem;
     border-radius: 999px;
-    background: rgb(255 255 255 / 0.08);
+    background: rgb(var(--fg) / 0.08);
     font-size: 0.8125rem;
     font-weight: 600;
     color: var(--soft);
@@ -846,24 +850,24 @@ const building = 'M-6 7V-4l6-4 6 4v11zM-3 -1h2M1 -1h2M-3 3h2M1 3h2';
     position: absolute;
     inset: 0;
     border-radius: inherit;
-    background: rgb(142 192 230 / 0.32);
+    background: rgb(var(--hot-rgb) / 0.32);
     box-shadow: inset 0 0 0 1px var(--hot);
     z-index: -1;
     opacity: calc(clamp(0, (var(--t) - var(--a)) * 6, 1) * clamp(0, (var(--b) - var(--t)) * 6, 1));
   }
-  .stage-n { display: grid; place-items: center; width: 1.25rem; height: 1.25rem; border-radius: 50%; background: rgb(255 255 255 / 0.14); font-size: 0.6875rem; }
+  .stage-n { display: grid; place-items: center; width: 1.25rem; height: 1.25rem; border-radius: 50%; background: rgb(var(--fg) / 0.14); font-size: 0.6875rem; }
   .corner { font-family: var(--font-body); font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; fill: var(--muted); }
   .corner-hot { fill: var(--hot); }
   .link {
     fill: none;
-    stroke: rgb(255 255 255 / 0.3);
+    stroke: rgb(var(--fg) / 0.3);
     stroke-width: 1.2;
     stroke-dasharray: calc(var(--len) * 1px) calc(var(--len) * 1px);
     stroke-dashoffset: calc(var(--len) * 1px * (1 - clamp(0, (var(--t) - var(--a)) * 2, 1)));
   }
   .hq { fill: var(--soft); }
   .hq-label { font-family: var(--font-body); font-size: 10px; font-weight: 700; fill: var(--brand); }
-  .ring-base { fill: none; stroke: rgb(255 255 255 / 0.1); stroke-width: 3; }
+  .ring-base { fill: none; stroke: rgb(var(--fg) / 0.1); stroke-width: 3; }
   .ring {
     fill: none;
     stroke: var(--soft);
@@ -872,16 +876,16 @@ const building = 'M-6 7V-4l6-4 6 4v11zM-3 -1h2M1 -1h2M-3 3h2M1 3h2';
     stroke-dasharray: calc(var(--s) * 75.4px * clamp(0, (var(--t) - var(--a)) / 0.9, 1)) 100px;
   }
   .ring-hot { stroke: var(--hot); }
-  .site { fill: #c3d3e2; }
-  .site-hot { fill: #fff; }
-  .bar { fill: rgb(255 255 255 / 0.28); }
+  .site { fill: var(--rv-site, #c3d3e2); }
+  .site-hot { fill: var(--fg-solid); }
+  .bar { fill: rgb(var(--fg) / 0.28); }
   .bar-hot { fill: var(--hot); }
   .rank-n { font-family: var(--font-body); font-size: 12px; font-weight: 700; fill: var(--muted); }
-  .rank-hot { fill: #fff; }
+  .rank-hot { fill: var(--fg-solid); }
 
   /* Sales */
-  .rep { fill: rgb(255 255 255 / 0.35); }
-  .bubble-c { fill: rgb(255 255 255 / 0.12); stroke: rgb(255 255 255 / 0.3); }
+  .rep { fill: rgb(var(--fg) / 0.35); }
+  .bubble-c { fill: rgb(var(--fg) / 0.12); stroke: rgb(var(--fg) / 0.3); }
   .bubble-q { font-family: var(--font-display); font-size: 12px; font-weight: 600; fill: var(--soft); }
   .board { list-style: none; padding: 0; position: relative; height: calc(6 * 26px); }
   .board li {
@@ -895,14 +899,14 @@ const building = 'M-6 7V-4l6-4 6 4v11zM-3 -1h2M1 -1h2M-3 3h2M1 3h2';
     transform: translateY(calc(var(--rank) * 26px));
     transition: transform 700ms var(--ease-out);
   }
-  .board svg { width: 12px; height: 16px; fill: rgb(255 255 255 / 0.55); }
-  .board-track { position: relative; height: 12px; border-radius: 3px; background: rgb(255 255 255 / 0.06); }
-  .board-fill { position: absolute; inset: 0; border-radius: 3px; background: rgb(255 255 255 / 0.3); transform-origin: left center; transform: scaleX(var(--v)); }
+  .board svg { width: 12px; height: 16px; fill: rgb(var(--fg) / 0.55); }
+  .board-track { position: relative; height: 12px; border-radius: 3px; background: rgb(var(--fg) / 0.06); }
+  .board-fill { position: absolute; inset: 0; border-radius: 3px; background: rgb(var(--fg) / 0.3); transform-origin: left center; transform: scaleX(var(--v)); }
   .board li[data-rank='0'] .board-fill { background: var(--hot); }
-  .board li[data-rank='0'] svg { fill: #fff; }
+  .board li[data-rank='0'] svg { fill: var(--fg-solid); }
   .spark { display: grid; gap: 0.25rem; margin-top: 0.5rem; }
   .spark svg { width: 100%; height: auto; overflow: visible; }
-  .flat { fill: none; stroke: rgb(255 255 255 / 0.35); stroke-width: 2; stroke-dasharray: 4 5; stroke-linejoin: round; }
+  .flat { fill: none; stroke: rgb(var(--fg) / 0.35); stroke-width: 2; stroke-dasharray: 4 5; stroke-linejoin: round; }
   .trend {
     fill: none;
     stroke: var(--hot);
@@ -911,40 +915,40 @@ const building = 'M-6 7V-4l6-4 6 4v11zM-3 -1h2M1 -1h2M-3 3h2M1 3h2';
     stroke-dasharray: 260px 260px;
     stroke-dashoffset: calc(260px * (1 - clamp(0, (var(--t) - var(--a)) / (var(--b) - var(--a)), 1)));
   }
-  .trend-dot { fill: #fff; }
+  .trend-dot { fill: var(--fg-solid); }
 
   /* Revenue growth */
-  .growth .grid { stroke: rgb(255 255 255 / 0.07); stroke-width: 1; stroke-dasharray: 2 4; }
-  .growth .baseline { stroke: rgb(255 255 255 / 0.22); stroke-width: 1; }
+  .growth .grid { stroke: rgb(var(--fg) / 0.07); stroke-width: 1; stroke-dasharray: 2 4; }
+  .growth .baseline { stroke: rgb(var(--fg) / 0.22); stroke-width: 1; }
   .growth .axis { font-family: var(--font-body); font-size: 9.5px; fill: var(--muted); }
   .reveal { clip-path: inset(0 calc((1 - clamp(0, (var(--t) - var(--a)) / (var(--b) - var(--a)), 1)) * 100%) 0 0); }
-  .band-base { fill: rgb(255 255 255 / 0.2); }
+  .band-base { fill: rgb(var(--fg) / 0.2); }
   .band { fill: var(--c); fill-opacity: 0.9; }
-  .growth-line { fill: none; stroke: #fff; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
-  .growth-line-dim { stroke: rgb(255 255 255 / 0.6); }
+  .growth-line { fill: none; stroke: var(--fg-solid); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+  .growth-line-dim { stroke: rgb(var(--fg) / 0.6); }
   .chips { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 0.4rem; min-height: 1.6rem; }
-  .chip { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.2rem 0.6rem; border-radius: 999px; background: rgb(142 192 230 / 0.18); box-shadow: inset 0 0 0 1px rgb(142 192 230 / 0.5); font-size: 0.75rem; font-weight: 600; color: var(--soft); }
-  .chip::before { content: ''; width: 8px; height: 8px; border-radius: 2px; background: var(--c, rgb(255 255 255 / 0.3)); }
-  .chip-base { background: rgb(255 255 255 / 0.06); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.18); color: var(--muted); }
-  .legend { grid-column: 1 / -1; padding: 0.85rem 1.1rem 1.1rem; border-top: 1px solid rgb(255 255 255 / 0.08); }
+  .chip { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.2rem 0.6rem; border-radius: 999px; background: rgb(var(--hot-rgb) / 0.18); box-shadow: inset 0 0 0 1px rgb(var(--hot-rgb) / 0.5); font-size: 0.75rem; font-weight: 600; color: var(--soft); }
+  .chip::before { content: ''; width: 8px; height: 8px; border-radius: 2px; background: var(--c, rgb(var(--fg) / 0.3)); }
+  .chip-base { background: rgb(var(--fg) / 0.06); box-shadow: inset 0 0 0 1px rgb(var(--fg) / 0.18); color: var(--muted); }
+  .legend { grid-column: 1 / -1; padding: 0.85rem 1.1rem 1.1rem; border-top: 1px solid rgb(var(--fg) / 0.08); }
 
   /* Cargo */
-  .track { fill: none; stroke: rgb(255 255 255 / 0.2); stroke-width: 1.5; stroke-dasharray: 3 6; }
-  .pod { fill: rgb(255 255 255 / 0.3); }
-  .pod-hot { fill: #fff; }
-  .crate { fill: rgb(255 255 255 / 0.22); }
+  .track { fill: none; stroke: rgb(var(--fg) / 0.2); stroke-width: 1.5; stroke-dasharray: 3 6; }
+  .pod { fill: rgb(var(--fg) / 0.3); }
+  .pod-hot { fill: var(--fg-solid); }
+  .crate { fill: rgb(var(--fg) / 0.22); }
   .crate-hot { fill: var(--hot); }
   .hub { fill: var(--soft); }
   .arm { stroke: var(--soft); stroke-width: 2; stroke-linecap: round; }
   .arm-end { fill: var(--hot); }
   .spin { transform: rotate(calc(var(--t) * 160deg)); }
-  .fuel { position: absolute; inset: 0; border-radius: 5px; background: rgb(255 255 255 / 0.3); transform-origin: left center; transform: scaleX(calc(1 - 0.9 * clamp(0, (var(--t) - 0.4) / 7.2, 1))); }
+  .fuel { position: absolute; inset: 0; border-radius: 5px; background: rgb(var(--fg) / 0.3); transform-origin: left center; transform: scaleX(calc(1 - 0.9 * clamp(0, (var(--t) - 0.4) / 7.2, 1))); }
   .fuel-hot { background: var(--hot); }
 
   /* Lead generation */
-  .lead-dot { fill: rgb(255 255 255 / 0.22); }
+  .lead-dot { fill: rgb(var(--fg) / 0.22); }
   .lead-dot-hot { fill: var(--hot); }
-  .lead-link { stroke: rgb(142 192 230 / 0.45); stroke-width: 1.3; }
+  .lead-link { stroke: rgb(var(--hot-rgb) / 0.45); stroke-width: 1.3; }
   .lead-hq { fill: none; stroke: var(--soft); stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
   .lead-hq-on { stroke: var(--brand); stroke-width: 1.6; }
 
@@ -954,7 +958,7 @@ const building = 'M-6 7V-4l6-4 6 4v11zM-3 -1h2M1 -1h2M-3 3h2M1 3h2';
     position: relative;
     height: 16px;
     border-radius: 2px;
-    background: rgb(255 255 255 / calc(0.05 + 0.17 * clamp(0, (var(--t) - var(--a)) * 8, 1)));
+    background: rgb(var(--fg) / calc(0.05 + 0.17 * clamp(0, (var(--t) - var(--a)) * 8, 1)));
   }
   /* The cell being typed into */
   .sc::after {
@@ -962,10 +966,10 @@ const building = 'M-6 7V-4l6-4 6 4v11zM-3 -1h2M1 -1h2M-3 3h2M1 3h2';
     position: absolute;
     inset: -1px;
     border-radius: 2px;
-    box-shadow: inset 0 0 0 1.5px #fff;
+    box-shadow: inset 0 0 0 1.5px var(--fg-solid);
     opacity: calc(clamp(0, (var(--t) - var(--a) + 0.26) * 12, 1) * clamp(0, (var(--a) - var(--t)) * 12, 1));
   }
-  .sheet-hot .sc { background: rgb(142 192 230 / calc(0.08 + 0.72 * clamp(0, (var(--t) - var(--a)) * 10, 1))); }
+  .sheet-hot .sc { background: rgb(var(--hot-rgb) / calc(0.08 + 0.72 * clamp(0, (var(--t) - var(--a)) * 10, 1))); }
   .sheet-hot .sc::after { display: none; }
 
   /* ---------- Stats under the window ---------- */
@@ -976,7 +980,7 @@ const building = 'M-6 7V-4l6-4 6 4v11zM-3 -1h2M1 -1h2M-3 3h2M1 3h2';
   .rv-num-sm { font-size: clamp(1.375rem, 1.1rem + 0.9vw, 1.875rem); white-space: nowrap; }
   .rv-num s { color: var(--soft); text-decoration-thickness: 2px; font-size: 0.7em; margin-right: 0.2em; }
   .rv-num small { font-family: var(--font-body); font-size: 0.875rem; letter-spacing: 0; color: var(--soft); }
-  .rv-note { font-size: 0.75rem; color: #bcd6ec; }
+  .rv-note { font-size: 0.75rem; color: var(--soft); }
 
   @media (prefers-reduced-motion: no-preference) {
     .bubble { animation: bob 2.4s ease-in-out infinite; animation-delay: calc(var(--i) * -0.4s); }
@@ -1005,7 +1009,7 @@ const building = 'M-6 7V-4l6-4 6 4v11zM-3 -1h2M1 -1h2M-3 3h2M1 3h2';
   }
   @media (max-width: 560px) {
     .panes { grid-template-columns: minmax(0, 1fr); }
-    .panes .lane + .lane { border-left: 0; border-top: 1px solid rgb(255 255 255 / 0.08); }
+    .panes .lane + .lane { border-left: 0; border-top: 1px solid rgb(var(--fg) / 0.08); }
     .lane { padding: 0.85rem 0.9rem 1rem; }
     .readout { font-size: 1rem; }
     .cells { gap: 3px; }

@@ -103,8 +103,8 @@ const spans = [
 ];
 ---
 
-<div class:list={['timeline', { compact }]} data-reveal data-timeline>
-  <ol class="phases" data-reveal="stagger" data-always data-rate="0.32">
+<div class:list={['timeline', { compact }]} data-timeline>
+  <ol class="phases on-light" data-always data-rate="0.32" data-phases={track}>
     {
       phases.map((p, i) => (
         <li
@@ -115,7 +115,7 @@ const spans = [
           data-from={spans[i][0]}
           data-to={spans[i][1]}
           data-tail={i === 3 ? '1' : undefined}
-          style="--loop:6.5;--still:6.2"
+          style={`--loop:6.5;--still:6.2;--n:${i}`}
         >
           <div class="phase-head">
             <p class="phase-meta">
@@ -186,6 +186,16 @@ const spans = [
   .phase-head .phase-brief { color: var(--seg-ink-2); }
   .phase-head .phase-meta { color: var(--seg-meta); }
   .phase :global(.pg) { padding-top: 0; }
+  /* First visit: the phases wait, then appear one at a time, 1 to 4 */
+  .phases.is-waiting .phase { opacity: 0; transform: translateY(28px); }
+  .phases.is-showing .phase {
+    animation: phase-in 900ms var(--ease-out) both;
+    animation-delay: calc(var(--n) * 450ms);
+  }
+  @keyframes phase-in {
+    from { opacity: 0; transform: translateY(28px); }
+    to { opacity: 1; transform: none; }
+  }
   .phase-meta {
     display: flex;
     align-items: center;
@@ -232,17 +242,8 @@ const spans = [
     .phase-brief { display: block; margin-top: -0.15rem; font-size: 1rem; line-height: 1.45; }
     .phase-head { margin: 0; padding: 1.1rem 1.15rem 1.2rem; border-radius: var(--radius-lg); }
     .phase-4 .phase-head { border: 1px dashed var(--rule-2); }
-    .phases { gap: 0; margin: var(--s-6) calc(var(--gutter) * -1) 0; }
-    .phase,
-    .phase.is-active {
-      padding: 2.5rem var(--gutter) 2.75rem;
-      border: 0;
-      border-radius: 0;
-      background: var(--paper);
-      box-shadow: none;
-      transform: none;
-    }
-    .phase:nth-child(even) { background: var(--paper-2); }
+    .phases { gap: var(--s-4); margin-top: var(--s-5); }
+    .phase { padding: 1rem 1rem 1.15rem; }
     .phase h3 { font-size: 1.625rem; }
     .timeline { gap: var(--s-5); }
     .phases { grid-template-columns: minmax(0, 1fr); }
@@ -254,4 +255,45 @@ const spans = [
   import { initScenes } from '../scripts/scenes';
   initScenes();
   document.addEventListener('spockhart:view', initScenes);
+
+  // The first time someone reaches a set of phases, they appear one at a time, 1 to 4. After
+  // that they are simply there, on this visit and every later one (remembered in this browser).
+  const seenKey = (track: string) => `spockhart:phases-seen:${track}`;
+  const seen = (track: string) => {
+    try {
+      return localStorage.getItem(seenKey(track)) === '1';
+    } catch {
+      return false;
+    }
+  };
+  const remember = (track: string) => {
+    try {
+      localStorage.setItem(seenKey(track), '1');
+    } catch {
+      /* private window: they will simply appear again next time */
+    }
+  };
+  function revealPhases() {
+    const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window);
+    document.querySelectorAll<HTMLElement>('[data-phases]').forEach((list) => {
+      if (list.dataset.revealReady) return;
+      list.dataset.revealReady = '1';
+      const track = list.dataset.phases || 'fix';
+      if (still || seen(track)) return;
+      list.classList.add('is-waiting');
+      const io = new IntersectionObserver(
+        (entries) => {
+          if (!entries.some((e) => e.isIntersecting)) return;
+          io.disconnect();
+          remember(track);
+          list.classList.add('is-showing');
+          list.classList.remove('is-waiting');
+        },
+        { threshold: 0.25 },
+      );
+      io.observe(list);
+    });
+  }
+  revealPhases();
+  document.addEventListener('spockhart:view', revealPhases);
 </script>

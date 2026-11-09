@@ -14,25 +14,25 @@ const isCurrent = (href: string) => (href === '/' ? path === '/' : path.startsWi
 <header class:list={['site-header', { 'over-dark': overDark }]} data-header>
   <div class="wrap header-inner">
     <a class="brand" href="/" aria-label={`${site.name}, home`}>
-      <Logo size={26} />
+      <Logo size={26} mark={false} />
     </a>
 
-    <nav class="nav" aria-label="Primary">
-      <ul>
-        {
-          primaryNav.map((item) => (
-            <li>
-              <a href={item.href} aria-current={isCurrent(item.href) ? 'page' : undefined}>
-                {item.label}
-              </a>
-            </li>
-          ))
-        }
-      </ul>
-    </nav>
-
     <div class="header-actions">
-      <a class="btn btn-sm header-cta" href="/contact/">Start a conversation</a>
+      <nav class="nav" aria-label="Primary">
+        <ul>
+          {
+            primaryNav.map((item, i) => (
+              <li>
+                <a href={item.href} aria-current={isCurrent(item.href) ? 'page' : undefined}>
+                  <span class="nav-n" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+                  <span class="nav-l">{item.label}</span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+      <a class="header-cta" href="/contact/" aria-current={isCurrent('/contact/') ? 'page' : undefined}>Start a conversation</a>
       <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-nav" data-menu-toggle>
         <span class="menu-label">Menu</span>
         <span class="menu-icon" aria-hidden="true"><i></i><i></i></span>
@@ -84,6 +84,8 @@ const isCurrent = (href: string) => (href === '/' ? path === '/' : path.startsWi
   .site-header.over-dark:not(.is-open) {
     --ink: #eef3f8;
     --ink-2: #c2d0dd;
+    --ink-3: #8fa1b4;
+    --accent: #b9dcf5;
     --mark: #eef3f8;
     --accent-soft: #8ec0e6;
     --btn-bg: #eef3f8;
@@ -122,40 +124,65 @@ const isCurrent = (href: string) => (href === '/' ? path === '/' : path.startsWi
   .brand :global(.mark) { transition: transform 900ms var(--ease-out); }
   .brand:hover :global(.mark) { transform: rotate(180deg); }
 
+  /* Numbered links and a plain, underlined call to action, all on the right */
   .nav ul {
     display: flex;
-    gap: clamp(1.25rem, 0.5rem + 1.6vw, 2.25rem);
+    gap: clamp(1.75rem, 0.5rem + 2.4vw, 3.25rem);
     list-style: none;
     padding: 0;
   }
   .nav a {
-    position: relative;
-    display: inline-block;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.6rem;
     padding-block: 0.4rem;
-    font-size: 0.95rem;
-    font-weight: 500;
-    color: var(--ink-2);
     text-decoration: none;
+    color: var(--ink);
+  }
+  .nav-n {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    font-variant-numeric: lining-nums tabular-nums;
+    color: var(--ink-3);
     transition: color var(--dur) var(--ease);
   }
-  .nav a::after {
+  .nav-l {
+    font-size: 1.0625rem;
+    font-weight: 500;
+    letter-spacing: -0.005em;
+    background-image: linear-gradient(currentColor, currentColor);
+    background-size: 0% 1px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    padding-bottom: 2px;
+    transition: background-size 360ms var(--ease);
+  }
+  .nav a:hover .nav-l, .nav a[aria-current='page'] .nav-l { background-size: 100% 1px; }
+  .nav a:hover .nav-n, .nav a[aria-current='page'] .nav-n { color: var(--accent-soft); }
+
+  .header-cta {
+    position: relative;
+    padding-block: 0.4rem;
+    font-size: 1.0625rem;
+    font-weight: 500;
+    letter-spacing: -0.005em;
+    white-space: nowrap;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .header-cta::after {
     content: '';
     position: absolute;
     left: 0;
     right: 0;
-    bottom: 0;
-    height: 1px;
+    bottom: 0.2rem;
+    height: 1.5px;
     background: var(--accent-soft);
-    transform: scaleX(0);
-    transform-origin: right;
-    transition: transform 360ms var(--ease);
+    transition: height 200ms var(--ease), background-color 200ms var(--ease);
   }
-  .nav a:hover { color: var(--ink); }
-  .nav a:hover::after { transform: scaleX(1); transform-origin: left; }
-  .nav a[aria-current='page'] { color: var(--ink); }
-  .nav a[aria-current='page']::after { transform: scaleX(1); }
+  .header-cta:hover::after { height: 2px; background: var(--accent); }
 
-  .header-actions { display: flex; align-items: center; gap: var(--s-3); }
+  .header-actions { display: flex; align-items: center; gap: clamp(1.75rem, 0.5rem + 2.4vw, 3.25rem); }
 
   .menu-toggle {
     display: none;
@@ -221,7 +248,7 @@ const isCurrent = (href: string) => (href === '/' ? path === '/' : path.startsWi
     font-size: 0.9rem;
   }
 
-  @media (max-width: 900px) {
+  @media (max-width: 1023px) {
     .nav, .header-cta { display: none; }
     .menu-toggle { display: inline-flex; }
     .header-inner { height: 64px; }

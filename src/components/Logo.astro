@@ -3,13 +3,15 @@
 import Mark from './Mark.astro';
 interface Props {
   size?: number;
+  /** Show the S mark beside the wordmark (the header shows the wordmark alone) */
+  mark?: boolean;
   class?: string;
 }
-const { size = 24, class: className = '' } = Astro.props;
+const { size = 24, mark = true, class: className = '' } = Astro.props;
 ---
 
 <span class:list={['logo', className]}>
-  <Mark size={size} />
+  {mark && <Mark size={size} />}
   <span class="wordmark">Spockhart</span>
 </span>
 

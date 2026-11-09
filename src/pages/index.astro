@@ -1,12 +1,10 @@
 ---
 import Base from '../layouts/Base.astro';
-import Mark from '../components/Mark.astro';
 import Mist from '../components/Mist.astro';
 import Calculator from '../components/Calculator.astro';
 import FixBuild from '../components/FixBuild.astro';
 import ClosingCTA from '../components/ClosingCTA.astro';
 import { site } from '../config/site';
-import { hexPath } from '../lib/logo';
 
 ---
 
@@ -26,14 +24,6 @@ import { hexPath } from '../lib/logo';
         </div>
       </div>
 
-      <div class="hero-figure" aria-hidden="true">
-        <svg class="construction load-fade" viewBox="-160 -160 320 320">
-          <path d={hexPath} transform="scale(1.24)" class="c-hex" />
-          <path d={hexPath} transform="scale(1.1)" class="c-hex-inner" />
-          <path d="M-160 0H160M0 -160V160" class="c-axis" />
-        </svg>
-        <Mark size="64%" tone="brand" assemble tilt class="hero-mark" />
-      </div>
     </div>
 
   </section>
@@ -69,37 +59,11 @@ import { hexPath } from '../lib/logo';
   }
   .hero-grid {
     display: grid;
-    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-    gap: var(--s-7);
+    grid-template-columns: minmax(0, 1fr);
     align-items: center;
   }
   .hero-copy { display: grid; gap: var(--s-5); justify-items: start; }
   .hero-copy h1 { font-size: clamp(3rem, 1.6rem + 6vw, 6.75rem); max-width: 10ch; }
   .hero-copy .lead { max-width: 48ch; }
   .hero-copy .btn-row { margin-top: var(--s-3); }
-
-  .hero-figure {
-    position: relative;
-    display: grid;
-    place-items: center;
-    aspect-ratio: 1;
-    width: 100%;
-    max-width: 460px;
-    justify-self: end;
-  }
-  .construction { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-  .construction * { fill: none; vector-effect: non-scaling-stroke; stroke-width: 1; }
-  .c-hex { stroke: var(--rule-2); }
-  .c-hex-inner { stroke: var(--rule-2); stroke-dasharray: 2 6; }
-  .c-axis { stroke: var(--rule); }
-  :global(.hero-mark) { position: relative; will-change: transform; }
-
-
-  @media (max-width: 960px) {
-    .hero-grid { grid-template-columns: minmax(0, 1fr); }
-    .hero-figure { max-width: 300px; justify-self: start; order: -1; margin-bottom: calc(var(--s-4) * -1); }
-  }
-  @media (max-width: 640px) {
-    .hero-figure { max-width: 190px; }
-  }
 </style>
