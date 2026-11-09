@@ -104,7 +104,7 @@ const spans = [
 ---
 
 <div class:list={['timeline', { compact }]} data-timeline>
-  <ol class="phases on-light" data-always data-rate="0.32" data-phases={track}>
+  <ol class="phases" data-always data-rate="0.32" data-phases={track}>
     {
       phases.map((p, i) => (
         <li
@@ -248,6 +248,47 @@ const spans = [
     .timeline { gap: var(--s-5); }
     .phases { grid-template-columns: minmax(0, 1fr); }
   }
+
+  /* ==========================================================================
+     Dark: the phases sit on the page's dark ground as quiet cards. The graphics read the same
+     colour names, set dark here; each heading block keeps its own tint, from the lightest in
+     phase 1 to the deepest in phase 3.
+     ========================================================================== */
+  .phases {
+    --ink: #eef3f8;
+    --ink-2: #b9c7d5;
+    --ink-3: #8ea1b5;
+    --rule: rgb(255 255 255 / 0.1);
+    --rule-2: rgb(255 255 255 / 0.22);
+    --accent: #8ec0e6;
+    --accent-soft: #6fa8d6;
+    --accent-wash: rgb(142 192 230 / 0.12);
+    --brand: #3c78aa;
+    --surface: #1c2541;
+    --paper-2: #151d33;
+    color-scheme: dark;
+  }
+  .phase { background: #151d33; border-color: rgb(255 255 255 / 0.1); }
+  .phase-1 { --seg: rgb(184 204 224 / 0.14); --seg-ink: #eef3f8; --seg-ink-2: #c3d0dd; --seg-meta: #b8cce0; }
+  .phase-2 { --seg: rgb(74 138 186 / 0.3); --seg-ink: #eef3f8; --seg-ink-2: #c3d0dd; --seg-meta: #9cc8ea; }
+  .phase-3 { --seg: rgb(31 77 111 / 0.75); --seg-ink: #eef3f8; --seg-ink-2: #c3d0dd; --seg-meta: #8ec0e6; }
+  .phase-4 {
+    --seg: repeating-linear-gradient(-45deg, transparent 0 6px, rgb(255 255 255 / 0.04) 6px 7px);
+    --seg-ink: #eef3f8;
+    --seg-ink-2: #c3d0dd;
+    --seg-meta: #8ec0e6;
+    border-color: rgb(255 255 255 / 0.22);
+  }
+  /* Shapes that put white words on a dark fill: the fill turns light, so the words turn dark */
+  .phase :global(.live), .phase :global(.shield), .phase :global(.us), .phase :global(.owned) { fill: #dfe8f1; }
+  .phase :global(.live-text), .phase :global(.shield-text), .phase :global(.owned-text), .phase :global(.us-mark), .phase :global(.flag-text) { fill: #14212f; }
+  .phase :global(.shield-icon) { stroke: #1f4d6f; }
+  .phase :global(.cursor) { fill: #eef3f8; stroke: #14212f; }
+  .phase :global(.win-bar) { fill: rgb(255 255 255 / 0.06); }
+  .phase :global(.sk rect) { fill: rgb(255 255 255 / 0.12); }
+  .phase :global(.step-slow) { fill: rgb(255 255 255 / calc(0.02 + 0.08 * clamp(0, (var(--t) - 3.5) * 4, 1))); }
+  .phase :global(.pill-text), .phase :global(.trained-word) { fill: #6fd29d; }
+  .phase :global(.pill-tick) { stroke: #6fd29d; }
 </style>
 
 <script>

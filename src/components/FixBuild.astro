@@ -728,4 +728,107 @@ const sets = [
     .fb-set-note { font-size: 0.625rem; letter-spacing: 0.1em; white-space: nowrap; }
     .fb-card { padding: 0.75rem 0.65rem; }
   }
+
+  /* ==========================================================================
+     Dark and refined, in the same language as the Nonprofits page: no frames, thin lines,
+     soft light, and a typographic list. Sits on the page's dark ground (.page-dark).
+     ========================================================================== */
+  .fb { background: transparent; padding-block: clamp(4rem, 3rem + 3vw, 6.5rem) clamp(2.5rem, 1.5rem + 3vw, 5rem); }
+  .fb-title {
+    text-align: left;
+    margin-left: 0;
+    font-size: clamp(2.25rem, 1.6rem + 2vw, 3.75rem);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    margin-bottom: clamp(2.5rem, 1.75rem + 2.5vw, 4.25rem);
+  }
+
+  /* The chart, unframed */
+  .fb-chart { padding: 0; border-radius: 0; background: none; overflow: visible; }
+  .fb-chart::before { display: none; }
+  .fb-win { background: none; border: 0; border-radius: 0; box-shadow: none; overflow: visible; }
+  .fb-win-bar {
+    padding: 0 0 0.85rem;
+    background: none;
+    border-bottom: 1px solid rgb(255 255 255 / 0.1);
+    font-size: 0.75rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  .fb-dots { display: none; }
+  .fb-svg { padding: 1rem 0 0; }
+  .fb-grid { stroke: rgb(255 255 255 / 0.05); }
+  .fb-axis { stroke: rgb(255 255 255 / 0.18); }
+  .fb-divider { stroke: rgb(255 255 255 / 0.07); }
+  .fb-axis-label { font-size: 10.5px; letter-spacing: 0.18em; fill: #8fa1b4; }
+  .fb-group { font-size: 19px; fill: #eef3f8; }
+  .fb-ann { fill: #8fa1b4; }
+  .fb-ann-hot { fill: #d9e6f2; font-weight: 500; }
+  .fb-bracket { stroke: rgb(238 243 248 / 0.3); }
+  .fb-bracket-after { stroke: rgb(238 243 248 / 0.5); }
+  .fb-rev { fill: rgb(110 160 205 / 0.5); }
+  .fb-cost { fill: rgb(226 163 154 / 0.42); }
+  .fb-add-rect { fill: rgb(156 200 234 / 0.2); stroke: rgb(156 200 234 / 0.65); stroke-width: 1; }
+  .fb-key-add { font-size: 12px; font-weight: 600; fill: #d9e6f2; }
+  .fb-cut-rect { stroke: rgb(226 163 154 / 0.6); stroke-width: 1; }
+  .fb-hatch-line { stroke: rgb(226 163 154 / 0.24); stroke-width: 1; }
+  .fb-key-cut { font-size: 11px; font-weight: 600; fill: #e2a39a; }
+  .fb-add.is-on .fb-add-rect { fill: rgb(156 200 234 / 0.45); }
+  :global(.fb-link) { stroke-width: 1; opacity: 0.5; }
+  :global(.fb-link-build) { stroke: #9cc8ea; }
+  :global(.fb-link-fix) { stroke: #e2a39a; }
+
+  /* The case studies: hairline-ruled rows, no boxes */
+  .fb-eyebrow { color: var(--ink-3); }
+  .fb-eyebrow::before { display: none; }
+  .fb-set-head { border-bottom-color: rgb(255 255 255 / 0.22); }
+  .fb-set-title { color: var(--ink); }
+  .fb-set-build .fb-set-note { color: #9cc8ea; }
+  .fb-set-fix .fb-set-note { color: #e2a39a; }
+  .fb-key {
+    position: relative;
+    width: auto;
+    height: auto;
+    padding-left: 1.6rem;
+    border-radius: 0;
+    background: none !important;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    color: var(--ink-3);
+  }
+  .fb-key::before { content: ''; position: absolute; left: 0; top: 50%; width: 1.1rem; height: 2px; border-radius: 1px; background: var(--c); }
+  .fb-card-build { --c: #9cc8ea; }
+  .fb-card-fix { --c: #e2a39a; }
+  .fb-v { color: var(--ink); font-weight: 400; }
+  .fb-l { color: var(--ink-2); }
+  .fb-caret { color: var(--ink-3); }
+  .fb-head:hover { background: rgb(255 255 255 / 0.035); }
+  .fb-head:hover .fb-caret, .fb-card.is-open .fb-caret { color: #9cc8ea; }
+  .fb-panel-body { border-top-color: rgb(255 255 255 / 0.1); }
+  .fb-card-build .fb-pnote { color: #9cc8ea; background: rgb(156 200 234 / 0.12); }
+  .fb-card-fix .fb-pnote { color: #e2a39a; background: rgb(226 163 154 / 0.12); }
+  .fb-client { color: var(--ink); }
+  .fb-client-mark::before { background: #eef3f8; }
+  .fb-client-mark svg { stroke: #14212f; }
+  .fb-headline { color: var(--ink); font-weight: 400; }
+  .fb-headline .hl { color: #9cc8ea; }
+
+  @media (min-width: 1100px) {
+    .fb-row { gap: 0; }
+    .fb-card { border: 0; border-bottom: 1px solid rgb(255 255 255 / 0.1); border-radius: 0; background: none; }
+    .fb-card.is-open { border-color: rgb(255 255 255 / 0.1); }
+    .fb-head { grid-template-columns: minmax(0, 1fr) auto; padding: 0.75rem 0.5rem 0.75rem 0; }
+    /* The words carry each row; the graphic opens in the dropdown */
+    .fb-media { display: none; }
+    .fb-panel-body { padding: 0.25rem 0 1.25rem; border-top: 0; }
+  }
+  /* Phones and tablets: the swipe cards, quiet on the dark ground */
+  @media (max-width: 1099px) {
+    .fb-card { border: 1px solid rgb(255 255 255 / 0.1); background: rgb(255 255 255 / 0.03); }
+    .fb-key { display: block; }
+    .fb-note { display: none; }
+    .fb-cs { border-top-color: rgb(255 255 255 / 0.1); }
+  }
 </style>
