@@ -4,7 +4,6 @@ import Mist from '../components/Mist.astro';
 import Calculator from '../components/Calculator.astro';
 import FixBuild from '../components/FixBuild.astro';
 import ClosingCTA from '../components/ClosingCTA.astro';
-import { site } from '../config/site';
 
 ---
 
@@ -15,13 +14,6 @@ import { site } from '../config/site';
       <div class="hero-copy">
         <h1 class="load-in" style="--i:1">We optimize <em class="display-em">operations.</em></h1>
         <div class="accent-rule load-in" style="--i:2"></div>
-        <p class="lead load-in" style="--i:2">
-          Spockhart works alongside your team to optimize existing processes, automate repetitive tasks, and develop new capabilities.
-          Within {site.offer.prototypeDays} days, you’ll have a working first version.
-        </p>
-        <div class="btn-row load-in" style="--i:3">
-          <a class="btn" href="/contact/">Start a conversation <span class="arr" aria-hidden="true">→</span></a>
-        </div>
       </div>
 
     </div>
@@ -67,6 +59,4 @@ import { site } from '../config/site';
   }
   .hero-copy { display: grid; gap: var(--s-5); justify-items: start; }
   .hero-copy h1 { font-size: clamp(3rem, 1.6rem + 6vw, 6.75rem); max-width: 10ch; }
-  .hero-copy .lead { max-width: 48ch; }
-  .hero-copy .btn-row { margin-top: var(--s-3); }
 </style>
