@@ -192,7 +192,8 @@ const isCurrent = (href: string) => (href === '/' ? path === '/' : path.startsWi
   }
   .header-cta:hover::after { height: 2px; background: var(--accent); }
 
-  .header-actions { display: flex; align-items: center; gap: clamp(1.75rem, 0.5rem + 2.4vw, 3.25rem); }
+  /* Baselines line up, so the call to action sits level with the numbered links */
+  .header-actions { display: flex; align-items: baseline; gap: clamp(1.75rem, 0.5rem + 2.4vw, 3.25rem); }
 
   .menu-toggle {
     display: none;

@@ -281,9 +281,10 @@ const sets = [
           const b = rect.getBBox();
           const sx = m.a * (b.x + b.width) + m.e - box.left + 4;
           const sy = m.d * (b.y + b.height / 2) + m.f - box.top;
-          const h = headOf(card).getBoundingClientRect();
-          const ex = h.left - box.left - 9;
-          const ey = h.top + h.height / 2 - box.top;
+          // End level with the row's dash (drawn 2px tall from the middle of its key), just short of it
+          const key = (card.querySelector<HTMLElement>('.fb-key') ?? headOf(card)).getBoundingClientRect();
+          const ex = key.left - box.left - 6;
+          const ey = key.top + key.height / 2 + 1 - box.top;
           // Each line curves straight out of its slice to its case study
           const dx = Math.max(24, (ex - sx) * 0.55);
           const { g, path } = lineFor(card);
@@ -434,6 +435,8 @@ const sets = [
       refresh();
       window.addEventListener('resize', refresh);
       document.fonts?.ready.then(refresh);
+      // Anything that shifts the list (a label typing in, fonts arriving) redraws the lines
+      if ('ResizeObserver' in window) new ResizeObserver(() => requestAnimationFrame(draw)).observe(cardsBox);
       wide.addEventListener('change', () => {
         if (open) setOpen(open, false);
         open = null;
