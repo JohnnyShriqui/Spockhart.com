@@ -53,7 +53,7 @@ const lerp = (a: string, b: string, t: number) => {
    boundary, and eases into the next. Each section draws its half, with many small steps, so
    there is no edge where the blend starts, stops or meets the next section. */
 const ease = (t: number) => t * t * (3 - 2 * t);
-const STEPS = 10;
+const STEPS = 16;
 const at = (k: number) => `calc(var(--band) * ${(k / STEPS).toFixed(2)})`;
 // The first case study takes the whole blend from the hero, and the last the whole blend into the page
 const fade = (prev: string, base: string, next: string, first: boolean, last: boolean) => {
@@ -260,10 +260,29 @@ const sectionsOf = (body = '') =>
       radial-gradient(46% 48% at var(--g1x) 50%, var(--g1), transparent 70%),
       radial-gradient(38% 42% at var(--g2x) 52%, var(--g2), transparent 70%),
       var(--fade);
-    --band: clamp(7rem, 4rem + 8vw, 13rem);
+    /* Each colour is only at full strength through the middle of its section; the rest is
+       one long blend into its neighbours, so the page reads as one continuous wash */
+    --band: 45%;
   }
   /* Every other case study is set deep and dark, so the page changes as you scroll. The light
      detail sheet stays light inside it. */
+  /* A very fine grain over the whole run of case studies keeps the long blends from banding */
+  .projects { position: relative; }
+  .projects::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: var(--grain);
+    background-size: 200px;
+    opacity: 0.05;
+    mix-blend-mode: overlay;
+  }
+  /* Stacked layouts start the words near the top, so the blends are shorter there */
+  @media (max-width: 960px) {
+    .project { --band: 25%; }
+  }
+
   /* The closing section follows on from the last case study with no rule between them */
   .projects ~ :global(.closing) { border-top: 0; }
 
@@ -409,7 +428,7 @@ const sectionsOf = (body = '') =>
   }
   /* Phones: tighter, same content */
   @media (max-width: 640px) {
-    .project { padding-block: 2.5rem; --band: 3rem; }
+    .project { padding-block: 2.5rem; }
     .project-grid, .flip .project-grid { gap: var(--s-5); }
     .project-text { gap: 0.65rem; }
     .project-kicker { font-size: 0.6875rem; }

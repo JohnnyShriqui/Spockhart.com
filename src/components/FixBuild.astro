@@ -532,6 +532,8 @@ const sets = [
   :global(.fb-link-build) { stroke: #4a8aba; }
   :global(.fb-link-fix) { stroke: #c0726b; }
   :global(.fb-link-g) { transition: opacity 250ms var(--ease); }
+  /* With a case study open, only its own line shows */
+  .has-open :global(.fb-link-g:not(.is-open)) { opacity: 0; }
 
   /* ---------- The case studies ---------- */
   .fb-cards { position: relative; display: grid; gap: 0.55rem; }
