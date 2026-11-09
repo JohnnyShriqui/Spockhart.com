@@ -189,7 +189,7 @@ const sets = [
       </figure>
 
       <!-- Phones and tablets: the case studies are left out, so the chart points to them -->
-      <a class="fb-more" href="/work/"><span class="fb-more-l">See our work in action</span> <span class="arr" aria-hidden="true">→</span></a>
+      <a class="fb-more" href="/work/"><span class="fb-more-l">See <mark class="fb-hl">our work</mark> in action</span> <span class="arr" aria-hidden="true">→</span></a>
 
       <!-- The case studies, grouped the way they sit on the chart -->
       <div class="fb-cards" data-fb-cards>
@@ -1050,10 +1050,23 @@ const sets = [
     justify-self: start;
     margin-top: calc(var(--s-6) * -1 + 0.9rem);
     padding-block: 0.4rem;
-    font-size: 1.0625rem;
-    font-weight: 500;
+    font-size: 1.25rem;
+    font-weight: 700;
     color: var(--ink);
     text-decoration: none;
+  }
+  /* "our work" in a stroke of the hero's lightsaber blue, like a highlighter */
+  .fb-hl {
+    color: #0b1622;
+    padding: 0.02em 0.28em;
+    margin: 0 -0.06em;
+    border-radius: 0.35em 0.2em 0.4em 0.25em;
+    background: linear-gradient(100deg, rgb(63 208 255 / 0.25) 0, rgb(63 208 255 / 0.7) 0.35em, rgb(63 208 255 / 0.6) calc(100% - 0.4em), rgb(63 208 255 / 0.3) 100%);
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+  @media (prefers-color-scheme: dark) {
+    .fb-hl { background: linear-gradient(100deg, rgb(63 208 255 / 0.6) 0, rgb(63 208 255 / 0.95) 0.35em, rgb(63 208 255 / 0.9) calc(100% - 0.4em), rgb(63 208 255 / 0.65) 100%); }
   }
   .fb-more-l {
     background-image: linear-gradient(var(--accent-soft), var(--accent-soft));
