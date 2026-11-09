@@ -1,8 +1,8 @@
 ---
 /**
  * Approach, below the hero: a fine line runs down the left margin out of the dark hero, like a
- * circuit, drawn to fit the layout. It branches into each section's heading marker, feeds each set
- * of steps through a line that drops into the top of every card, and ends at the closing line.
+ * circuit, drawn to fit the layout, and feeds each set of steps through a line that drops into the
+ * top of every card.
  * A light grid of dots sits behind it all. Still, decorative, behind the content.
  */
 ---
@@ -42,24 +42,16 @@
         const left = lr.left + card.offsetLeft - list.offsetLeft;
         return { cx: X(left + card.offsetWidth / 2), top: Y(lr.top + card.offsetTop - list.offsetTop), bottom: Y(lr.top + card.offsetTop - list.offsetTop + card.offsetHeight) };
       });
-      const brow = section.querySelector<HTMLElement>('.eyebrow')!.getBoundingClientRect();
-      return { cards, left: X(lr.left), right: X(lr.right), mark: { x: X(brow.left) + 3, y: Y(brow.top + brow.height / 2) } };
+      return { cards, left: X(lr.left), right: X(lr.right) };
     });
     if (!sets.length) return;
-    const closing = document.querySelector<HTMLElement>('.closing h2')?.getBoundingClientRect();
 
     const path = (d: string, cls: string) => g.append(el('path', { d, class: cls }));
     const node = (x: number, y: number, cls = 'tr-node', r = 3.2) => g.append(el('circle', { cx: x, cy: y, r, class: cls }));
 
-    // The left spine: down from the hero, a branch into each heading marker, ending at the closing
+    // The left spine: down from the hero to the line that feeds the last set of steps
     const sx = Math.max(14, sets[0].left - 34);
-    const stops = sets.map((s) => s.mark);
-    if (closing) stops.push({ x: X(closing.left) - 4, y: Y(closing.top + closing.height / 2) });
-    path(`M${sx} 0 V${stops[stops.length - 1].y}`, 'tr-spine');
-    stops.forEach((s, i) => {
-      path(`M${sx} ${s.y} H${s.x - (i < sets.length ? 9 : 10)}`, 'tr-branch');
-      node(sx, s.y);
-    });
+    path(`M${sx} 0 V${sets[sets.length - 1].cards[0].top - 30}`, 'tr-spine');
 
     // Each set of steps is fed from the spine: a line branches off just above the cards and drops
     // into the top of each one
@@ -115,8 +107,7 @@
   .traces svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
   .traces :global(path) { fill: none; stroke-width: 1; }
   .traces :global(.tr-spine) { stroke: rgb(var(--tr) / 0.28); }
-  .traces :global(.tr-branch) { stroke: rgb(var(--tr) / 0.34); }
-      .traces :global(.tr-bus) { stroke: rgb(var(--tr) / 0.2); }
+        .traces :global(.tr-bus) { stroke: rgb(var(--tr) / 0.2); }
   .traces :global(.tr-stub) { stroke: rgb(var(--tr) / 0.28); }
   .traces :global(.tr-node) { fill: var(--tr-ground); stroke: rgb(var(--tr) / 0.5); stroke-width: 1; }
     .traces :global(.tr-dot) { fill: rgb(var(--tr) / 0.45); }
