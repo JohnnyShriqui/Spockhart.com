@@ -32,7 +32,7 @@ const isCurrent = (href: string) => (href === '/' ? path === '/' : path.startsWi
           }
         </ul>
       </nav>
-      <a class="header-cta" href="/contact/" aria-current={isCurrent('/contact/') ? 'page' : undefined}>Start a conversation</a>
+      <a class="header-cta" href="/contact/" aria-current={isCurrent('/contact/') ? 'page' : undefined}><span class="cta-l">Start a conversation</span></a>
       <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-nav" data-menu-toggle>
         <span class="menu-label">Menu</span>
         <span class="menu-icon" aria-hidden="true"><i></i><i></i></span>
@@ -170,27 +170,27 @@ const isCurrent = (href: string) => (href === '/' ? path === '/' : path.startsWi
   .nav a:hover .nav-l, .nav a[aria-current='page'] .nav-l { background-size: 100% 1px; }
   .nav a:hover .nav-n, .nav a[aria-current='page'] .nav-n { color: var(--accent-soft); }
 
+  /* Underlined exactly like the links' current-page line, so the two sit at the same height */
   .header-cta {
-    position: relative;
+    display: inline-flex;
+    align-items: baseline;
     padding-block: 0.4rem;
-    font-size: 1.0625rem;
-    font-weight: 500;
-    letter-spacing: -0.005em;
     white-space: nowrap;
     color: var(--ink);
     text-decoration: none;
   }
-  .header-cta::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0.2rem;
-    height: 1.5px;
-    background: var(--accent-soft);
-    transition: height 200ms var(--ease), background-color 200ms var(--ease);
+  .cta-l {
+    font-size: 1.0625rem;
+    font-weight: 500;
+    letter-spacing: -0.005em;
+    background-image: linear-gradient(var(--accent-soft), var(--accent-soft));
+    background-size: 100% 1px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    padding-bottom: 2px;
+    transition: background-size 200ms var(--ease);
   }
-  .header-cta:hover::after { height: 2px; background: var(--accent); }
+  .header-cta:hover .cta-l { background-image: linear-gradient(var(--accent), var(--accent)); background-size: 100% 2px; }
 
   /* Baselines line up, so the call to action sits level with the numbered links */
   .header-actions { display: flex; align-items: baseline; gap: clamp(1.75rem, 0.5rem + 2.4vw, 3.25rem); }
