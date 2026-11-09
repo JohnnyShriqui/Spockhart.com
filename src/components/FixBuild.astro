@@ -25,18 +25,21 @@ interface Item {
   id: string;
   value: string;
   label: string;
+  /** Shown as a small pill beside the figure: still running for the client, or being built now */
+  status: 'live' | 'progress';
 }
+const STATUS = { live: 'Live', progress: 'In progress' } as const;
 
 const build: Item[] = [
-  { k: 'A', id: 'sales-performance-system', value: '+$316K A Month', label: 'We lifted average sales with a new analytics system' },
-  { k: 'B', id: 'digital-practice-growth', value: '$150K → $1M', label: 'We grew a consulting practice in under a year' },
-  { k: 'C', id: 'lead-generation-engine', value: '+$1B Market', label: 'We digitized a division’s expertise to open a new market' },
+  { k: 'A', id: 'sales-performance-system', value: '+$316K A Month', label: 'We lifted average sales with a new analytics system', status: 'live' },
+  { k: 'B', id: 'digital-practice-growth', value: '$150K → $1M', label: 'We grew a consulting practice in under a year', status: 'live' },
+  { k: 'C', id: 'lead-generation-engine', value: '+$1B Market', label: 'We digitized a division’s expertise to open a new market', status: 'live' },
 ];
 const fix: Item[] = [
-  { k: '1', id: 'commission-automation', value: 'Excel → Automated', label: 'We’re automating commissions for a $1.2B manufacturer' },
-  { k: '2', id: 'project-feasibility-platform', value: '12 Months → Minutes', label: 'We cut feasibility assessments from $100K+ each to $0' },
-  { k: '3', id: 'momentum-exchange-prototype', value: '↑ 83% More Fuel Efficient', label: 'In a prototype we built' },
-  { k: '4', id: 'subcontractor-financing-marketplace', value: '6+ Months → Weeks', label: 'We cut financing approvals for subcontractors' },
+  { k: '1', id: 'commission-automation', value: 'Excel → Automated', label: 'We’re automating commissions for a $1.2B manufacturer', status: 'progress' },
+  { k: '2', id: 'project-feasibility-platform', value: '12 Months → Minutes', label: 'We cut feasibility assessments from $100K+ each to $0', status: 'live' },
+  { k: '3', id: 'momentum-exchange-prototype', value: '↑ 83% More Fuel Efficient', label: 'In a prototype we built', status: 'live' },
+  { k: '4', id: 'subcontractor-financing-marketplace', value: '6+ Months → Weeks', label: 'We cut financing approvals for subcontractors', status: 'live' },
 ];
 
 /* Chart geometry (viewBox 0 0 560 470). Heights are illustrative. */
@@ -174,6 +177,10 @@ const sets = [
                         <span class="fb-note">Our Work</span>
                         <span class="fb-text">
                           <span class="fb-v">{it.value}</span>
+                          <span class:list={['fb-pill', `fb-pill-${it.status}`]}>
+                            <i aria-hidden="true"></i>
+                            {STATUS[it.status]}
+                          </span>
                         </span>
                       </div>
                       <span class="fb-caret" aria-hidden="true">
@@ -856,4 +863,33 @@ const sets = [
   .fb-key::before { box-shadow: 0 0 6px var(--c); }
   .fb-set-build .fb-set-note { color: var(--neon-blue); }
   .fb-set-fix .fb-set-note { color: var(--neon-red); }
+
+  /* Status pills: whether the work is live for the client now or being built */
+  .fb-text { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem 0.85rem; }
+  .fb-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.22rem 0.6rem 0.22rem 0.5rem;
+    border: 1px solid rgb(255 255 255 / 0.14);
+    border-radius: 999px;
+    font-family: var(--font-body);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    line-height: 1.2;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: var(--ink-2);
+  }
+  .fb-pill i { width: 6px; height: 6px; border-radius: 50%; background: var(--dot); box-shadow: 0 0 6px var(--dot); flex: none; }
+  .fb-pill-live { --dot: #4ade80; }
+  .fb-pill-progress { --dot: #fbbf24; }
+  @media (prefers-reduced-motion: no-preference) {
+    .fb-pill-live i { animation: fb-live 3.2s ease-in-out infinite; }
+    @keyframes fb-live { 50% { opacity: 0.4; box-shadow: 0 0 2px var(--dot); } }
+  }
+  @media (max-width: 1099px) {
+    .fb-pill { font-size: 0.625rem; padding: 0.18rem 0.5rem 0.18rem 0.42rem; }
+  }
 </style>
