@@ -71,7 +71,7 @@ const sets = [
       <figure class="fb-chart" aria-label="Before, costs are just under revenue. After, revenue is up three slices and costs are down four.">
         <div class="fb-win">
           <div class="fb-win-bar"><span class="fb-dots"><i></i><i></i><i></i></span>Costs vs revenue</div>
-          <svg viewBox={`0 0 560 ${VB_H}`} class="fb-svg" data-fb-svg aria-hidden="true" preserveAspectRatio="xMidYMid meet">
+          <svg viewBox={`0 0 560 ${VB_H}`} class="fb-svg" data-fb-svg aria-hidden="true" preserveAspectRatio="xMidYMin meet">
             <defs>
               <pattern id="fb-hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
                 <line x1="0" y1="0" x2="0" y2="7" class="fb-hatch-line" />
@@ -241,17 +241,34 @@ const sets = [
         if (ctrl && (how === 'stop' || animate)) ctrl[how]();
       };
 
-      /* ---------- Lines from each slice out to its case study (laptops) ---------- */
+      /* ---------- Lines from each slice out to its case study (laptops) ----------
+         Each line is made once and only its path is updated, so nothing flickers or restarts
+         while a case study opens or closes. */
+      const lines = new Map<HTMLElement, { g: SVGGElement; path: SVGPathElement }>();
+      const lineFor = (card: HTMLElement) => {
+        let l = lines.get(card);
+        if (!l) {
+          const kind = /\d/.test(card.dataset.card!) ? 'fix' : 'build';
+          const g = document.createElementNS(ns, 'g') as SVGGElement;
+          const path = document.createElementNS(ns, 'path') as SVGPathElement;
+          path.setAttribute('pathLength', '1');
+          path.setAttribute('class', `fb-link fb-link-${kind}`);
+          g.append(path);
+          links.append(g);
+          l = { g, path };
+          lines.set(card, l);
+        }
+        return l;
+      };
       const draw = () => {
-        links.replaceChildren();
+        links.style.display = wide.matches ? '' : 'none';
         if (!wide.matches) return;
         const box = stage.getBoundingClientRect();
         links.setAttribute('viewBox', `0 0 ${box.width} ${box.height}`);
         const m = chart.getScreenCTM();
         if (!m) return;
         for (const card of cards) {
-          const k = card.dataset.card!;
-          const rect = slice(k)?.querySelector<SVGRectElement>('[data-slice-rect]');
+          const rect = slice(card.dataset.card!)?.querySelector<SVGRectElement>('[data-slice-rect]');
           if (!rect) continue;
           const b = rect.getBBox();
           const sx = m.a * (b.x + b.width) + m.e - box.left + 4;
@@ -260,23 +277,19 @@ const sets = [
           const ex = h.left - box.left - 9;
           const ey = h.top + h.height / 2 - box.top;
           const dx = Math.max(24, (ex - sx) * 0.55);
-          const kind = /\d/.test(k) ? 'fix' : 'build';
-          const g = document.createElementNS(ns, 'g');
-          g.setAttribute('class', `fb-link-g fb-link-g-${kind}${card === open ? ' is-open' : ''}`);
-          const path = document.createElementNS(ns, 'path');
+          const { g, path } = lineFor(card);
+          g.setAttribute('class', `fb-link-g${card === open ? ' is-open' : ''}`);
           path.setAttribute('d', `M${sx.toFixed(1)} ${sy.toFixed(1)} C${(sx + dx).toFixed(1)} ${sy.toFixed(1)} ${(ex - dx).toFixed(1)} ${ey.toFixed(1)} ${ex.toFixed(1)} ${ey.toFixed(1)}`);
-          path.setAttribute('pathLength', '1');
-          path.setAttribute('class', `fb-link fb-link-${kind}`);
-          g.append(path);
-          links.append(g);
         }
       };
-      // Keep the lines attached while a case study opens or closes and the others move
+      // While a case study opens or closes, the chart grows or shrinks with the list, frame by
+      // frame, and the lines stay attached to every case study
       let follow = 0;
       const track = (ms = 600) => {
         const until = performance.now() + ms;
         cancelAnimationFrame(follow);
         const step = () => {
+          if (wide.matches) chartFig.style.height = `${cardsBox.offsetHeight}px`;
           draw();
           if (performance.now() < until) follow = requestAnimationFrame(step);
         };
@@ -315,8 +328,8 @@ const sets = [
           }
         }
         if (wide.matches) {
-          // The chart is exactly as tall as the list of case studies, measured with all closed
-          if (!open) chartFig.style.height = `${cardsBox.offsetHeight}px`;
+          // The chart is always exactly as tall as the list of case studies, open or closed
+          chartFig.style.height = `${cardsBox.offsetHeight}px`;
         } else {
           chartFig.style.removeProperty('height');
         }
@@ -336,6 +349,7 @@ const sets = [
         setOpen(card, next);
         open = next ? card : null;
         root.classList.toggle('has-open', Boolean(open));
+        hold(Boolean(open));
         track(700);
       };
       const mode = () => {
@@ -355,7 +369,8 @@ const sets = [
         });
       });
 
-      /* ---------- The chart: Before turns into After, over and over ---------- */
+      /* ---------- The chart: Before turns into After, over and over, while every case
+         study is closed. With one open, it holds still on the finished After. ---------- */
       let shown = false;
       let timer = 0;
       const toAfter = () => {
@@ -363,10 +378,21 @@ const sets = [
         timer = window.setTimeout(toBefore, 14000);
       };
       const toBefore = () => {
-        if (!shown) return;
+        if (!shown || open) return;
         root.classList.add('fb-pre');
         timer = window.setTimeout(toAfter, 2600);
       };
+      function hold(on: boolean) {
+        window.clearTimeout(timer);
+        if (on) {
+          root.classList.add('fb-hold');
+          root.classList.remove('fb-pre');
+          return;
+        }
+        // Let the snap to the finished frame settle before the transitions come back
+        requestAnimationFrame(() => root.classList.remove('fb-hold'));
+        if (animate && shown) timer = window.setTimeout(toBefore, 4000);
+      }
 
       /* ---------- Phones and tablets: each graphic plays while it is on screen ---------- */
       const each = new IntersectionObserver(
@@ -386,7 +412,7 @@ const sets = [
             if (now === shown) return;
             shown = now;
             clearTimeout(timer);
-            if (shown) timer = window.setTimeout(toAfter, 300);
+            if (shown && !open) timer = window.setTimeout(toAfter, 300);
           },
           { threshold: 0.3 },
         ).observe(chart);
@@ -404,6 +430,7 @@ const sets = [
         if (open) setOpen(open, false);
         open = null;
         root.classList.remove('has-open');
+        hold(false);
         cards.forEach((card) => control(card, 'thumb', 'stop'));
         mode();
         refresh();
@@ -494,8 +521,6 @@ const sets = [
   :global(.fb-link-build) { stroke: #4a8aba; }
   :global(.fb-link-fix) { stroke: #c0726b; }
   :global(.fb-link-g) { transition: opacity 250ms var(--ease); }
-  /* With a case study open, only its line stays, so nothing stretches to the cards pushed below */
-  .has-open :global(.fb-link-g:not(.is-open)) { opacity: 0; }
 
   /* ---------- The case studies ---------- */
   .fb-cards { position: relative; display: grid; gap: 0.55rem; }
@@ -629,6 +654,9 @@ const sets = [
     .fb-add { transition: opacity 900ms var(--ease) calc(2600ms + (2 - var(--i)) * 400ms), transform 1300ms var(--ease-out) calc(2600ms + (2 - var(--i)) * 400ms); }
     .fb-wide { transition: opacity 1000ms var(--ease) 4100ms; }
     :global(.fb-link) { stroke-dasharray: 1; stroke-dashoffset: 0; transition: stroke-dashoffset 1800ms var(--ease-out) 4400ms, opacity 250ms var(--ease), stroke-width 250ms var(--ease); }
+
+    /* A case study is open: the chart sits still on its finished After */
+    .fb-hold .fb-cost-after, .fb-hold .fb-cut, .fb-hold .fb-add, .fb-hold .fb-wide, .fb-hold :global(.fb-link) { transition: none !important; }
 
     /* Back to Before, quickly and together */
     .fb-pre .fb-cost-after { transform: scaleY(1); transition: transform 700ms var(--ease); }

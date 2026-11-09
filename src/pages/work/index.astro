@@ -51,7 +51,7 @@ const sectionsOf = (body = '') =>
         const live = d.status === 'in-development';
         const panelId = `${entry.id}-details`;
         return (
-          <article id={entry.id} class:list={['project', { flip: i % 2 === 1, tint: i % 2 === 1 }]} data-project>
+          <article id={entry.id} class:list={['project', { flip: i % 2 === 1, dark: i % 2 === 1 }]} data-project>
             <div class="wrap project-grid">
               <div class="project-text" data-reveal>
                 <p class="project-kicker">
@@ -89,7 +89,7 @@ const sectionsOf = (body = '') =>
             <div class="cs-panel" id={panelId} data-panel data-open="false" role="region" aria-label={`${plain(d.title)} details`}>
               <div class="cs-panel-inner">
                 <div class="wrap">
-                  <div class="cs-card">
+                  <div class:list={['cs-card', { 'on-light': i % 2 === 1 }]}>
                     <ul class="cs-metrics">
                       {d.metrics.map((m) => (
                         <li>
@@ -183,7 +183,29 @@ const sectionsOf = (body = '') =>
 
 <style>
   .project { padding-block: clamp(3.5rem, 2rem + 4.5vw, 6.5rem); border-bottom: 1px solid var(--rule); scroll-margin-top: 72px; }
-  .project.tint { background: var(--paper-2); }
+  /* Every other case study is set deep and dark, so the page changes as you scroll. The light
+     detail sheet stays light inside it. */
+  .project.dark {
+    --ink: #eef3f8;
+    --ink-2: #b5c4d3;
+    --ink-3: #94a8bc;
+    --rule: rgb(255 255 255 / 0.1);
+    --rule-2: rgb(255 255 255 / 0.22);
+    --accent: #8ec0e6;
+    --accent-soft: #6fa8d6;
+    position: relative;
+    color: var(--ink);
+    border-bottom-color: transparent;
+    background:
+      radial-gradient(50% 75% at 22% 50%, rgb(40 98 146 / 0.42), transparent 72%),
+      radial-gradient(40% 60% at 100% 0%, rgb(54 66 128 / 0.28), transparent 72%),
+      linear-gradient(170deg, #0c1826 0%, #10223a 100%);
+  }
+  .project.dark h2 { color: var(--ink); }
+  .project.dark .client-mark::before { background: #eef3f8; }
+  .project.dark .client-mark svg { stroke: #14212f; }
+  .project.dark .cs-toggle:hover { background: rgb(255 255 255 / 0.08); border-color: rgb(255 255 255 / 0.4); }
+  .project.dark .project-visual > :global(.rv) { box-shadow: 0 30px 60px -36px rgb(0 0 0 / 0.6); }
   .project-grid {
     display: grid;
     grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);

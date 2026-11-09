@@ -1,14 +1,14 @@
 ---
 /**
  * Nonprofits: more impact per dollar. One line chart in the same window style as the chart on
- * the home page. Everything without Spockhart is grey: the history up to the day we start, and
- * the dashed paths demand and resources would take without us. Everything Spockhart does is in
- * colour, inside the shaded "With Spockhart" period: resources in blue (like revenue), demand in
- * coral (like costs), and the three parts we add, numbered to match the cards beside the chart.
- * An illustration, not data.
+ * the home page. Each line keeps one colour all the way across: demand in coral (like costs),
+ * resources in blue (like revenue). From the day Spockhart starts, each splits in two: dashed is
+ * where it goes without us, solid is where it goes with us, and every line end says which.
+ * Arrows show what we do to each: demand pushed down, resources pushed up, in three numbered
+ * parts that match the cards beside the chart. An illustration, not data.
  *
  * Like the home chart, it builds itself slowly on a loop while on screen: first the problem,
- * then Spockhart's period, lines and parts 1 to 3, and the result holds.
+ * then Spockhart's lines and parts 1 to 3, and the result holds.
  */
 
 interface Dims {
@@ -56,7 +56,7 @@ function draw(d: Dims) {
      stood when we started, so resources rise alongside demand and never cross it */
   const gapAtStart = r0(xS) - f0(xS);
   const fW = (x: number) => f0(x) + 0.24 * Math.pow(p(x), 1.5);
-  const rW = (x: number) => (u(x) <= S ? r0(x) : fW(x) + gapAtStart * (1 - 0.5 * smooth(x)));
+  const rW = (x: number) => (u(x) <= S ? r0(x) : fW(x) + gapAtStart * (1 - 0.42 * smooth(x)));
   const rEff = (x: number) => r0(x) - 0.7 * (r0(x) - rW(x));
 
   const after = xs.filter((x) => x >= xS - 0.01);
@@ -65,9 +65,14 @@ function draw(d: Dims) {
   const back = (f: (x: number) => number, set = xs) => [...set].reverse().map((x) => `L${x.toFixed(1)} ${y(f(x)).toFixed(1)}`).join(' ');
   const area = (a: (x: number) => number, b: (x: number) => number) => `${pts(a, after)} ${back(b, after)} Z`;
 
-  const kx = d.X1 - 22;
+  const kx = d.X1 - 40;
   const mid = (a: (x: number) => number, b: (x: number) => number) => y((a(kx) + b(kx)) / 2);
   const gx = d.X0 + (d.X1 - d.X0) * 0.14;
+
+  /* The arrows: from where each line would be without us to where it is with us */
+  const ax = d.X1 - 58;
+  const sg = (x: number) => d.X0 + (d.X1 - d.X0) * x;
+  const gapAt = sg(0.74);
 
   return {
     ...d,
@@ -78,33 +83,26 @@ function draw(d: Dims) {
     pre: { demand: pts(f0, before), res: pts(r0, before) },
     without: { demand: pts(f0, after), res: pts(r0, after) },
     withUs: { demand: pts(fW, after), res: pts(rW, after) },
-    keys: [
-      { k: '1', x: kx, y: mid(rEff, r0), at: 4900 },
-      { k: '2', x: kx, y: mid(rW, rEff), at: 5800 },
-      { k: '3', x: kx, y: mid(f0, fW), at: 7300 },
-    ],
-    ends: {
-      demand: y(fW(d.X1)),
-      res: y(rW(d.X1)),
-      demand0: y(f0(d.X1)),
-      res0: y(r0(d.X1)),
+    arrows: {
+      down: { x: ax, y1: y(f0(ax)) + 6, y2: y(fW(ax)) - 7 },
+      up: { x: ax, y1: y(r0(ax)) - 6, y2: y(rW(ax)) + 7 },
     },
+    keys: [
+      { k: '1', x: ax + 18, y: mid(rEff, r0), at: 4900 },
+      { k: '2', x: ax + 18, y: mid(rW, rEff), at: 5800 },
+      { k: '3', x: ax + 18, y: y((f0(ax) + fW(ax)) / 2), at: 6800 },
+    ],
+    ends: { demand: y(fW(d.X1)), res: y(rW(d.X1)), demand0: y(f0(d.X1)), res0: y(r0(d.X1)) },
     left: { demand: y(f0(d.X0)), res: y(r0(d.X0)) },
     gap: { x: gx, y: y((f0(gx) + r0(gx)) / 2) },
+    smaller: { x: gapAt, y: y((fW(gapAt) + rW(gapAt)) / 2) },
   };
 }
 
 const charts = [
-  { cls: 'npi-wide', ...draw({ W: 560, H: 396, X0: 24, X1: 456, TOP: 34, BASE: 346 }) },
-  { cls: 'npi-narrow', ...draw({ W: 352, H: 324, X0: 10, X1: 268, TOP: 30, BASE: 276 }) },
+  { cls: 'npi-wide', ...draw({ W: 560, H: 392, X0: 24, X1: 450, TOP: 26, BASE: 342 }) },
+  { cls: 'npi-narrow', ...draw({ W: 352, H: 318, X0: 10, X1: 258, TOP: 22, BASE: 270 }) },
 ];
-const hexPts = (cx: number, cy: number, r: number) =>
-  [0, 1, 2, 3, 4, 5]
-    .map((k) => {
-      const a = (Math.PI / 3) * k - Math.PI / 2;
-      return `${(cx + Math.cos(a) * r).toFixed(1)},${(cy + Math.sin(a) * r).toFixed(1)}`;
-    })
-    .join(' ');
 ---
 
 <section class="npi" aria-labelledby="npi-title" data-npi>
@@ -122,7 +120,7 @@ const hexPts = (cx: number, cy: number, r: number) =>
             <span class="npi-dots"><i></i><i></i><i></i></span>Demand vs resources
             <span class="npi-legend" aria-hidden="true">
               <span><i class="lg-with"></i>With Spockhart</span>
-              <span><i class="lg-without"></i>Without Spockhart</span>
+              <span><i class="lg-without"></i>Without</span>
             </span>
           </div>
           {
@@ -134,49 +132,61 @@ const hexPts = (cx: number, cy: number, r: number) =>
                   </pattern>
                 </defs>
 
-                <!-- The Spockhart period: shaded and labelled -->
-                <g class="fade band" style="--at:300ms">
-                  <rect x={c.xS} y={c.TOP - 30} width={c.X1 - c.xS} height={c.BASE - c.TOP + 30} class="band-fill" />
-                  <polygon points={hexPts(c.xS + 15, c.TOP - 15, 6)} class="band-mark" />
-                  <text x={c.xS + 27} y={c.TOP - 11} class="band-label">With Spockhart</text>
-                </g>
-
                 {c.grid.map((gy) => (
                   <line x1={c.X0} x2={c.X1} y1={gy} y2={gy} class="grid" />
                 ))}
                 <line x1={c.X0} x2={c.X1} y1={c.BASE} y2={c.BASE} class="axis" />
-                <line x1={c.xS} x2={c.xS} y1={c.TOP - 30} y2={c.BASE + 6} class="start" />
+                <line x1={c.xS} x2={c.xS} y1={c.TOP} y2={c.BASE + 6} class="start" />
                 <text x={c.xS} y={c.BASE + 24} class="axis-label" text-anchor="middle">Spockhart starts</text>
                 <text x={c.X1} y={c.BASE + 24} class="axis-label" text-anchor="end">Time</text>
 
-                <!-- What Spockhart adds -->
-                <path d={c.regions.demand} fill={`url(#npi-hatch-${c.cls})`} class="sweep" style="--at:3900ms;--dur:3400ms" />
-                <path d={c.regions.further} class="sweep r-further" style="--at:900ms;--dur:4000ms" />
-                <path d={c.regions.funding} class="sweep r-funding" style="--at:2400ms;--dur:3400ms" />
-                <path d={c.seam} class="sweep seam" style="--at:2400ms;--dur:3400ms" />
+                <!-- What Spockhart changes: the space between each line without us and with us -->
+                <path d={c.regions.demand} fill={`url(#npi-hatch-${c.cls})`} class="sweep" style="--at:3600ms;--dur:3400ms" />
+                <path d={c.regions.further} class="sweep r-further" style="--at:700ms;--dur:4000ms" />
+                <path d={c.regions.funding} class="sweep r-funding" style="--at:2100ms;--dur:3400ms" />
+                <path d={c.seam} class="sweep seam" style="--at:2100ms;--dur:3400ms" />
 
-                <!-- Without Spockhart: grey, and dashed from the day we start -->
-                <path d={c.pre.demand} class="l-before" />
-                <path d={c.pre.res} class="l-before" />
-                <path d={c.without.demand} class="l-without" />
-                <path d={c.without.res} class="l-without" />
-                <text x={c.X0} y={c.left.demand - 12} class="side-label">Demand</text>
-                <text x={c.X0} y={c.left.res + 22} class="side-label">Resources</text>
+                <!-- Each line, one colour all the way: solid up to the start, then dashed without us -->
+                <path d={c.pre.demand} class="l-demand" />
+                <path d={c.pre.res} class="l-res" />
+                <path d={c.without.demand} class="l-without l-without-demand" />
+                <path d={c.without.res} class="l-without l-without-res" />
+                <text x={c.X0} y={c.left.demand - 12} class="side-label side-demand">Demand</text>
+                <text x={c.X0} y={c.left.res + 22} class="side-label side-res">Resources</text>
                 <text x={c.gap.x} y={c.gap.y + 4} class="gap-label" text-anchor="middle">The gap</text>
-                <text x={c.X1 + 8} y={c.ends.demand0 - 2} class="without-label">
-                  <tspan x={c.X1 + 8}>Without</tspan>
-                  <tspan x={c.X1 + 8} dy="13">Spockhart</tspan>
+                <text x={c.X1 + 8} y={c.ends.demand0 - 3} class="end-label end-without">
+                  <tspan x={c.X1 + 8} class="end-demand-soft">Demand</tspan>
+                  <tspan x={c.X1 + 8} dy="13">without us</tspan>
                 </text>
-                <text x={c.X1 + 8} y={c.ends.res0 - 2} class="without-label">
-                  <tspan x={c.X1 + 8}>Without</tspan>
-                  <tspan x={c.X1 + 8} dy="13">Spockhart</tspan>
+                <text x={c.X1 + 8} y={c.ends.res0 - 3} class="end-label end-without">
+                  <tspan x={c.X1 + 8} class="end-res-soft">Resources</tspan>
+                  <tspan x={c.X1 + 8} dy="13">without us</tspan>
                 </text>
 
-                <!-- With Spockhart: in colour -->
+                <!-- With Spockhart: solid -->
                 <path d={c.withUs.res} pathLength="1" class="draw l-res" />
                 <path d={c.withUs.demand} pathLength="1" class="draw l-demand" />
-                <text x={c.X1 + 8} y={c.ends.demand + 4.5} class="fade end-label end-demand" style="--at:4900ms">Demand</text>
-                <text x={c.X1 + 8} y={c.ends.res + 4.5} class="fade end-label end-res" style="--at:4900ms">Resources</text>
+                <g class="fade" style="--at:4900ms">
+                  <text x={c.X1 + 8} y={c.ends.demand - 3} class="end-label end-with">
+                    <tspan x={c.X1 + 8} class="end-demand">Demand</tspan>
+                    <tspan x={c.X1 + 8} dy="13">with Spockhart</tspan>
+                  </text>
+                  <text x={c.X1 + 8} y={c.ends.res + 7} class="end-label end-with">
+                    <tspan x={c.X1 + 8} class="end-res">Resources</tspan>
+                    <tspan x={c.X1 + 8} dy="13">with Spockhart</tspan>
+                  </text>
+                </g>
+                <text x={c.smaller.x} y={c.smaller.y + 4} class="fade gap-label" text-anchor="middle" style="--at:5400ms">Smaller gap</text>
+
+                <!-- Arrows: demand pushed down, resources pushed up -->
+                <g class="fade" style="--at:4900ms">
+                  <line x1={c.arrows.up.x} x2={c.arrows.up.x} y1={c.arrows.up.y1} y2={c.arrows.up.y2} class="arrow arrow-up" />
+                  <path d={`M${c.arrows.up.x - 5} ${c.arrows.up.y2 + 6} L${c.arrows.up.x} ${c.arrows.up.y2} L${c.arrows.up.x + 5} ${c.arrows.up.y2 + 6}`} class="arrow arrow-up" />
+                </g>
+                <g class="fade" style="--at:6800ms">
+                  <line x1={c.arrows.down.x} x2={c.arrows.down.x} y1={c.arrows.down.y1} y2={c.arrows.down.y2} class="arrow arrow-down" />
+                  <path d={`M${c.arrows.down.x - 5} ${c.arrows.down.y2 - 6} L${c.arrows.down.x} ${c.arrows.down.y2} L${c.arrows.down.x + 5} ${c.arrows.down.y2 - 6}`} class="arrow arrow-down" />
+                </g>
 
                 {c.keys.map((k) => (
                   <text x={k.x} y={k.y + 4.5} text-anchor="middle" class={`fade key key-${k.k}`} style={`--at:${k.at}ms`}>
@@ -298,39 +308,45 @@ const hexPts = (cx: number, cy: number, r: number) =>
   .npi-dots i { width: 8px; height: 8px; border-radius: 50%; background: rgb(255 255 255 / 0.18); }
   .npi-legend { display: flex; gap: 1rem; margin-left: auto; font-weight: 600; letter-spacing: 0.02em; color: #9fb6cb; }
   .npi-legend span { display: inline-flex; align-items: center; gap: 0.5rem; }
-  .npi-legend i { display: inline-block; width: 20px; border-top: 3px solid #8ec0e6; border-radius: 2px; }
-  .npi-legend .lg-without { border-top: 2px dashed rgb(255 255 255 / 0.45); }
+  .npi-legend i { display: inline-block; width: 20px; border-top: 3px solid #d9e6f2; border-radius: 2px; }
+  .npi-legend .lg-without { border-top: 2px dashed rgb(217 230 242 / 0.55); }
   .npi-svg { display: block; width: 100%; height: auto; padding: 0.75rem 0.5rem 0.6rem; box-sizing: border-box; overflow: visible; }
   .npi-narrow { display: none; }
 
   .grid { stroke: rgb(255 255 255 / 0.06); stroke-width: 1; }
   .axis { stroke: rgb(255 255 255 / 0.28); stroke-width: 1; }
-  .start { stroke: rgb(142 192 230 / 0.55); stroke-width: 1; stroke-dasharray: 2 4; }
+  .start { stroke: rgb(255 255 255 / 0.3); stroke-width: 1; stroke-dasharray: 2 4; }
   .axis-label { font-family: var(--font-body); font-size: 11.5px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; fill: #9fb6cb; }
 
-  /* The Spockhart period */
-  .band-fill { fill: rgb(142 192 230 / 0.08); }
-  .band-mark { fill: #8ec0e6; }
-  .band-label { font-family: var(--font-body); font-size: 11.5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; fill: #8ec0e6; }
-
-  /* Without Spockhart: grey */
-  .l-before { fill: none; stroke: #b4c3d2; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
-  .l-without { fill: none; stroke: rgb(255 255 255 / 0.42); stroke-width: 2; stroke-dasharray: 5 5; }
-  .side-label { font-family: var(--font-body); font-size: 12.5px; font-weight: 600; fill: #b4c3d2; }
-  .gap-label { font-family: var(--font-body); font-size: 11.5px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; fill: #9fb6cb; }
-  .without-label { font-family: var(--font-body); font-size: 11px; font-weight: 600; fill: #9fb6cb; }
-
-  /* With Spockhart: resources in the revenue blues, demand in the cost coral */
+  /* Each line keeps its colour: demand coral, resources blue. Solid is with Spockhart,
+     dashed is without, faint. */
   .l-demand, .l-res { fill: none; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
   .l-demand { stroke: #e8958c; }
-  .l-res { stroke: #e3f1fb; }
+  .l-res { stroke: #a9d1ee; }
+  .l-without { fill: none; stroke-width: 2; stroke-dasharray: 5 5; }
+  .l-without-demand { stroke: rgb(232 149 140 / 0.6); }
+  .l-without-res { stroke: rgb(169 209 238 / 0.55); }
+  .side-label { font-family: var(--font-body); font-size: 12.5px; font-weight: 700; }
+  .side-demand { fill: #f1b3ac; }
+  .side-res { fill: #bcdcf3; }
+  .gap-label { font-family: var(--font-body); font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; fill: #9fb6cb; }
+  .end-label { font-family: var(--font-body); font-size: 11px; font-weight: 600; }
+  .end-without { fill: #8ea6bc; }
+  .end-with { fill: #d9e6f2; }
+  .end-demand, .end-res, .end-demand-soft, .end-res-soft { font-size: 12.5px; font-weight: 700; }
+  .end-demand { fill: #f1b3ac; }
+  .end-res { fill: #bcdcf3; }
+  .end-demand-soft { fill: rgb(241 179 172 / 0.7); }
+  .end-res-soft { fill: rgb(188 220 243 / 0.7); }
+
+  /* What Spockhart changes: resources added in the revenue blues, demand taken away in coral */
   .r-further { fill: #6f9fc6; }
   .r-funding { fill: #a9d1ee; }
   .seam { fill: none; stroke: #173f5c; stroke-width: 2; }
   .hatch-line { stroke: rgb(217 138 130 / 0.38); stroke-width: 2; }
-  .end-label { font-family: var(--font-body); font-size: 13.5px; font-weight: 700; }
-  .end-demand { fill: #f1b3ac; }
-  .end-res { fill: #e3f1fb; }
+  .arrow { fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .arrow-up { stroke: #133650; }
+  .arrow-down { stroke: #f1b3ac; }
   .key { font-family: var(--font-body); font-size: 14px; font-weight: 700; }
   .key-1, .key-2 { fill: #133650; }
   .key-3 { fill: #f1b3ac; }

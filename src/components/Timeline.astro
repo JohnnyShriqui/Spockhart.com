@@ -104,7 +104,7 @@ const spans = [
 ---
 
 <div class:list={['timeline', { compact }]} data-reveal data-timeline>
-  <ol class="phases" data-reveal="stagger" data-scene-group="(min-width: 901px)" data-hover="(min-width: 901px) and (hover: hover) and (pointer: fine)" data-rate="0.32" data-gap="600">
+  <ol class="phases" data-reveal="stagger" data-scene-group="(min-width: 901px)" data-rate="0.32" data-gap="600">
     {
       phases.map((p, i) => (
         <li
@@ -250,7 +250,7 @@ const spans = [
 </style>
 
 <script>
-  // Laptops: the phases rest on their finished frame; pointing at one plays its graphic (scripts/scenes.ts)
+  // Laptops: the phases play one at a time, in order; the others rest on their finished frame (scripts/scenes.ts)
   import { initScenes } from '../scripts/scenes';
   initScenes();
   document.addEventListener('spockhart:view', initScenes);
