@@ -307,12 +307,12 @@ const sets = [
       let active: HTMLElement | null = null;
       const toAfter = () => {
         root.classList.remove('fb-pre');
-        timer = window.setTimeout(toBefore, 9800);
+        timer = window.setTimeout(toBefore, 14000);
       };
       const toBefore = () => {
         if (!shown || active) return;
         root.classList.add('fb-pre');
-        timer = window.setTimeout(toAfter, 1900);
+        timer = window.setTimeout(toAfter, 2600);
       };
       const loop = (delay: number) => {
         clearTimeout(timer);
@@ -635,11 +635,11 @@ const sets = [
   /* The After builds itself, over and over: costs drop, the cut slices appear, new revenue
      stacks up, then the lines draw out to the case studies */
   @media (prefers-reduced-motion: no-preference) {
-    .fb-cost-after { transition: transform 1450ms var(--ease-out) 250ms; }
-    .fb-cut { transition: opacity 650ms var(--ease) calc(950ms + var(--i) * 190ms); }
-    .fb-add { transition: opacity 600ms var(--ease) calc(1700ms + (2 - var(--i)) * 260ms), transform 900ms var(--ease-out) calc(1700ms + (2 - var(--i)) * 260ms); }
-    .fb-wide { transition: opacity 700ms var(--ease) 2750ms; }
-    :global(.fb-link) { stroke-dasharray: 1; stroke-dashoffset: 0; transition: stroke-dashoffset 1300ms var(--ease-out) 3000ms, opacity 250ms var(--ease), stroke-width 250ms var(--ease); }
+    .fb-cost-after { transition: transform 2200ms var(--ease-out) 300ms; }
+    .fb-cut { transition: opacity 1000ms var(--ease) calc(1400ms + var(--i) * 300ms); }
+    .fb-add { transition: opacity 900ms var(--ease) calc(2600ms + (2 - var(--i)) * 400ms), transform 1300ms var(--ease-out) calc(2600ms + (2 - var(--i)) * 400ms); }
+    .fb-wide { transition: opacity 1000ms var(--ease) 4100ms; }
+    :global(.fb-link) { stroke-dasharray: 1; stroke-dashoffset: 0; transition: stroke-dashoffset 1800ms var(--ease-out) 4400ms, opacity 250ms var(--ease), stroke-width 250ms var(--ease); }
 
     /* Back to Before, quickly and together */
     .fb-pre .fb-cost-after { transform: scaleY(1); transition: transform 700ms var(--ease); }
