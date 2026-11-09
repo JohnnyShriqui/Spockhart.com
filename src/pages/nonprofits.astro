@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import PageHero from '../components/PageHero.astro';
+import GapChart from '../components/GapChart.astro';
 import ClosingCTA from '../components/ClosingCTA.astro';
 import NonprofitGap from '../components/NonprofitGap.astro';
 
@@ -15,7 +16,9 @@ import NonprofitGap from '../components/NonprofitGap.astro';
     eyebrow="Nonprofits"
     title="Engineering nonprofit impact."
     lead="Every nonprofit faces the same fundamental challenge: unlimited demand on limited resources. We exist to close that gap."
-  />
+  >
+    <GapChart slot="figure" />
+  </PageHero>
 
   <NonprofitGap />
 
