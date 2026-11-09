@@ -688,6 +688,8 @@ const building = 'M-6 7V-4l6-4 6 4v11zM-3 -1h2M1 -1h2M-3 3h2M1 3h2';
 <style>
   .rv {
     position: relative;
+    /* Everything inside moves; keep its layout and repaints inside the graphic */
+    contain: layout paint;
     display: grid;
     gap: var(--s-5);
     align-content: start;

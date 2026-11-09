@@ -186,7 +186,7 @@ const sectionsOf = (body = '') =>
 
 <style>
   /* ---------- Dark, in the hero's colours ----------
-     One deep petrol ground for the whole page, the same fine grain as the hero, and a soft glow
+     One deep petrol ground for the whole page and a soft glow
      behind each graphic (teal and blue in turn, like the hero's) that fades out well before the
      edges of its case study, so nothing ever meets on a line. */
   .work-dark {
@@ -207,17 +207,6 @@ const sectionsOf = (body = '') =>
     isolation: isolate;
     color: var(--ink);
     background: linear-gradient(180deg, #0c1f28 0%, #0b1c25 50%, #0a1922 100%);
-  }
-  .work-dark::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
-    background-image: var(--grain);
-    background-size: 200px;
-    opacity: 0.13;
-    mix-blend-mode: overlay;
   }
   .work-dark :global(.closing) { border-top: 0; }
 

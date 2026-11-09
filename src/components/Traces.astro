@@ -1,0 +1,98 @@
+---
+/**
+ * Approach, below the hero: fine lines and dots that seem to run down out of the dark hero into the
+ * light page. Short drops across the width fade within a few hundred pixels; a few longer traces
+ * run down the margins past both tracks, with small nodes along them; a faint grid of dots sits
+ * behind it all. Still, decorative, behind the content. Navy on the light page, white on the dark.
+ */
+const W = 1440;
+const H = 2600;
+// Short drops from the hero's edge: every 64px, lengths that vary without looking random
+const drops = Array.from({ length: 22 }, (_, i) => {
+  const x = 32 + i * 64 + ((i * 37) % 3) * 6;
+  const len = 70 + ((i * 53 + 17) % 9) * 34;
+  return { x, len, dot: i % 3 !== 1 };
+});
+// Long traces down the margins, each with a jog and nodes along the way
+const traces = [
+  { d: 'M44 0 V520 H72 V1180 H44 V2600', nodes: [[44, 260], [72, 520], [72, 860], [72, 1180], [44, 1640], [44, 2120]] },
+  { d: 'M88 0 V340 H112 V1460 H88 V2600', nodes: [[88, 340], [112, 980], [112, 1460], [88, 1900]] },
+  { d: 'M1396 0 V680 H1368 V1320 H1396 V2600', nodes: [[1396, 420], [1368, 680], [1368, 1000], [1396, 1320], [1396, 1780], [1396, 2260]] },
+  { d: 'M1352 0 V260 H1328 V1560 H1352 V2600', nodes: [[1352, 260], [1328, 760], [1328, 1560], [1352, 2020]] },
+];
+---
+
+<div class="traces" aria-hidden="true">
+  <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMin slice">
+    <defs>
+      <linearGradient id="tr-drop-fade" x1="0" y1="0" x2="0" y2="440" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#fff" />
+        <stop offset="1" stop-color="#fff" stop-opacity="0" />
+      </linearGradient>
+      <mask id="tr-drop-mask" maskUnits="userSpaceOnUse" x="0" y="0" width={W} height={H}>
+        <rect width={W} height="440" fill="url(#tr-drop-fade)" />
+      </mask>
+      <linearGradient id="tr-long-fade" x1="0" y1="0" x2="0" y2={H} gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#fff" />
+        <stop offset="0.55" stop-color="#fff" stop-opacity="0.7" />
+        <stop offset="1" stop-color="#fff" stop-opacity="0.15" />
+      </linearGradient>
+      <mask id="tr-long-mask" maskUnits="userSpaceOnUse" x="0" y="0" width={W} height={H}>
+        <rect width={W} height={H} fill="url(#tr-long-fade)" />
+      </mask>
+    </defs>
+
+    <g mask="url(#tr-drop-mask)" class="tr-drops">
+      {
+        drops.map((p) => (
+          <>
+            <path d={`M${p.x} 0 V${p.len}`} />
+            {p.dot && <circle cx={p.x} cy={p.len} r="2.2" />}
+          </>
+        ))
+      }
+    </g>
+
+    <g mask="url(#tr-long-mask)" class="tr-long">
+      {traces.map((t) => <path d={t.d} />)}
+      {traces.flatMap((t) => t.nodes.map(([x, y]) => <circle cx={x} cy={y} r="3.2" class="tr-node" />))}
+    </g>
+  </svg>
+</div>
+
+<style>
+  .traces {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+    color: #1b2a3d;
+    /* A faint grid of dots, strongest near the hero and fading down the page */
+    background-image: radial-gradient(circle, rgb(27 42 61 / 0.13) 1px, transparent 1.4px);
+    background-size: 28px 28px;
+    background-position: 14px 6px;
+    -webkit-mask-image: linear-gradient(180deg, #000 0, rgb(0 0 0 / 0.55) 26%, rgb(0 0 0 / 0.4) 70%, transparent 100%);
+    mask-image: linear-gradient(180deg, #000 0, rgb(0 0 0 / 0.55) 26%, rgb(0 0 0 / 0.4) 70%, transparent 100%);
+  }
+  .traces svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .traces path { fill: none; stroke: currentColor; stroke-width: 1; vector-effect: non-scaling-stroke; }
+  .tr-drops path { stroke-opacity: 0.28; }
+  .tr-drops circle { fill: currentColor; fill-opacity: 0.3; }
+  .tr-long path { stroke-opacity: 0.16; }
+  .tr-node { fill: var(--paper); stroke: currentColor; stroke-opacity: 0.32; stroke-width: 1; vector-effect: non-scaling-stroke; }
+  @media (prefers-color-scheme: dark) {
+    .traces {
+      color: #eef3f8;
+      background-image: radial-gradient(circle, rgb(255 255 255 / 0.07) 1px, transparent 1.4px);
+    }
+    .tr-drops path { stroke-opacity: 0.16; }
+    .tr-drops circle { fill-opacity: 0.2; }
+    .tr-long path { stroke-opacity: 0.1; }
+    .tr-node { fill: #111930; stroke-opacity: 0.22; }
+  }
+  /* Phones and small tablets: the dots only */
+  @media (max-width: 900px) {
+    .traces svg { display: none; }
+  }
+</style>

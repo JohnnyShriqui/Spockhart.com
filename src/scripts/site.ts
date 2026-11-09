@@ -115,8 +115,11 @@ function initReveals() {
     (entries) => {
       for (const entry of entries) {
         if (!entry.isIntersecting) continue;
-        play(entry.target as HTMLElement);
         io.unobserve(entry.target);
+        // Only rise in from below the screen; if a fast scroll has already brought it into view,
+        // leave it as it is rather than blanking it and fading it back in
+        if (entry.boundingClientRect.top < window.innerHeight - 8) continue;
+        play(entry.target as HTMLElement);
       }
     },
     { rootMargin: '0px 0px 10% 0px', threshold: 0 },

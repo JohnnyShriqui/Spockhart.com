@@ -3,25 +3,16 @@ import CopyEmail from './CopyEmail.astro';
 
 interface Props {
   title?: string;
-  body?: string;
   primary?: { label: string; href: string };
-  /** On phones, hide the paragraph and keep the heading and buttons */
+  /** Kept so existing pages need no change; the section is short everywhere now */
   terse?: boolean;
 }
-const {
-  title = 'Tell us where you’d like to improve.',
-  body = 'A 30-minute conversation about how work actually gets done in your organization. No pitch deck. We start on your real problem.',
-  primary = { label: 'Start a conversation', href: '/contact/' },
-  terse = false,
-} = Astro.props;
+const { title = 'Tell us where you’d like to improve.', primary = { label: 'Start a conversation', href: '/contact/' } } = Astro.props;
 ---
 
-<section class:list={['closing section', { terse }]}>
+<section class="closing section">
   <div class="wrap closing-inner" data-reveal>
-    <div class="closing-copy">
-      <h2>{title}</h2>
-      <p>{body}</p>
-    </div>
+    <h2>{title}</h2>
     <div class="closing-actions">
       <a class="btn" href={primary.href}>{primary.label} <span class="arr" aria-hidden="true">→</span></a>
       <CopyEmail />
@@ -30,15 +21,12 @@ const {
 </section>
 
 <style>
-  /* Heading, a line of context, then the buttons directly underneath */
-  .closing { border-top: 1px solid var(--rule); padding-block: clamp(3.5rem, 2.25rem + 4vw, 6rem); }
-  .closing-inner { display: grid; gap: var(--s-6); justify-items: start; }
-  .closing-copy { display: grid; gap: var(--s-4); }
-  .closing-copy h2 { max-width: 18ch; }
-  .closing-copy p { color: var(--ink-2); font-size: var(--step-1); max-width: 52ch; }
+  /* Short: the heading on one line, the buttons directly underneath */
+  .closing { border-top: 1px solid var(--rule); padding-block: clamp(2.25rem, 1.5rem + 2.25vw, 3.5rem); }
+  .closing-inner { display: grid; gap: var(--s-5); justify-items: start; }
+  .closing h2 { max-width: none; font-size: clamp(1.75rem, 1.3rem + 1.6vw, 2.75rem); line-height: 1.1; text-wrap: balance; }
   .closing-actions { display: flex; flex-wrap: wrap; gap: var(--s-3); align-items: center; }
   @media (max-width: 640px) {
-    .terse .closing-copy p { display: none; }
-    .closing-inner { gap: var(--s-5); }
+    .closing-inner { gap: var(--s-4); }
   }
 </style>
