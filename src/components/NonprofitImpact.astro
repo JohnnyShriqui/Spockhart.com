@@ -3,7 +3,11 @@
  * Nonprofits: more impact per dollar. One line chart in the same window style as the chart on
  * the home page, in the same colours: resources in blue (like revenue), demand in coral (like
  * costs). What Spockhart adds is filled in and numbered, and the three numbered cards beside
- * it say what each part is. An illustration, not data. Nothing moves.
+ * it say what each part is. An illustration, not data.
+ *
+ * Like the home chart, it builds itself on a loop while on screen: first the problem (demand
+ * pulling away from flat resources), then Spockhart's lines bend and parts 1 to 3 fill in, and
+ * the result holds. Pointing at a card lights up its part of the chart.
  */
 
 interface Dims {
@@ -18,17 +22,17 @@ interface Dims {
 const ways = [
   {
     k: '1',
-    name: 'Take resources further',
+    name: 'Take Resources Further',
     body: 'We help you get more out of the people, time and funding you already have, so your organization can serve more people without needing to grow its resources at the same pace.',
   },
   {
     k: '2',
-    name: 'Bring in more funding',
+    name: 'Bring In More Funding',
     body: 'We help you uncover new opportunities to generate revenue and attract funding, creating more sustainable financial support for your mission.',
   },
   {
     k: '3',
-    name: 'Bring demand down',
+    name: 'Bring Demand Down',
     body: 'We help you add services beyond your core program that work upstream, so needs are met early and fewer people reach your door in crisis.',
   },
 ];
@@ -55,6 +59,7 @@ function draw(d: Dims) {
   const rEff = (x: number) => r0(x) - 0.7 * (r0(x) - rW(x));
 
   const after = xs.filter((x) => x >= xS - 0.01);
+  const before = xs.filter((x) => x <= xS + 0.01);
   const pts = (f: (x: number) => number, set = xs) => set.map((x, i) => `${i ? 'L' : 'M'}${x.toFixed(1)} ${y(f(x)).toFixed(1)}`).join(' ');
   const back = (f: (x: number) => number, set = xs) => [...set].reverse().map((x) => `L${x.toFixed(1)} ${y(f(x)).toFixed(1)}`).join(' ');
   const area = (a: (x: number) => number, b: (x: number) => number) => `${pts(a, after)} ${back(b, after)} Z`;
@@ -70,13 +75,18 @@ function draw(d: Dims) {
     regions: { further: area(rEff, r0), funding: area(rW, rEff), demand: area(f0, fW) },
     seam: pts(rEff, after),
     without: { demand: pts(f0, after), res: pts(r0, after) },
-    withUs: { demand: pts(fW), res: pts(rW) },
+    pre: { demand: pts(fW, before), res: pts(rW, before) },
+    withUs: { demand: pts(fW, after), res: pts(rW, after) },
     keys: [
       { k: '1', x: kx, y: mid(rEff, r0) },
       { k: '2', x: kx, y: mid(rW, rEff) },
       { k: '3', x: kx, y: mid(f0, fW) },
     ],
-    ends: { demand: y(fW(d.X1)), res: y(rW(d.X1)) },
+    /* End labels start at the dashed lines' ends and slide to where Spockhart's lines finish */
+    ends: {
+      demand: { y: y(f0(d.X1)), dy: y(fW(d.X1)) - y(f0(d.X1)) },
+      res: { y: y(r0(d.X1)), dy: y(rW(d.X1)) - y(r0(d.X1)) },
+    },
     gap: { x: gx, y: y((f0(gx) + r0(gx)) / 2) },
   };
 }
@@ -87,12 +97,13 @@ const charts = [
 ];
 ---
 
-<section class="npi" aria-labelledby="npi-title">
+<section class="npi" aria-labelledby="npi-title" data-npi>
   <div class="wrap">
     <h2 id="npi-title" class="npi-title">More Impact per Dollar</h2>
 
     <div class="npi-grid">
       <figure
+        data-npi-chart
         class="npi-chart"
         aria-label="Illustration: demand keeps rising and resources stay flat. With Spockhart, resources go further (1) and new funding comes in (2) while demand is brought down (3), so the gap between them narrows."
       >
@@ -121,22 +132,31 @@ const charts = [
                 <text x={c.xS} y={c.BASE + 24} class="axis-label" text-anchor="middle">Spockhart starts</text>
                 <text x={c.X1} y={c.BASE + 24} class="axis-label" text-anchor="end">Time</text>
 
-                <path d={c.regions.demand} fill={`url(#npi-hatch-${c.cls})`} class="r-demand" />
-                <path d={c.regions.further} class="r-further" />
-                <path d={c.regions.funding} class="r-funding" />
-                <path d={c.seam} class="seam" />
+                <path d={c.regions.demand} fill={`url(#npi-hatch-${c.cls})`} class="part sweep r-demand" data-part="3" style="--at:2000ms" />
+                <path d={c.regions.further} class="part sweep r-further" data-part="1" style="--at:300ms" />
+                <path d={c.regions.funding} class="part sweep r-funding" data-part="2" style="--at:1150ms" />
+                <path d={c.seam} class="sweep seam" style="--at:1150ms" />
 
                 <path d={c.without.demand} class="l-without l-without-demand" />
                 <path d={c.without.res} class="l-without l-without-res" />
-                <path d={c.withUs.res} class="l-res" />
-                <path d={c.withUs.demand} class="l-demand" />
+                <path d={c.pre.res} class="l-res" />
+                <path d={c.pre.demand} class="l-demand" />
+                <path d={c.withUs.res} pathLength="1" class="draw l-res" />
+                <path d={c.withUs.demand} pathLength="1" class="draw l-demand" />
 
                 <text x={c.gap.x} y={c.gap.y + 4} class="gap-label" text-anchor="middle">The gap</text>
-                <text x={c.X1 + 8} y={c.ends.demand + 4.5} class="end-label end-demand">Demand</text>
-                <text x={c.X1 + 8} y={c.ends.res + 4.5} class="end-label end-res">Resources</text>
+                <text x={c.X1 + 8} y={c.ends.demand.y + 4.5} class="slide end-label end-demand" style={`--dy:${c.ends.demand.dy.toFixed(1)}px`}>Demand</text>
+                <text x={c.X1 + 8} y={c.ends.res.y + 4.5} class="slide end-label end-res" style={`--dy:${c.ends.res.dy.toFixed(1)}px`}>Resources</text>
 
-                {c.keys.map((k) => (
-                  <text x={k.x} y={k.y + 4.5} text-anchor="middle" class={`key key-${k.k}`}>
+                {c.keys.map((k, i) => (
+                  <text
+                    x={k.x}
+                    y={k.y + 4.5}
+                    text-anchor="middle"
+                    class={`part pop key key-${k.k}`}
+                    data-part={k.k}
+                    style={`--at:${[2700, 3400, 4200][i]}ms`}
+                  >
                     {k.k}
                   </text>
                 ))}
@@ -149,7 +169,7 @@ const charts = [
       <ol class="npi-ways">
         {
           ways.map((w) => (
-            <li class:list={['npi-way', `way-${w.k}`]}>
+            <li class:list={['npi-way', `way-${w.k}`]} data-way={w.k}>
               <span class="npi-key" aria-hidden="true">{w.k}</span>
               <div>
                 <h3 class="npi-way-title">{w.name}</h3>
@@ -162,6 +182,75 @@ const charts = [
     </div>
   </div>
 </section>
+
+<script>
+  // Builds on a loop while on screen, like the chart on the home page: the problem first, then
+  // Spockhart's part, held for a while. Pointing at a card holds the finished chart and lights
+  // up that card's part.
+  function initImpact() {
+    document.querySelectorAll<HTMLElement>('[data-npi]').forEach((root) => {
+      if (root.dataset.ready) return;
+      root.dataset.ready = '1';
+      const chart = root.querySelector<HTMLElement>('[data-npi-chart]')!;
+      const parts = Array.from(root.querySelectorAll<SVGElement>('[data-part]'));
+      const cards = Array.from(root.querySelectorAll<HTMLElement>('[data-way]'));
+      const pointer = window.matchMedia('(hover: hover) and (pointer: fine)');
+      const animate = !window.matchMedia('(prefers-reduced-motion: reduce)').matches && 'IntersectionObserver' in window;
+
+      let shown = false;
+      let held = false;
+      let timer = 0;
+      const toAfter = () => {
+        root.classList.remove('npi-pre');
+        timer = window.setTimeout(toBefore, 14000);
+      };
+      const toBefore = () => {
+        if (!shown || held) return;
+        root.classList.add('npi-pre');
+        timer = window.setTimeout(toAfter, 2600);
+      };
+
+      if (animate) {
+        root.classList.add('npi-pre');
+        new IntersectionObserver(
+          (entries) => {
+            const now = entries.some((e) => e.isIntersecting);
+            if (now === shown) return;
+            shown = now;
+            window.clearTimeout(timer);
+            if (shown) timer = window.setTimeout(toAfter, 300);
+          },
+          { threshold: 0.3 },
+        ).observe(chart);
+      }
+
+      cards.forEach((card) => {
+        card.addEventListener('pointerenter', () => {
+          if (!pointer.matches) return;
+          held = true;
+          window.clearTimeout(timer);
+          root.classList.remove('npi-pre');
+          root.classList.add('has-active');
+          cards.forEach((c) => c.classList.toggle('is-on', c === card));
+          parts.forEach((p) => p.classList.toggle('is-on', p.dataset.part === card.dataset.way));
+        });
+        card.addEventListener('pointerleave', () => {
+          if (!held) return;
+          held = false;
+          root.classList.add('npi-settle');
+          window.setTimeout(() => root.classList.remove('npi-settle'), 400);
+          root.classList.remove('has-active');
+          cards.forEach((c) => c.classList.remove('is-on'));
+          parts.forEach((p) => p.classList.remove('is-on'));
+          window.clearTimeout(timer);
+          if (animate && shown) timer = window.setTimeout(toBefore, 3500);
+        });
+      });
+    });
+  }
+  initImpact();
+  document.addEventListener('spockhart:view', initImpact);
+</script>
 
 <style>
   .npi { padding-block: clamp(2.5rem, 1.75rem + 2.2vw, 3.75rem); background: var(--paper-2); }
@@ -249,6 +338,27 @@ const charts = [
   .npi-legend i { display: inline-block; width: 20px; border-top: 3px solid #e3f1fb; border-radius: 2px; }
   .npi-legend .lg-without { border-top: 1.5px dashed rgb(255 255 255 / 0.55); }
 
+  /* ---------- Motion ----------
+     At rest (and with reduced motion) the chart shows the finished picture. On screen, it starts
+     from the problem and builds Spockhart's part, then holds, over and over. */
+  .slide { transform: translateY(var(--dy)); }
+  .part { transition: opacity 300ms var(--ease); }
+  /* Pointing at a card lights up its part of the chart */
+  .has-active .part:not(.is-on) { opacity: 0.3; }
+  @media (prefers-reduced-motion: no-preference) {
+    .draw { stroke-dasharray: 1 1; stroke-dashoffset: 0; transition: stroke-dashoffset 2400ms var(--ease-out) 300ms; }
+    .sweep { clip-path: inset(0 0 0 0); transition: clip-path 2400ms var(--ease-out) var(--at), opacity 300ms var(--ease); }
+    .slide { transition: transform 2400ms var(--ease-out) 300ms; }
+    .pop { transition: opacity 700ms var(--ease) var(--at); }
+    .has-active .pop, .npi-settle .pop { transition: opacity 300ms var(--ease); }
+
+    /* Back to the problem, quickly and together */
+    .npi-pre .draw { stroke-dashoffset: 1; transition: stroke-dashoffset 500ms var(--ease); }
+    .npi-pre .sweep { clip-path: inset(0 100% 0 0); transition: clip-path 500ms var(--ease); }
+    .npi-pre .slide { transform: translateY(0); transition: transform 500ms var(--ease); }
+    .npi-pre .pop { opacity: 0; transition: opacity 300ms var(--ease); }
+  }
+
   /* ---------- The three ways, keyed to the chart ---------- */
   .npi-ways { list-style: none; padding: 0; display: grid; gap: 0.6rem; }
   .npi-way {
@@ -260,7 +370,9 @@ const charts = [
     border: 1px solid var(--rule);
     border-radius: var(--radius);
     background: var(--surface);
+    transition: border-color 250ms var(--ease), box-shadow 300ms var(--ease);
   }
+  .npi-way.is-on { border-color: var(--rule-2); box-shadow: 0 12px 24px -18px rgb(27 42 61 / 0.35); }
   .npi-key {
     display: grid;
     place-items: center;

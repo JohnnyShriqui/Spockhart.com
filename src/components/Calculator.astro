@@ -10,15 +10,11 @@ interface Props {
   title?: string;
   resultLabel?: string;
   /** Words around the hours figure under the big number */
-  hoursBefore?: string;
-  hoursAfter?: string;
   cta?: string;
 }
 const {
   title = 'How much time is your team losing?',
   resultLabel = 'Every year, tedious, repetitive tasks cost you',
-  hoursBefore = 'in wages, across',
-  hoursAfter = 'of manual, repetitive work.',
   cta = 'Get that time back',
 } = Astro.props;
 
@@ -82,9 +78,6 @@ const iconFill = (i: number) => Math.max(0, Math.min(1, fteIcons - i));
       <div class="calc-right">
         <p class="r-label"><span class="t-desk">{resultLabel}</span><span class="t-mob">Lost every year</span></p>
         <p class="r-big tabular"><span data-out="cost">{money(r.cost)}</span></p>
-        <p class="r-sub">
-          {hoursBefore} <strong><span class="tabular" data-out="hours">{num(r.hours)}</span> hours</strong> {hoursAfter}
-        </p>
 
         <ul class="r-tiles" aria-hidden="true">
           <li><span class="tile-v tabular" data-out="hours">{num(r.hours)}</span><span class="tile-k">hours a year</span></li>
@@ -248,8 +241,6 @@ const iconFill = (i: number) => Math.max(0, Math.min(1, fteIcons - i));
     margin-top: calc(var(--s-2) * -1);
   }
   .r-unit { font-size: 0.42em; letter-spacing: -0.01em; font-weight: 400; color: #d9e6f2; }
-  .r-sub { color: #d9e6f2; font-size: 1.0625rem; margin-top: calc(var(--s-3) * -1); }
-  .r-sub strong { color: #fff; font-weight: 600; }
 
   .r-viz { display: grid; gap: 0.6rem; padding-top: var(--s-4); border-top: 1px solid rgb(255 255 255 / 0.16); }
   .r-line { font-size: 0.975rem; color: #d9e6f2; }
@@ -306,7 +297,7 @@ const iconFill = (i: number) => Math.max(0, Math.min(1, fteIcons - i));
     .calc-right { gap: 0.5rem; padding: 1.1rem 1rem 1rem; }
     .r-label { font-size: 0.6875rem; letter-spacing: 0.14em; }
     .r-big { font-size: min(2.75rem, 14cqi); margin-top: 0; }
-    .r-sub, .r-viz { display: none; }
+    .r-viz { display: none; }
     .r-tiles {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));

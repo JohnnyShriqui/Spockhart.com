@@ -30,7 +30,7 @@ interface Item {
 const build: Item[] = [
   { k: 'A', id: 'sales-performance-system', value: '+$316K a month', label: 'We lifted average sales with a new analytics system' },
   { k: 'B', id: 'digital-practice-growth', value: '$150K → $1M', label: 'We grew a consulting practice in under a year' },
-  { k: 'C', id: 'lead-generation-engine', value: 'A $1B+ market', label: 'We turned a contractor’s expertise into a lead engine' },
+  { k: 'C', id: 'lead-generation-engine', value: 'A $1B+ market', label: 'We turned a division’s expertise into a digital service' },
 ];
 const fix: Item[] = [
   { k: '1', id: 'commission-automation', value: 'Excel → Automated', label: 'We’re automating commissions for a $1.2B manufacturer' },
@@ -338,12 +338,13 @@ const sets = [
         // Open wide, over the chart (which steps back behind the veil anyway), so the graphic
         // and its words can be large enough to read
         const span = cardsBox.getBoundingClientRect().right - chartFig.getBoundingClientRect().left;
-        const width = Math.round(Math.min(1000, span * 0.82));
+        const width = Math.round(Math.min(920, span * 0.74));
         const reach = Math.max(0, width - card.offsetWidth);
         // Every opened case study is the same size: the graphic is fitted into one box
-        const OPEN_H = 360;
+        const OPEN_H = 300;
         const natural = Number(card.dataset.h || 480);
-        const mw = Math.round(width * 0.6);
+        // The graphic takes a little under half; the words get the wider share
+        const mw = Math.round(width * 0.45);
         const s = Math.min(mw / LIVE_W, OPEN_H / natural);
         card.style.setProperty('--reach', `${reach}px`);
         card.style.setProperty('--mw', `${mw}px`);
@@ -640,6 +641,7 @@ const sets = [
   @media (min-width: 1100px) {
     .fb-card.is-on {
       margin-left: calc(var(--reach, 0px) * -1);
+      grid-template-columns: auto minmax(0, 1fr);
       align-items: start;
       padding: 0.85rem 1.25rem 0.85rem 0.85rem;
       gap: 1.5rem;
@@ -662,7 +664,9 @@ const sets = [
     .fb-card.is-on .fb-headline { font-size: 1.4375rem; line-height: 1.25; }
     .fb-card.is-on .fb-l { display: none; }
     .fb-card.is-on .fb-cs { display: grid; gap: 0.75rem; margin-top: 0.5rem; padding-top: 1rem; border-top: 1px solid var(--rule); }
-    .fb-card.is-on .fb-caret { align-self: start; transform: rotate(180deg); color: var(--accent); background: var(--accent-wash); }
+    /* The chevron moves to the corner, so the words can use the full width beside the graphic */
+    .fb-card.is-on .fb-caret { position: absolute; top: 0.85rem; right: 0.85rem; transform: rotate(180deg); color: var(--accent); background: var(--accent-wash); }
+    .fb-card.is-on .fb-body { padding-right: 1.75rem; }
   }
 
   /* The After builds itself, over and over: costs drop, the cut slices appear, new revenue
