@@ -244,6 +244,9 @@ ${run('hl-lock', 'hl-lock', 'ease-in-out')}
     text-decoration: none;
     cursor: pointer;
     transition: filter 300ms var(--ease), translate 300ms var(--ease);
+    /* Its own layer, so its animation keeps drawing whatever the page around it is doing */
+    will-change: transform;
+    transform: translateZ(0);
   }
   /* It takes you to the breakdown below: on pointing, it brightens and lifts a touch */
   .live:hover { filter: brightness(1.3); translate: 0 -2px; }

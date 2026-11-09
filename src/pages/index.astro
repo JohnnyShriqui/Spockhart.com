@@ -74,8 +74,12 @@ import ClosingCTA from '../components/ClosingCTA.astro';
     inset: 0;
     z-index: 2;
     pointer-events: none;
-    /* The blur itself deepens as the page scrolls, so the hero goes soft rather than fading */
     background: rgb(12 23 36 / calc(var(--frost, 0) * 0.3));
+  }
+  /* The blur itself deepens as the page scrolls, so the hero goes soft rather than fading. It is
+     only switched on once the page has moved: phone browsers stop redrawing what sits under a
+     blur, which froze the moving graphic in the corner while the page was at the top. */
+  .hero.is-frosting .hero-frost {
     -webkit-backdrop-filter: blur(calc(var(--frost, 0) * 24px)) saturate(calc(1 + var(--frost, 0) * 0.15));
     backdrop-filter: blur(calc(var(--frost, 0) * 24px)) saturate(calc(1 + var(--frost, 0) * 0.15));
   }
@@ -98,6 +102,7 @@ import ClosingCTA from '../components/ClosingCTA.astro';
       ticking = false;
       const f = Math.min(1, Math.max(0, window.scrollY / (hero.offsetHeight * 0.75)));
       hero.style.setProperty('--frost', f.toFixed(3));
+      hero.classList.toggle('is-frosting', f > 0.01);
     };
     update();
     window.addEventListener(
