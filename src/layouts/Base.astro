@@ -20,7 +20,8 @@ interface Props {
 const { title, description = site.description, noindex = false, ogType = 'website', schema = [], lightHero = false } = Astro.props;
 const fullTitle = title ? `${title} | ${site.name}` : `${site.name} | ${site.tagline.replace(/\.$/, '')}`;
 const canonical = new URL(Astro.url.pathname, site.url).href;
-const ogImage = new URL('/og.png', site.url).href;
+// A new name whenever the picture changes, so apps that cached the old one fetch it fresh
+const ogImage = new URL('/share.jpg', site.url).href;
 
 const organization = {
   '@context': 'https://schema.org',
