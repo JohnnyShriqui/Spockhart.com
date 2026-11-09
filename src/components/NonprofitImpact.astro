@@ -315,13 +315,14 @@ const charts = [
     .fade { opacity: 1; transition: opacity 1200ms var(--ease) var(--at); }
     .npi-pre .reveal { clip-path: inset(-20px calc(100% + 20px) -20px -20px); transition: clip-path 900ms var(--ease); }
     .npi-pre .fade { opacity: 0; transition: opacity 700ms var(--ease); }
-    /* The first gap: eases in once the lines without us reach the end, holds about three seconds,
-       then fades slowly as ours come in */
-    .gap-then { animation: npi-gap-then 6200ms var(--ease) 3800ms both; }
+    /* The first gap: fades in over two seconds once the lines without us reach the end, holds,
+       then fades out over about three seconds as ours come in. An even, gentle curve on every step
+       so it never pops. */
+    .gap-then { animation: npi-gap-then 7000ms cubic-bezier(0.45, 0, 0.55, 1) 3800ms both; }
     .npi-pre .gap-then { animation: none; opacity: 0; }
     @keyframes npi-gap-then {
       0% { opacity: 0; }
-      19%, 68% { opacity: 1; }
+      28.6%, 60% { opacity: 1; }
       100% { opacity: 0; }
     }
   }
