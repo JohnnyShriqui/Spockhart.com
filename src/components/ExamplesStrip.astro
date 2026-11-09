@@ -1,0 +1,120 @@
+---
+/**
+ * Home, under the section's opening line: everyday work we take on, as cards in the same two
+ * groups (and colours) as the case studies below. A small line icon, the name, and one short line.
+ * Laptops: the two groups side by side, each a 2 x 2 grid. Phones: 2 x 2 grids, names only.
+ */
+const groups = [
+  {
+    key: 'build',
+    title: 'Revenue Development',
+    note: 'Revenue up',
+    items: [
+      { name: 'Quoting and estimating', line: 'Accurate quotes out the door in minutes', icon: 'M7 3h7l4 4v14H7z M14 3v4h4 M10 12h5 M10 16h5' },
+      { name: 'New digital services', line: 'Your expertise, turned into something you sell', icon: 'M12 3l8 4.5-8 4.5-8-4.5z M4 12l8 4.5 8-4.5 M4 16.5l8 4.5 8-4.5' },
+      { name: 'Lead generation', line: 'A steady flow of qualified enquiries', icon: 'M9 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6 M18 8v6 M15 11h6' },
+      { name: 'Customer portals', line: 'Orders, status and documents in one place', icon: 'M3 5h18v14H3z M3 9h18 M6.5 7h.01 M9 7h.01' },
+    ],
+  },
+  {
+    key: 'fix',
+    title: 'Operations Efficiency',
+    note: 'Costs down',
+    items: [
+      { name: 'Invoicing and billing', line: 'Invoices sent and followed up automatically', icon: 'M6 3h12v18l-3-2-3 2-3-2-3 2z M9 8h6 M9 12h6 M9 16h3' },
+      { name: 'Scheduling and dispatch', line: 'The right people in the right place', icon: 'M4 6h16v14H4z M4 10h16 M8 3v5 M16 3v5 M8 14h3' },
+      { name: 'Duplicate data entry', line: 'Entered once, synced across every system', icon: 'M4 8h13l-3-3 M20 16H7l3 3' },
+      { name: 'Reporting and dashboards', line: 'Live numbers instead of month-end spreadsheets', icon: 'M4 20h16 M7 16v-4 M12 16V7 M17 16v-7' },
+    ],
+  },
+];
+---
+
+<div class="ex">
+  {
+    groups.map((g) => (
+      <section class:list={['ex-group', `ex-${g.key}`]} aria-label={g.title}>
+        <p class="ex-head">
+          <span class="ex-title">{g.title}</span>
+          <span class="ex-note">{g.note}</span>
+        </p>
+        <ul class="ex-cards">
+          {g.items.map((it) => (
+            <li class="ex-card">
+              <span class="ex-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d={it.icon} />
+                </svg>
+              </span>
+              <span class="ex-text">
+                <span class="ex-name">{it.name}</span>
+                <span class="ex-line">{it.line}</span>
+              </span>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))
+  }
+</div>
+
+<style>
+  .ex {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: clamp(2rem, 1rem + 2.5vw, 3.5rem);
+    margin-bottom: clamp(3rem, 2rem + 2.5vw, 4.5rem);
+  }
+  .ex-build { --c: var(--hl); --c-rgb: var(--hl-rgb); }
+  .ex-fix { --c: var(--warm); --c-rgb: var(--warm-rgb); }
+  /* The same heads as the case study list: title, a coloured note, a firm rule */
+  .ex-head { display: flex; align-items: baseline; justify-content: space-between; gap: 0.75rem; padding-bottom: 0.45rem; margin-bottom: 0.75rem; border-bottom: 1px solid var(--rule-2); }
+  .ex-title { font-family: var(--font-display); font-size: 1.0625rem; color: var(--ink); }
+  .ex-note { font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; white-space: nowrap; color: var(--c); }
+
+  .ex-cards { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 1fr; gap: 0.6rem; }
+  .ex-card {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0.85rem;
+    align-items: start;
+    padding: 0.95rem 1rem 1rem;
+    border: 1px solid var(--bar-line, rgb(27 42 61 / 0.1));
+    border-radius: var(--radius-lg);
+    background: var(--bar-bg, #fff);
+    box-shadow: var(--bar-shadow, none);
+    overflow: hidden;
+  }
+  /* A fine line in the group's colour along the top of each card */
+  .ex-card::before { content: ''; position: absolute; inset: 0 0 auto; height: 2px; background: var(--c); opacity: 0.85; }
+  .ex-icon {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    background: rgb(var(--c-rgb) / 0.1);
+  }
+  .ex-icon svg { width: 18px; height: 18px; fill: none; stroke: var(--c); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+  .ex-text { display: grid; gap: 0.2rem; min-width: 0; }
+  .ex-name { font-family: var(--font-display); font-size: 1.0625rem; line-height: 1.2; color: var(--ink); }
+  .ex-line { font-size: 0.875rem; line-height: 1.4; color: var(--ink-2); }
+
+  @media (max-width: 1099px) {
+    .ex { grid-template-columns: minmax(0, 1fr); row-gap: 1.75rem; }
+  }
+  /* Smaller laptops: every card the same height in both groups */
+  @media (min-width: 1100px) and (max-width: 1399px) {
+    .ex-card { min-height: 7.25rem; }
+  }
+  /* Phones: 2 x 2 grids of compact cards, the name alone under the coloured line */
+  @media (max-width: 640px) {
+    .ex { row-gap: 1.4rem; margin-bottom: 2.5rem; }
+    .ex-head { margin-bottom: 0.6rem; }
+    .ex-cards { gap: 0.45rem; }
+    .ex-card { grid-template-columns: minmax(0, 1fr); align-items: center; padding: 0.85rem 0.8rem 0.8rem; }
+    .ex-icon, .ex-line { display: none; }
+    .ex-name { font-size: 0.9375rem; line-height: 1.25; }
+  }
+</style>

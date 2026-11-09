@@ -15,6 +15,7 @@
 import { getCollection } from 'astro:content';
 import ResultVisual from './ResultVisual.astro';
 import TypeLine from './TypeLine.astro';
+import ExamplesStrip from './ExamplesStrip.astro';
 import { iconFor, headline } from '../lib/work';
 
 // The client line and headline from each case study on Our Work, shown when one is opened
@@ -82,7 +83,9 @@ const sets = [
 
 <section class="fb" id="results" aria-labelledby="fb-title" data-fb>
   <div class="wrap">
-    <h2 id="fb-title" class="fb-title" data-reveal>Better Operations. New Opportunities.</h2>
+    <h2 id="fb-title" class="fb-title" data-reveal>We work with growing organizations across the GTA looking to improve how they operate and expand what they can do.</h2>
+
+    <ExamplesStrip />
 
     <div class="fb-stage" data-fb-stage>
       <svg class="fb-links" aria-hidden="true" data-fb-links></svg>
@@ -193,7 +196,7 @@ const sets = [
 
       <!-- The case studies, grouped the way they sit on the chart -->
       <div class="fb-cards" data-fb-cards>
-        <div class="fb-eyebrow"><TypeLine text="Our case studies" /></div>
+        <div class="fb-eyebrow"><TypeLine text="What We’ve Built" /></div>
         {
           sets.map((set) => (
             <div class:list={['fb-set', `fb-set-${set.key}`]}>
@@ -1106,5 +1109,13 @@ const sets = [
   /* Smaller laptops: a touch smaller so the lines still fit on one line */
   @media (min-width: 1100px) and (max-width: 1399px) {
     .fb-line { font-size: 0.9375rem; }
+  }
+  /* The section opens with a sentence, not a headline: a little smaller, in a readable width */
+  .fb .fb-title {
+    max-width: 34em;
+    font-size: clamp(1.5rem, 1.1rem + 1.4vw, 2.25rem);
+    line-height: 1.2;
+    text-wrap: balance;
+    margin-bottom: clamp(2rem, 1.25rem + 2vw, 3rem);
   }
 </style>
