@@ -80,7 +80,7 @@ const charts = [chartFor('wide'), chartFor('narrow')];
    studies under the chart instead, as cards like the examples above, each opening its case study */
 const card = (it: Item) => {
   const rest = (it.brief ?? it.rest).replace(/^[,\s]+/, '');
-  return { name: it.value.charAt(0).toUpperCase() + it.value.slice(1), line: rest.charAt(0).toUpperCase() + rest.slice(1), icon: iconFor(it.id), href: `/work/#${it.id}` };
+  return { name: it.value.charAt(0).toUpperCase() + it.value.slice(1), line: rest.charAt(0).toUpperCase() + rest.slice(1), icon: iconFor(it.id), href: `/work/#${it.id}`, rv: it.id };
 };
 const proofGroups = [
   { key: 'build' as const, title: 'Revenue Development', note: 'Revenue up', items: build.map(card) },
@@ -208,10 +208,10 @@ const sets = [
       </figure>
 
       <!-- Phones and tablets: the case studies, as cards under the chart -->
-      <ExamplesStrip class="fb-proof" groups={proofGroups} note="" />
+      <ExamplesStrip class="fb-proof ex-bars" groups={proofGroups} note="" />
 
       <!-- Phones and tablets: the case studies are left out, so the chart points to them -->
-      <a class="fb-more" href="/work/"><span class="fb-more-l">See <mark class="fb-hl">our work</mark> in action</span> <span class="arr" aria-hidden="true">→</span></a>
+      <a class="fb-more" href="/work/"><span class="fb-more-l">See <mark class="fb-hl">full list</mark></span> <span class="arr" aria-hidden="true">→</span></a>
 
       <!-- The case studies, grouped the way they sit on the chart -->
       <div class="fb-cards" data-fb-cards>

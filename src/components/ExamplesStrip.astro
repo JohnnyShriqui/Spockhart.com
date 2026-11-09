@@ -1,4 +1,5 @@
 ---
+import ResultVisual from './ResultVisual.astro';
 /**
  * Home: cards in the same two groups (and colours) as the case studies. A small line icon, a name,
  * and one short line. By default, the everyday work we take on (under the section's opening line),
@@ -11,6 +12,8 @@ interface Item {
   line: string;
   icon: string;
   href?: string;
+  /** A case study: shown with a still of its graphic, like the case study bars on laptops */
+  rv?: string;
 }
 interface Group {
   key: 'build' | 'fix';
@@ -49,7 +52,7 @@ const examples: Group[] = [
 ];
 const {
   groups = examples,
-  note = 'These are a few examples, not the full list. If it slows your team down or holds back growth, we can build for it.',
+  note = 'This list is not comprehensive. If something slows your team down or holds back growth, we can build for it.',
   class: className = '',
 } = Astro.props;
 ---
@@ -68,11 +71,19 @@ const {
             return (
               <li>
                 <Tag class:list={['ex-card', { 'ex-link': it.href }]} href={it.href}>
-                  <span class="ex-icon" aria-hidden="true">
-                    <svg viewBox="0 0 24 24">
-                      <path d={it.icon} />
-                    </svg>
-                  </span>
+                  {it.rv ? (
+                    <div class="ex-thumb" aria-hidden="true">
+                      <div class="ex-thumb-live" data-frozen>
+                        <ResultVisual id={it.rv} />
+                      </div>
+                    </div>
+                  ) : (
+                    <span class="ex-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24">
+                        <path d={it.icon} />
+                      </svg>
+                    </span>
+                  )}
                   <span class="ex-text">
                     <span class="ex-name">{it.name}</span>
                     <span class="ex-line">{it.line}</span>
@@ -114,7 +125,8 @@ const {
     grid-template-columns: auto minmax(0, 1fr);
     gap: 0.9rem;
     align-items: center;
-    padding: 0.95rem 1.05rem 1rem;
+    /* A touch more room on top, to balance the coloured line along the top edge */
+    padding: 1.1rem 1.05rem 0.9rem;
     border: 1px solid var(--bar-line, rgb(27 42 61 / 0.1));
     border-radius: var(--radius-lg);
     background: var(--bar-bg, #fff);
@@ -160,18 +172,41 @@ const {
     .ex { row-gap: 2.25rem; margin-bottom: 3.5rem; }
     .ex-head { margin-bottom: 0.75rem; }
     .ex-cards { grid-template-columns: minmax(0, 1fr); grid-auto-rows: auto; gap: 0.55rem; }
-    .ex-card { padding: 0.85rem 0.95rem 0.9rem; gap: 0.85rem; }
+    .ex-card { padding: 1rem 0.95rem 0.8rem; gap: 0.85rem; }
     .ex-icon { width: 34px; height: 34px; }
     .ex-name { font-size: 1rem; }
     .ex-line { font-size: 0.875rem; }
   }
   /* Small phones: a little smaller, so each card keeps to two lines and they all match */
   @media (max-width: 380px) {
-    .ex-card { gap: 0.7rem; padding: 0.75rem 0.8rem 0.8rem; }
+    .ex-card { gap: 0.7rem; padding: 0.88rem 0.8rem 0.7rem; }
     .ex-icon { width: 30px; height: 30px; }
     .ex-icon svg { width: 16px; height: 16px; }
     .ex-name { font-size: 0.9375rem; }
     .ex-line { font-size: 0.8125rem; }
     .ex-link { gap: 0.6rem; }
+  }
+  /* Case studies (phones): the same bars as the case study list on laptops. A still of the graphic
+     on the left, the result in the display face with the rest a step quieter, a quiet arrow,
+     and no coloured line. */
+  .ex-bars .ex-card::before { display: none; }
+  .ex-bars .ex-card { gap: 0.8rem; padding: 0.55rem 0.9rem 0.55rem 0.55rem; min-height: 5rem; }
+  .ex-bars .ex-link:hover { border-color: rgb(var(--hair) / 0.22); }
+  .ex-thumb { position: relative; width: 64px; height: 40px; border-radius: 4px; overflow: hidden; background: #1f4d6f; }
+  .ex-thumb-live { position: absolute; left: 0; top: 0; width: 640px; transform: scale(0.1); transform-origin: 0 0; pointer-events: none; }
+  .ex-thumb-live :global(.rv-split) { display: none; }
+  .ex-thumb-live :global(.rv) { padding: 14px; gap: 0; }
+  .ex-bars .ex-name { font-size: 1rem; }
+  .ex-bars .ex-line { font-family: var(--font-display); font-size: 0.875rem; line-height: 1.3; color: var(--ink-3); }
+  .ex-bars .ex-arr { color: var(--ink-3); }
+  @media (max-width: 380px) {
+    .ex-bars .ex-card { gap: 0.65rem; padding-right: 0.75rem; min-height: 4.7rem; }
+    .ex-thumb { width: 52px; height: 34px; }
+    .ex-thumb-live { transform: scale(0.08125); }
+    .ex-bars .ex-name { font-size: 0.9375rem; }
+    .ex-bars .ex-line { font-size: 0.8125rem; }
+  }
+  @media (max-width: 340px) {
+    .ex-bars .ex-card { min-height: 5.9rem; }
   }
 </style>
