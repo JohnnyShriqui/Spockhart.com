@@ -5,7 +5,6 @@ import PageHero from '../../components/PageHero.astro';
 import Honeycomb from '../../components/Honeycomb.astro';
 import ResultVisual from '../../components/ResultVisual.astro';
 import ClosingCTA from '../../components/ClosingCTA.astro';
-import Aura from '../../components/Aura.astro';
 import { iconFor, headline, plainTitle as plain } from '../../lib/work';
 
 const all = (await getCollection('work')).sort((a, b) => a.data.order - b.data.order);
@@ -47,7 +46,6 @@ const sectionsOf = (body = '') =>
 
   <!-- The whole page carries on in the hero's deep petrol, not just the opening -->
   <div class="work-dark" data-dark-page>
-  <Aura span={8} />
   <section class="projects" aria-label="Projects" data-projects>
     {
       all.map((entry, i) => {

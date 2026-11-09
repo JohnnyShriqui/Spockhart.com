@@ -1,53 +1,42 @@
 ---
-/**
- * The living light behind every hero: soft patches of light and shadow, each wandering on its
- * own slow path and glowing up and down on its own rhythm. The paths all have different
- * lengths (29 to 53 seconds), so the pattern almost never repeats. Colours come from each
- * page's theme (--mist-1 to --mist-3). Decorative; still with reduced motion.
- */
-const blobs = [
-  { c: 'var(--mist-1)', o: 0.6, w: 62, x: 58, y: -22, d: 37, g: 17, ax: '-14%', ay: '12%', bx: '-4%', by: '22%', as: 1.12, bs: 0.92 },
-  { c: 'var(--mist-2)', o: 0.42, w: 48, x: -12, y: 48, d: 43, g: 23, ax: '16%', ay: '-10%', bx: '8%', by: '-20%', as: 0.9, bs: 1.15 },
-  { c: 'var(--mist-3)', o: 0.38, w: 38, x: 40, y: 30, d: 29, g: 13, ax: '-18%', ay: '-14%', bx: '12%', by: '10%', as: 1.2, bs: 0.95 },
-  { c: 'var(--mist-1)', o: 0.32, w: 44, x: 78, y: 52, d: 53, g: 19, ax: '-10%', ay: '-18%', bx: '-22%', by: '4%', as: 1.08, bs: 1.18 },
-  { c: 'rgb(2 6 14)', o: 0.5, w: 46, x: 10, y: -14, d: 47, g: 21, ax: '22%', ay: '18%', bx: '6%', by: '30%', as: 1.15, bs: 0.9 },
-  { c: 'rgb(2 6 14)', o: 0.4, w: 40, x: 60, y: 70, d: 31, g: 11, ax: '-20%', ay: '-12%', bx: '-30%', by: '-24%', as: 0.92, bs: 1.12 },
-];
+/** The soft ambient shapes from the original site. Decorative; still. */
 ---
 
 <div class="mist" aria-hidden="true">
-  {
-    blobs.map((b) => (
-      <span
-        style={`--c:${b.c};--o:${b.o};width:${b.w}%;left:${b.x}%;top:${b.y}%;--d:${b.d}s;--g:${b.g}s;--ax:${b.ax};--ay:${b.ay};--bx:${b.bx};--by:${b.by};--as:${b.as};--bs:${b.bs}`}
-      />
-    ))
-  }
+  <span class="m1"></span>
+  <span class="m2"></span>
+  <span class="m3"></span>
 </div>
 
 <style>
   .mist { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
-  .mist span {
-    position: absolute;
-    aspect-ratio: 1;
-    border-radius: 50%;
-    background: radial-gradient(circle, var(--c) 0%, transparent 68%);
-    opacity: var(--o);
+  .mist span { position: absolute; border-radius: 50%; }
+  .m1 {
+    width: 640px;
+    height: 640px;
+    top: -26%;
+    right: -14%;
+    background: radial-gradient(circle, var(--mist-1) 0%, transparent 70%);
+    opacity: 0.55;
   }
-  @media (prefers-reduced-motion: no-preference) {
-    .mist span {
-      animation:
-        wander var(--d) ease-in-out infinite,
-        glow var(--g) ease-in-out infinite alternate;
-    }
-    @keyframes wander {
-      0%, 100% { transform: translate(0, 0) scale(1); }
-      33% { transform: translate(var(--ax), var(--ay)) scale(var(--as)); }
-      66% { transform: translate(var(--bx), var(--by)) scale(var(--bs)); }
-    }
-    @keyframes glow {
-      from { opacity: calc(var(--o) * 0.55); }
-      to { opacity: var(--o); }
-    }
+  .m2 {
+    width: 460px;
+    height: 460px;
+    bottom: -30%;
+    left: -12%;
+    background: radial-gradient(circle, var(--mist-2) 0%, transparent 70%);
+    opacity: 0.35;
+  }
+  .m3 {
+    width: 320px;
+    height: 320px;
+    top: 38%;
+    left: 52%;
+    background: radial-gradient(circle, var(--mist-3) 0%, transparent 70%);
+    opacity: 0.3;
+  }
+  @media (max-width: 640px) {
+    .m1 { width: 420px; height: 420px; }
+    .m3 { display: none; }
   }
 </style>
