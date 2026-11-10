@@ -189,49 +189,30 @@ const panels = !Astro.props.groups;
     .ex-link { gap: 0.6rem; }
   }
   /* The everyday examples: one panel per group instead of eight boxes, on the same dark panel as the
-     chart below, in the hero's lightsaber colours: a glowing line along the top (with a slow glint
-     running along it), a soft glow in the corner, glowing icons. Inside, the examples sit in a
-     simple grid with no boxes of their own, divided by fine rules. */
-  .ex-panels .ex-fix { --saber: 255 42 77; --saber-soft: #ff8a9c; }
-  .ex-panels .ex-build { --saber: 63 208 255; --saber-soft: #8fe3ff; }
+     chart below. Restrained, like the chart's own frame: no glow and no motion. Each group's colour
+     is a quiet, muted tone, used only for a short rule by the title, the label and the line icons.
+     Inside, the examples sit in a simple grid with no boxes of their own, divided by fine rules. */
+  .ex-panels .ex-fix { --tone: #d9958f; }
+  .ex-panels .ex-build { --tone: #9cc8ea; }
   .ex-panels .ex-group {
     --ink: #eef3f8;
-    --ink-2: #a9b9c9;
+    --ink-2: #a3b3c4;
     --hair: 255 255 255;
     position: relative;
     padding: clamp(1.35rem, 1rem + 1vw, 1.85rem) clamp(1.35rem, 1rem + 1.2vw, 2.1rem) clamp(0.4rem, 0.25rem + 0.4vw, 0.7rem);
-    border: 1px solid rgb(255 255 255 / 0.06);
+    border: 1px solid rgb(255 255 255 / 0.07);
     border-radius: var(--radius-lg);
-    background:
-      radial-gradient(70% 60% at 0% 0%, rgb(var(--saber) / 0.11), transparent 70%),
-      radial-gradient(60% 70% at 100% 100%, rgb(63 120 170 / 0.12), transparent 70%),
-      linear-gradient(165deg, #0e1c2c 0%, #0a1521 100%);
+    background: linear-gradient(165deg, #0f1d2d 0%, #0a1521 100%);
     box-shadow: 0 24px 48px -30px rgb(4 18 30 / 0.55);
     color: var(--ink);
     overflow: hidden;
   }
-  .ex-panels .ex-group::before {
-    content: '';
-    position: absolute;
-    inset: 0 0 auto;
-    height: 2px;
-    background: linear-gradient(90deg, rgb(var(--saber)) 0 42%, #fff 50%, rgb(var(--saber)) 58% 100%);
-    background-size: 250% 100%;
-    background-position: 100% 0;
-    box-shadow: 0 0 10px 1px rgb(var(--saber) / 0.65), 0 0 26px rgb(var(--saber) / 0.3);
-  }
-  @media (prefers-reduced-motion: no-preference) {
-    .ex-panels .ex-group::before { animation: ex-glint 8s ease-in-out infinite; }
-    .ex-panels .ex-build::before { animation-delay: 4s; }
-  }
-  @keyframes ex-glint {
-    0% { background-position: 100% 0; }
-    45%, 100% { background-position: 0 0; }
-  }
-  .ex-panels .ex-head { margin-bottom: 0; padding-bottom: 0.85rem; border-bottom: 1px solid rgb(255 255 255 / 0.1); }
-  .ex-panels .ex-title { font-size: 1.3125rem; }
-  .ex-panels .ex-note { color: var(--saber-soft); }
-  .ex-panels .ex-icon svg { stroke: rgb(var(--saber)); filter: drop-shadow(0 0 3px rgb(var(--saber) / 0.6)); }
+  .ex-panels .ex-head { margin-bottom: 0; padding-bottom: 0.9rem; border-bottom: 1px solid rgb(255 255 255 / 0.1); }
+  .ex-panels .ex-title { display: inline-flex; align-items: center; gap: 0.7rem; font-size: 1.3125rem; line-height: 1.25; }
+  /* A short rule in the group's tone, like the numbered list on the Nonprofits page */
+  .ex-panels .ex-title::before { content: ''; width: 1.1rem; height: 1.5px; background: var(--tone); flex: none; }
+  .ex-panels .ex-note { color: var(--tone); opacity: 0.9; }
+  .ex-panels .ex-icon svg { stroke: var(--tone); stroke-width: 1.5; opacity: 0.9; }
   .ex-panels .ex-cards { gap: 0 clamp(1.25rem, 0.75rem + 1.5vw, 2.25rem); grid-auto-rows: auto; }
   .ex-panels .ex-card {
     min-height: 0;
@@ -252,6 +233,10 @@ const panels = !Astro.props.groups;
     .ex-panels .ex-cards > li:nth-child(n + 2) .ex-card { border-top: 1px solid rgb(255 255 255 / 0.07); }
     .ex-panels .ex-card { padding: 0.95rem 0; }
     .ex-panels .ex-title { font-size: 1.1875rem; }
+  }
+  /* Phones: no short rule, so the title keeps to one line beside its label */
+  @media (max-width: 480px) {
+    .ex-panels .ex-title::before { display: none; }
   }
   @media (max-width: 380px) {
     .ex-panels .ex-icon svg { width: 18px; height: 18px; }
