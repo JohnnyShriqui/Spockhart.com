@@ -33,6 +33,8 @@ const year = new Date().getFullYear();
   <div class="wrap footer-bottom">
     <p>© {year} {site.legalName}. {site.city}, {site.country}.</p>
     <p class="footer-links">
+      <a href={`mailto:${site.email}`}>{site.email}</a>
+      <a href={site.phoneHref}>{site.phone}</a>
       {site.linkedin && <a href={site.linkedin} rel="me noopener" target="_blank">LinkedIn</a>}
     </p>
   </div>

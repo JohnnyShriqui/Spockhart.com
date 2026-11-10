@@ -14,8 +14,16 @@ import { site } from '../../config/site';
         <p class="lead load-in" style="--i:2">Tell us what your team could accomplish with more time. We reply within {site.offer.replyWithin}.</p>
 
         <div class="load-in contact-direct" style="--i:3">
-          <p class="label">Prefer email?</p>
-          <CopyEmail />
+          <div class="direct-options">
+            <div class="direct-option">
+              <p class="label">Prefer email?</p>
+              <CopyEmail />
+            </div>
+            <div class="direct-option">
+              <p class="label">Prefer to talk?</p>
+              <CopyEmail value={site.phone} href={site.phoneHref} />
+            </div>
+          </div>
           <p class="small muted">{site.city}, {site.country}</p>
         </div>
       </div>
@@ -103,7 +111,10 @@ import { site } from '../../config/site';
   }
   .contact-intro { display: grid; gap: var(--s-5); align-content: start; }
   .contact-intro h1 { font-size: var(--step-5); max-width: 9ch; }
-  .contact-direct { display: grid; gap: var(--s-3); justify-items: start; margin-top: var(--s-4); }
+  .contact-direct { display: grid; gap: var(--s-4); justify-items: start; margin-top: var(--s-4); }
+  /* Email and phone side by side, each with its own label; they stack when there is no room */
+  .direct-options { display: flex; flex-wrap: wrap; gap: var(--s-5) var(--s-6); }
+  .direct-option { display: grid; gap: var(--s-3); justify-items: start; }
   .label { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); }
 
   .contact-form-wrap {

@@ -9,6 +9,9 @@ export const site = {
     'Spockhart is a Toronto engineering firm. We embed with companies and nonprofits, find where operations lose time and money, and build the systems that fix it.',
   url: 'https://spockhart.com',
   email: 'john@spockhart.com',
+  /** Shown on Contact and in the footer; calls go straight to John */
+  phone: '(416) 606-7204',
+  phoneHref: 'tel:+14166067204',
   city: 'Toronto',
   region: 'Ontario',
   country: 'Canada',

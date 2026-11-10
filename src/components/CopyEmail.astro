@@ -1,19 +1,23 @@
 ---
 /**
- * Shows the email address as selectable text with a copy button.
- * The address is always visible, so it works where mailto links do not.
+ * Shows the email address (or, with `value` and `href`, the phone number) as selectable text
+ * with a copy button. It is always visible, so it works where mailto and tel links do not.
  */
 import { site } from '../config/site';
 interface Props {
   onNavy?: boolean;
   class?: string;
+  /** What to show and copy; the email address unless given */
+  value?: string;
+  /** Where tapping it goes; mailto: the email address unless given */
+  href?: string;
 }
-const { onNavy = false, class: className = '' } = Astro.props;
+const { onNavy = false, class: className = '', value = site.email, href = `mailto:${site.email}` } = Astro.props;
 ---
 
 <span class:list={['copy-email', className, { 'on-navy': onNavy }]} data-copy-email>
-  <a class="copy-address" href={`mailto:${site.email}`}>{site.email}</a>
-  <button type="button" class="copy-btn" data-copy={site.email} aria-label={`Copy ${site.email}`}>
+  <a class="copy-address" href={href}>{value}</a>
+  <button type="button" class="copy-btn" data-copy={value} aria-label={`Copy ${value}`}>
     <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" class="ic-copy">
       <rect x="5" y="5" width="8.5" height="8.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.3"></rect>
       <path d="M3.5 10.5h-.5A1.5 1.5 0 0 1 1.5 9V3A1.5 1.5 0 0 1 3 1.5h6A1.5 1.5 0 0 1 10.5 3v.5" fill="none" stroke="currentColor" stroke-width="1.3"></path>
