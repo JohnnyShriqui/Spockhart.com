@@ -255,21 +255,28 @@ const spans = [
   initScenes();
   document.addEventListener('spockhart:view', initScenes);
 
-  // The first time someone reaches a set of phases, they appear one at a time, 1 to 4. After
-  // that they are simply there, on this visit and every later one (remembered in this browser).
+  // The first time someone reaches a set of phases on a visit, they appear one at a time, 1 to 4.
+  // For the rest of that visit (reloads included) they are simply there; a new visit, in a new
+  // tab or after the browser is closed, plays it again.
   const seenKey = (track: string) => `spockhart:phases-seen:${track}`;
   const seen = (track: string) => {
     try {
-      return localStorage.getItem(seenKey(track)) === '1';
+      // The old "seen forever" flag is no longer used
+      localStorage.removeItem(seenKey(track));
+    } catch {
+      /* storage blocked */
+    }
+    try {
+      return sessionStorage.getItem(seenKey(track)) === '1';
     } catch {
       return false;
     }
   };
   const remember = (track: string) => {
     try {
-      localStorage.setItem(seenKey(track), '1');
+      sessionStorage.setItem(seenKey(track), '1');
     } catch {
-      /* private window: they will simply appear again next time */
+      /* private window or storage blocked: they will simply appear again next time */
     }
   };
   function revealPhases() {
