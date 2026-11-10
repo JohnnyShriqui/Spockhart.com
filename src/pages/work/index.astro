@@ -46,8 +46,9 @@ const sectionsOf = (body = '') =>
     class="work-hero"
     theme="work"
     title="Our team’s experience."
-    lead="Spockhart is a new firm built on years of experience. Our team has transformed operations and built technology at some of North America’s largest organizations, with the examples below drawn from previous roles."
+    lead="Spockhart is a new firm built on years of experience. Our team has transformed operations and built technology at some of North America’s largest organizations."
   >
+    <p class="work-note"><strong>Please note:</strong> these are not Spockhart projects. Each one was delivered by a member of our team in a previous role, and client names are withheld.</p>
     <Honeycomb slot="figure" />
   </PageHero>
 
@@ -224,6 +225,17 @@ const sectionsOf = (body = '') =>
     background: linear-gradient(180deg, #0c1f28 0%, #0b1c25 50%, #0a1922 100%);
   }
   .work-dark :global(.closing) { border-top: 0; }
+
+  /* The hero's disclaimer: plain, set apart by a fine rule, a step quieter than the lead */
+  .work-note {
+    max-width: 52ch;
+    padding-left: 0.95rem;
+    border-left: 2px solid var(--accent-soft);
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    color: var(--ink-2);
+  }
+  .work-note strong { font-weight: 600; color: var(--ink); }
 
   .project {
     --glow: rgb(26 104 118 / 0.46);
