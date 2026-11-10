@@ -56,10 +56,11 @@ import { site } from '../config/site';
   /* The two tracks run on one band, one straight after the other */
   .engagement-fix { padding-bottom: var(--s-10); }
   .engagement-grow { padding-top: 0; }
-  /* Phones: the bar sits right under the title; the phases run to the bottom of the section */
+  /* Phones: the bar sits right under the title; the phases run to the bottom of the section, with
+     clear room before the second track begins */
   @media (max-width: 640px) {
     .engagement { padding-bottom: 0; }
-    .engagement-grow { padding-top: var(--s-4); }
+    .engagement-grow { padding-top: 4.5rem; }
     .engagement .section-head { margin-bottom: 0.25rem; }
   }
 </style>
