@@ -98,9 +98,13 @@ const sets = [
     <h2 id="fb-title" class="fb-title" data-reveal>We work within industrial and construction companies to improve cost efficiency and expand operations.</h2>
 
     <ExamplesStrip />
+  </div>
 
-    <!-- Then our own results: the same size as the opening line, so it reads as a second part.
-         Laptops show it above the case studies; phones, which leave the list out, above the chart. -->
+  <!-- Then our own results, on a slightly deeper tone so the two parts read as two sections. The
+       heading is the same size as the opening line. Laptops show it above the case studies; phones,
+       which leave the list out, above the chart. -->
+  <div class="fb-band">
+  <div class="wrap">
     <h3 class="fb-built fb-built-narrow" data-reveal>What We’ve Built So Far</h3>
 
     <div class="fb-stage" data-fb-stage>
@@ -277,6 +281,7 @@ const sets = [
         }
       </div>
     </div>
+  </div>
   </div>
 </section>
 
@@ -1097,6 +1102,10 @@ const sets = [
        the bars is even (the left side also holds the Old margin note) */
     .fb-chart { margin-right: -3rem; padding-right: 4.25rem; }
     .fb-win-bar { margin-right: -3rem; }
+    /* The two example panels above sit on the same columns as the chart and the case studies, so
+       their edges line up with the chart's and the list's */
+    .fb :global(.ex-panels) { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1fr); column-gap: clamp(4.25rem, 2.25rem + 4vw, 5.75rem); }
+    .fb :global(.ex-panels > .ex-group:first-child) { margin-right: -3rem; }
     .fb-svg-narrow { display: none; }
     .fb-svg-wide { flex: none; width: 100%; padding: 0; }
     .fb-axis-label { font-size: 10.5px; letter-spacing: 0.14em; }
@@ -1149,5 +1158,19 @@ const sets = [
   }
   @media (max-width: 1099px) {
     .fb :global(.fb-proof) { margin: 0.5rem 0 0; }
+  }
+
+  /* Two sections, told apart by a slight change of ground (as the sections on Our Work and
+     Nonprofits once alternated): the work we take on sits on the page's own light ground, and
+     what we've built on a slightly deeper tone that runs the full width of the page. */
+  .fb { padding-bottom: 0; }
+  .fb :global(.ex) { margin-bottom: clamp(3.25rem, 2.25rem + 2.5vw, 4.75rem); }
+  .fb-band {
+    background: var(--paper-2);
+    padding-block: clamp(3.5rem, 2.25rem + 3vw, 5.25rem);
+  }
+  @media (max-width: 1099px) {
+    .fb :global(.ex) { margin-bottom: 3rem; }
+    .fb-band { padding-block: 3rem 3.5rem; }
   }
 </style>

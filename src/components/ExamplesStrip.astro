@@ -234,6 +234,26 @@ const panels = !Astro.props.groups;
     .ex-panels .ex-card { padding: 0.95rem 0; }
     .ex-panels .ex-title { font-size: 1.1875rem; }
   }
+  /* Laptops: on the home page the panels sit on the same columns as the chart and case studies
+     below them (set in FixBuild), so the left one is a little narrower. The examples are a step
+     smaller and a little closer together, so each one keeps to one line. */
+  @media (min-width: 1100px) {
+    .ex-panels .ex-group { padding-inline: 1.6rem; }
+    .ex-panels .ex-cards { column-gap: 1.5rem; }
+    .ex-panels .ex-card { gap: 0.7rem; }
+    .ex-panels .ex-name { font-size: 0.9375rem; }
+    .ex-panels .ex-line { font-size: 0.84375rem; }
+    .ex-panels .ex-icon svg { width: 18px; height: 18px; }
+  }
+  @media (min-width: 1440px) {
+    .ex-panels .ex-group { padding-inline: 1.85rem; }
+    .ex-panels .ex-cards { column-gap: 2rem; }
+  }
+  /* Small laptops: one example per row, so none of them wraps */
+  @media (min-width: 1100px) and (max-width: 1279px) {
+    .ex-panels .ex-cards { grid-template-columns: minmax(0, 1fr); }
+    .ex-panels .ex-cards > li:nth-child(n + 2) .ex-card { border-top: 1px solid rgb(255 255 255 / 0.07); }
+  }
   /* Phones: no short rule, so the title keeps to one line beside its label */
   @media (max-width: 480px) {
     .ex-panels .ex-title::before { display: none; }
