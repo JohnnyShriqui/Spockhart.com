@@ -3,7 +3,10 @@
  * Approach, below the hero: a fine line runs down the left margin out of the dark hero, like a
  * circuit, drawn to fit the layout, and runs the whole way down to the footer. It feeds each set of
  * steps through a line that drops into the top of every card.
- * A light grid of dots sits behind it all. Still, decorative, behind the content.
+ * A light grid of dots sits behind it all. Decorative, behind the content.
+ * The first time a set of steps comes into view on a visit, its line draws itself: across from the
+ * left line, dropping into each card as it reaches it, and each card rises as its line lands
+ * (the cards' timing is in Timeline.astro).
  */
 ---
 
@@ -13,6 +16,14 @@
 
 <script>
   const NS = 'http://www.w3.org/2000/svg';
+  // Drawing schedule, in ms from when a set starts showing. The line reaches card k at
+  // LEAD + k * STEP, then drops into it over DROP. Timeline.astro starts card k at
+  // LEAD + k * STEP + 120, so it rises as the line lands.
+  const LEAD = 250;
+  const STEP = 450;
+  const DROP = 220;
+  const TOTAL = LEAD + 3 * STEP + DROP + 400;
+
   const el = (name: string, attrs: Record<string, string | number>) => {
     const n = document.createElementNS(NS, name);
     for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, String(v));
@@ -43,12 +54,22 @@
         return { cx: X(left + card.offsetWidth / 2), top: Y(lr.top + card.offsetTop - list.offsetTop), bottom: Y(lr.top + card.offsetTop - list.offsetTop + card.offsetHeight) };
       });
       const head = section.querySelector<HTMLElement>('.section-head')!.getBoundingClientRect();
-      return { cards, left: X(lr.left), right: X(lr.right), headBottom: Y(head.bottom) };
+      return { list, cards, left: X(lr.left), right: X(lr.right), headBottom: Y(head.bottom) };
     });
     if (!sets.length) return;
 
-    const path = (d: string, cls: string) => g.append(el('path', { d, class: cls }));
-    const node = (x: number, y: number, cls = 'tr-node', r = 3.2) => g.append(el('circle', { cx: x, cy: y, r, class: cls }));
+    const path = (d: string, cls: string, to: Element = g) => {
+      const n = el('path', { d, class: cls, pathLength: 1 });
+      to.append(n);
+      return n;
+    };
+    const node = (x: number, y: number, cls = 'tr-node', r = 3.2, to: Element = g) => {
+      const n = el('circle', { cx: x, cy: y, r, class: cls });
+      to.append(n);
+      return n;
+    };
+    const time = (n: Element, delay: number, dur: number, elapsed: number) =>
+      n.setAttribute('style', `animation-delay:${(delay - elapsed).toFixed(0)}ms;animation-duration:${dur}ms`);
 
     // The left spine: down from the hero to the line that feeds the last set of steps
     const sx = Math.max(16, sets[0].left - 46);
@@ -58,15 +79,32 @@
     // Each set of steps is fed from the spine: a line branches off just above the cards and drops
     // into the top of each one
     sets.forEach((s) => {
-      const lastX = s.cards[s.cards.length - 1].cx;
       // Halfway between the heading and the cards, so it has room on both sides
       const inY = +((s.headBottom + s.cards[0].top) / 2).toFixed(1);
-      path(`M${sx} ${inY} H${lastX}`, 'tr-bus');
-      node(sx, inY, 'tr-node', 3.4);
-      s.cards.forEach((c) => {
-        path(`M${c.cx} ${inY} V${c.top}`, 'tr-stub');
-        node(c.cx, c.top, 'tr-dot', 3);
+      // Waiting to be reached: nothing yet. Just reached: draw it. Otherwise it is simply there.
+      const waiting = s.list.classList.contains('is-waiting');
+      const showAt = Number(s.list.dataset.showAt || 0);
+      const elapsed = showAt ? performance.now() - showAt : Infinity;
+      const drawing = !waiting && s.list.classList.contains('is-showing') && elapsed < TOTAL;
+      const set = el('g', { class: `tr-set${waiting ? ' is-waiting' : drawing ? ' is-drawing' : ''}` });
+      g.append(set);
+      // The line runs across in pieces, card to card, so it can turn down into each as it passes
+      let fromX = sx;
+      s.cards.forEach((c, k) => {
+        const reach = LEAD + k * STEP;
+        const bus = path(`M${fromX} ${inY} H${c.cx}`, 'tr-bus', set);
+        const stub = path(`M${c.cx} ${inY} V${c.top}`, 'tr-stub', set);
+        const dot = node(c.cx, c.top, 'tr-dot', 3, set);
+        if (drawing) {
+          const start = k === 0 ? 0 : LEAD + (k - 1) * STEP;
+          time(bus, start, reach - start, elapsed);
+          time(stub, reach, DROP, elapsed);
+          time(dot, reach + DROP - 30, 320, elapsed);
+        }
+        fromX = c.cx;
       });
+      // Where the line leaves the left line: always there
+      node(sx, inY, 'tr-node', 3.4);
     });
   }
 
@@ -81,6 +119,11 @@
     };
     drawTraces();
     document.fonts?.ready.then(soon);
+    // Redraw when a set of steps starts waiting or showing
+    if ('MutationObserver' in window) {
+      const mo = new MutationObserver(soon);
+      document.querySelectorAll('[data-phases]').forEach((list) => mo.observe(list, { attributes: true, attributeFilter: ['class'] }));
+    }
     if ('ResizeObserver' in window) new ResizeObserver(soon).observe(host);
     window.addEventListener('resize', soon, { passive: true });
   }
@@ -115,4 +158,29 @@
   .traces :global(path) { fill: none; stroke: var(--tr-line); stroke-width: 1.6; stroke-linecap: round; }
   .traces :global(.tr-node) { fill: var(--tr-ground); stroke: var(--tr-line); stroke-width: 1.6; }
   .traces :global(.tr-dot) { fill: var(--tr-line); }
+  /* Drawing in: each piece of line runs from its start to its end, then the dot lands */
+  .traces :global(.tr-set.is-waiting) { opacity: 0; }
+  .traces :global(.is-drawing path) {
+    stroke-dasharray: 1;
+    animation-name: tr-draw;
+    animation-timing-function: linear;
+    animation-fill-mode: both;
+  }
+  .traces :global(.is-drawing .tr-stub) { animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1); }
+  .traces :global(.is-drawing .tr-dot) {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation-name: tr-land;
+    animation-timing-function: cubic-bezier(0.3, 1.5, 0.5, 1);
+    animation-fill-mode: both;
+  }
+  @keyframes tr-draw {
+    0% { stroke-dashoffset: 1; opacity: 0; }
+    1% { opacity: 1; }
+    100% { stroke-dashoffset: 0; opacity: 1; }
+  }
+  @keyframes tr-land {
+    from { transform: scale(0); }
+    to { transform: scale(1); }
+  }
 </style>

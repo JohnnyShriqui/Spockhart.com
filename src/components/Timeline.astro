@@ -183,7 +183,12 @@ const spans = [
   .phases.is-waiting .phase { opacity: 0; transform: translateY(28px); }
   .phases.is-showing .phase {
     animation: phase-in 900ms var(--ease-out) both;
-    animation-delay: calc(var(--n) * 450ms);
+    animation-delay: calc(var(--lead, 0ms) + var(--n) * 450ms);
+  }
+  /* Laptops: the line from the left draws across and drops into each card first (Traces.astro),
+     so each card rises just as its line lands */
+  @media (min-width: 901px) {
+    .phases { --lead: 370ms; }
   }
   @keyframes phase-in {
     from { opacity: 0; transform: translateY(28px); }
@@ -292,6 +297,8 @@ const spans = [
           if (!entries.some((e) => e.isIntersecting)) return;
           io.disconnect();
           remember(track);
+          // The line above (Traces.astro) times its drawing from this moment
+          list.dataset.showAt = String(performance.now());
           list.classList.add('is-showing');
           list.classList.remove('is-waiting');
         },
