@@ -14,7 +14,7 @@ const work = defineCollection({
     sector: z.string(),
     scope: z.string(),
     kind: z.enum(['team-experience', 'spockhart']).default('team-experience'),
-    /** 'in-development' work is listed separately and labelled as current. */
+    /** 'in-development': the project itself is still being built (by the client), and is labelled that way. */
     status: z.enum(['complete', 'in-development']).default('complete'),
     metrics: z.array(z.object({ value: z.string(), label: z.string() })).min(1).max(4),
     order: z.number(),
