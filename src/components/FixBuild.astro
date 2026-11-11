@@ -457,14 +457,13 @@ const sets = [
         if (wide.matches) {
           // The chart is exactly as tall as the list of case studies with all of them closed,
           // and stays that size
-          // The panel starts level with the note under the heading and ends just under the
-          // Before and After labels; it keeps that size while case studies open and close
+          // The panel runs exactly as tall as the column beside it, from the heading to the
+          // See all work link; it keeps that size while case studies open and close
           if (!open) {
-            chartFig.style.removeProperty('height');
-            chartFig.style.marginTop = '0px';
-            const note = root.querySelector<HTMLElement>('.fb-built-note.fb-built-wide');
-            const lift = note ? note.getBoundingClientRect().top - chartFig.getBoundingClientRect().top : 0;
-            chartFig.style.marginTop = `${Math.max(0, lift).toFixed(1)}px`;
+            const cs = getComputedStyle(chartFig);
+            const pad = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
+            chartFig.style.removeProperty('margin-top');
+            chartFig.style.height = `${(cardsBox.offsetHeight - pad).toFixed(1)}px`;
             centre();
           }
         } else {
