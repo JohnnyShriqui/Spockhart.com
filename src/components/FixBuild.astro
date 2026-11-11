@@ -237,7 +237,7 @@ const sets = [
                         </div>
                       </div>
                       <div class="fb-body">
-                        <span class="fb-note">Our Work</span>
+                        <span class="fb-note"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 8a5.5 5.5 0 1 0 1.6-3.9 M2.4 2.6v2.6H5 M8 5.2V8l2 1.3" /></svg>Team project at a previous employer</span>
                         <span class="fb-text">
                           <span class="fb-line"><span class="fb-v">{it.value}</span><span class="fb-l">{it.rest}</span></span>
                         </span>
@@ -251,7 +251,7 @@ const sets = [
                     <div class="fb-panel" id={`fb-panel-${it.k}`} data-panel>
                       <div class="fb-panel-inner">
                         <div class="fb-panel-body">
-                          <span class="fb-pnote">Our Work</span>
+                          <span class="fb-pnote"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 8a5.5 5.5 0 1 0 1.6-3.9 M2.4 2.6v2.6H5 M8 5.2V8l2 1.3" /></svg>Team project at a previous employer</span>
                           <div class="fb-cs">
                             <p class="fb-client">
                               <span class="fb-client-mark" aria-hidden="true">
@@ -706,21 +706,25 @@ const sets = [
   }
   .fb-card-build .fb-key { background: var(--accent); }
   .fb-card-fix .fb-key { background: #a04f48; }
-  /* Opened (and on phones) the letter gives way to a note that this is our team's own work */
-  .fb-note {
-    display: none;
-    justify-self: start;
-    padding: 0.28rem 0.6rem;
+  /* Opened (and on phones) the letter gives way to a note that this was a team project at a
+     previous employer, the same marker as on Our Work */
+  .fb-note, .fb-pnote {
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.3rem 0.75rem 0.3rem 0.6rem;
+    border: 1px solid rgb(var(--hair, 27 42 61) / 0.16);
     border-radius: 999px;
-    font-size: 0.6875rem;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    line-height: 1.2;
+    background: rgb(var(--hair, 27 42 61) / 0.03);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    line-height: 1.3;
+    color: var(--ink-2);
     white-space: nowrap;
   }
-  .fb-card-build .fb-note { color: var(--accent); background: var(--accent-wash); }
-  .fb-card-fix .fb-note { color: #a04f48; background: rgb(160 79 72 / 0.1); }
+  .fb-note { display: none; justify-self: start; }
+  .fb-pnote { display: inline-flex; }
+  .fb-note svg, .fb-pnote svg { width: 14px; height: 14px; flex: none; fill: none; stroke: var(--accent); stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; }
+  .fb-card-fix .fb-note svg, .fb-card-fix .fb-pnote svg { stroke: #a04f48; }
   .fb-text { display: grid; gap: 0.1rem; min-width: 0; }
   .fb-v { font-family: var(--font-display); font-size: 1.125rem; line-height: 1.15; color: var(--ink); font-variant-numeric: lining-nums; }
   /* A chevron says there is more to see; it turns when the case study opens */
@@ -764,17 +768,6 @@ const sets = [
   .fb-card.is-open .fb-panel { grid-template-rows: 1fr; }
   .fb-panel-inner { min-height: 0; overflow: hidden; }
   .fb-panel-body { display: grid; gap: 0.8rem; justify-items: start; padding: 0.95rem 1rem 1rem; border-top: 1px solid var(--rule); text-align: left; }
-  .fb-pnote {
-    padding: 0.28rem 0.6rem;
-    border-radius: 999px;
-    font-size: 0.6875rem;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    line-height: 1.2;
-  }
-  .fb-card-build .fb-pnote { color: var(--accent); background: var(--accent-wash); }
-  .fb-card-fix .fb-pnote { color: #a04f48; background: rgb(160 79 72 / 0.1); }
   .fb-cs { display: grid; gap: 0.5rem; }
   .fb-graphic { position: relative; width: 100%; overflow: hidden; border-radius: var(--radius-lg); }
   .fb-graphic-live { position: absolute; left: 0; top: 0; width: 640px; transform: scale(var(--gs, 0.8)); transform-origin: 0 0; }
@@ -834,7 +827,7 @@ const sets = [
     .fb-head { cursor: default; }
     .fb-body { order: 1; align-items: start; grid-template-columns: minmax(0, 1fr); gap: 0.5rem; }
     .fb-key { display: none; }
-    .fb-note { display: block; }
+    .fb-note { display: inline-flex; }
     .fb-text { gap: 0; }
     .fb-v { font-size: 1.0625rem; }
     .fb-cs { order: 2; gap: 0.35rem; margin-top: 0.4rem; padding-top: 0.5rem; border-top: 1px solid var(--rule); }
@@ -935,8 +928,8 @@ const sets = [
   .fb-head:hover { background: rgb(var(--hair) / 0.035); }
   .fb-head:hover .fb-caret, .fb-card.is-open .fb-caret { color: var(--hl); }
   .fb-panel-body { border-top-color: rgb(var(--hair) / 0.1); }
-  .fb-card-build .fb-pnote { color: var(--hl); background: rgb(var(--hl-rgb) / 0.12); }
-  .fb-card-fix .fb-pnote { color: var(--warm); background: rgb(var(--warm-rgb) / 0.12); }
+  .fb-card-build .fb-pnote svg { stroke: var(--hl); }
+  .fb-card-fix .fb-pnote svg { stroke: var(--warm); }
   .fb-client { color: var(--ink); }
   .fb-client-mark::before { background: var(--ink); }
   .fb-client-mark svg { stroke: var(--on-ink); }
