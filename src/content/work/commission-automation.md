@@ -5,7 +5,7 @@ client: 'A $1.2B Global Manufacturer'
 sector: Sales & financial operations
 scope: Commission platform design and build
 status: in-development
-order: 6
+order: 4
 metrics:
   - value: $1.2B
     label: Annual client revenue

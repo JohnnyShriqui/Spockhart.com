@@ -4,7 +4,7 @@ summary: We implemented a centralized performance tracking system that gave a 16
 client: 'A Multi-$M Sales Organization'
 sector: Sales operations
 scope: Sales operations and performance tracking
-order: 5
+order: 2
 metrics:
   - value: 16 representatives
     label: Tracked through one centralized performance system

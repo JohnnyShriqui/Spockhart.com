@@ -4,7 +4,7 @@ summary: We delivered a working engineering prototype of a momentum-exchange sys
 client: 'A Leading North American Aerospace & Engineering Company'
 sector: Advanced engineering
 scope: Prototype design, testing and validation
-order: 7
+order: 6
 metrics:
   - value: 83% more cargo
     label: Potential payload capacity improvement per trip

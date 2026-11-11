@@ -4,7 +4,7 @@ summary: We digitized a division's expertise to open up a $1B+ market and create
 client: 'A National General Contractor'
 sector: Business development
 scope: Lead-generation platform
-order: 3
+order: 5
 metrics:
   - value: $1B+ market
     label: Opened up through one digital service
