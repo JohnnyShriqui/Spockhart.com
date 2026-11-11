@@ -6,8 +6,16 @@
  * originals dim; then the copy is improved, costs (red) cut a slice at a time and new revenue
  * (blue) flickering in a slice at a time, until the new margin locks in. It holds, and runs again.
  * Below, the same chart is broken down case study by case study.
- * Decorative; still on its finished frame with reduced motion; hidden on small screens.
+ * Decorative; still on its finished frame with reduced motion.
+ * `inline`: sits in the page's flow at a larger size (the Our Work hero) rather than in the corner,
+ * and links nowhere unless given an `href`.
  */
+interface Props {
+  inline?: boolean;
+  href?: string;
+}
+const { inline = false, href = inline ? undefined : '#results' } = Astro.props;
+const Tag = href ? 'a' : 'div';
 const VB_W = 560;
 const VB_H = 440;
 const BASE = 410;
@@ -181,7 +189,12 @@ ${run('hl-lock', 'hl-lock', 'ease-in-out')}
 </style>`;
 ---
 
-<a class="live" href="#results" aria-label="Revenue vs costs: see how, case study by case study">
+<Tag
+  class:list={['live', { 'live-inline': inline }]}
+  href={href}
+  role={href ? undefined : 'img'}
+  aria-label={href ? 'Revenue vs costs: see how, case study by case study' : 'Revenue vs costs: costs cut and new revenue added'}
+>
   <span class="live-cap" aria-hidden="true">
     <span class="live-status hl-status"></span>
     Revenue vs costs<span class="live-caret"></span>
@@ -225,7 +238,7 @@ ${run('hl-lock', 'hl-lock', 'ease-in-out')}
       <path d="M0 0 L0 34 L9 26 L15 40 L21 37 L15 24 L27 24 Z" class="hl-arrow" />
     </g>
   </svg>
-</a>
+</Tag>
 
 <Fragment set:html={style} />
 
@@ -266,6 +279,11 @@ ${run('hl-lock', 'hl-lock', 'ease-in-out')}
   .live-status { width: 4px; height: 4px; border-radius: 50%; background: var(--blue); box-shadow: 0 0 6px var(--blue); }
   .live-caret { width: 0.5em; height: 1.05em; margin-left: 0.1em; background: var(--blue); box-shadow: 0 0 6px var(--blue); opacity: 0.85; }
   .live-svg { display: block; width: 100%; height: auto; margin-top: 0.6rem; overflow: visible; }
+  /* In the page's flow, larger: the Our Work hero */
+  .live-inline { position: relative; right: auto; bottom: auto; width: 100%; max-width: 440px; margin-left: auto; cursor: default; }
+  .live-inline:hover { filter: none; translate: none; }
+  .live-inline .live-cap { font-size: 0.6875rem; padding-bottom: 0.65rem; }
+  .live-inline .live-svg { margin-top: 1rem; }
 
   .hl-grid { stroke: rgb(63 208 255 / 0.06); stroke-width: 1; }
   .hl-axis { stroke: rgb(63 208 255 / 0.3); stroke-width: 1.5; }
