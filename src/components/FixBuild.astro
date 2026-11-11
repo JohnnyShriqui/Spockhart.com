@@ -39,8 +39,8 @@ const build: Item[] = [
 const fix: Item[] = [
   { k: '1', id: 'commission-automation', value: '80% less time', rest: ' processing commissions for a $1.2B manufacturer', brief: 'Commissions at a $1.2B manufacturer' },
   { k: '2', id: 'project-feasibility-platform', value: '12 months → minutes', rest: ', eliminating $100K+ assessment costs' },
-  { k: '3', id: 'momentum-exchange-prototype', value: '83% greater fuel efficiency', rest: ' with a new momentum-transfer system' },
-  { k: '4', id: 'subcontractor-financing-marketplace', value: '6+ months → weeks', rest: ' for subcontractor financing approvals' },
+  { k: '3', id: 'subcontractor-financing-marketplace', value: '6+ months → weeks', rest: ' for subcontractor financing approvals' },
+  { k: '4', id: 'momentum-exchange-prototype', value: '83% greater fuel efficiency', rest: ' with a new momentum-transfer system' },
 ];
 
 /* Chart geometry. The same chart is drawn twice: tall beside the list of case studies on laptops
@@ -123,7 +123,7 @@ const sets = [
                 data-fb-svg={c.key}
                 data-crop={c.key === 'wide' ? c.crop : undefined}
                 aria-hidden="true"
-                preserveAspectRatio="xMidYMid meet"
+                preserveAspectRatio={c.key === 'wide' ? 'xMidYMax meet' : 'xMidYMid meet'}
               >
                 <defs>
                   <pattern id={`fb-hatch-${c.key}`} width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
@@ -132,6 +132,7 @@ const sets = [
                 </defs>
 
                 {c.grid.map((y) => <line x1="24" x2={c.x2} y1={y} y2={y} class="fb-grid" />)}
+                {c.key === 'wide' && <g data-fb-grid-more data-top={Math.min(...c.grid)} data-step={c.grid[0] - c.grid[1]} data-x2={c.x2} />}
                 <line x1="24" x2={c.x2} y1={c.BASE} y2={c.BASE} class="fb-axis" />
                 <line x1="280" x2="280" y1={c.newTop - 12} y2={c.BASE + c.grp - 4} class="fb-divider" />
 
@@ -399,7 +400,27 @@ const sets = [
         const r = headOf(card).getBoundingClientRect();
         const drop = Math.max(0, r.top + r.height / 2 - sliceMid(card.dataset.card!) + 30);
         chart.style.marginTop = `${(top + drop).toFixed(1)}px`;
+        gridUp();
         return drop;
+      };
+      // The background lines carry on up the panel, to just under its caption
+      const gridUp = () => {
+        const more = chart.querySelector<SVGGElement>('[data-fb-grid-more]');
+        const bar = chartFig.querySelector<HTMLElement>('.fb-win-bar');
+        const m = chart.getScreenCTM();
+        if (!more || !bar || !m) return;
+        more.replaceChildren();
+        // Copies of a drawn line, so they keep its styling
+        const model = chart.querySelector<SVGLineElement>('.fb-grid');
+        if (!model) return;
+        const limit = (bar.getBoundingClientRect().bottom + 16 - m.f) / m.d;
+        const step = Number(more.dataset.step);
+        for (let y = Number(more.dataset.top) - step; y >= limit; y -= step) {
+          const line = model.cloneNode() as SVGLineElement;
+          line.setAttribute('y1', y.toFixed(1));
+          line.setAttribute('y2', y.toFixed(1));
+          more.append(line);
+        }
       };
 
       /* ---------- Thumbnails: each graphic, scaled down to a still frame ---------- */
@@ -436,14 +457,19 @@ const sets = [
         if (wide.matches) {
           // The chart is exactly as tall as the list of case studies with all of them closed,
           // and stays that size
+          // The panel starts level with the note under the heading and ends just under the
+          // Before and After labels; it keeps that size while case studies open and close
           if (!open) {
-            chartFig.style.height = `${cardsBox.offsetHeight}px`;
-            const drop = centre();
-            // The chart now reaches a little below the last case study; the section makes room
-            if (drop) chartFig.style.height = `${(cardsBox.offsetHeight + drop).toFixed(1)}px`;
+            chartFig.style.removeProperty('height');
+            chartFig.style.marginTop = '0px';
+            const note = root.querySelector<HTMLElement>('.fb-built-note.fb-built-wide');
+            const lift = note ? note.getBoundingClientRect().top - chartFig.getBoundingClientRect().top : 0;
+            chartFig.style.marginTop = `${Math.max(0, lift).toFixed(1)}px`;
+            centre();
           }
         } else {
           chartFig.style.removeProperty('height');
+          chartFig.style.removeProperty('margin-top');
           centre();
         }
       };
@@ -1116,7 +1142,7 @@ const sets = [
     .fb-stage { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1fr); column-gap: clamp(4.25rem, 2.25rem + 4vw, 5.75rem); }
     /* The dark panel reaches a little further right than the drawing, so the space either side of
        the bars is even (the left side also holds the Old margin note) */
-    .fb-chart { margin-right: -3rem; padding-right: 4.25rem; }
+    .fb-chart { align-self: start; margin-right: -3rem; padding-right: 4.25rem; }
     .fb-win-bar { margin-right: -3rem; }
     /* The two example panels above sit on the same columns as the chart and the case studies, so
        their edges line up with the chart's and the list's */
