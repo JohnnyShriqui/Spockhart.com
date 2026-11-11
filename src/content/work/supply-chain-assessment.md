@@ -1,6 +1,6 @@
 ---
-title: 'We Mapped a [Global Supplier Network], Scored It Against [Industry 4.0] and Ranked It Into One Roadmap.'
-summary: We mapped supplier processes across a global network, assessed them against Industry 4.0 best practice, and built a weighted scoring platform that set the next year's improvement priorities.
+title: 'A [Global Supplier Network], Mapped, Scored Against [Industry 4.0] and Ranked Into One Roadmap.'
+summary: Supplier processes across a global network, mapped, assessed against Industry 4.0 best practice and ranked in a weighted scoring platform that set the next year's improvement priorities.
 client: 'A Global Telecommunications Equipment Company'
 sector: Supply chain & Industry 4.0
 scope: Process mapping and assessment platform
@@ -18,9 +18,9 @@ metrics:
 
 A global telecommunications equipment company needed a clear, comparable picture of how its suppliers' processes performed against modern manufacturing standards, so it could decide where to focus improvement.
 
-## What we did
+## What the team did
 
-We built a structured assessment of the whole supplier network.
+The team built a structured assessment of the whole supplier network.
 
 - Mapped supplier processes across the global network
 - Assessed each against Industry 4.0 best practice

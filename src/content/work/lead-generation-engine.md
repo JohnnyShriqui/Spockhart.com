@@ -1,6 +1,6 @@
 ---
-title: 'We Digitized a Division’s Expertise to Open Up a [$1B+ Market] and Create a New [Lead-Generation Engine].'
-summary: We digitized a division's expertise to open up a $1B+ market and create a new lead-generation engine.
+title: 'A Division’s Expertise, Digitized to Open Up a [$1B+ Market] and Create a New [Lead-Generation Engine].'
+summary: A division's expertise, digitized to open up a $1B+ market and create a new lead-generation engine.
 client: 'A National General Contractor'
 sector: Business development
 scope: Lead-generation platform
@@ -18,9 +18,9 @@ metrics:
 
 One division of a national general contractor had years of expertise in judging which development opportunities were worth pursuing. That expertise lived with its people, so it could serve only one project at a time and could not reach the builders, developers and organizations in a new market.
 
-## What we did
+## What the team did
 
-We turned that expertise into a digital service anyone in the market could use.
+The team turned that expertise into a digital service anyone in the market could use.
 
 - Captured the division's judgement in a tool that assesses an opportunity on its own
 - Made it available to builders, developers and organizations across North America

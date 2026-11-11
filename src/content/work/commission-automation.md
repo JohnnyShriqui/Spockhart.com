@@ -1,6 +1,6 @@
 ---
-title: 'We Helped Build [Automated Commissions] to Replace Excel Across the [Entire Sales Organization].'
-summary: We helped build a custom commission platform to replace a $1.2B global manufacturer's manual Excel process with a centralized, auditable system designed to cut the time spent processing commissions by 80%, scheduled to go live in January 2027.
+title: 'A Platform for [Automated Commissions] to Replace Excel Across the [Entire Sales Organization].'
+summary: A custom commission platform to replace a $1.2B global manufacturer's manual Excel process with a centralized, auditable system designed to cut the time spent processing commissions by 80%, scheduled to go live in January 2027.
 client: 'A $1.2B Global Manufacturer'
 sector: Sales & financial operations
 scope: Commission platform design and build
@@ -21,9 +21,9 @@ metrics:
 
 A $1.2B global manufacturer calculated sales commissions for its entire sales organization by hand, in Excel. Every payout depended on spreadsheets maintained manually, which took a large share of the team's time each cycle and made results difficult to check or explain.
 
-## What we did
+## What the team did
 
-We helped design and build a custom commission platform to replace the spreadsheets.
+The team was designing and building a custom commission platform to replace the spreadsheets.
 
 - One central system for commission calculations across the entire sales organization
 - The same rules applied to every representative, every time

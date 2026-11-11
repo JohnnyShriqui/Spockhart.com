@@ -1,6 +1,6 @@
 ---
-title: 'We Grew a Digital Practice [More Than 6x] in Under a Year, From [$150K to $1M].'
-summary: We built out a consulting firm's digital services practice across digital twins, analytics and transformation platforms, growing it from about $150K to $1M in revenue in under a year.
+title: 'A Digital Practice Grown [More Than 6x] in Under a Year, From [$150K to $1M].'
+summary: A consulting firm's digital services practice, built out across digital twins, analytics and transformation platforms, grew from about $150K to $1M in revenue in under a year.
 client: 'A Consulting Firm'
 sector: Digital transformation & commercial growth
 scope: Practice development, business development and delivery
@@ -18,9 +18,9 @@ metrics:
 
 A consulting firm's digital practice was earning about $150K a year from traditional advisory work. The firm wanted to grow it into a technical delivery business able to win and deliver larger, technology-led engagements.
 
-## What we did
+## What the team did
 
-As part of the team responsible for building and scaling the practice, we worked across business development, client relationships and delivery.
+The team responsible for building and scaling the practice worked across business development, client relationships and delivery.
 
 - Brought new services to market in digital twins, analytics and enterprise transformation platforms
 - Built the capability to sell and deliver technology-led engagements to enterprise clients
