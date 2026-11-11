@@ -1,17 +1,39 @@
 ---
 /**
- * Nonprofits hero image: demand keeps rising while resources stay flat, and the
- * gap between them grows. Then capacity added with Spockhart closes most of it.
+ * Nonprofits hero image, the full story in brief (the chart further down the page tells it in
+ * detail). First, without us: demand keeps rising while resources stay flat, and the gap between
+ * them grows. Then, with Spockhart: demand is brought down and resources are brought up, so the
+ * gap narrows from both sides. The original lines stay behind, dashed, as "without".
  * An illustration, not data. Plays on a loop through scripts/scenes.ts.
  */
-const demand = 'M40 262 C180 236 320 154 460 66';
-const resources = 'M40 292 C180 289 320 283 460 276';
-const withUs = 'M40 292 C190 285 300 180 460 100';
-const back = 'L460 276 C320 283 180 289 40 292 Z';
+
+/* Every curve runs evenly from x 40 to x 460, so a point's x fixes its place along the curve */
+type Curve = [number, number, number, number];
+const path = (c: Curve) => `M40 ${c[0]} C180 ${c[1]} 320 ${c[2]} 460 ${c[3]}`;
+const back = (c: Curve) => `L460 ${c[3]} C320 ${c[2]} 180 ${c[1]} 40 ${c[0]}`;
+const at = (c: Curve, x: number) => {
+  const t = (x - 40) / 420;
+  const s = 1 - t;
+  return s * s * s * c[0] + 3 * s * s * t * c[1] + 3 * s * t * t * c[2] + t * t * t * c[3];
+};
+
+/* Without us */
+const demand: Curve = [262, 236, 154, 66];
+const resources: Curve = [292, 289, 283, 276];
+/* With us: demand eases, resources rise, and the gap that is left stays narrow */
+const demandUs: Curve = [262, 240, 184, 128];
+const resUs: Curve = [292, 286, 240, 170];
+
+/* Arrows from where each line would be without us to where it is with us */
+const AX = 330;
+const down = { y1: at(demand, AX) + 6, y2: at(demandUs, AX) - 6 };
+const up = { y1: at(resources, AX) - 6, y2: at(resUs, AX) + 6 };
+const arrowDown = `M${AX} ${down.y1.toFixed(1)} V${down.y2.toFixed(1)} M${AX - 4} ${(down.y2 - 5).toFixed(1)} L${AX} ${down.y2.toFixed(1)} L${AX + 4} ${(down.y2 - 5).toFixed(1)}`;
+const arrowUp = `M${AX} ${up.y1.toFixed(1)} V${up.y2.toFixed(1)} M${AX - 4} ${(up.y2 + 5).toFixed(1)} L${AX} ${up.y2.toFixed(1)} L${AX + 4} ${(up.y2 + 5).toFixed(1)}`;
 ---
 
-<figure class="gap" aria-label="Illustration: demand on a nonprofit rises while resources stay flat; Spockhart closes the gap.">
-  <svg viewBox="0 0 480 360" class="scene" data-scene data-rate="1" data-loop="10" data-still="9" style="--loop:10;--still:9">
+<figure class="gap" aria-label="Illustration: without Spockhart, demand on a nonprofit rises while resources stay flat, and the gap grows. With Spockhart, demand is brought down and resources are brought up, so the gap narrows.">
+  <svg viewBox="0 0 480 360" class="scene" data-scene data-rate="1" data-loop="11" data-still="10" style="--loop:11;--still:10">
     <defs>
       <pattern id="gap-hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
         <rect width="8" height="8" fill="rgb(74 138 186 / 0.07)" />
@@ -23,25 +45,44 @@ const back = 'L460 276 C320 283 180 289 40 292 Z';
     <text x="466" y="342" class="axis-label" text-anchor="end">Time</text>
 
     <g class="ends">
-      <path d={`${demand} ${back}`} class="gap-area fade" style="--a:1.8;--b:2.5" />
+      <!-- 1. Without us: the lines draw, and the gap between them opens -->
+      <path d={`${path(demand)} ${back(resources)} Z`} class="gap-area gap-old" />
 
-      <path d={resources} pathLength="100" class="line line-res draw" style="--a:0.4;--b:1.8" />
-      <path d={demand} pathLength="100" class="line line-demand draw" style="--a:0.2;--b:1.8" />
-      <!-- Spockhart's line, the capacity under it and its end dot are revealed together, left to
-           right, so the line never runs ahead of its colour and the dot only arrives with the line -->
-      <g class="us-reveal" style="--a:3.2;--b:5.4">
-        <path d={`${withUs} ${back}`} class="closed-area" />
-        <path d={withUs} class="line line-us" />
-        <circle cx="460" cy="100" r="5.5" class="dot-us" />
+      <g class="solid-old">
+        <path d={path(resources)} pathLength="100" class="line line-res draw" style="--a:0.4;--b:1.8" />
+        <path d={path(demand)} pathLength="100" class="line line-demand draw" style="--a:0.2;--b:1.8" />
+        <circle cx="460" cy={demand[3]} r="5" class="dot-demand fade" style="--a:1.7;--b:2" />
+        <circle cx="460" cy={resources[3]} r="5" class="dot-res fade" style="--a:1.7;--b:2" />
+      </g>
+      <!-- Then they stay behind, dashed, as where things go without us -->
+      <g class="dashed-old">
+        <path d={path(demand)} pathLength="100" class="line-was line-was-demand" />
+        <path d={path(resources)} pathLength="100" class="line-was line-was-res" />
       </g>
 
-      <circle cx="460" cy="66" r="5" class="dot-demand fade" style="--a:1.7;--b:2" />
-      <circle cx="460" cy="276" r="5" class="dot-res fade" style="--a:1.7;--b:2" />
-
-      <text x="452" y="50" class="label label-demand fade" text-anchor="end" style="--a:1.6;--b:2.1">Demand</text>
-      <text x="452" y="304" class="label label-res fade" text-anchor="end" style="--a:1.6;--b:2.1">Resources</text>
-      <text x="440" y="214" class="label label-us fade" text-anchor="end" style="--a:5.2;--b:5.8">With Spockhart</text>
+      <g class="fade" style="--a:1.6;--b:2.1">
+        <text x="452" y="50" class="label label-demand" text-anchor="end">Demand</text>
+        <text x="452" y="304" class="label label-res" text-anchor="end">Resources</text>
+      </g>
       <text x="300" y="232" class="label label-gap gap-word" text-anchor="middle">The gap</text>
+
+      <!-- 2. With Spockhart: demand comes down and resources come up, left to right, so each line
+           arrives with its colour and its end dot -->
+      <g class="us-reveal" style="--a:3.4;--b:5.8">
+        <path d={`${path(demand)} ${back(demandUs)} Z`} class="area-eased" />
+        <path d={`${path(resUs)} ${back(resources)} Z`} class="area-gained" />
+        <path d={`${path(demandUs)} ${back(resUs)} Z`} class="gap-area" />
+        <path d={path(resUs)} class="line line-us" />
+        <path d={path(demandUs)} class="line line-demand-us" />
+        <circle cx="460" cy={demandUs[3]} r="5" class="dot-demand" />
+        <circle cx="460" cy={resUs[3]} r="5.5" class="dot-us" />
+      </g>
+
+      <g class="fade" style="--a:5.6;--b:6.3">
+        <path d={arrowDown} class="arrow" />
+        <path d={arrowUp} class="arrow arrow-up" />
+      </g>
+
     </g>
   </svg>
 </figure>
@@ -54,21 +95,30 @@ const back = 'L460 276 C320 283 180 289 40 292 Z';
 
 <style>
   .gap { margin: 0; width: 100%; }
-  .gap svg { width: 100%; height: auto; overflow: visible; --t: var(--still, 9); }
+  .gap svg { width: 100%; height: auto; overflow: visible; --t: var(--still, 10); }
   .axis { fill: none; stroke: var(--rule-2); stroke-width: 1.2; }
   .axis-label { font-family: var(--font-body); font-size: 12px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; fill: var(--ink-3); }
 
   .line { fill: none; stroke-linecap: round; stroke-dasharray: 100 100; }
   .line-demand { stroke: var(--ink); stroke-width: 3; }
   .line-res { stroke: var(--ink-3); stroke-width: 2.5; }
-  .line-us { stroke: var(--accent); stroke-width: 3.5; }
+  .line-us { stroke: var(--accent); stroke-width: 3.5; stroke-dasharray: none; }
+  .line-demand-us { stroke: var(--ink); stroke-width: 3; stroke-dasharray: none; }
+  .line-was { fill: none; stroke-width: 1.6; stroke-dasharray: 1.4 1.6; stroke-linecap: round; }
+  .line-was-demand { stroke: rgb(238 243 248 / 0.5); }
+  .line-was-res { stroke: rgb(148 168 188 / 0.55); }
+
   .gap-area { fill: url(#gap-hatch); }
-  .closed-area { fill: rgb(74 138 186 / 0.3); }
+  /* What we change: resources gained in the brand blue, demand eased in a quiet light */
+  .area-gained { fill: rgb(74 138 186 / 0.3); }
+  .area-eased { fill: rgb(238 243 248 / 0.07); }
   .us-reveal { clip-path: inset(-12px calc((1 - clamp(0, (var(--t) - var(--a)) / (var(--b) - var(--a)), 1)) * 100%) -12px -12px); }
-  .line-us { stroke-dasharray: none; }
+
   .dot-demand { fill: var(--ink); }
   .dot-res { fill: var(--ink-3); }
   .dot-us { fill: var(--accent); stroke: var(--paper); stroke-width: 2; }
+  .arrow { fill: none; stroke: rgb(238 243 248 / 0.6); stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+  .arrow-up { stroke: var(--accent); }
 
   .label { font-family: var(--font-body); font-size: 15px; font-weight: 600; }
   .label-demand { fill: var(--ink); }
@@ -76,9 +126,18 @@ const back = 'L460 276 C320 283 180 289 40 292 Z';
   .label-us { fill: var(--accent); }
   .label-gap { font-family: var(--font-display); font-size: 22px; font-weight: 500; fill: var(--accent); }
 
+
   /* Timing, driven by --t (seconds into the loop) */
   .draw { stroke-dashoffset: calc(100 * (1 - clamp(0, (var(--t) - var(--a)) / (var(--b) - var(--a)), 1))); }
   .fade { opacity: clamp(0, (var(--t) - var(--a)) / (var(--b) - var(--a)), 1); }
-  .gap-word { opacity: calc(clamp(0, (var(--t) - 2) * 3, 1) * clamp(0, (4 - var(--t)) * 2.5, 1)); }
+  /* The first gap opens, then gives way as the narrower one comes in */
+  .gap-old {
+    opacity: clamp(0, (var(--t) - 1.8) / 0.7, 1);
+    clip-path: inset(-12px -12px -12px calc(clamp(0, (var(--t) - 3.4) / 2.4, 1) * 100%));
+  }
+  .gap-word { opacity: calc(clamp(0, (var(--t) - 2) * 3, 1) * clamp(0, (3.4 - var(--t)) * 2.5, 1)); }
+  /* The original lines turn dashed: the solid ones fade out as the dashed ones fade in */
+  .solid-old { opacity: calc(1 - clamp(0, (var(--t) - 3) / 0.6, 1)); }
+  .dashed-old { opacity: clamp(0, (var(--t) - 3) / 0.6, 1); }
   .ends { opacity: clamp(0, (var(--loop) - 0.3 - var(--t)) * 4, 1); }
 </style>
