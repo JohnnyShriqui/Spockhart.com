@@ -1,7 +1,7 @@
 ---
 title: 'A [12-Month, $100K+] Assessment, Turned Into One Done [in Minutes for $0].'
 summary: An automated feasibility platform that gave affordable housing organizations an answer in minutes, at no cost, in place of a year-long, six-figure consulting assessment, and became a national contractor's North American lead-generation engine.
-client: 'A National General Contractor'
+client: 'Affordable Housing Organizations'
 sector: Construction & affordable housing
 scope: Platform engineering
 order: 1
