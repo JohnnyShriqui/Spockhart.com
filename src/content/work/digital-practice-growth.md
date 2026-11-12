@@ -3,7 +3,7 @@ title: 'A Digital Practice Grown [More Than 6x] in Under a Year, From [$150K to 
 summary: A consulting firm's digital services practice, built out across digital twins, analytics and transformation platforms, grew from about $150K to $1M in revenue in under a year.
 client: 'A Consulting Firm'
 sector: Digital transformation & commercial growth
-scope: Practice development, business development and delivery
+scope: Practice structure, positioning, business development and delivery
 order: 7
 metrics:
   - value: '~$150K → ~$1M'
@@ -22,8 +22,10 @@ A consulting firm's digital practice was earning about $150K a year from traditi
 
 The team responsible for building and scaling the practice worked across business development, client relationships and delivery.
 
-- Brought new services to market in digital twins, analytics and enterprise transformation platforms
-- Built the capability to sell and deliver technology-led engagements to enterprise clients
+- Brought a national general contractor's technology to market as new services in digital twins, analytics and enterprise transformation platforms
+- Set up how the practice was structured
+- Shaped how it was positioned and sold, inside the contractor and to outside clients
+- Built the sales materials behind each pitch
 - Delivered the work alongside selling it, so each new service had proof behind it
 
 ## The outcome
