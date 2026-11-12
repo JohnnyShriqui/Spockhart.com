@@ -102,7 +102,7 @@ const sets = [
   <!-- Then our own results, on a slightly deeper tone so the two parts read as two sections. The
        heading is the same size as the opening line. Laptops show it above the case studies; phones,
        which leave the list out, above the chart. -->
-  <div class="fb-band">
+  <div class="fb-band" id="experience">
   <div class="wrap">
     <h3 class="fb-built fb-built-narrow" data-reveal>Our Team’s Experience</h3>
     <p class="fb-built-note fb-built-narrow" data-reveal>Projects our team led or worked on in previous roles, before Spockhart. Client names withheld.</p>
@@ -1210,6 +1210,8 @@ const sets = [
      what we've built on a slightly deeper tone that runs the full width of the page. */
   .fb { padding-bottom: 0; }
   .fb :global(.ex) { margin-bottom: clamp(3.25rem, 2.25rem + 2.5vw, 4.75rem); }
+  /* The hero chart links here: it lands with the chart just under the header */
+  .fb-band { scroll-margin-top: 1.5rem; }
   .fb-band {
     background: var(--paper-2);
     padding-block: clamp(3.5rem, 2.25rem + 3vw, 5.25rem);

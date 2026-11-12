@@ -1,7 +1,7 @@
 ---
 /**
- * Shows the email address (or, with `value` and `href`, the phone number) as selectable text
- * with a copy button. It is always visible, so it works where mailto and tel links do not.
+ * Shows the email address (or, with `value`, the phone number). Clicking anywhere on it copies
+ * it, with a tick to confirm; it never opens an email app or starts a call.
  */
 import { site } from '../config/site';
 interface Props {
@@ -9,15 +9,15 @@ interface Props {
   class?: string;
   /** What to show and copy; the email address unless given */
   value?: string;
-  /** Where tapping it goes; mailto: the email address unless given */
+  /** No longer used: it only copies */
   href?: string;
 }
-const { onNavy = false, class: className = '', value = site.email, href = `mailto:${site.email}` } = Astro.props;
+const { onNavy = false, class: className = '', value = site.email } = Astro.props;
 ---
 
-<span class:list={['copy-email', className, { 'on-navy': onNavy }]} data-copy-email>
-  <a class="copy-address" href={href}>{value}</a>
-  <button type="button" class="copy-btn" data-copy={value} aria-label={`Copy ${value}`}>
+<button type="button" class:list={['copy-email', className, { 'on-navy': onNavy }]} data-copy-email data-copy={value} aria-label={`Copy ${value}`}>
+  <span class="copy-address">{value}</span>
+  <span class="copy-btn" aria-hidden="true">
     <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" class="ic-copy">
       <rect x="5" y="5" width="8.5" height="8.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.3"></rect>
       <path d="M3.5 10.5h-.5A1.5 1.5 0 0 1 1.5 9V3A1.5 1.5 0 0 1 3 1.5h6A1.5 1.5 0 0 1 10.5 3v.5" fill="none" stroke="currentColor" stroke-width="1.3"></path>
@@ -25,9 +25,9 @@ const { onNavy = false, class: className = '', value = site.email, href = `mailt
     <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" class="ic-done">
       <path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
     </svg>
-    <span class="copy-status" role="status" aria-live="polite"></span>
-  </button>
-</span>
+  </span>
+  <span class="copy-status" role="status" aria-live="polite"></span>
+</button>
 
 <style>
   .copy-email {
@@ -40,12 +40,20 @@ const { onNavy = false, class: className = '', value = site.email, href = `mailt
     font-size: 0.95rem;
     color: var(--ink);
     max-width: 100%;
+    background: transparent;
+    font: inherit;
+    font-size: 0.95rem;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color var(--dur) var(--ease), background-color var(--dur) var(--ease);
   }
+  .copy-email:hover { border-color: color-mix(in oklab, currentColor 45%, transparent); background: color-mix(in oklab, currentColor 5%, transparent); }
+  .copy-email:hover .copy-btn { opacity: 1; }
+  .copy-email:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .copy-email.on-navy { border-color: var(--navy-rule); color: var(--on-navy); }
   .copy-address {
     color: inherit;
     text-decoration: none;
-    user-select: all;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -64,7 +72,6 @@ const { onNavy = false, class: className = '', value = site.email, href = `mailt
     opacity: 0.75;
     transition: opacity var(--dur) var(--ease), background-color var(--dur) var(--ease);
   }
-  .copy-btn:hover { opacity: 1; background: color-mix(in oklab, currentColor 10%, transparent); }
   .copy-btn svg { grid-area: 1 / 1; transition: opacity 200ms var(--ease), transform 300ms var(--ease-out); }
   .ic-done { opacity: 0; transform: scale(0.6); }
   .is-copied .ic-copy { opacity: 0; transform: scale(0.6); }
