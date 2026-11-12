@@ -29,7 +29,7 @@ import { site } from '../../config/site';
       </div>
 
       <div class="contact-form-wrap on-light load-in" style="--i:2">
-        <form class="contact-form" data-contact-form data-endpoint={site.formEndpoint} novalidate>
+        <form class="contact-form" data-contact-form data-endpoint={site.formEndpoint} data-key={site.formAccessKey} novalidate>
           <div class="row-2">
             <div class="field">
               <label for="cf-name">Name</label>
@@ -68,6 +68,7 @@ import { site } from '../../config/site';
             ></textarea>
           </div>
           <input type="hidden" id="cf-type" name="type" value="" />
+          <input type="hidden" id="cf-estimate" name="estimate" value="" />
           <input type="text" name="_gotcha" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
           <div class="form-foot">
             <button class="btn" type="submit" data-submit>

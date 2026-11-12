@@ -20,10 +20,12 @@ export const site = {
   /** LinkedIn company page URL. Leave empty to hide the link. */
   linkedin: '',
   /**
-   * Where the contact form posts. Works with Formspree, Basin, Getform and similar
-   * services that accept JSON. Leave empty and the form falls back to composing an email.
-   * Example: 'https://formspree.io/f/abcdwxyz'
+   * Contact form delivery. With a Web3Forms access key (free, from web3forms.com, made for
+   * john@spockhart.com), Send delivers the message straight to that inbox. The key is meant to
+   * be public. Without one, the form falls back to composing an email for the visitor to send.
    */
+  formAccessKey: '',
+  /** Any other JSON form service (Formspree, Basin...), used only when there is no access key */
   formEndpoint: '',
   /** Show the advisory board on the About page. Turn on once every advisor has agreed to be listed. */
   showAdvisors: false,

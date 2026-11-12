@@ -1,27 +1,29 @@
 /**
- * Contact form. Posts JSON to `site.formEndpoint` when one is configured,
- * then sends the visitor to /contact/thanks/. With no endpoint, it composes
- * the message for the visitor to send by email instead of failing silently.
+ * Contact form. With a Web3Forms access key it sends the message straight to John's inbox (a
+ * clear subject line, one field per line, Reply goes to the visitor), then shows the thanks page.
+ * Another JSON endpoint works the same way. With neither, it composes the message for the visitor
+ * to send by email instead of failing silently.
  */
 export function initContactForm() {
   const form = document.querySelector<HTMLFormElement>('[data-contact-form]');
   if (!form) return;
-  const endpoint = form.dataset.endpoint ?? '';
+  const key = form.dataset.key ?? '';
+  const endpoint = key ? 'https://api.web3forms.com/submit' : (form.dataset.endpoint ?? '');
   const errorBox = form.querySelector<HTMLElement>('[data-form-error]')!;
   const submit = form.querySelector<HTMLButtonElement>('[data-submit]')!;
   const submitLabel = form.querySelector<HTMLElement>('[data-submit-label]')!;
   const message = form.querySelector<HTMLTextAreaElement>('#cf-message')!;
   const type = form.querySelector<HTMLInputElement>('#cf-type')!;
+  const estimateField = form.querySelector<HTMLInputElement>('#cf-estimate')!;
 
-  // Prefill from the calculator. Parameters arrive in the query string,
-  // or after the hash when the site runs as a single page.
+  // From the calculator: its numbers travel with the message, out of sight, rather than
+  // appearing in the visitor's message box. Parameters arrive in the query string, or after
+  // the hash when the site runs as a single page.
   const prefill = () => {
     const query = location.search || (location.hash.includes('?') ? `?${location.hash.split('?')[1]}` : '');
     const params = new URLSearchParams(query);
     const estimate = params.get('estimate');
-    if (estimate && !message.value.startsWith('Our numbers')) {
-      message.value = `${estimate}\n\nWhere most of that time goes: `;
-    }
+    if (estimate) estimateField.value = estimate.replace(/^Our numbers:\s*/, '');
     if (params.get('org') === 'nonprofit') type.value = 'Nonprofit';
   };
   prefill();
@@ -73,7 +75,33 @@ export function initContactForm() {
       `Email: ${d.get('email')}`,
       '',
       String(d.get('message') ?? ''),
+      ...(d.get('estimate') ? ['', `From the calculator: ${d.get('estimate')}`] : []),
     ].join('\n');
+  };
+
+  // What arrives in the inbox: a subject that says who wrote, then one field per line
+  const payload = () => {
+    const d = new FormData(form);
+    const get = (k: string) => String(d.get(k) ?? '').trim();
+    const sizeLabel = form.querySelector<HTMLSelectElement>('#cf-size')?.selectedOptions[0]?.textContent ?? get('size');
+    const body: Record<string, string> = {
+      Name: get('name'),
+      Email: get('email'),
+      Organization: get('organization'),
+      'Team size': sizeLabel,
+      Message: get('message'),
+    };
+    if (get('type')) body.Type = get('type');
+    if (get('estimate')) body['From the calculator'] = get('estimate');
+    if (!key) return body;
+    return {
+      access_key: key,
+      subject: `New inquiry from ${get('name')}${get('organization') ? `, ${get('organization')}` : ''}`,
+      from_name: 'Spockhart website',
+      replyto: get('email'),
+      botcheck: '',
+      ...body,
+    };
   };
 
   form.addEventListener('submit', async (e) => {
@@ -127,9 +155,10 @@ export function initContactForm() {
       const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify(Object.fromEntries(new FormData(form))),
+        body: JSON.stringify(payload()),
       });
-      if (!res.ok) throw new Error(String(res.status));
+      const out = await res.json().catch(() => ({}));
+      if (!res.ok || (key && out.success === false)) throw new Error(String(res.status));
       location.href = '/contact/thanks/';
     } catch {
       errorBox.textContent = 'That did not go through. Please try again, or email us directly at the address on this page.';
