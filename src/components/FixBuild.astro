@@ -2,7 +2,7 @@
 /**
  * Fix what's broken. Build what's missing.
  *
- * One chart, Before and After. After, revenue rises by two new slices (A and B) and costs fall
+ * One chart, Before and After. After, revenue rises by three new slices (A to C) and costs fall
  * by four slices (1 to 4). Each slice is a real result our team delivered, drawn out to its case
  * study on the right. The After builds itself on a loop while the chart is on screen.
  *
@@ -33,7 +33,8 @@ interface Item {
 
 const build: Item[] = [
   { k: 'A', id: 'sales-performance-system', value: '+$316K a month', rest: ' with a new sales intelligence system' },
-  { k: 'B', id: 'lead-generation-engine', value: 'A $1B+ market opened', rest: ' through a new digital service' },
+  { k: 'B', id: 'digital-practice-growth', value: '$150K to $1M revenue', rest: ' by scaling a digital services practice' },
+  { k: 'C', id: 'lead-generation-engine', value: 'A $1B+ market opened', rest: ' through a new digital service' },
 ];
 const fix: Item[] = [
   { k: '1', id: 'commission-automation', value: '80% less time', rest: ' processing commissions for a $1.2B manufacturer', brief: 'Commissions at a $1.2B manufacturer' },
@@ -111,7 +112,7 @@ const sets = [
       <svg class="fb-links" aria-hidden="true" data-fb-links></svg>
 
       <!-- The chart, in the same window style as the case studies -->
-      <figure class="fb-chart" aria-label="Before, costs are just under revenue. After, revenue is up two slices and costs are down four.">
+      <figure class="fb-chart" aria-label="Before, costs are just under revenue. After, revenue is up three slices and costs are down four.">
         <div class="fb-win">
           <div class="fb-win-bar"><span class="fb-dots"><i></i><i></i><i></i></span>Revenue vs costs</div>
           {
@@ -149,7 +150,7 @@ const sets = [
                   <text x={(before.rev + before.cost + W) / 2} y={c.BASE + c.grp} text-anchor="middle" class="fb-group">Before</text>
                 </g>
 
-                <!-- After: revenue up by A and B, costs down by 1 to 4 -->
+                <!-- After: revenue up by A to C, costs down by 1 to 4 -->
                 <rect x={after.rev} y={c.revTop} width={W} height={c.REV} rx="2" class="fb-rev fb-rev-after" />
                 {
                   build.map((b, i) => {
