@@ -4,7 +4,7 @@ summary: A centralized performance tracking system gave a 16-person sales team c
 client: 'A Multi-$M Sales Organization'
 sector: Sales operations
 scope: Sales operations and performance tracking
-order: 3
+order: 4
 metrics:
   - value: 16 representatives
     label: Tracked through one centralized performance system
