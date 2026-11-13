@@ -647,6 +647,64 @@ const building = 'M-6 7V-4l6-4 6 4v11zM-3 -1h2M1 -1h2M-3 3h2M1 3h2';
   }
 
   {
+    id === 'receiving-labels' && (
+      <>
+        <div class="win">
+          <div class="win-bar" aria-hidden="true"><span class="win-dots"><i /><i /><i /></span><span>Receiving incoming material</span></div>
+          <div class="scene" data-scene data-loop="12" data-still="11.3" style="--loop:12;--still:11.3">
+            <div class="lane">
+              <div class="lane-head">
+                <span class="tag">Before</span>
+                <span class="readout tabular">
+                  Waiting to receive <span class="sep">·</span> <span data-count="0.3 0, 11.1 120" data-fmt="{} min">120 min</span>
+                </span>
+              </div>
+              <div class="cells ends" aria-hidden="true">
+                {twelve.map((i) => (
+                  <span class="cell" style={`--i:${i}`}>
+                    <span class="cell-fill" />
+                  </span>
+                ))}
+              </div>
+              <p class="lane-foot ends"><span class="ap" style="--a:11.1">Waiting on the other site.</span></p>
+            </div>
+            <div class="lane">
+              <div class="lane-head">
+                <span class="tag tag-hot">After</span>
+                <span class="readout readout-hot swap">
+                  <span class="dn" style="--d:0.5">Marking on site</span>
+                  <span class="ap" style="--a:0.5">Received on arrival</span>
+                </span>
+              </div>
+              <div class="cells ends" aria-hidden="true">
+                {twelve.map((i) => (
+                  <span class="cell cell-hot" style={`--a:${(0.4 + i * 0.14).toFixed(2)}`}>
+                    <svg class="cell-doc pop" viewBox="0 0 14 15">
+                      <path d="M1 3.5 7 0.5l6 3v8l-6 3-6-3z" />
+                      <path d="M4.5 8l2 2 3.5-4" class="tick" />
+                    </svg>
+                  </span>
+                ))}
+              </div>
+              <p class="lane-foot lane-foot-hot ends"><span class="ap" style="--a:2.1">Received and put away as it comes in.</span></p>
+            </div>
+          </div>
+        </div>
+        <div class="rv-split">
+          <div>
+            <span class="rv-k">Wait to receive material</span>
+            <p class="rv-num"><s>~2 hours</s> <strong>Minutes</strong></p>
+          </div>
+          <div>
+            <span class="rv-k">Single point of failure</span>
+            <p class="rv-num"><strong>Removed</strong></p>
+          </div>
+        </div>
+      </>
+    )
+  }
+
+  {
     id === 'commission-automation' && (
       <>
         <div class="win">
