@@ -1,30 +1,30 @@
 ---
-title: 'A [New Sports Platform], Taken From Concept to a [Live First Season].'
-summary: A skill-based sports contest platform designed, built and launched from the ground up, with growth driven by the commissioners who run each league.
-client: 'A Sports Technology Platform'
-sector: New digital product
-scope: Product strategy, platform build and launch
+title: 'A New Digital Revenue Platform, Taken From [Idea] to [Live Product].'
+summary: A new digital platform identified, designed, built with a partner engineering team and taken to market, with a growth model where every new customer brings their own users.
+client: 'A Digital Platform Startup'
+sector: Revenue development
+scope: Product strategy, build and go-to-market
 origin: Our own venture
 order: 3
 metrics:
-  - value: Concept → live
-    label: A new platform, designed, built and launched
-  - value: First season
-    label: Launched, with early traction
-  - value: Commissioner-led
-    label: A growth model where each commissioner brings an entire league
+  - value: Idea → live product
+    label: Designed, built and launched from scratch
+  - value: Partner-built
+    label: Engineering delivered by an external team, managed end to end
+  - value: Network-led growth
+    label: Every new customer brings their own group of users
 ---
 
 ## The challenge
 
-Skill-based sports contests are usually run by a commissioner for their own league of friends or colleagues, often by hand. The opportunity was a platform that runs the contest for them, and grows one league at a time.
+A popular activity was still often run by hand, on spreadsheets and group chats. The opportunity was to turn that manual work into a product, and grow it through the people already running it.
 
 ## What the team did
 
-- Designed the product and its commissioner-first model
-- Built the platform with an engineering partner, from first prototype to launch
-- Took it to market through commissioners, so each one brings their whole league
+- Identified the opportunity and designed the product around the people who run each group
+- Took it from first prototype to a live platform, with engineering delivered by a partner team
+- Launched it on a growth model where every new customer brings their own users
 
 ## The outcome
 
-The platform launched for its first season with early traction, on a growth model built to scale one league at a time. It is the same path Spockhart takes clients down: find the opportunity, build it, and bring it to market.
+A live platform with early traction, built the same way Spockhart builds for clients: find the opportunity, prototype fast, and take it to market.

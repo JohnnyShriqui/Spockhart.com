@@ -1,29 +1,30 @@
 ---
-title: 'A Race Car Taken From [Blank Page to Competition] Every Season, on a [Fixed Deadline].'
-summary: Four seasons on a university Formula SAE team, designing, building and testing a formula-style race car to compete against university teams from around the world.
-client: 'A University Formula Racing Team'
-sector: Engineering and rapid prototyping
-scope: Vehicle design, build and testing
+title: 'A [High-Performance Machine], Engineered From [Concept to Competition] on a Fixed Deadline.'
+summary: A complete high-performance vehicle, its mechanical, electrical and software systems engineered to work as one, taken from blank page to competition each season against an immovable deadline.
+client: 'A Formula Racing Team'
+sector: Advanced engineering
+scope: Systems design, rapid prototyping and testing
 order: 6
 metrics:
-  - value: 4 seasons
-    label: On the team, from design through competition
-  - value: Concept → race car
-    label: A new car designed, built and tested each season
+  - value: Concept → competition
+    label: A complete vehicle, designed, built and tested each season
+  - value: 4 build cycles
+    label: Four seasons of design, build, test and race
   - value: Fixed deadline
-    label: Competition day does not move, so the car has to be ready
+    label: Race day does not move, so every system has to work on time
 ---
 
 ## The challenge
 
-Formula SAE teams design, build and race a small formula-style car against university teams from around the world, judged on engineering, cost and business case as well as on the track. The deadline is fixed, the budget comes from sponsors, and the team changes every year.
+Design and build a complete high-performance vehicle whose mechanical, electrical and software systems all have to work together, against an immovable deadline and a sponsor-funded budget. Every design decision is judged on performance, cost and business case.
 
 ## What the team did
 
-- Designed, built and tested a new car each season, from blank page to competition
-- Integrated mechanical, electrical and software systems into one working vehicle
-- Worked to a budget raised from sponsors, and a deadline that could not move
+- Took a complete vehicle from blank page to competition, every season
+- Integrated mechanical, electrical and software systems into one machine
+- Ran rapid design, build and test cycles to hit a deadline that could not move
+- Delivered within a budget raised from sponsors
 
 ## The outcome
 
-Four seasons of taking an engineering system from concept to a working machine by a fixed date. The same discipline is behind Spockhart's working first version in 30 days.
+Four seasons of engineering complex systems to a fixed date. It is the same discipline behind Spockhart's promise of a working first version in 30 days.
