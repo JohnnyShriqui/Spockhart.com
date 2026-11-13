@@ -158,6 +158,24 @@ export function initContactForm() {
       });
       const out = await res.json().catch(() => ({}));
       if (!res.ok || (key && out.success === false)) throw new Error(String(res.status));
+      // The thank-you page shows the visitor what they sent (this browser tab only)
+      try {
+        const d = new FormData(form);
+        const sizeLabel = form.querySelector<HTMLSelectElement>('#cf-size')?.selectedOptions[0]?.textContent ?? '';
+        sessionStorage.setItem(
+          'spockhart:sent',
+          JSON.stringify({
+            name: String(d.get('name') ?? '').trim(),
+            organization: String(d.get('organization') ?? '').trim(),
+            email: String(d.get('email') ?? '').trim(),
+            size: sizeLabel,
+            message: String(d.get('message') ?? '').trim(),
+            at: Date.now(),
+          }),
+        );
+      } catch {
+        /* storage blocked: the page simply shows less */
+      }
       location.href = '/contact/thanks/';
     } catch {
       errorBox.textContent = 'That did not go through. Please try again, or email us directly at the address on this page.';

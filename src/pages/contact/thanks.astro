@@ -2,28 +2,174 @@
 import Base from '../../layouts/Base.astro';
 import Mark from '../../components/Mark.astro';
 import Mist from '../../components/Mist.astro';
+import CopyEmail from '../../components/CopyEmail.astro';
 import { site } from '../../config/site';
+
 ---
 
 <Base title="Thank you" noindex>
-  <section class="thanks hero-dark theme-quiet" data-hero-dark>
+  <section class="ty hero-dark theme-quiet" data-hero-dark>
     <Mist />
-    <div class="wrap thanks-inner">
-      <div class="load-in" style="--i:0"><Mark size={72} tone="brand" assemble tilt /></div>
-      <h1 class="load-in" style="--i:1">Thank you. We have it.</h1>
-      <p class="lead load-in" style="--i:2">
-        A member of our team will reply within {site.offer.replyWithin}. In the meantime, here is how we work.
-      </p>
-      <div class="btn-row load-in" style="--i:3">
-        <a class="btn" href="/approach/">See our approach <span class="arr" aria-hidden="true">→</span></a>
-        <a class="btn btn-ghost" href="/work/">See our team&rsquo;s work</a>
+    <div class="wrap ty-grid">
+      <div class="ty-main">
+        <h1 class="load-in" style="--i:1">Thank you<span data-sent-first></span>.</h1>
+        <p class="ty-lead load-in" style="--i:2">
+          Your message is with us. You will hear back within {site.offer.replyWithin}.
+        </p>
+
+        <div class="ty-links load-in" style="--i:3">
+          <a class="ty-link" href="/approach/"><span>See how we work</span> <span class="arr" aria-hidden="true">→</span></a>
+          <a class="ty-link ty-link-quiet" href="/">Back to the home page</a>
+        </div>
       </div>
+
+      <!-- A receipt of what they sent. Filled from this browser tab only; hidden on a direct visit. -->
+      <aside class="ty-receipt load-fade" aria-label="Your message" data-receipt hidden>
+        <div class="rc-head">
+          <Mark size={22} tone="brand" />
+          <span class="rc-brand">Spockhart</span>
+          <span class="rc-status"><i aria-hidden="true"></i>Delivered</span>
+        </div>
+        <dl class="rc-rows">
+          <div><dt>From</dt><dd data-sent="name"></dd></div>
+          <div data-row="organization"><dt>Organization</dt><dd data-sent="organization"></dd></div>
+          <div data-row="size"><dt>Team size</dt><dd data-sent="size"></dd></div>
+          <div><dt>Reply to</dt><dd data-sent="email"></dd></div>
+          <div><dt>Received</dt><dd data-sent="at"></dd></div>
+        </dl>
+        <blockquote class="rc-msg" data-sent="message"></blockquote>
+        <div class="rc-foot">
+          <span>Need us sooner?</span>
+          <CopyEmail value={site.phone} />
+        </div>
+      </aside>
     </div>
   </section>
 </Base>
 
+<script>
+  function fillReceipt() {
+    const card = document.querySelector<HTMLElement>('[data-receipt]');
+    if (!card) return;
+    let sent: Record<string, string | number> | null = null;
+    try {
+      sent = JSON.parse(sessionStorage.getItem('spockhart:sent') || 'null');
+    } catch {
+      sent = null;
+    }
+    if (!sent || !sent.name) return;
+
+    // A name typed in all capitals or all lower case is shown as a name
+    const tidy = (v: string) => (v === v.toUpperCase() || v === v.toLowerCase() ? v.toLowerCase().replace(/(^|[\s'-])\p{L}/gu, (m) => m.toUpperCase()) : v);
+    const name = tidy(String(sent.name));
+    const first = name.split(/\s+/)[0];
+    const firstSlot = document.querySelector('[data-sent-first]');
+    if (firstSlot && first) firstSlot.textContent = `, ${first}`;
+
+    const at = new Date(Number(sent.at) || Date.now());
+    const when = new Intl.DateTimeFormat('en-CA', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }).format(at);
+    const values: Record<string, string> = {
+      name,
+      organization: String(sent.organization || ''),
+      size: String(sent.size || ''),
+      email: String(sent.email || ''),
+      at: when,
+      message: String(sent.message || ''),
+    };
+    card.querySelectorAll<HTMLElement>('[data-sent]').forEach((el) => {
+      el.textContent = values[el.dataset.sent!] ?? '';
+    });
+    card.querySelectorAll<HTMLElement>('[data-row]').forEach((row) => {
+      if (!values[row.dataset.row!]) row.hidden = true;
+    });
+    if (!values.message) card.querySelector<HTMLElement>('.rc-msg')!.hidden = true;
+    card.hidden = false;
+    document.querySelector('.ty-grid')?.classList.add('has-receipt');
+  }
+  fillReceipt();
+  document.addEventListener('spockhart:view', fillReceipt);
+</script>
+
 <style>
-  .thanks { padding-top: clamp(9rem, 6rem + 8vw, 13rem); padding-bottom: var(--section); }
-  .thanks-inner { display: grid; gap: var(--s-5); justify-items: start; }
-  .thanks h1 { font-size: var(--step-5); max-width: 14ch; }
+  .ty {
+    min-height: 100vh;
+    min-height: 100svh;
+    display: flex;
+    align-items: center;
+    padding-top: calc(88px + clamp(2rem, 1rem + 3vw, 4rem));
+    padding-bottom: clamp(3.5rem, 2rem + 4vw, 6rem);
+  }
+  .ty > .wrap { width: 100%; }
+  .ty-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: clamp(3rem, 2rem + 3vw, 5rem); align-items: center; }
+  .ty-main { display: grid; gap: var(--s-5); justify-items: start; max-width: 40rem; }
+  .ty h1 { font-size: clamp(2.75rem, 1.9rem + 3.6vw, 5rem); line-height: 1.02; max-width: 14ch; }
+  .ty-lead { font-size: var(--step-1); line-height: 1.55; color: var(--ink-2); max-width: 36rem; }
+
+  .ty-links { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.75rem 2rem; margin-top: var(--s-4); }
+  .ty-link {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    font-weight: 600;
+    color: var(--ink);
+    text-decoration: none;
+    background-image: linear-gradient(var(--accent-soft), var(--accent-soft));
+    background-size: 100% 1px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    padding-bottom: 3px;
+  }
+  .ty-link .arr { transition: transform var(--dur) var(--ease); }
+  .ty-link:hover .arr { transform: translateX(4px); }
+  .ty-link-quiet { font-weight: 500; color: var(--ink-3); background-image: none; }
+  .ty-link-quiet:hover { color: var(--ink); }
+
+  /* The receipt: a quiet glass card */
+  .ty-receipt {
+    position: relative;
+    display: grid;
+    gap: 1.25rem;
+    padding: clamp(1.4rem, 1rem + 1vw, 1.9rem);
+    border: 1px solid rgb(255 255 255 / 0.1);
+    border-radius: var(--radius-lg);
+    background: linear-gradient(160deg, rgb(255 255 255 / 0.06), rgb(255 255 255 / 0.02));
+    box-shadow: 0 30px 60px -36px rgb(0 0 0 / 0.7), inset 0 1px 0 rgb(255 255 255 / 0.06);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+  }
+  .rc-head { display: flex; align-items: center; gap: 0.6rem; padding-bottom: 1rem; border-bottom: 1px solid rgb(255 255 255 / 0.08); }
+  .rc-brand { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.32em; text-transform: uppercase; color: var(--ink); }
+  .rc-status { margin-left: auto; display: inline-flex; align-items: center; gap: 0.45rem; font-size: 0.8125rem; color: var(--ink-2); }
+  .rc-status i { width: 7px; height: 7px; border-radius: 50%; background: #6fd3a8; box-shadow: 0 0 0 4px rgb(111 211 168 / 0.14); }
+  .rc-rows { display: grid; gap: 0.65rem; }
+  .rc-rows > div { display: grid; grid-template-columns: 7.5rem minmax(0, 1fr); gap: 1rem; align-items: baseline; }
+  .rc-rows dt { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); }
+  .rc-rows dd { margin: 0; font-size: 0.9375rem; color: var(--ink); overflow-wrap: anywhere; }
+  .rc-msg {
+    margin: 0;
+    padding: 0.9rem 1rem;
+    border-left: 2px solid var(--accent-soft);
+    border-radius: 0 6px 6px 0;
+    background: rgb(255 255 255 / 0.035);
+    font-family: var(--font-display);
+    font-size: 1.0625rem;
+    line-height: 1.55;
+    color: var(--ink);
+    white-space: pre-line;
+    display: -webkit-box;
+    -webkit-line-clamp: 6;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .rc-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem; padding-top: 1rem; border-top: 1px solid rgb(255 255 255 / 0.08); font-size: 0.875rem; color: var(--ink-3); }
+
+  /* Laptops: words on the left, the receipt on the right */
+  @media (min-width: 1000px) {
+    .ty-grid.has-receipt { grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr); }
+    .ty-receipt { max-width: 30rem; justify-self: end; width: 100%; }
+  }
+  @media (max-width: 640px) {
+    .ty { align-items: flex-start; padding-top: calc(72px + 2.5rem); }
+    .rc-rows > div { grid-template-columns: 6.5rem minmax(0, 1fr); }
+  }
 </style>
