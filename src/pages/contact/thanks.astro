@@ -27,10 +27,7 @@ import { site } from '../../config/site';
       <aside class="ty-receipt load-fade" aria-label="Your message" data-receipt hidden>
         <div class="rc-head">
           <Logo mark={false} class="rc-logo" />
-          <span class="rc-status">
-            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.4l2.9 2.9 6.1-6.6" /></svg>
-            Delivered
-          </span>
+          <span class="rc-status">Delivered</span>
         </div>
         <dl class="rc-rows">
           <div><dt>From</dt><dd data-sent="name"></dd></div>
@@ -142,7 +139,7 @@ import { site } from '../../config/site';
   .rc-head { display: flex; align-items: center; gap: 0.6rem; padding-bottom: 1rem; border-bottom: 1px solid rgb(255 255 255 / 0.08); }
   /* The same wordmark as the nav bar, a size down */
   .ty-receipt :global(.rc-logo .wordmark) { font-size: 0.8125rem; }
-  /* Delivered: a fine check and small capitals, no badge */
+  /* Delivered: small capitals, no badge */
   .rc-status {
     margin-left: auto;
     display: inline-flex;
@@ -154,7 +151,6 @@ import { site } from '../../config/site';
     text-transform: uppercase;
     color: var(--accent);
   }
-  .rc-status svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
   .rc-rows { display: grid; gap: 0.65rem; }
   .rc-rows > div { display: grid; grid-template-columns: 7.5rem minmax(0, 1fr); gap: 1rem; align-items: baseline; }
   .rc-rows dt { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); }
