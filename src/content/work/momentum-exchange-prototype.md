@@ -4,7 +4,7 @@ summary: A working engineering prototype of a momentum-exchange system that coul
 client: 'A Leading North American Aerospace & Engineering Company'
 sector: Advanced engineering
 scope: Prototype design, testing and validation
-order: 4
+order: 5
 metrics:
   - value: 83% more cargo
     label: Potential payload capacity improvement per trip

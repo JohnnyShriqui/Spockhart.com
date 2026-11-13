@@ -33,6 +33,7 @@ interface Item {
 
 const build: Item[] = [
   { k: 'A', id: 'sales-performance-system', value: '+$316K a month', rest: ' with a new sales intelligence system' },
+  { k: 'B', id: 'survival-sports-platform', value: 'A new platform, live', rest: ' in its first season', brief: 'A new sports platform' },
 ];
 const fix: Item[] = [
   { k: '1', id: 'commission-automation', value: '80% less time', rest: ' processing commissions for a $1.2B manufacturer', brief: 'Commissions at a $1.2B manufacturer' },
@@ -103,7 +104,7 @@ const sets = [
   <div class="fb-band" id="experience">
   <div class="wrap">
     <h3 class="fb-built fb-built-narrow" data-reveal>Our Team’s Experience</h3>
-    <p class="fb-built-note fb-built-narrow" data-reveal>Projects our team led or worked on in previous roles, before Spockhart. Client names withheld.</p>
+    <p class="fb-built-note fb-built-narrow" data-reveal>Projects our team led or worked on outside Spockhart. Client names withheld.</p>
 
     <div class="fb-stage" data-fb-stage>
       <svg class="fb-links" aria-hidden="true" data-fb-links></svg>
@@ -219,7 +220,7 @@ const sets = [
       <!-- The case studies, grouped the way they sit on the chart -->
       <div class="fb-cards" data-fb-cards>
         <h3 class="fb-built fb-built-wide">Our Team’s Experience</h3>
-        <p class="fb-built-note fb-built-wide">Projects our team led or worked on in previous roles, before Spockhart. Client names withheld.</p>
+        <p class="fb-built-note fb-built-wide">Projects our team led or worked on outside Spockhart. Client names withheld.</p>
         {
           sets.map((set) => (
             <div class:list={['fb-set', `fb-set-${set.key}`]}>
@@ -237,7 +238,7 @@ const sets = [
                         </div>
                       </div>
                       <div class="fb-body">
-                        <span class="fb-note"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 8a5.5 5.5 0 1 0 1.6-3.9 M2.4 2.6v2.6H5 M8 5.2V8l2 1.3" /></svg>Before Spockhart</span>
+                        <span class="fb-note"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 8a5.5 5.5 0 1 0 1.6-3.9 M2.4 2.6v2.6H5 M8 5.2V8l2 1.3" /></svg>{work[it.id]?.origin}</span>
                         <span class="fb-text">
                           <span class="fb-line"><span class="fb-v">{it.value}</span><span class="fb-l">{it.rest}</span></span>
                         </span>
@@ -251,7 +252,7 @@ const sets = [
                     <div class="fb-panel" id={`fb-panel-${it.k}`} data-panel>
                       <div class="fb-panel-inner">
                         <div class="fb-panel-body">
-                          <span class="fb-pnote"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 8a5.5 5.5 0 1 0 1.6-3.9 M2.4 2.6v2.6H5 M8 5.2V8l2 1.3" /></svg>Before Spockhart</span>
+                          <span class="fb-pnote"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 8a5.5 5.5 0 1 0 1.6-3.9 M2.4 2.6v2.6H5 M8 5.2V8l2 1.3" /></svg>{work[it.id]?.origin}</span>
                           <div class="fb-cs">
                             <p class="fb-client">
                               <span class="fb-client-mark" aria-hidden="true">

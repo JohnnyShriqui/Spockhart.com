@@ -48,7 +48,7 @@ const sectionsOf = (body = '') =>
     title="Our team’s experience."
     lead="Spockhart is a new firm built on years of experience. Our team has transformed operations and built technology at some of North America’s largest organizations."
   >
-    <p class="work-note"><strong>Please note:</strong> these are projects our team led or worked on in previous roles, before Spockhart. Client names are withheld.</p>
+    <p class="work-note"><strong>Please note:</strong> these are projects our team led or worked on outside Spockhart, in previous roles and our own ventures. Client names are withheld.</p>
     <HeroLive slot="figure" inline />
   </PageHero>
 
@@ -67,7 +67,7 @@ const sectionsOf = (body = '') =>
                   <svg viewBox="0 0 16 16" aria-hidden="true">
                     <path d="M2.5 8a5.5 5.5 0 1 0 1.6-3.9 M2.4 2.6v2.6H5 M8 5.2V8l2 1.3" />
                   </svg>
-                  Before Spockhart
+                  {d.origin}
                 </p>
                 <p class="project-kicker">
                   Case study {String(i + 1).padStart(2, '0')}

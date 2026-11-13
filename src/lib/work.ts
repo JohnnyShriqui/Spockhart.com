@@ -5,6 +5,8 @@
  * client's logo would sit (24x24 stroke icons, drawn in a navy hexagon).
  */
 export const industryIcons: Record<string, string> = {
+  'survival-sports-platform': 'M8 4h8v5a4 4 0 0 1-8 0zM8 6H5a3 3 0 0 0 3 3M16 6h3a3 3 0 0 1-3 3M12 13v4M9 21h6M10 17h4',
+  'formula-racing': 'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM3.5 12.5h5l2 3h3l2-3h5M12 15.5V21',
   'receiving-labels': 'M3 8.5 12 4l9 4.5v8L12 21l-9-4.5zM3 8.5 12 13l9-4.5M12 13v8M7 10.7l9-4.5',
   'commission-automation': 'M3 21V11l5 3v-3l5 3v-3l5 3V5h3v16zM3 21h18M7 17h2M12 17h2M17 17h1',
   'project-feasibility-platform': 'M4 21V9h7v12M11 21V3h3l6 4M14 7h6M18 7v4M3 21h18M6.5 12h2M6.5 15h2M6.5 18h2',

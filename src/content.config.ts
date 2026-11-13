@@ -18,6 +18,8 @@ const work = defineCollection({
     status: z.enum(['complete', 'in-development']).default('complete'),
     metrics: z.array(z.object({ value: z.string(), label: z.string() })).min(1).max(4),
     order: z.number(),
+    /** The marker above the case study: when or where the work was done */
+    origin: z.string().default('Before Spockhart'),
   }),
 });
 

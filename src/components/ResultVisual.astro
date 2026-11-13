@@ -647,6 +647,107 @@ const building = 'M-6 7V-4l6-4 6 4v11zM-3 -1h2M1 -1h2M-3 3h2M1 3h2';
   }
 
   {
+    id === 'survival-sports-platform' && (
+      <>
+        <div class="win">
+          <div class="win-bar" aria-hidden="true"><span class="win-dots"><i /><i /><i /></span><span>Running a league</span></div>
+          <div class="scene" data-scene data-loop="12" data-still="11.3" style="--loop:12;--still:11.3">
+            <div class="lane">
+              <div class="lane-head">
+                <span class="tag">Before</span>
+                <span class="readout">Run by hand</span>
+              </div>
+              <div class="sheet ends" aria-hidden="true">
+                {Array.from({ length: 40 }, (_, k) => (
+                  <span class="sc" style={`--a:${(0.3 + k * 0.26).toFixed(2)}`} />
+                ))}
+              </div>
+            </div>
+            <div class="lane">
+              <div class="lane-head">
+                <span class="tag tag-hot">After</span>
+                <span class="readout readout-hot swap">
+                  <span class="dn" style="--d:1.2">Launching</span>
+                  <span class="ap" style="--a:1.2">Live, league by league</span>
+                </span>
+              </div>
+              <div class="cells ends" aria-hidden="true">
+                {twelve.map((i) => (
+                  <span class="cell cell-hot" style={`--a:${(0.4 + i * 0.14).toFixed(2)}`}>
+                    <svg class="cell-doc pop" viewBox="0 0 14 15">
+                      <path d="M3 1h8v4a4 4 0 0 1-8 0zM5.5 11.5h3v2h-3z" />
+                      <path d="M4.5 4.5l2 2 3-3" class="tick" />
+                    </svg>
+                  </span>
+                ))}
+              </div>
+              <p class="lane-foot lane-foot-hot ends"><span class="ap" style="--a:2.1">Every commissioner brings a whole league.</span></p>
+            </div>
+          </div>
+        </div>
+        <div class="rv-split">
+          <div>
+            <span class="rv-k">A new platform</span>
+            <p class="rv-num rv-num-sm"><strong>Concept → live</strong></p>
+          </div>
+          <div>
+            <span class="rv-k">Launched</span>
+            <p class="rv-num rv-num-sm"><strong>Season one</strong></p>
+          </div>
+        </div>
+      </>
+    )
+  }
+
+  {
+    id === 'formula-racing' && (
+      <>
+        <div class="win">
+          <div class="win-bar" aria-hidden="true"><span class="win-dots"><i /><i /><i /></span><span>One build season</span></div>
+          <div class="scene" data-scene data-loop="12" data-still="11.3" style="--loop:12;--still:11.3">
+            <div class="lane">
+              <div class="lane-head">
+                <span class="tag">Start</span>
+                <span class="readout">A blank page</span>
+              </div>
+              <div class="phases-row ends" aria-hidden="true">
+                {['Design', 'Build', 'Test', 'Compete'].map((p) => (
+                  <span class="cell phase-cell"><span class="phase-name">{p}</span></span>
+                ))}
+              </div>
+            </div>
+            <div class="lane">
+              <div class="lane-head">
+                <span class="tag tag-hot">Season end</span>
+                <span class="readout readout-hot swap">
+                  <span class="dn" style="--d:9.4">Building</span>
+                  <span class="ap" style="--a:9.4">Race-ready</span>
+                </span>
+              </div>
+              <div class="phases-row ends" aria-hidden="true">
+                {['Design', 'Build', 'Test', 'Compete'].map((p, i) => (
+                  <span class="cell cell-hot phase-cell" style={`--a:${(0.6 + i * 2.6).toFixed(2)}`}><span class="phase-name">{p}</span></span>
+                ))}
+              </div>
+              <p class="lane-foot lane-foot-hot ends"><span class="ap" style="--a:9.6">On the start line, on the day.</span></p>
+            </div>
+          </div>
+        </div>
+        <div class="rv-split">
+          <div>
+            <span class="rv-k">Seasons on the team</span>
+            <p class="rv-num"><strong>4</strong></p>
+          </div>
+          <div>
+            <span class="rv-k">Every season</span>
+            <p class="rv-num rv-num-sm"><strong>Concept → race car</strong></p>
+          </div>
+        </div>
+      </>
+    )
+  }
+
+  {
     id === 'receiving-labels' && (
       <>
         <div class="win">
@@ -672,8 +773,8 @@ const building = 'M-6 7V-4l6-4 6 4v11zM-3 -1h2M1 -1h2M-3 3h2M1 3h2';
               <div class="lane-head">
                 <span class="tag tag-hot">After</span>
                 <span class="readout readout-hot swap">
-                  <span class="dn" style="--d:0.5">Marking on site</span>
-                  <span class="ap" style="--a:0.5">Received on arrival</span>
+                  <span class="dn" style="--d:0.5">Recording on site</span>
+                  <span class="ap" style="--a:0.5">Recorded on arrival</span>
                 </span>
               </div>
               <div class="cells ends" aria-hidden="true">
@@ -1034,6 +1135,11 @@ const building = 'M-6 7V-4l6-4 6 4v11zM-3 -1h2M1 -1h2M-3 3h2M1 3h2';
 
   /* Commissions */
   .sheet { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 3px; }
+  /* Formula racing: one season in four phases, lit one after another */
+  .phases-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; }
+  .phase-cell { display: grid; place-items: center; }
+  .phase-name { font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: rgb(var(--fg) / 0.45); }
+  .cell-hot .phase-name { color: rgb(var(--fg) / calc(0.45 + 0.55 * clamp(0, (var(--t) - var(--a)) * 4, 1))); }
   .sc {
     position: relative;
     height: 16px;
