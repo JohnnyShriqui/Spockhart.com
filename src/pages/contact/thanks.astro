@@ -1,6 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
-import Mark from '../../components/Mark.astro';
+import Logo from '../../components/Logo.astro';
 import Mist from '../../components/Mist.astro';
 import CopyEmail from '../../components/CopyEmail.astro';
 import { site } from '../../config/site';
@@ -26,9 +26,11 @@ import { site } from '../../config/site';
       <!-- A receipt of what they sent. Filled from this browser tab only; hidden on a direct visit. -->
       <aside class="ty-receipt load-fade" aria-label="Your message" data-receipt hidden>
         <div class="rc-head">
-          <Mark size={22} tone="brand" />
-          <span class="rc-brand">Spockhart</span>
-          <span class="rc-status"><i aria-hidden="true"></i>Delivered</span>
+          <Logo mark={false} class="rc-logo" />
+          <span class="rc-status">
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.4l2.9 2.9 6.1-6.6" /></svg>
+            Delivered
+          </span>
         </div>
         <dl class="rc-rows">
           <div><dt>From</dt><dd data-sent="name"></dd></div>
@@ -138,9 +140,21 @@ import { site } from '../../config/site';
     backdrop-filter: blur(10px);
   }
   .rc-head { display: flex; align-items: center; gap: 0.6rem; padding-bottom: 1rem; border-bottom: 1px solid rgb(255 255 255 / 0.08); }
-  .rc-brand { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.32em; text-transform: uppercase; color: var(--ink); }
-  .rc-status { margin-left: auto; display: inline-flex; align-items: center; gap: 0.45rem; font-size: 0.8125rem; color: var(--ink-2); }
-  .rc-status i { width: 7px; height: 7px; border-radius: 50%; background: #6fd3a8; box-shadow: 0 0 0 4px rgb(111 211 168 / 0.14); }
+  /* The same wordmark as the nav bar, a size down */
+  .ty-receipt :global(.rc-logo .wordmark) { font-size: 0.8125rem; }
+  /* Delivered: a fine check and small capitals, no badge */
+  .rc-status {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .rc-status svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
   .rc-rows { display: grid; gap: 0.65rem; }
   .rc-rows > div { display: grid; grid-template-columns: 7.5rem minmax(0, 1fr); gap: 1rem; align-items: baseline; }
   .rc-rows dt { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); }
