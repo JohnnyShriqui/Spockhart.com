@@ -24,7 +24,7 @@ export const site = {
    * john@spockhart.com), Send delivers the message straight to that inbox. The key is meant to
    * be public. Without one, the form falls back to composing an email for the visitor to send.
    */
-  formAccessKey: '',
+  formAccessKey: 'cbe1747f-cec8-4f16-bd0d-994a1a5f8465',
   /** Any other JSON form service (Formspree, Basin...), used only when there is no access key */
   formEndpoint: '',
   /** Show the advisory board on the About page. Turn on once every advisor has agreed to be listed. */

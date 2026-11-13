@@ -99,7 +99,6 @@ export function initContactForm() {
       subject: `New inquiry from ${get('name')}${get('organization') ? `, ${get('organization')}` : ''}`,
       from_name: 'Spockhart website',
       replyto: get('email'),
-      botcheck: '',
       ...body,
     };
   };
