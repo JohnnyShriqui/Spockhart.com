@@ -1,5 +1,5 @@
 ---
-title: 'An Online Gaming Platform, Redesigned End to End, Growing Paying Users [6x].'
+title: '[6x Paying Users] on an Online Gaming Platform, [Redesigned End to End].'
 summary: A skill-based online gaming platform, redesigned from the ground up with new features that let organizers run their own contests and bring their own players. Paying users and revenue grew more than sixfold.
 client: 'An Online Gaming Platform'
 sector: Digital product and revenue development
