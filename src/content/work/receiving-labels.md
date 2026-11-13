@@ -4,7 +4,7 @@ summary: A contract manufacturer's receiving depended on a single location, so d
 client: 'A Contract Manufacturer'
 sector: Manufacturing operations
 scope: Receiving and material flow
-order: 2
+order: 3
 metrics:
   - value: '~2 hours → Minutes'
     label: Time required to receive incoming material
