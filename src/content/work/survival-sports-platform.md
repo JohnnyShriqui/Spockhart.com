@@ -1,30 +1,30 @@
 ---
-title: 'A New Digital Platform, Built From Scratch, Growing Paying Users [6x].'
-summary: A new digital platform identified, designed, built with a partner engineering team and taken to market, where paying users and revenue grew more than sixfold.
-client: 'A Digital Platform Startup'
-sector: Revenue development
-scope: Product strategy, build and go-to-market
+title: 'An Online Gaming Platform, Redesigned End to End, Growing Paying Users [6x].'
+summary: A skill-based online gaming platform, redesigned from the ground up with new features that let organizers run their own contests and bring their own players. Paying users and revenue grew more than sixfold.
+client: 'An Online Gaming Platform'
+sector: Digital product and revenue development
+scope: Product redesign, feature development and growth
 origin: Our own venture
 order: 3
 metrics:
   - value: 6x
     label: Growth in paying users, and in revenue
-  - value: Idea → live product
-    label: Designed, built and launched from scratch, with engineering delivered by a partner team
-  - value: Network-led growth
-    label: Every new customer brings their own group of users
+  - value: Rebuilt end to end
+    label: A full product redesign, from the player experience to the back end
+  - value: Organizer-led growth
+    label: Every organizer brings their own community of players
 ---
 
 ## The challenge
 
-A popular activity was still often run by hand, on spreadsheets and group chats. The opportunity was to turn that manual work into a product, and grow it through the people already running it.
+Skill-based gaming contests, run by organizers for their own communities, were often managed by hand: entries in spreadsheets, picks over group chats, results tallied manually. That capped how many contests an organizer could run, and how many players could join them.
 
 ## What the team did
 
-- Identified the opportunity and designed the product around the people who run each group
-- Took it from first prototype to a live platform, with engineering delivered by a partner team
-- Launched it on a growth model where every new customer brings their own users
+- Redesigned the platform end to end, around the organizers who run each contest and the players who join them
+- Built new features that take the manual work off organizers, from entries and picks through to results
+- Built growth into the product itself: every organizer brings their own community, so the platform grows one community at a time
 
 ## The outcome
 
-Paying users and revenue grew more than sixfold. It was built the same way Spockhart builds for clients: find the opportunity, prototype fast, and take it to market.
+Paying users and revenue grew more than sixfold. It is the same playbook Spockhart brings to clients: find where the work is still manual, build the product that removes it, and turn it into growth.

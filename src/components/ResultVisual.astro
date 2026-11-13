@@ -650,39 +650,66 @@ const building = 'M-6 7V-4l6-4 6 4v11zM-3 -1h2M1 -1h2M-3 3h2M1 3h2';
     id === 'survival-sports-platform' && (
       <>
         <div class="win">
-          <div class="win-bar" aria-hidden="true"><span class="win-dots"><i /><i /><i /></span><span>Turning manual work into a product</span></div>
+          <div class="win-bar" aria-hidden="true"><span class="win-dots"><i /><i /><i /></span><span>Contest dashboard</span></div>
           <div class="scene" data-scene data-loop="12" data-still="11.3" style="--loop:12;--still:11.3">
-            <div class="lane">
-              <div class="lane-head">
-                <span class="tag">Before</span>
-                <span class="readout">Run by hand</span>
-              </div>
-              <div class="sheet ends" aria-hidden="true">
-                {Array.from({ length: 40 }, (_, k) => (
-                  <span class="sc" style={`--a:${(0.3 + k * 0.26).toFixed(2)}`} />
-                ))}
-              </div>
-            </div>
-            <div class="lane">
-              <div class="lane-head">
-                <span class="tag tag-hot">After</span>
-                <span class="readout readout-hot swap">
-                  <span class="dn" style="--d:1.2">Launching</span>
-                  <span class="ap" style="--a:1.2">Live, and growing</span>
-                </span>
-              </div>
-              <div class="cells ends" aria-hidden="true">
-                {twelve.map((i) => (
-                  <span class="cell cell-hot" style={`--a:${(0.4 + i * 0.14).toFixed(2)}`}>
-                    <svg class="cell-doc pop" viewBox="0 0 14 15">
-                      <path d="M3 1h8v4a4 4 0 0 1-8 0zM5.5 11.5h3v2h-3z" />
-                      <path d="M4.5 4.5l2 2 3-3" class="tick" />
-                    </svg>
-                  </span>
-                ))}
-              </div>
-              <p class="lane-foot lane-foot-hot ends"><span class="ap" style="--a:2.1">Every new customer brings their own users.</span></p>
-            </div>
+            <svg class="gp ends" viewBox="0 0 600 270" aria-hidden="true">
+              <!-- A contest, live: picks lock in, players advance or go out -->
+              <text x="14" y="30" class="gp-title">Round 7</text>
+              <rect x="82" y="17" width="44" height="18" rx="9" class="gp-live ap" style="--a:0.3" />
+              <text x="104" y="30" text-anchor="middle" class="gp-live-t ap" style="--a:0.3">LIVE</text>
+              <text x="14" y="54" class="gp-col">Player</text>
+              <text x="182" y="54" text-anchor="middle" class="gp-col">Pick</text>
+              <text x="253" y="54" text-anchor="middle" class="gp-col">Status</text>
+                <g class="gp-row" style="--a:3.2">
+                  <circle cx="26" cy="74" r="7" class="gp-avatar" />
+                  <rect x="42" y="70" width="96" height="8" rx="4" class="gp-name" />
+                  <rect x="160" y="64" width="44" height="20" rx="10" class="gp-chip" />
+                  <text x="182" y="78" text-anchor="middle" class="gp-chip-t">KC</text>
+                  <path d="M248 70 l4 4 7-8" class="gp-ok pop" style="--a:3.2" />
+                </g>
+                <g class="gp-row gp-out" style="--a:4.6">
+                  <circle cx="26" cy="110" r="7" class="gp-avatar" />
+                  <rect x="42" y="106" width="78" height="8" rx="4" class="gp-name" />
+                  <rect x="160" y="100" width="44" height="20" rx="10" class="gp-chip" />
+                  <text x="182" y="114" text-anchor="middle" class="gp-chip-t">PHI</text>
+                  <path d="M249 105 l8 8 M257 105 l-8 8" class="gp-x pop" style="--a:4.6" />
+                </g>
+                <g class="gp-row" style="--a:3.6">
+                  <circle cx="26" cy="146" r="7" class="gp-avatar" />
+                  <rect x="42" y="142" width="104" height="8" rx="4" class="gp-name" />
+                  <rect x="160" y="136" width="44" height="20" rx="10" class="gp-chip" />
+                  <text x="182" y="150" text-anchor="middle" class="gp-chip-t">BUF</text>
+                  <path d="M248 142 l4 4 7-8" class="gp-ok pop" style="--a:3.6" />
+                </g>
+                <g class="gp-row" style="--a:4.0">
+                  <circle cx="26" cy="182" r="7" class="gp-avatar" />
+                  <rect x="42" y="178" width="70" height="8" rx="4" class="gp-name" />
+                  <rect x="160" y="172" width="44" height="20" rx="10" class="gp-chip" />
+                  <text x="182" y="186" text-anchor="middle" class="gp-chip-t">DET</text>
+                  <path d="M248 178 l4 4 7-8" class="gp-ok pop" style="--a:4.0" />
+                </g>
+                <g class="gp-row gp-out" style="--a:5.6">
+                  <circle cx="26" cy="218" r="7" class="gp-avatar" />
+                  <rect x="42" y="214" width="88" height="8" rx="4" class="gp-name" />
+                  <rect x="160" y="208" width="44" height="20" rx="10" class="gp-chip" />
+                  <text x="182" y="222" text-anchor="middle" class="gp-chip-t">SF</text>
+                  <path d="M249 213 l8 8 M257 213 l-8 8" class="gp-x pop" style="--a:5.6" />
+                </g>
+              <line x1="300" y1="22" x2="300" y2="250" class="gp-divide" />
+
+              <!-- Paying users, growing sixfold -->
+              <text x="324" y="30" class="gp-title">Paying users</text>
+              <line x1="324" y1="232" x2="584" y2="232" class="gp-axis" />
+              <line x1="324" y1="180" x2="584" y2="180" class="gp-grid" />
+              <line x1="324" y1="128" x2="584" y2="128" class="gp-grid" />
+              <line x1="324" y1="76" x2="584" y2="76" class="gp-grid" />
+              <path d="M330 218 C400 214 452 196 490 164 S556 92 574 70 L574 232 L330 232 Z" class="gp-area" />
+              <path d="M330 218 C400 214 452 196 490 164 S556 92 574 70" pathLength="1" class="gp-line" />
+              <circle cx="330" cy="218" r="3.5" class="gp-dot0" />
+              <text x="330" y="252" class="gp-col">Start</text>
+              <circle cx="574" cy="70" r="5" class="gp-dot pop" style="--a:9.1" />
+              <text x="566" y="56" text-anchor="end" class="gp-six ap" style="--a:9.3">6x</text>
+            </svg>
           </div>
         </div>
         <div class="rv-split">
@@ -1087,6 +1114,37 @@ const building = 'M-6 7V-4l6-4 6 4v11zM-3 -1h2M1 -1h2M-3 3h2M1 3h2';
 
   /* Commissions */
   .sheet { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 3px; }
+  /* Online gaming platform: a live contest on the left, paying users growing on the right */
+  .gp { display: block; width: 100%; height: auto; padding: 0.4rem 0.6rem 0.2rem; box-sizing: border-box; }
+  .gp text { font-family: var(--font-body); }
+  .gp-title { font-size: 14px; font-weight: 600; fill: var(--fg-solid); }
+  .gp-col { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; fill: var(--muted); }
+  .gp-live { fill: rgb(var(--hot-rgb) / 0.18); stroke: rgb(var(--hot-rgb) / 0.6); }
+  .gp-live-t { font-size: 9.5px; font-weight: 700; letter-spacing: 0.14em; fill: var(--hot); }
+  .gp-avatar { fill: rgb(var(--fg) / 0.22); }
+  .gp-name { fill: rgb(var(--fg) / 0.16); }
+  .gp-chip { fill: rgb(var(--fg) / 0.08); stroke: rgb(var(--fg) / 0.18); }
+  .gp-chip-t { font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; fill: var(--soft); }
+  .gp-ok { fill: none; stroke: var(--hot); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+  .gp-x { fill: none; stroke: #f08a98; stroke-width: 2.2; stroke-linecap: round; }
+  /* A player who goes out fades back */
+  .gp-out > :not(.gp-x) { opacity: calc(1 - 0.6 * clamp(0, (var(--t) - var(--a)) * 4, 1)); }
+  .gp-divide { stroke: rgb(var(--fg) / 0.1); }
+  .gp-axis { stroke: rgb(var(--fg) / 0.3); }
+  .gp-grid { stroke: rgb(var(--fg) / 0.07); }
+  .gp-line {
+    fill: none;
+    stroke: var(--hot);
+    stroke-width: 2.6;
+    stroke-linecap: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: calc(1 - clamp(0, (var(--t) - 0.6) / 8.4, 1));
+    filter: drop-shadow(0 0 4px rgb(var(--hot-rgb) / 0.55));
+  }
+  .gp-area { fill: rgb(var(--hot-rgb) / 0.12); clip-path: inset(0 calc((1 - clamp(0, (var(--t) - 0.6) / 8.4, 1)) * 100%) 0 0); }
+  .gp-dot0 { fill: rgb(var(--fg) / 0.5); }
+  .gp-dot { fill: var(--hot); stroke: var(--fg-solid); stroke-width: 1.5; }
+  .gp-six { font-family: var(--font-display) !important; font-size: 24px; fill: var(--fg-solid); }
   .sc {
     position: relative;
     height: 16px;
