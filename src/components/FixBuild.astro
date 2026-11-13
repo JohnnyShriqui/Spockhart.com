@@ -2,8 +2,8 @@
 /**
  * Fix what's broken. Build what's missing.
  *
- * One chart, Before and After. After, revenue rises by two new slices (A and B) and costs fall
- * by four slices (1 to 4). Each slice is a real result our team delivered, drawn out to its case
+ * One chart, Before and After. After, revenue rises by new slices (A, B...) and costs fall by
+ * cost slices (1, 2...). Each slice is a real result our team delivered, drawn out to its case
  * study on the right. The After builds itself on a loop while the chart is on screen.
  *
  * Laptops: each case study opens like a dropdown when clicked, with its words on top and its
@@ -33,13 +33,10 @@ interface Item {
 
 const build: Item[] = [
   { k: 'A', id: 'sales-performance-system', value: '+$316K a month', rest: ' with a new sales intelligence system' },
-  { k: 'B', id: 'lead-generation-engine', value: 'A $1B+ market opened', rest: ' through a new digital service' },
 ];
 const fix: Item[] = [
   { k: '1', id: 'commission-automation', value: '80% less time', rest: ' processing commissions for a $1.2B manufacturer', brief: 'Commissions at a $1.2B manufacturer' },
-  { k: '2', id: 'project-feasibility-platform', value: '12 months → minutes', rest: ', eliminating $100K+ assessment costs' },
-  { k: '3', id: 'subcontractor-financing-marketplace', value: '6+ months → weeks', rest: ' for subcontractor financing approvals' },
-  { k: '4', id: 'momentum-exchange-prototype', value: '83% greater fuel efficiency', rest: ' with a new momentum-transfer system' },
+  { k: '2', id: 'momentum-exchange-prototype', value: '83% greater fuel efficiency', rest: ' with a new momentum-transfer system' },
 ];
 
 /* Chart geometry. The same chart is drawn twice: tall beside the list of case studies on laptops
@@ -54,7 +51,7 @@ const chartFor = (key: 'wide' | 'narrow') => {
   const REV = 230 * S; // revenue, before
   const COST = 216 * S; // costs, before: just under revenue
   const ADD = (138 / build.length) * S; // each new revenue slice: the gain stays the same height however many there are
-  const CUT = 26 * S; // each cost slice removed
+  const CUT = (104 / fix.length) * S; // each cost slice removed: the saving stays the same height however many there are
   const TOP = 42;
   const BASE = TOP + REV + ADD * build.length;
   const lab = 22; // axis labels below the base line
@@ -111,7 +108,7 @@ const sets = [
       <svg class="fb-links" aria-hidden="true" data-fb-links></svg>
 
       <!-- The chart, in the same window style as the case studies -->
-      <figure class="fb-chart" aria-label="Before, costs are just under revenue. After, revenue is up two slices and costs are down four.">
+      <figure class="fb-chart" aria-label="Before, costs are just under revenue. After, revenue is up and costs are down.">
         <div class="fb-win">
           <div class="fb-win-bar"><span class="fb-dots"><i></i><i></i><i></i></span>Revenue vs costs</div>
           {
@@ -149,7 +146,7 @@ const sets = [
                   <text x={(before.rev + before.cost + W) / 2} y={c.BASE + c.grp} text-anchor="middle" class="fb-group">Before</text>
                 </g>
 
-                <!-- After: revenue up by A and B, costs down by 1 to 4 -->
+                <!-- After: revenue up by the new slices, costs down by the cost slices -->
                 <rect x={after.rev} y={c.revTop} width={W} height={c.REV} rx="2" class="fb-rev fb-rev-after" />
                 {
                   build.map((b, i) => {
@@ -389,6 +386,15 @@ const sets = [
         const first = cards[0].getBoundingClientRect();
         const last = cards[cards.length - 1].getBoundingClientRect();
         chart.style.marginTop = '0px';
+        // A short list (only a few case studies): the drawing fills the panel instead of
+        // shrinking to the list, and the lines curve across to wherever the cards sit
+        const room = chartFig.getBoundingClientRect().bottom - parseFloat(getComputedStyle(chartFig).paddingBottom) - chart.getBoundingClientRect().top;
+        if (last.bottom - first.top < room - 60) {
+          chart.style.height = `${(room - 16).toFixed(1)}px`;
+          chart.style.marginTop = '16px';
+          gridUp();
+          return 0;
+        }
         chart.style.height = `${(last.bottom - first.top).toFixed(1)}px`;
         const top = first.top - chart.getBoundingClientRect().top;
         chart.style.marginTop = `${top.toFixed(1)}px`;
@@ -462,7 +468,9 @@ const sets = [
             const cs = getComputedStyle(chartFig);
             const pad = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
             chartFig.style.removeProperty('margin-top');
-            chartFig.style.height = `${(cardsBox.offsetHeight - pad).toFixed(1)}px`;
+            // ...but never so short that the drawing has to shrink
+            const tall = Math.max(cardsBox.offsetHeight, chartFig.offsetWidth * 0.82);
+            chartFig.style.height = `${(tall - pad).toFixed(1)}px`;
             centre();
           }
         } else {
