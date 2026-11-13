@@ -4,7 +4,6 @@ summary: A skill-based online gaming platform, redesigned from the ground up wit
 client: 'An Online Gaming Platform'
 sector: Digital product and revenue development
 scope: Product redesign, feature development and growth
-origin: Our own venture
 order: 4
 metrics:
   - value: 6x
