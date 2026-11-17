@@ -1,0 +1,252 @@
+---
+/**
+ * Team hero figure: who is involved in every engagement, top to bottom. The advisory board
+ * guides it, our founder leads it, specialists come in as the work needs, and the client's own
+ * team ends up owning it. A spine draws down through the four, and each row arrives as it lands.
+ */
+import { advisors } from '../data/advisors';
+import { site } from '../config/site';
+import { initials } from '../lib/format';
+
+const board = advisors.filter((a) => a.confirmed || site.previewTeam);
+const specialists = [
+  { label: 'Engineering', d: 'M8.5 7 3.5 12l5 5M15.5 7l5 5-5 5' },
+  { label: 'Data', d: 'M5 19v-7M12 19V5M19 19v-10' },
+  { label: 'AI', d: 'M12 3.5c.7 4.4 3.6 7.3 8.5 8.5-4.9 1.2-7.8 4.1-8.5 8.5-.7-4.4-3.6-7.3-8.5-8.5 4.9-1.2 7.8-4.1 8.5-8.5z' },
+  { label: 'Design', d: 'M4 20l1.2-4.6L15.6 5a2.1 2.1 0 0 1 3 3L8.2 18.4 4 20zM13.6 7l3 3' },
+];
+---
+
+<figure
+  class="crew"
+  aria-label="Who is involved in every Spockhart engagement: the advisory board guides it, our founder leads it from the first conversation to the hand-over, specialists are brought in as the work needs, and your team is trained to own it."
+>
+  <div class="crew-head">
+    <span class="crew-kicker">Every engagement</span>
+    <span class="crew-tag">Who is involved</span>
+  </div>
+
+  <ol class="crew-rows">
+    <li class="crew-row" style="--n:0">
+      <span class="crew-node" aria-hidden="true"></span>
+      <div class="crew-text">
+        <p class="crew-role">Advisory board</p>
+        <p class="crew-note">Guidance from leaders who have done it</p>
+      </div>
+      <div class="crew-side crew-avatars" aria-hidden="true">
+        {board.map((a, i) => <span class="av" style={`--k:${i}`}>{initials(a.name)}</span>)}
+      </div>
+    </li>
+
+    <li class="crew-row is-lead" style="--n:1">
+      <span class="crew-node" aria-hidden="true"></span>
+      <div class="crew-text">
+        <p class="crew-role">Engagement lead</p>
+        <p class="crew-note">With you from the first call to the hand-over</p>
+      </div>
+      <div class="crew-side" aria-hidden="true">
+        <span class="av av-lead">JS</span>
+      </div>
+    </li>
+
+    <li class="crew-row" style="--n:2">
+      <span class="crew-node" aria-hidden="true"></span>
+      <div class="crew-text">
+        <p class="crew-role">Specialists</p>
+        <p class="crew-note">Engineering, data, AI and design</p>
+      </div>
+      <div class="crew-side crew-skills">
+        {
+          specialists.map((s) => (
+            <span class="skill" title={s.label}>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d={s.d} /></svg>
+              <span class="skill-label">{s.label}</span>
+            </span>
+          ))
+        }
+      </div>
+    </li>
+
+    <li class="crew-row" style="--n:3">
+      <span class="crew-node" aria-hidden="true"></span>
+      <div class="crew-text">
+        <p class="crew-role">Your team</p>
+        <p class="crew-note">Trained to own and run what we build</p>
+      </div>
+      <div class="crew-side" aria-hidden="true">
+        <span class="handover">
+          <svg viewBox="0 0 24 24"><circle cx="15" cy="9" r="4.5" /><path d="M11.8 12.2 4 20M6.5 17.5l2.2 2.2M9 15l2 2" /></svg>
+          Month {site.offer.minimumMonths}
+        </span>
+      </div>
+    </li>
+  </ol>
+</figure>
+
+<style>
+  .crew {
+    --node: 26px;
+    --row-pad: 1.05rem;
+    margin: 0;
+    width: 100%;
+    background: var(--card-bg, #fff);
+    border: 1px solid rgb(27 42 61 / 0.08);
+    border-radius: 14px;
+    box-shadow:
+      0 1px 2px rgb(27 42 61 / 0.04),
+      0 24px 48px -20px rgb(31 77 111 / 0.28),
+      0 60px 90px -60px rgb(31 77 111 / 0.3);
+    overflow: hidden;
+  }
+  .crew-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--s-4);
+    padding: 1rem 1.35rem 0.9rem;
+    border-bottom: 1px solid var(--rule);
+  }
+  .crew-kicker {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+  .crew-tag { font-size: 0.8125rem; color: var(--ink-3); }
+
+  .crew-rows {
+    list-style: none;
+    margin: 0;
+    padding: 0.5rem 0;
+    position: relative;
+  }
+  /* The spine through the four nodes */
+  .crew-rows::before {
+    content: '';
+    position: absolute;
+    left: calc(1.35rem + var(--node) / 2 - 0.75px);
+    top: calc(0.5rem + var(--row-pad) + var(--node) / 2);
+    bottom: calc(0.5rem + var(--row-pad) + var(--node) / 2);
+    width: 1.5px;
+    background: linear-gradient(180deg, var(--rule-2), var(--accent-soft) 38%, var(--accent-soft) 62%, var(--rule-2));
+    transform-origin: top;
+  }
+
+  .crew-row {
+    position: relative;
+    display: grid;
+    grid-template-columns: var(--node) minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.95rem;
+    padding: var(--row-pad) 1.35rem;
+  }
+  .crew-row + .crew-row { border-top: 1px solid rgb(27 42 61 / 0.05); }
+  .crew-node {
+    width: 11px;
+    height: 11px;
+    justify-self: center;
+    border-radius: 50%;
+    background: var(--card-bg, #fff);
+    border: 1.5px solid var(--accent-soft);
+    position: relative;
+    z-index: 1;
+  }
+  .crew-text { min-width: 0; display: grid; gap: 0.1rem; }
+  .crew-role { font-weight: 600; font-size: 1rem; color: var(--ink); line-height: 1.3; }
+  .crew-note { font-size: 0.875rem; color: var(--ink-2); line-height: 1.4; }
+
+  /* The lead: the row everything runs through */
+  .is-lead { background: linear-gradient(90deg, rgb(74 138 186 / 0.12), rgb(74 138 186 / 0.03)); }
+  .is-lead .crew-node {
+    width: 15px;
+    height: 15px;
+    background: var(--accent);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 5px rgb(74 138 186 / 0.18);
+  }
+
+  .crew-side { display: flex; align-items: center; justify-content: flex-end; }
+  .av {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    font-family: var(--font-display);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    color: var(--ink);
+    background: linear-gradient(160deg, #e6eef6, #d3e0ec);
+    border: 2px solid var(--card-bg, #fff);
+  }
+  .crew-avatars .av + .av { margin-left: -5px; }
+  .crew-avatars .av:nth-child(2) { background: linear-gradient(160deg, #ecebf8, #dad8f0); }
+  .crew-avatars .av:nth-child(3) { background: linear-gradient(160deg, #e5f1f1, #cfe3e3); }
+  .crew-avatars .av:nth-child(4) { background: linear-gradient(160deg, #eef1f5, #d9e0e8); }
+  .av-lead {
+    width: 40px;
+    height: 40px;
+    font-size: 0.9375rem;
+    color: #fff;
+    background: linear-gradient(160deg, var(--accent), var(--brand));
+    border: 0;
+    box-shadow: 0 6px 14px -6px rgb(31 77 111 / 0.6);
+  }
+
+  .crew-skills { gap: 0.35rem; }
+  .skill {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: var(--paper);
+    border: 1px solid var(--rule);
+  }
+  .skill svg { width: 17px; height: 17px; fill: none; stroke: var(--accent); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+  .skill-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .handover {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.7rem 0.35rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--accent);
+    background: rgb(74 138 186 / 0.1);
+    white-space: nowrap;
+  }
+  .handover svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; }
+
+  /* On load: the spine draws down, and each row arrives as it reaches it */
+  @media (prefers-reduced-motion: no-preference) {
+    .crew-rows::before { animation: crew-spine 1500ms var(--ease-out) 500ms both; }
+    .crew-row { animation: crew-row 800ms var(--ease-out) both; animation-delay: calc(560ms + var(--n) * 300ms); }
+    .crew-row .crew-node { animation: crew-node 500ms var(--ease-out) both; animation-delay: calc(620ms + var(--n) * 300ms); }
+    .crew-avatars .av { animation: crew-node 520ms var(--ease-out) both; animation-delay: calc(760ms + var(--k) * 90ms); }
+  }
+  @keyframes crew-spine { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+  @keyframes crew-row { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  @keyframes crew-node { from { opacity: 0; transform: scale(0.4); } to { opacity: 1; transform: none; } }
+
+  @media (max-width: 420px) {
+    .crew { --row-pad: 0.9rem; }
+    .crew-row { gap: 0.75rem; padding-inline: 1rem; }
+    .crew-rows::before { left: calc(1rem + var(--node) / 2 - 0.75px); }
+    .crew-head { padding-inline: 1rem; }
+    .crew-skills { display: none; }
+    .av { width: 30px; height: 30px; font-size: 0.625rem; }
+    .crew-avatars .av + .av { margin-left: -6px; }
+  }
+</style>

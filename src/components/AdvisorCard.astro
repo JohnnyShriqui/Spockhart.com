@@ -1,37 +1,41 @@
 ---
+/**
+ * One advisor on the Team page. With a photo, the portrait fills the plate; without one, the plate
+ * carries their initials on a soft wash in one of four brand tones, so a row reads as a set.
+ */
 import type { Advisor } from '../data/advisors';
 import { initials } from '../lib/format';
+import { site } from '../config/site';
+
 interface Props {
   advisor: Advisor;
-  compact?: boolean;
+  /** Position in the row, to pick the plate's tone */
+  index?: number;
 }
-const { advisor, compact = false } = Astro.props;
+const { advisor, index = 0 } = Astro.props;
+const tone = index % 4;
+const pending = !advisor.confirmed && site.previewTeam;
 ---
 
-<article class:list={['advisor', { compact }]}>
-  <div class="portrait">
+<article class:list={['advisor', `tone-${tone}`]}>
+  <div class="plate">
     {
       advisor.photo ? (
-        <img src={advisor.photo} alt={`Portrait of ${advisor.name}`} width="600" height="600" loading="lazy" decoding="async" />
+        <img src={advisor.photo} alt={`Portrait of ${advisor.name}`} width="800" height="1000" loading="lazy" decoding="async" />
       ) : (
-        <svg viewBox="0 0 120 120" aria-hidden="true" class="monogram">
-          <path class="mono-frame" d="M60 6 106.8 33 106.8 87 60 114 13.2 87 13.2 33Z" />
-          <path class="mono-facet" d="M60 6 106.8 33 60 60 13.2 33Z" />
-          <path class="mono-lines" d="M60 60V114M60 60 106.8 33M60 60 13.2 33" />
-          <text x="60" y="60" dominant-baseline="central" text-anchor="middle">{initials(advisor.name)}</text>
-        </svg>
+        <span class="plate-initials" aria-hidden="true">{initials(advisor.name)}</span>
       )
     }
+    {pending && <span class="pending"><span class="pending-long">Awaiting confirmation</span><span class="pending-short">Pending</span></span>}
   </div>
   <div class="advisor-text">
     <h3>{advisor.name}</h3>
     <p class="advisor-title">{advisor.title}</p>
-    {!compact && <p class="advisor-focus"><span>Advises on</span>{advisor.focus}</p>}
+    <p class="advisor-focus"><span>Advises on</span>{advisor.focus}</p>
     {
-      advisor.linkedin && !compact && (
-        <a class="arrow-link small" href={advisor.linkedin} target="_blank" rel="noopener">
-          <span>LinkedIn</span>
-          <span class="arr" aria-hidden="true">↗</span>
+      advisor.linkedin && (
+        <a class="advisor-link" href={advisor.linkedin} target="_blank" rel="noopener">
+          LinkedIn <span aria-hidden="true">↗</span>
         </a>
       )
     }
@@ -39,46 +43,125 @@ const { advisor, compact = false } = Astro.props;
 </article>
 
 <style>
-  .advisor { display: grid; gap: var(--s-4); align-content: start; }
-  .portrait {
-    aspect-ratio: 1;
+  .advisor {
+    --wash-a: #dbe7f2;
+    --wash-b: #f3f7fb;
+    --wash-glow: rgb(74 138 186 / 0.35);
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: 1.15rem;
+    align-content: start;
+    min-width: 0;
+  }
+  .tone-1 { --wash-a: #e1def4; --wash-b: #f5f4fb; --wash-glow: rgb(120 112 196 / 0.3); }
+  .tone-2 { --wash-a: #d6e9e8; --wash-b: #f2f8f8; --wash-glow: rgb(44 128 128 / 0.26); }
+  .tone-3 { --wash-a: #dde3ea; --wash-b: #f4f6f9; --wash-glow: rgb(88 107 128 / 0.3); }
+
+  .plate {
+    position: relative;
+    aspect-ratio: 4 / 5;
     max-width: 100%;
-    border-radius: var(--radius-lg);
-    background: var(--paper-2);
-    border: 1px solid var(--rule);
+    border-radius: 12px;
     overflow: hidden;
+    isolation: isolate;
     display: grid;
     place-items: center;
+    background:
+      radial-gradient(90% 70% at 85% 0%, var(--wash-glow), transparent 70%),
+      linear-gradient(165deg, var(--wash-a) 0%, var(--wash-b) 100%);
+    border: 1px solid rgb(27 42 61 / 0.07);
+    transition: transform 600ms var(--ease-out), box-shadow 600ms var(--ease-out);
   }
-  .portrait img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(0.15); }
-  .monogram { width: 62%; height: auto; overflow: visible; transition: transform 900ms var(--ease-out); }
-  .advisor:hover .monogram { transform: rotate(60deg); }
-  .advisor:hover .monogram text { transform: rotate(-60deg); }
-  .mono-frame { fill: none; stroke: var(--rule-2); stroke-width: 1; }
-  .mono-facet { fill: var(--accent-wash); }
-  .mono-lines { stroke: var(--rule); stroke-width: 0.75; fill: none; }
-  .monogram text {
+  /* Fine grain, like good paper */
+  .plate::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background-image: var(--grain);
+    background-size: 200px;
+    opacity: 0.08;
+    mix-blend-mode: multiply;
+  }
+  /* A hairline frame inset from the edge */
+  .plate::before {
+    content: '';
+    position: absolute;
+    inset: 10px;
+    z-index: 1;
+    border: 1px solid rgb(255 255 255 / 0.65);
+    border-radius: 6px;
+    pointer-events: none;
+  }
+  .plate img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(0.2) contrast(1.02); }
+  .plate-initials {
     font-family: var(--font-display);
-    font-size: 30px;
-    font-weight: 500;
-    fill: var(--ink);
-    letter-spacing: 0.02em;
-    transform-origin: 60px 60px;
-    transition: transform 900ms var(--ease-out);
+    font-weight: 350;
+    font-size: clamp(3.25rem, 2.4rem + 2.6vw, 5rem);
+    letter-spacing: 0.04em;
+    color: rgb(27 42 61 / 0.82);
+    line-height: 1;
+    transition: transform 700ms var(--ease-out), letter-spacing 700ms var(--ease-out);
   }
-  .advisor-text { display: grid; gap: 0.3rem; }
-  .advisor h3 { font-size: var(--step-1); font-weight: 550; }
-  .advisor-title { color: var(--ink-2); font-size: 0.9375rem; }
-  .advisor-focus { margin-top: var(--s-2); font-size: 0.9375rem; color: var(--ink); }
+  .advisor:hover .plate {
+    transform: translateY(-4px);
+    box-shadow: 0 22px 40px -24px rgb(31 77 111 / 0.45);
+  }
+  .advisor:hover .plate-initials { letter-spacing: 0.1em; }
+
+  .pending {
+    position: absolute;
+    top: 18px;
+    left: 18px;
+    z-index: 2;
+    padding: 0.25rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #8a6418;
+    background: rgb(255 248 230 / 0.92);
+    border: 1px solid rgb(181 132 36 / 0.35);
+  }
+
+  .pending-short { display: none; }
+  /* The "Advises on" lines sit level across a row, however long each title runs */
+  .advisor-text { display: grid; gap: 0.35rem; grid-template-rows: auto 1fr auto; }
+  .advisor-title { align-self: start; }
+  .advisor h3 { font-size: 1.375rem; font-weight: 500; line-height: 1.2; }
+  .advisor-title { color: var(--ink-2); font-size: 0.9375rem; line-height: 1.45; }
+  .advisor-focus {
+    margin-top: 0.6rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--rule);
+    font-size: 0.9375rem;
+    color: var(--ink);
+  }
   .advisor-focus span {
     display: block;
-    font-size: 0.7rem;
+    font-size: 0.6875rem;
     font-weight: 600;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--accent);
-    margin-bottom: 0.15rem;
+    margin-bottom: 0.2rem;
   }
-  .compact h3 { font-size: 1.0625rem; }
-  .compact .advisor-title { font-size: 0.875rem; }
+  .advisor-link { margin-top: 0.4rem; font-size: 0.875rem; font-weight: 600; color: var(--accent); text-decoration: none; }
+  .advisor-link:hover { text-decoration: underline; }
+
+  /* Phones: a compact row, the plate beside the name */
+  @media (max-width: 560px) {
+    .advisor { grid-template-columns: 104px minmax(0, 1fr); grid-template-rows: none; gap: 1rem; align-items: start; }
+    .plate { aspect-ratio: 4 / 5; border-radius: 10px; }
+    .plate::before { inset: 6px; border-radius: 5px; }
+    .plate-initials { font-size: 2rem; }
+    .pending { top: auto; bottom: 9px; left: 50%; transform: translateX(-50%); font-size: 0.5625rem; padding: 0.15rem 0.45rem; }
+    .pending-long { display: none; }
+    .pending-short { display: inline; }
+    .advisor h3 { font-size: 1.1875rem; }
+    .advisor-title { font-size: 0.875rem; }
+    .advisor-focus { margin-top: 0.35rem; padding-top: 0.5rem; font-size: 0.875rem; }
+  }
 </style>

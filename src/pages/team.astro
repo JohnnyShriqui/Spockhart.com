@@ -1,0 +1,274 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import TeamCrew from '../components/TeamCrew.astro';
+import AdvisorCard from '../components/AdvisorCard.astro';
+import ClosingCTA from '../components/ClosingCTA.astro';
+import { advisors } from '../data/advisors';
+import { site } from '../config/site';
+
+const board = advisors.filter((a) => a.confirmed || site.previewTeam);
+
+const promises = [
+  {
+    title: 'We learn before we pitch.',
+    body: 'Our first conversation is about how your organization runs, not what we can sell you.',
+    d: 'M10.5 17a6.5 6.5 0 1 0 0-13 6.5 6.5 0 0 0 0 13zM15.2 15.2 20 20',
+  },
+  {
+    title: 'We work alongside your team.',
+    body: 'We embed with the people who do the work, so what we build fits how they actually work.',
+    d: 'M9 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM2.5 20c.6-3.4 3.2-5.5 6.5-5.5s5.9 2.1 6.5 5.5M16 4.3a3.5 3.5 0 0 1 0 6.4M18.3 14.8c1.8.8 2.9 2.6 3.2 5.2',
+  },
+  {
+    title: `Results in ${site.offer.prototypeDays} days.`,
+    body: `Every engagement puts a working first version in your hands within ${site.offer.prototypeDays} days.`,
+    d: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 7v5l3.5 2',
+  },
+  {
+    title: 'We hand over the keys.',
+    body: 'Everything is documented and handed over, so your team owns and runs it without us.',
+    d: 'M15 13.5a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9zM11.8 12.2 4 20M6.5 17.5l2.2 2.2M9 15l2 2',
+  },
+];
+---
+
+<Base
+  title="Team"
+  description="Meet the people behind Spockhart: our founder, who leads every engagement, and an advisory board of leaders from business, technology and philanthropy."
+  lightHero
+>
+  <PageHero
+    theme="team"
+    light
+    title="The people behind the work."
+    lead="Every engagement is led by our founder, from the first conversation to the hand-over, and backed by specialists and an advisory board of leaders from business, technology and philanthropy."
+  >
+    <TeamCrew slot="figure" />
+  </PageHero>
+
+  <div class="page-body body-team" data-body>
+    <!-- Founder: who he is on the left, a short letter in his own words on the right -->
+    <section class="section founder" aria-labelledby="founder-title">
+      <div class="wrap founder-grid">
+        <div class="founder-id" data-reveal>
+          <p class="eyebrow">Our founder</p>
+          <h2 id="founder-title">Jonathan Shriqui</h2>
+          <p class="founder-role">Founder and engagement lead</p>
+          <dl class="founder-facts">
+            <div>
+              <dt>Based in</dt>
+              <dd>{site.city}</dd>
+            </div>
+            <div>
+              <dt>Background</dt>
+              <dd>Innovation consulting, mechatronics and AI</dd>
+            </div>
+            <div>
+              <dt>On every engagement</dt>
+              <dd>From the first conversation to the hand-over</dd>
+            </div>
+          </dl>
+        </div>
+
+        <article class="letter" data-reveal aria-label="A note from our founder">
+          <p class="letter-open">I started Spockhart because I kept seeing the same thing, everywhere I worked.</p>
+          <p>
+            Before Spockhart, I spent years in innovation consulting, building platforms, sales systems and new products for large
+            organizations. Again and again, I saw talented people losing hours every week to tedious, repetitive tasks: copying,
+            chasing, reconciling and reporting. The fix was usually obvious from the inside, and almost nobody had the time to build it.
+          </p>
+          <p>
+            Spockhart exists to build it. We work inside your organization, simplify how the work happens, connect the pieces, and
+            stay until it runs reliably without heroics. Then we hand you the keys.
+          </p>
+          <p>I lead every engagement myself, and I hold each one to a simple standard: more of your team’s time on the work that matters.</p>
+          <footer class="letter-sign">
+            <span class="sig-name">Jonathan Shriqui</span>
+            <span class="sig-role">Founder, Spockhart</span>
+          </footer>
+        </article>
+      </div>
+    </section>
+
+    {
+      board.length > 0 && (
+        <section class="section board-band" aria-labelledby="board-title">
+          <div class="wrap">
+            <div class="section-head board-head" data-reveal>
+              <p class="eyebrow">Advisory board</p>
+              <h2 id="board-title">Guided by people who have done it.</h2>
+              <p>Leaders from business, technology and philanthropy who challenge our thinking and hold our work to a high standard.</p>
+            </div>
+            <div class="board" data-reveal="stagger" style={`--cols:${Math.min(board.length, 5)}`}>
+              {board.map((a, i) => <AdvisorCard advisor={a} index={i} />)}
+            </div>
+          </div>
+        </section>
+      )
+    }
+
+    <section class="section promises-band" aria-labelledby="promises-title">
+      <div class="wrap">
+        <div class="section-head" data-reveal>
+          <p class="eyebrow">Working with us</p>
+          <h2 id="promises-title">What you can expect from us.</h2>
+        </div>
+        <ul class="promises" data-reveal="stagger">
+          {
+            promises.map((p) => (
+              <li class="promise">
+                <span class="promise-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24"><path d={p.d} /></svg>
+                </span>
+                <h3>{p.title}</h3>
+                <p>{p.body}</p>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </section>
+
+    <ClosingCTA title="Come meet the team." />
+  </div>
+</Base>
+
+<style>
+  /* ---------- Founder ---------- */
+  .founder-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: clamp(2rem, 1rem + 4vw, 5.5rem);
+    align-items: start;
+  }
+  .founder-id { display: grid; gap: var(--s-4); position: sticky; top: 112px; }
+  .founder-id h2 { font-size: var(--step-4); line-height: 1.05; }
+  .founder-role { font-size: var(--step-1); color: var(--ink-2); margin-top: -0.35rem; }
+  .founder-facts {
+    margin: var(--s-4) 0 0;
+    display: grid;
+    border-top: 1px solid var(--rule);
+  }
+  .founder-facts > div {
+    display: grid;
+    grid-template-columns: 9.5rem minmax(0, 1fr);
+    gap: var(--s-4);
+    padding-block: 0.85rem;
+    border-bottom: 1px solid var(--rule);
+  }
+  .founder-facts dt {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    padding-top: 0.15rem;
+  }
+  .founder-facts dd { margin: 0; color: var(--ink); }
+
+  .letter {
+    position: relative;
+    display: grid;
+    gap: var(--s-5);
+    padding: clamp(1.75rem, 1rem + 3vw, 3.5rem);
+    background: var(--card-bg);
+    border: 1px solid rgb(27 42 61 / 0.07);
+    border-radius: 14px;
+    box-shadow: 0 1px 2px rgb(27 42 61 / 0.04), 0 30px 60px -40px rgb(31 77 111 / 0.35);
+  }
+  /* A steel-blue edge along the top of the sheet */
+  .letter::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: clamp(1.75rem, 1rem + 3vw, 3.5rem);
+    width: 56px;
+    height: 3px;
+    border-radius: 0 0 2px 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-soft));
+  }
+  .letter p { color: var(--ink-2); font-size: var(--step-1); line-height: 1.65; max-width: 60ch; }
+  .letter .letter-open {
+    font-family: var(--font-display);
+    font-size: var(--step-3);
+    font-weight: 450;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    text-wrap: balance;
+  }
+  .letter-sign {
+    display: grid;
+    gap: 0.15rem;
+    margin-top: var(--s-3);
+    padding-top: var(--s-5);
+    border-top: 1px solid var(--rule);
+  }
+  .sig-name { font-family: var(--font-display); font-style: italic; font-size: var(--step-2); color: var(--ink); }
+  .sig-role { font-size: 0.875rem; color: var(--ink-3); }
+
+  /* ---------- Advisory board ---------- */
+  .board-band {
+    background:
+      radial-gradient(40% 60% at 100% 0%, rgb(184 204 224 / 0.35), transparent 70%),
+      linear-gradient(180deg, var(--paper-2), var(--paper));
+    border-top: 1px solid var(--rule);
+  }
+  .board-head { max-width: 760px; }
+  .board {
+    display: grid;
+    grid-template-columns: repeat(var(--cols, 4), minmax(0, 1fr));
+    gap: clamp(1.5rem, 1rem + 1.5vw, 2.5rem);
+  }
+  @media (max-width: 1000px) {
+    .board { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: var(--s-7); }
+  }
+
+  /* ---------- What you can expect ---------- */
+  .promises-band { border-top: 1px solid var(--rule); padding-bottom: clamp(2.5rem, 1.5rem + 3vw, 4.5rem); }
+  .promises {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    border-top: 1px solid var(--rule-2);
+  }
+  .promise {
+    display: grid;
+    gap: 0.6rem;
+    align-content: start;
+    padding: var(--s-6) var(--s-5) var(--s-6) 0;
+  }
+  .promise + .promise { padding-left: var(--s-5); border-left: 1px solid var(--rule); }
+  .promise-icon {
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    margin-bottom: 0.4rem;
+    border-radius: 10px;
+    background: var(--card-bg);
+    border: 1px solid var(--rule);
+    box-shadow: 0 8px 18px -12px rgb(31 77 111 / 0.4);
+  }
+  .promise-icon svg { width: 21px; height: 21px; fill: none; stroke: var(--accent); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+  .promise h3 { font-size: var(--step-2); font-weight: 500; line-height: 1.2; }
+  .promise p { color: var(--ink-2); font-size: 1rem; line-height: 1.55; }
+
+  @media (max-width: 960px) {
+    .founder-grid { grid-template-columns: minmax(0, 1fr); }
+    .founder-id { position: static; }
+    .promises { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .promise:nth-child(3) { padding-left: 0; border-left: 0; }
+    .promise:nth-child(n + 3) { border-top: 1px solid var(--rule); }
+  }
+  @media (max-width: 560px) {
+    .founder-facts > div { grid-template-columns: minmax(0, 1fr); gap: 0.2rem; }
+    .board { grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
+    .promises { grid-template-columns: minmax(0, 1fr); }
+    .promise, .promise + .promise { padding: var(--s-5) 0; border-left: 0; }
+    .promise + .promise { border-top: 1px solid var(--rule); }
+  }
+</style>

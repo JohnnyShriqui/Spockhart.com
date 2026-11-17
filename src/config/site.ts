@@ -29,6 +29,11 @@ export const site = {
   formEndpoint: '',
   /** Show the advisory board on the About page. Turn on once every advisor has agreed to be listed. */
   showAdvisors: false,
+  /**
+   * Team page preview: also shows advisors who have not confirmed yet, marked as awaiting
+   * confirmation. Must be false before the Team page goes live.
+   */
+  previewTeam: true,
   /** Engagement facts used across the site. */
   offer: {
     prototypeDays: 30,
@@ -43,6 +48,7 @@ export const primaryNav: NavItem[] = [
   { label: 'Approach', href: '/approach/' },
   { label: 'Our work', href: '/work/' },
   { label: 'Nonprofits', href: '/nonprofits/' },
+  { label: 'Team', href: '/team/' },
 ];
 
 export const footerNav: { heading: string; items: NavItem[] }[] = [
@@ -58,6 +64,7 @@ export const footerNav: { heading: string; items: NavItem[] }[] = [
     heading: 'Company',
     items: [
       { label: 'Nonprofits', href: '/nonprofits/' },
+      { label: 'Team', href: '/team/' },
       { label: 'Contact', href: '/contact/' },
     ],
   },

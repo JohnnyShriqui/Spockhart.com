@@ -384,6 +384,24 @@ a { color: inherit; }
   --mist-2: #b4cfea;
   --mist-3: #d6ccef;
 }
+/* Team, light: a clear morning in the brand's blues, steel light from the upper right and a
+   touch of lavender low on the left, easing at the bottom into the page below */
+.theme-team-light {
+  background:
+    linear-gradient(180deg, rgb(240 243 247 / 0) 70%, #f0f3f7 100%),
+    radial-gradient(46% 80% at 94% 4%, rgb(160 196 228 / 0.72), transparent 72%),
+    radial-gradient(42% 70% at 2% 102%, rgb(198 204 240 / 0.62), transparent 72%),
+    radial-gradient(30% 46% at 60% 58%, rgb(204 224 242 / 0.5), transparent 72%),
+    linear-gradient(190deg, #f6f9fc 0%, #eef3f8 60%, #eaf0f6 100%);
+  --mist-1: #b4cde6;
+  --mist-2: #c8ceef;
+  --mist-3: #cfe2f0;
+}
+/* The grain thins out toward the bottom, so the hero has no edge against the page below */
+.theme-team-light::after {
+  -webkit-mask-image: linear-gradient(180deg, #000 50%, transparent 100%);
+  mask-image: linear-gradient(180deg, #000 50%, transparent 100%);
+}
 
 /* Below the hero (Home, Approach, Nonprofits): always light. The hero above always stays dark. */
 .page-body {
@@ -411,7 +429,8 @@ a { color: inherit; }
 
 .theme-home .mist,
 .theme-approach .mist,
-.theme-nonprofit .mist {
+.theme-nonprofit .mist,
+.theme-team-light .mist {
   -webkit-mask-image: linear-gradient(180deg, #000 45%, transparent 90%);
   mask-image: linear-gradient(180deg, #000 45%, transparent 90%);
 }
