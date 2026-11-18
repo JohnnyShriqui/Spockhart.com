@@ -1,10 +1,13 @@
 ---
 /**
- * "Built for business. Driven by purpose." told as two charts and no copy. For growing companies,
- * revenue climbs away from costs and the gap opens. For nonprofits, resources rise to meet
- * demand and the gap closes. One firm joins the two. Illustrations, not data.
- * The lines draw in when the section scrolls into view.
+ * Who we are, in one image: the screen split edge to edge. On the left, in daylight, "Built for
+ * business." with the live revenue vs costs graph from the home page. On the right, in deep
+ * navy, "Driven by purpose." with the demand and resources chart from the Nonprofits page.
+ * Spockhart sits on the seam between them.
  */
+import HeroLive from './HeroLive.astro';
+import GapChart from './GapChart.astro';
+
 interface Props {
   /** 1 when this opens the page */
   level?: 1 | 2;
@@ -12,210 +15,201 @@ interface Props {
 const { level = 2 } = Astro.props;
 const Heading = level === 1 ? 'h1' : 'h2';
 const Label = level === 1 ? 'h2' : 'h3';
-
-const biz = {
-  revenue: 'M24 128 C150 120 260 82 376 38',
-  costs: 'M24 128 C150 136 260 160 376 172',
-  gap: 'M24 128 C150 120 260 82 376 38 L376 172 C260 160 150 136 24 128 Z',
-};
-const np = {
-  demand: 'M24 62 C150 58 260 54 376 48',
-  resources: 'M24 182 C150 176 260 110 376 54',
-  gap: 'M24 62 C150 58 260 54 376 48 L376 54 C260 110 150 176 24 182 Z',
-};
 ---
 
-<div class="dual" data-dual>
+<section class="bp" aria-label="Built for business. Driven by purpose.">
   <Heading class="visually-hidden">Built for business. Driven by purpose.</Heading>
 
-  <div class="half half-biz">
-    <p class="half-title" aria-hidden="true">Built for business.</p>
-    <div class="half-copy">
-      <Label class="half-label">Growing organizations</Label>
-      <p class="half-text">We work within growing organizations to improve cost efficiency and expand operations.</p>
+  <div class="side side-biz">
+    <p class="side-title load-in" style="--i:1" aria-hidden="true">Built for business.</p>
+    <div class="side-copy load-in" style="--i:2">
+      <Label class="side-label">Growing organizations</Label>
+      <p class="side-text">We work within growing organizations to improve cost efficiency and expand operations.</p>
     </div>
-    <svg class="chart" viewBox="0 0 400 210" role="img" aria-label="For growing companies: revenue climbs away from costs, and the gap between them opens.">
-      <path d="M24 50H376M24 100H376M24 150H376" class="grid" />
-      <path d="M24 200H376" class="base" />
-      <path d={biz.gap} class="gap gap-biz" />
-      <path d={biz.costs} pathLength="1" class="line line-costs" />
-      <path d={biz.revenue} pathLength="1" class="line line-revenue" />
-      <circle cx="376" cy="38" r="5" class="dot dot-revenue" />
-      <circle cx="376" cy="172" r="4.5" class="dot dot-costs" />
-      <text x="362" y="24" text-anchor="end" class="lbl lbl-revenue">Revenue</text>
-      <text x="362" y="194" text-anchor="end" class="lbl lbl-costs">Costs</text>
-    </svg>
-    <a class="half-link" href="/approach/">For growing organizations <span aria-hidden="true">→</span></a>
+    <div class="side-figure load-fade">
+      <HeroLive inline light />
+    </div>
+    <a class="side-link" href="/approach/">How we work <span aria-hidden="true">→</span></a>
   </div>
 
-  <div class="half half-np">
-    <p class="half-title" aria-hidden="true">Driven by purpose.</p>
-    <div class="half-copy">
-      <Label class="half-label">Nonprofits</Label>
-      <p class="half-text">Every nonprofit faces the same fundamental challenge: unlimited demand on limited resources. We exist to close that gap.</p>
+  <div class="side side-np">
+    <p class="side-title load-in" style="--i:2" aria-hidden="true">Driven by purpose.</p>
+    <div class="side-copy load-in" style="--i:3">
+      <Label class="side-label">Nonprofits</Label>
+      <p class="side-text">Every nonprofit faces the same fundamental challenge: unlimited demand on limited resources. We exist to close that gap.</p>
     </div>
-    <svg class="chart" viewBox="0 0 400 210" role="img" aria-label="For nonprofits: resources rise to meet demand, and the gap between them closes.">
-      <defs>
-        <pattern id="dual-hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-          <path d="M0 0V7" stroke="rgb(142 192 230 / 0.28)" stroke-width="1.5" />
-        </pattern>
-      </defs>
-      <path d="M24 50H376M24 100H376M24 150H376" class="grid grid-np" />
-      <path d="M24 200H376" class="base base-np" />
-      <path d={np.gap} class="gap gap-np" />
-      <path d={np.demand} pathLength="1" class="line line-demand" />
-      <path d={np.resources} pathLength="1" class="line line-resources" />
-      <circle cx="24" cy="62" r="4.5" class="dot dot-demand" />
-      <circle cx="24" cy="182" r="4.5" class="dot dot-resources" />
-      <circle cx="376" cy="51" r="6" class="dot dot-meet" />
-      <text x="38" y="48" class="lbl lbl-demand">Demand</text>
-      <text x="38" y="201" class="lbl lbl-resources">Resources</text>
-    </svg>
-    <a class="half-link" href="/nonprofits/">For nonprofits <span aria-hidden="true">→</span></a>
+    <div class="side-figure load-fade">
+      <GapChart />
+    </div>
+    <a class="side-link" href="/nonprofits/">Nonprofits <span aria-hidden="true">→</span></a>
   </div>
 
-  <div class="dual-badge" aria-hidden="true"><span>Spockhart</span></div>
-</div>
-
-<script>
-  // The lines draw in once, when the section comes into view
-  function initDual() {
-    const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    document.querySelectorAll<HTMLElement>('[data-dual]').forEach((el) => {
-      if (el.dataset.ready || still || !('IntersectionObserver' in window)) return;
-      el.dataset.ready = '1';
-      const play = () => {
-        el.classList.add('is-playing');
-        el.classList.remove('will-play');
-      };
-      if (el.getBoundingClientRect().top < window.innerHeight * 0.85) {
-        play();
-        return;
-      }
-      el.classList.add('will-play');
-      const io = new IntersectionObserver(
-        (entries) => {
-          if (!entries.some((e) => e.isIntersecting)) return;
-          io.disconnect();
-          play();
-        },
-        { threshold: 0.3 },
-      );
-      io.observe(el);
-    });
-  }
-  initDual();
-  document.addEventListener('spockhart:view', initDual);
-</script>
+  <div class="seam" aria-hidden="true">
+    <span class="seam-line"></span>
+  </div>
+  <!-- On the seam, level with the two graphics: the firm that joins them -->
+  <span class="seam-mark" aria-hidden="true">Spockhart</span>
+</section>
 
 <style>
-  .dual {
+  .bp {
+    --pad-out: max(var(--gutter), calc((100vw - var(--max)) / 2));
+    --pad-in: clamp(2rem, 1rem + 3.5vw, 5rem);
     position: relative;
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    /* The two halves share rows, so their titles, text, charts and links line up */
+    /* The two sides share rows, so titles, text, graphics and links line up across the seam */
     grid-template-rows: auto auto 1fr auto;
-    border-radius: 24px;
-    box-shadow: 0 1px 2px rgb(27 42 61 / 0.05), 0 50px 90px -60px rgb(27 42 61 / 0.6);
+    min-height: min(calc(100svh - 88px), 980px);
   }
-  .half {
+  .side {
+    position: relative;
+    isolation: isolate;
     display: grid;
-    grid-row: span 4;
+    grid-row: 1 / span 4;
     grid-template-rows: subgrid;
-    row-gap: clamp(1.25rem, 0.75rem + 1.5vw, 2rem);
-    align-content: start;
-    padding: clamp(2.25rem, 1.5rem + 2.5vw, 3.75rem) clamp(1.5rem, 1rem + 2vw, 3.25rem) clamp(1.75rem, 1.25rem + 1.5vw, 2.5rem);
+    row-gap: clamp(1.25rem, 0.75rem + 1vw, 1.75rem);
+    padding-block: clamp(3.5rem, 2rem + 3vw, 5rem) clamp(2.25rem, 1.5rem + 2vw, 3.25rem);
+    overflow: hidden;
   }
-  .half-biz { background: #fff; border-radius: 24px 0 0 24px; }
-  .half-np {
+  .side-biz {
+    grid-column: 1;
+    padding-left: var(--pad-out);
+    padding-right: var(--pad-in);
     background:
-      radial-gradient(80% 60% at 100% 0%, rgb(74 138 186 / 0.35), transparent 70%),
-      linear-gradient(160deg, #1d3a57 0%, #122538 70%, #0e1d2d 100%);
-    border-radius: 0 24px 24px 0;
+      radial-gradient(60% 50% at 0% 0%, rgb(255 255 255 / 0.9), transparent 70%),
+      linear-gradient(180deg, #f7f9fc 0%, #edf2f7 100%);
   }
-  .half-title {
-    font-family: var(--font-display);
-    font-size: clamp(2rem, 1.4rem + 2.2vw, 3.5rem);
-    font-weight: 450;
-    line-height: 1.02;
-    letter-spacing: -0.02em;
-    color: var(--ink);
-  }
-  .half-np .half-title { color: #fff; font-style: italic; font-weight: 400; }
-  .half-copy { display: grid; gap: 0.45rem; align-content: start; max-width: 46ch; margin-top: -0.25rem; }
-  .half-label { font-family: var(--font-body); font-size: var(--step-1); font-weight: 600; line-height: 1.3; letter-spacing: 0; color: var(--accent); }
-  .half-np .half-label { color: #8ec0e6; }
-  .half-text { font-size: 1.0625rem; line-height: 1.55; color: var(--ink-2); }
-  .half-np .half-text { color: rgb(238 243 248 / 0.82); }
-  .chart { width: 100%; height: auto; overflow: visible; margin-top: 0.5rem; align-self: end; }
-  .half-link { justify-self: start; font-weight: 600; font-size: 0.9375rem; color: var(--accent); text-decoration: none; }
-  .half-link:hover { text-decoration: underline; }
-  .half-np .half-link { color: #b9dcf5; }
-
-  /* The firm, joining the two */
-  .dual-badge {
+  /* Engineering paper: a fine grid, fading out toward the text */
+  .side-biz::before {
+    content: '';
     position: absolute;
-    left: 50%;
+    inset: 0;
+    z-index: -1;
+    background-image:
+      linear-gradient(rgb(27 42 61 / 0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(27 42 61 / 0.045) 1px, transparent 1px);
+    background-size: 44px 44px;
+    -webkit-mask-image: linear-gradient(180deg, transparent 20%, #000 75%);
+    mask-image: linear-gradient(180deg, transparent 20%, #000 75%);
+  }
+  .side-np {
+    grid-column: 2;
+    padding-left: var(--pad-in);
+    padding-right: var(--pad-out);
+    /* The dark-hero colours, so the nonprofit chart reads as it does on its own page */
+    --ink: #eef3f8;
+    --ink-2: #b5c4d3;
+    --ink-3: #94a8bc;
+    --rule: rgb(255 255 255 / 0.1);
+    --rule-2: rgb(255 255 255 / 0.2);
+    --accent: #8ec0e6;
+    --accent-soft: #6fa8d6;
+    --paper: #102236;
+    color: var(--ink);
+    background:
+      radial-gradient(70% 55% at 100% 0%, rgb(46 104 152 / 0.55), transparent 70%),
+      radial-gradient(60% 50% at 0% 100%, rgb(42 95 142 / 0.35), transparent 72%),
+      linear-gradient(170deg, #13283e 0%, #0e1f31 55%, #0a1624 100%);
+  }
+  .side-np::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image: var(--grain);
+    background-size: 200px;
+    opacity: 0.12;
+    mix-blend-mode: overlay;
+  }
+
+  .side-title {
+    font-family: var(--font-display);
+    font-size: clamp(2.75rem, 1.2rem + 3.3vw, 5rem);
+    font-weight: 450;
+    line-height: 1;
+    text-wrap: balance;
+    letter-spacing: -0.03em;
+    color: #1b2a3d;
+  }
+  .side-np .side-title { color: #fff; font-style: italic; font-weight: 400; text-shadow: 0 18px 40px rgb(0 0 0 / 0.35); }
+
+  .side-copy { display: grid; gap: 0.5rem; align-content: start; max-width: 44ch; }
+  .side-label {
+    font-family: var(--font-body);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #2c5f8a;
+  }
+  .side-np .side-label { color: #8ec0e6; }
+  .side-text { font-size: var(--step-1); line-height: 1.55; color: #4a5d72; }
+  .side-np .side-text { color: rgb(238 243 248 / 0.8); }
+
+  .side-figure { align-self: end; width: 100%; max-width: 460px; }
+  .side-biz .side-figure :global(.live-inline) { max-width: none; margin: 0; }
+  .side-biz .side-figure :global(.live-cap) { display: none; }
+  .side-np .side-figure :global(.gap) { max-width: none; }
+
+  .side-link {
+    justify-self: start;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.7rem 1.15rem;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 0.9375rem;
+    text-decoration: none;
+    color: #1b2a3d;
+    border: 1px solid rgb(27 42 61 / 0.18);
+    transition: background-color 300ms var(--ease), border-color 300ms var(--ease);
+  }
+  .side-link:hover { background: #fff; border-color: rgb(27 42 61 / 0.35); }
+  .side-np .side-link { color: #fff; border-color: rgb(255 255 255 / 0.25); }
+  .side-np .side-link:hover { background: rgb(255 255 255 / 0.08); border-color: rgb(255 255 255 / 0.5); }
+
+  /* The seam: one firm, holding both */
+  .seam { position: absolute; inset: 0 auto 0 50%; z-index: 3; pointer-events: none; }
+  .seam-line {
+    position: absolute;
     top: 0;
-    z-index: 2;
-    transform: translate(-50%, -50%);
+    bottom: 0;
+    left: -0.5px;
+    width: 1px;
+    background: linear-gradient(180deg, rgb(142 192 230 / 0) 0%, rgb(142 192 230 / 0.7) 30%, rgb(142 192 230 / 0.7) 70%, rgb(142 192 230 / 0) 100%);
+  }
+  .seam-mark {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    justify-self: center;
+    align-self: center;
+    z-index: 3;
+    margin-top: clamp(2rem, 1rem + 3vw, 4rem);
     padding: 0.85rem 1.4rem;
     border-radius: 999px;
     background: #fff;
     border: 1px solid rgb(27 42 61 / 0.1);
-    box-shadow: 0 14px 30px -14px rgb(27 42 61 / 0.5);
-  }
-  .dual-badge span {
-    display: block;
+    box-shadow: 0 16px 34px -14px rgb(12 26 41 / 0.55);
     font-family: var(--font-wordmark);
     font-size: 0.75rem;
     letter-spacing: 0.34em;
-    margin-right: -0.34em;
+    text-indent: 0.34em;
     text-transform: uppercase;
-    color: var(--ink);
+    color: #1b2a3d;
     line-height: 1;
     white-space: nowrap;
   }
 
-  /* Charts */
-  .grid { stroke: rgb(27 42 61 / 0.06); stroke-width: 1; fill: none; }
-  .grid-np { stroke: rgb(255 255 255 / 0.07); }
-  .base { stroke: rgb(27 42 61 / 0.22); stroke-width: 1.2; }
-  .base-np { stroke: rgb(255 255 255 / 0.2); }
-  .line { fill: none; stroke-linecap: round; stroke-dasharray: 1 1; }
-  .line-revenue { stroke: #2c5f8a; stroke-width: 3.5; }
-  .line-costs { stroke: #a9524a; stroke-width: 2.5; }
-  .line-demand { stroke: #eef3f8; stroke-width: 3; }
-  .line-resources { stroke: #8ec0e6; stroke-width: 3.5; }
-  .gap-biz { fill: rgb(44 95 138 / 0.12); }
-  .gap-np { fill: url(#dual-hatch); }
-  .dot-revenue { fill: #2c5f8a; }
-  .dot-costs { fill: #a9524a; }
-  .dot-demand { fill: #eef3f8; }
-  .dot-resources { fill: #8ec0e6; }
-  .dot-meet { fill: #8ec0e6; stroke: #122538; stroke-width: 2.5; }
-  .lbl { font-family: var(--font-body); font-size: 13px; font-weight: 600; }
-  .lbl-revenue { fill: #2c5f8a; }
-  .lbl-costs { fill: #a9524a; }
-  .lbl-demand { fill: #eef3f8; }
-  .lbl-resources { fill: #8ec0e6; }
-
-  /* Drawing in: lines draw left to right, the gaps follow behind them */
-  .will-play .line { stroke-dashoffset: 1; }
-  .will-play .gap, .will-play .dot, .will-play .lbl { opacity: 0; }
-  .is-playing .line { animation: dual-draw 1800ms var(--ease-out) 150ms both; }
-  .is-playing .gap { animation: dual-gap 1800ms var(--ease-out) 250ms both; }
-  .is-playing .dot, .is-playing .lbl { animation: dual-fade 600ms var(--ease) 1500ms both; }
-  .is-playing .dot-demand, .is-playing .dot-resources, .is-playing .lbl-demand, .is-playing .lbl-resources { animation-delay: 200ms; }
-  @keyframes dual-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
-  @keyframes dual-gap { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
-  @keyframes dual-fade { from { opacity: 0; } to { opacity: 1; } }
-
-  @media (max-width: 760px) {
-    .dual { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; border-radius: 20px; }
-    .half { grid-row: auto; grid-template-rows: none; }
-    .half-biz { border-radius: 20px 20px 0 0; }
-    .half-np { border-radius: 0 0 20px 20px; }
-    .half { padding-top: 2.5rem; }
+  /* Tablets and phones: one side above the other, the mark on the join */
+  @media (max-width: 900px) {
+    .bp { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; min-height: 0; }
+    .side { grid-row: auto; grid-column: auto; grid-template-rows: none; padding-inline: max(var(--gutter), env(safe-area-inset-left, 0px)); }
+    .side-np { padding-top: clamp(4rem, 3rem + 4vw, 5rem); }
+    .seam { inset: auto 0 auto 0; top: var(--seam-y, 50%); }
+    .seam-line { display: none; }
+    .seam-mark { display: none; }
   }
 </style>

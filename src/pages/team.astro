@@ -15,12 +15,10 @@ const DRAFT = true;
   description="Built for business. Driven by purpose. Spockhart works within growing organizations and nonprofits. Meet our founder and advisory board."
   lightHero
 >
-  <!-- Who we are first: business and purpose, side by side -->
-  <section class="team-hero hero-light theme-team-light">
-    <div class="wrap">
-      <DualStory level={1} />
-    </div>
-  </section>
+  <!-- Who we are first: business and purpose, edge to edge -->
+  <div class="team-top">
+    <DualStory level={1} />
+  </div>
 
   <div class="page-body body-team" data-body>
     <!-- Then the people -->
@@ -42,15 +40,11 @@ const DRAFT = true;
 </Base>
 
 <style>
-  .team-hero {
-    position: relative;
-    padding-top: clamp(7.5rem, 6rem + 4vw, 10rem);
-    padding-bottom: clamp(2.5rem, 1.5rem + 3vw, 4.5rem);
-  }
-  .team-hero > .wrap { position: relative; z-index: 1; }
+  /* The split starts just under the header */
+  .team-top { padding-top: 88px; background: var(--paper); }
 
   /* ---------- The team ---------- */
-  .crew-band { padding-top: clamp(3rem, 2rem + 3vw, 5rem); }
+  .crew-band { padding-top: clamp(4rem, 3rem + 3vw, 6.5rem); }
   .crew {
     display: grid;
     grid-template-columns: minmax(0, 3.4fr) repeat(3, minmax(0, 2.85fr));
@@ -70,14 +64,12 @@ const DRAFT = true;
   /* Our founder's card stands a little taller than the rest */
   .crew-slot.is-lead :global(.tcard) { aspect-ratio: 4 / 5.7; }
 
-  /* Tablets: the title on top, the three in a row */
   @media (max-width: 1023px) {
     .crew { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: var(--s-6); }
     .crew-title { grid-column: 1 / -1; max-width: none; }
   }
-  /* Phones: our founder full width, the advisors two up beneath */
   @media (max-width: 640px) {
-    .team-hero { padding-top: 6.5rem; }
+    .team-top { padding-top: 72px; }
     .crew { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 0.75rem; }
     .crew-slot.is-lead { grid-column: 1 / -1; }
     .crew-slot.is-lead :global(.tcard) { aspect-ratio: 4 / 3.4; }
