@@ -15,13 +15,12 @@ const DRAFT = false;
   description="Built for Business, Driven by Purpose. Spockhart works with corporations and nonprofits. Meet our founder and advisory board."
   lightHero
 >
-  <!-- Who we are first: business and purpose, edge to edge -->
+  <!-- One deep, softly lit room: who we are first, then the people, each standing on the floor -->
+  <div class="room">
   <div class="team-top">
     <DualStory level={1} />
   </div>
 
-  <div class="page-body body-team" data-body>
-    <!-- Then the people -->
     <section class="section crew-band" aria-labelledby="team-title">
       <div class="wrap crew" data-reveal="stagger">
         <h2 id="team-title" class="crew-title">Our team</h2>
@@ -34,17 +33,29 @@ const DRAFT = false;
         }
       </div>
     </section>
+  </div>
 
+  <div class="page-body body-team" data-body>
     <ClosingCTA title="Come meet the team." />
   </div>
 </Base>
 
 <style>
+  /* The room: lit from the front, a little darker toward the edges, easing into the page below */
+  .room {
+    position: relative;
+    background:
+      linear-gradient(180deg, rgb(240 243 247 / 0) 88%, #f0f3f7 100%),
+      radial-gradient(70% 40% at 50% 20%, rgb(255 255 255 / 0.95), transparent 72%),
+      radial-gradient(60% 32% at 50% 74%, rgb(255 255 255 / 0.7), transparent 72%),
+      radial-gradient(140% 100% at 50% 42%, transparent 55%, rgb(12 26 41 / 0.07) 100%),
+      linear-gradient(180deg, #eef2f6 0%, #e8edf2 100%);
+  }
   /* The card sits just under the header */
-  .team-top { padding-top: clamp(6.5rem, 5.5rem + 2.5vw, 8rem); background: var(--paper); }
+  .team-top { padding-top: clamp(6.5rem, 5.5rem + 2.5vw, 8rem); }
 
   /* ---------- The team ---------- */
-  .crew-band { padding-top: clamp(3.5rem, 2.5rem + 3vw, 5.5rem); }
+  .crew-band { padding-top: clamp(4.5rem, 3.5rem + 3vw, 6.5rem); padding-bottom: clamp(5rem, 4rem + 3vw, 7rem); }
   .crew {
     display: grid;
     grid-template-columns: minmax(0, 3.4fr) repeat(3, minmax(0, 2.85fr));
@@ -63,6 +74,32 @@ const DRAFT = false;
   }
   /* Our founder's card stands a little taller than the rest */
   .crew-slot.is-lead :global(.tcard) { aspect-ratio: 4 / 5.7; }
+  /* Each card stands in the room: its thickness along the bottom, and its shadow on the floor */
+  .crew-slot { position: relative; isolation: isolate; }
+  .crew-slot::before {
+    content: '';
+    position: absolute;
+    z-index: -2;
+    left: 6%;
+    right: 6%;
+    bottom: -40px;
+    height: 56px;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgb(12 26 41 / 0.34), rgb(12 26 41 / 0.12) 55%, transparent);
+    filter: blur(9px);
+  }
+  .crew-slot::after {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    left: 8px;
+    right: 8px;
+    bottom: -8px;
+    height: 34px;
+    border-radius: 0 0 20px 20px;
+    background: linear-gradient(90deg, #262d36, #3b444f 50%, #262d36);
+    box-shadow: 0 6px 10px -4px rgb(12 26 41 / 0.35);
+  }
 
   @media (max-width: 1023px) {
     .crew { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: var(--s-6); }
@@ -70,7 +107,9 @@ const DRAFT = false;
   }
   @media (max-width: 640px) {
     .team-top { padding-top: 5.5rem; }
-    .crew { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 0.75rem; }
+    .crew { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 1.75rem; }
+    .crew-slot::before { bottom: -26px; height: 36px; }
+    .crew-slot::after { bottom: -6px; border-radius: 0 0 14px 14px; }
     .crew-slot.is-lead { grid-column: 1 / -1; }
     .crew-slot.is-lead :global(.tcard) { aspect-ratio: 4 / 3.4; }
     .crew-slot:not(.is-lead) :global(.tcard-meta h3) { font-size: 0.9375rem; }

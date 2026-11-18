@@ -52,7 +52,13 @@ const linkedin = person.linkedin || (draft ? '#' : '');
     aspect-ratio: 4 / 5;
     width: 100%;
     background: linear-gradient(180deg, #dde2e7 0%, #cdd4db 100%);
-    box-shadow: 0 1px 2px rgb(27 42 61 / 0.06), 0 30px 50px -34px rgb(27 42 61 / 0.55);
+    /* A lit top edge, a tight contact shadow, and a long soft one */
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.6),
+      0 1px 1px rgb(12 26 41 / 0.08),
+      0 6px 10px -4px rgb(12 26 41 / 0.16),
+      0 30px 44px -24px rgb(12 26 41 / 0.45),
+      0 70px 90px -46px rgb(12 26 41 / 0.4);
   }
   .tcard-media { position: absolute; inset: 0; display: grid; place-items: center; }
   .tcard-media img {

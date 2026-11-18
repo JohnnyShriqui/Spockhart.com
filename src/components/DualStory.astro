@@ -8,6 +8,7 @@
  */
 import HeroLive from './HeroLive.astro';
 import GapChart from './GapChart.astro';
+import { smoothFade } from '../lib/fade';
 
 interface Props {
   /** 1 when this opens the page */
@@ -16,11 +17,20 @@ interface Props {
 const { level = 2 } = Astro.props;
 const Heading = level === 1 ? 'h1' : 'h2';
 const Label = level === 1 ? 'h2' : 'h3';
+
+/* Daylight to deep navy: flat at each side, one long smooth blend across the middle */
+const LIGHT = '#f2f5f9';
+const NAVY = '#0f2135';
+const fadeX = smoothFade('90deg', LIGHT, NAVY, 18, 82, 40);
+const fadeY = smoothFade('180deg', LIGHT, NAVY, 40, 62, 40);
+/* The card's lower edge, seen as its thickness: the same blend, a shade deeper */
+const edgeX = smoothFade('90deg', '#c4cdd7', '#07121e', 18, 82, 40);
 ---
 
 <section class="bp" aria-label="Built for Business, Driven by Purpose">
   <Heading class="visually-hidden">Built for Business, Driven by Purpose</Heading>
 
+  <div class="bp-stage" style={`--fade-x:${fadeX};--fade-y:${fadeY};--edge-x:${edgeX}`}>
   <div class="bp-card">
     <div class="side side-biz">
       <p class="side-title load-in" style="--i:1" aria-hidden="true">Built for Business,</p>
@@ -40,6 +50,7 @@ const Label = level === 1 ? 'h2' : 'h3';
       <a class="side-link" href="/nonprofits/">Nonprofits <span aria-hidden="true">→</span></a>
     </div>
   </div>
+  </div>
 </section>
 
 <style>
@@ -49,33 +60,50 @@ const Label = level === 1 ? 'h2' : 'h3';
   .bp-card {
     position: relative;
     isolation: isolate;
-    max-width: var(--max);
-    margin-inline: auto;
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     /* The two sides share rows, so titles, labels, graphics and links line up */
     grid-template-rows: auto auto 1fr auto;
     border-radius: 28px;
     overflow: hidden;
-    /* Daylight to deep navy, eased through the middle so the two sides melt into one */
+    /* Daylight to deep navy (see --fade-x), with a soft glow in each top corner */
     background:
-      radial-gradient(55% 70% at 0% 0%, rgb(255 255 255 / 0.85), transparent 70%),
-      radial-gradient(50% 80% at 100% 0%, rgb(46 104 152 / 0.5), transparent 70%),
-      radial-gradient(40% 60% at 100% 100%, rgb(42 95 142 / 0.25), transparent 72%),
-      linear-gradient(
-        90deg,
-        #f5f8fb 0%,
-        #eef2f7 33%,
-        #dbe3ec 39%,
-        #b4c3d3 44%,
-        #7d93aa 49%,
-        #4a6480 53.5%,
-        #26405b 58%,
-        #172e46 63%,
-        #11253a 69%,
-        #0d1e30 100%
-      );
-    box-shadow: 0 1px 2px rgb(12 26 41 / 0.08), 0 50px 90px -50px rgb(12 26 41 / 0.55);
+      radial-gradient(50% 70% at 0% 0%, rgb(255 255 255 / 0.7), transparent 70%),
+      radial-gradient(45% 75% at 100% 0%, rgb(46 104 152 / 0.42), transparent 70%),
+      var(--fade-x);
+    /* Standing in the room: a lit top edge, a tight contact shadow, and a long soft one */
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.55),
+      0 1px 1px rgb(12 26 41 / 0.08),
+      0 6px 10px -4px rgb(12 26 41 / 0.14),
+      0 34px 50px -26px rgb(12 26 41 / 0.42),
+      0 80px 110px -50px rgb(12 26 41 / 0.42);
+  }
+  /* The stage: the card, its thickness along the bottom, and its shadow on the floor */
+  .bp-stage { position: relative; isolation: isolate; max-width: var(--max); margin-inline: auto; }
+  .bp-stage::before {
+    content: '';
+    position: absolute;
+    z-index: -2;
+    left: 7%;
+    right: 7%;
+    bottom: -46px;
+    height: 70px;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgb(12 26 41 / 0.32), rgb(12 26 41 / 0.12) 55%, transparent);
+    filter: blur(10px);
+  }
+  .bp-stage::after {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    left: 10px;
+    right: 10px;
+    bottom: -9px;
+    height: 40px;
+    border-radius: 0 0 26px 26px;
+    background: var(--edge-x);
+    box-shadow: 0 6px 10px -4px rgb(12 26 41 / 0.35);
   }
   /* Engineering paper on the light side, fading out before the middle */
   .bp-card::before {
@@ -87,10 +115,10 @@ const Label = level === 1 ? 'h2' : 'h3';
       linear-gradient(rgb(27 42 61 / 0.05) 1px, transparent 1px),
       linear-gradient(90deg, rgb(27 42 61 / 0.05) 1px, transparent 1px);
     background-size: 40px 40px;
-    -webkit-mask-image: linear-gradient(90deg, #000 0%, rgb(0 0 0 / 0.6) 25%, transparent 42%);
-    mask-image: linear-gradient(90deg, #000 0%, rgb(0 0 0 / 0.6) 25%, transparent 42%);
+    -webkit-mask-image: linear-gradient(90deg, #000 0%, rgb(0 0 0 / 0.5) 20%, transparent 40%);
+    mask-image: linear-gradient(90deg, #000 0%, rgb(0 0 0 / 0.5) 20%, transparent 40%);
   }
-  /* A fine grain on the navy side */
+  /* A fine grain across the card: texture on the navy, and a dither that keeps the blend from banding */
   .bp-card::after {
     content: '';
     position: absolute;
@@ -99,10 +127,8 @@ const Label = level === 1 ? 'h2' : 'h3';
     pointer-events: none;
     background-image: var(--grain);
     background-size: 200px;
-    opacity: 0.12;
+    opacity: 0.1;
     mix-blend-mode: overlay;
-    -webkit-mask-image: linear-gradient(90deg, transparent 45%, #000 70%);
-    mask-image: linear-gradient(90deg, transparent 45%, #000 70%);
   }
 
   .side {
@@ -182,24 +208,15 @@ const Label = level === 1 ? 'h2' : 'h3';
       grid-template-rows: none;
       border-radius: 22px;
       background:
-        radial-gradient(80% 40% at 0% 0%, rgb(255 255 255 / 0.85), transparent 70%),
-        radial-gradient(80% 40% at 100% 100%, rgb(46 104 152 / 0.45), transparent 70%),
-        linear-gradient(
-          180deg,
-          #f5f8fb 0%,
-          #eef2f7 38%,
-          #c9d4e0 45%,
-          #7d93aa 50%,
-          #34506d 55%,
-          #172e46 61%,
-          #0d1e30 100%
-        );
+        radial-gradient(80% 30% at 0% 0%, rgb(255 255 255 / 0.7), transparent 70%),
+        radial-gradient(80% 30% at 100% 100%, rgb(46 104 152 / 0.4), transparent 70%),
+        var(--fade-y);
     }
+    .bp-stage::after { display: none; }
     .bp-card::before { -webkit-mask-image: linear-gradient(180deg, #000 0%, transparent 42%); mask-image: linear-gradient(180deg, #000 0%, transparent 42%); }
-    .bp-card::after { -webkit-mask-image: linear-gradient(180deg, transparent 48%, #000 65%); mask-image: linear-gradient(180deg, transparent 48%, #000 65%); }
     .side { grid-row: auto; grid-column: auto; grid-template-rows: none; }
-    .side-biz { padding-bottom: 3.5rem; }
-    .side-np { padding-top: 3.5rem; justify-items: start; text-align: left; }
+    .side-biz { padding-bottom: 4.5rem; }
+    .side-np { padding-top: 4.5rem; justify-items: start; text-align: left; }
     .side-np .side-label { margin-right: 0; }
     .side-figure { max-width: 420px; }
     .side-title { white-space: normal; }
