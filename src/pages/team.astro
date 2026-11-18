@@ -62,7 +62,9 @@ const DRAFT = false;
 
   /* ---------- The team ---------- */
   .crew-band { padding-top: clamp(6.5rem, 4.5rem + 5vw, 10rem); padding-bottom: clamp(5rem, 4rem + 3vw, 7rem); }
+  /* A little wider than the card above it */
   .crew {
+    max-width: calc(var(--max) + 200px + 2 * var(--gutter));
     display: grid;
     grid-template-columns: minmax(0, 3.4fr) repeat(3, minmax(0, 2.85fr));
     column-gap: clamp(0.75rem, 0.4rem + 0.8vw, 1.25rem);
