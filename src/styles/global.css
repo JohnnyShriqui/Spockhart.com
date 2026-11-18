@@ -429,18 +429,19 @@ a { color: inherit; }
   --mist-2: #2a5f8e;
   --mist-3: #5c4a82;
 }
-/* Our Work: deep petrol, cool light behind the results */
+/* Our Work: the home page's midnight blue, the brand's steel glowing on the right, easing at the
+   bottom into the page's own deep blue below */
 .theme-work {
   background:
-    /* The bottom eases into the page's deep petrol, so the hero flows straight on into it */
-    linear-gradient(180deg, rgb(12 31 40 / 0) 50%, rgb(12 31 40 / 0.16) 64%, rgb(12 31 40 / 0.5) 80%, rgb(12 31 40 / 0.86) 93%, #0c1f28 100%),
-    radial-gradient(50% 72% at 80% 46%, rgb(26 104 118 / 0.48), transparent 72%),
-    radial-gradient(46% 62% at 0% 0%, rgb(36 78 126 / 0.45), transparent 72%),
-    radial-gradient(40% 52% at 34% 112%, rgb(18 72 82 / 0.5), transparent 72%),
-    linear-gradient(170deg, #07141a 0%, #0a1f28 55%, #0d2932 100%);
-  --mist-1: #1c6b76;
-  --mist-2: #285a88;
-  --mist-3: #1e5b64;
+    linear-gradient(180deg, rgb(14 31 50 / 0) 60%, rgb(14 31 50 / 0.3) 76%, rgb(14 31 50 / 0.75) 92%, #0e1f32 100%),
+    radial-gradient(52% 72% at 80% 40%, rgb(46 104 152 / 0.5), transparent 72%),
+    radial-gradient(55% 75% at 100% 105%, rgb(38 96 142 / 0.48), transparent 72%),
+    radial-gradient(50% 70% at 0% 108%, rgb(42 95 142 / 0.42), transparent 72%),
+    radial-gradient(42% 46% at 38% -8%, rgb(56 66 132 / 0.32), transparent 72%),
+    linear-gradient(165deg, #09131e 0%, #0d1c2d 55%, #10233a 100%);
+  --mist-1: #2a6496;
+  --mist-2: #2a5f8e;
+  --mist-3: #3a4c8c;
 }
 /* The drifting light fades out before the hero's bottom edge, so it is never cut off */
 .theme-work .mist {
