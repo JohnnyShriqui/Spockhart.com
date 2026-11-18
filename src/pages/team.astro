@@ -62,9 +62,11 @@ const DRAFT = false;
 
   /* ---------- The team ---------- */
   .crew-band { padding-top: clamp(6.5rem, 4.5rem + 5vw, 10rem); padding-bottom: clamp(5rem, 4rem + 3vw, 7rem); }
-  /* The cards keep their size with more room between them; the title sits a touch further left */
+  /* A little wider than the card above it: the cards keep their size, and the extra width goes
+     to more room between them and to the title, which sits further left */
   .crew {
-    --card-w: clamp(13rem, 18.5vw, 16.5rem);
+    --card-w: clamp(13rem, 19.5vw, 18rem);
+    max-width: calc(var(--max) + 100px + 2 * var(--gutter));
     display: grid;
     grid-template-columns: minmax(0, 1fr) repeat(3, var(--card-w));
     column-gap: clamp(1.25rem, 0.5rem + 2vw, 2.75rem);
@@ -73,7 +75,6 @@ const DRAFT = false;
   .crew-title {
     grid-column: 1;
     align-self: start;
-    margin-left: calc(-1 * clamp(1rem, 0.5rem + 2vw, 3rem));
     max-width: 5ch;
     font-size: clamp(3.5rem, 2rem + 5vw, 7.25rem);
     font-weight: 400;
@@ -100,7 +101,7 @@ const DRAFT = false;
 
   @media (max-width: 1023px) {
     .crew { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: var(--s-6); }
-    .crew-title { grid-column: 1 / -1; max-width: none; margin-left: 0; }
+    .crew-title { grid-column: 1 / -1; max-width: none; }
   }
   @media (max-width: 640px) {
     .team-top { padding-top: 5.5rem; }
