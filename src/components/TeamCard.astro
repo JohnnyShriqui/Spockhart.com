@@ -16,7 +16,7 @@ const { person, draft = false, class: className = '' } = Astro.props;
 const linkedin = person.linkedin || (draft ? '#' : '');
 ---
 
-<article class:list={['tcard', className, { 'no-photo': !person.photo }]}>
+<article class:list={['tcard', className, { 'no-photo': !person.photo }]} data-tilt="4" data-tilt-depth="1400">
   <div class="tcard-media">
     {
       person.photo ? (
