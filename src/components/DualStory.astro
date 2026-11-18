@@ -23,14 +23,12 @@ const LIGHT = '#f2f5f9';
 const NAVY = '#0f2135';
 const fadeX = smoothFade('90deg', LIGHT, NAVY, 18, 82, 40);
 const fadeY = smoothFade('180deg', LIGHT, NAVY, 40, 62, 40);
-/* The card's lower edge, seen as its thickness: the same blend, a shade deeper */
-const edgeX = smoothFade('90deg', '#c4cdd7', '#07121e', 18, 82, 40);
 ---
 
 <section class="bp" aria-label="Built for Business, Driven by Purpose">
   <Heading class="visually-hidden">Built for Business, Driven by Purpose</Heading>
 
-  <div class="bp-stage" style={`--fade-x:${fadeX};--fade-y:${fadeY};--edge-x:${edgeX}`}>
+  <div class="bp-stage" style={`--fade-x:${fadeX};--fade-y:${fadeY}`}>
   <div class="bp-card">
     <div class="side side-biz">
       <p class="side-title load-in" style="--i:1" aria-hidden="true">Built for Business,</p>
@@ -79,7 +77,7 @@ const edgeX = smoothFade('90deg', '#c4cdd7', '#07121e', 18, 82, 40);
       0 34px 50px -26px rgb(12 26 41 / 0.42),
       0 80px 110px -50px rgb(12 26 41 / 0.42);
   }
-  /* The stage: the card, its thickness along the bottom, and its shadow on the floor */
+  /* The stage: the card and its shadow on the floor */
   .bp-stage { position: relative; isolation: isolate; max-width: var(--max); margin-inline: auto; }
   .bp-stage::before {
     content: '';
@@ -92,18 +90,6 @@ const edgeX = smoothFade('90deg', '#c4cdd7', '#07121e', 18, 82, 40);
     border-radius: 50%;
     background: radial-gradient(closest-side, rgb(12 26 41 / 0.32), rgb(12 26 41 / 0.12) 55%, transparent);
     filter: blur(10px);
-  }
-  .bp-stage::after {
-    content: '';
-    position: absolute;
-    z-index: -1;
-    left: 10px;
-    right: 10px;
-    bottom: -9px;
-    height: 40px;
-    border-radius: 0 0 26px 26px;
-    background: var(--edge-x);
-    box-shadow: 0 6px 10px -4px rgb(12 26 41 / 0.35);
   }
   /* Engineering paper on the light side, fading out before the middle */
   .bp-card::before {
@@ -212,7 +198,6 @@ const edgeX = smoothFade('90deg', '#c4cdd7', '#07121e', 18, 82, 40);
         radial-gradient(80% 30% at 100% 100%, rgb(46 104 152 / 0.4), transparent 70%),
         var(--fade-y);
     }
-    .bp-stage::after { display: none; }
     .bp-card::before { -webkit-mask-image: linear-gradient(180deg, #000 0%, transparent 42%); mask-image: linear-gradient(180deg, #000 0%, transparent 42%); }
     .side { grid-row: auto; grid-column: auto; grid-template-rows: none; }
     .side-biz { padding-bottom: 4.5rem; }

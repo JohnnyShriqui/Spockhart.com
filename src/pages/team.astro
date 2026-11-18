@@ -74,7 +74,7 @@ const DRAFT = false;
   }
   /* Our founder's card stands a little taller than the rest */
   .crew-slot.is-lead :global(.tcard) { aspect-ratio: 4 / 5.7; }
-  /* Each card stands in the room: its thickness along the bottom, and its shadow on the floor */
+  /* Each card stands in the room, with its shadow on the floor */
   .crew-slot { position: relative; isolation: isolate; }
   .crew-slot::before {
     content: '';
@@ -88,18 +88,6 @@ const DRAFT = false;
     background: radial-gradient(closest-side, rgb(12 26 41 / 0.34), rgb(12 26 41 / 0.12) 55%, transparent);
     filter: blur(9px);
   }
-  .crew-slot::after {
-    content: '';
-    position: absolute;
-    z-index: -1;
-    left: 8px;
-    right: 8px;
-    bottom: -8px;
-    height: 34px;
-    border-radius: 0 0 20px 20px;
-    background: linear-gradient(90deg, #262d36, #3b444f 50%, #262d36);
-    box-shadow: 0 6px 10px -4px rgb(12 26 41 / 0.35);
-  }
 
   @media (max-width: 1023px) {
     .crew { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: var(--s-6); }
@@ -109,7 +97,6 @@ const DRAFT = false;
     .team-top { padding-top: 5.5rem; }
     .crew { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 1.75rem; }
     .crew-slot::before { bottom: -26px; height: 36px; }
-    .crew-slot::after { bottom: -6px; border-radius: 0 0 14px 14px; }
     .crew-slot.is-lead { grid-column: 1 / -1; }
     .crew-slot.is-lead :global(.tcard) { aspect-ratio: 4 / 3.4; }
     .crew-slot:not(.is-lead) :global(.tcard-meta h3) { font-size: 0.9375rem; }
