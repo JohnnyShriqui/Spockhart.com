@@ -62,17 +62,18 @@ const DRAFT = false;
 
   /* ---------- The team ---------- */
   .crew-band { padding-top: clamp(6.5rem, 4.5rem + 5vw, 10rem); padding-bottom: clamp(5rem, 4rem + 3vw, 7rem); }
-  /* A little wider than the card above it */
+  /* The cards keep their size with more room between them; the title sits a touch further left */
   .crew {
-    max-width: calc(var(--max) + 200px + 2 * var(--gutter));
+    --card-w: clamp(13rem, 18.5vw, 16.5rem);
     display: grid;
-    grid-template-columns: minmax(0, 3.4fr) repeat(3, minmax(0, 2.85fr));
-    column-gap: clamp(0.75rem, 0.4rem + 0.8vw, 1.25rem);
+    grid-template-columns: minmax(0, 1fr) repeat(3, var(--card-w));
+    column-gap: clamp(1.25rem, 0.5rem + 2vw, 2.75rem);
     align-items: end;
   }
   .crew-title {
     grid-column: 1;
     align-self: start;
+    margin-left: calc(-1 * clamp(1rem, 0.5rem + 2vw, 3rem));
     max-width: 5ch;
     font-size: clamp(3.5rem, 2rem + 5vw, 7.25rem);
     font-weight: 400;
@@ -80,8 +81,8 @@ const DRAFT = false;
     letter-spacing: -0.035em;
     color: var(--ink);
   }
-  /* Our founder's card stands a little taller than the rest */
-  .crew-slot.is-lead :global(.tcard) { aspect-ratio: 4 / 5.7; }
+  /* All three cards stand the same height */
+  .crew-slot :global(.tcard) { aspect-ratio: 4 / 5.7; }
   /* Each card stands in the room, with its shadow on the floor */
   .crew-slot { position: relative; isolation: isolate; }
   .crew-slot::before {
@@ -99,7 +100,7 @@ const DRAFT = false;
 
   @media (max-width: 1023px) {
     .crew { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: var(--s-6); }
-    .crew-title { grid-column: 1 / -1; max-width: none; }
+    .crew-title { grid-column: 1 / -1; max-width: none; margin-left: 0; }
   }
   @media (max-width: 640px) {
     .team-top { padding-top: 5.5rem; }
@@ -107,6 +108,7 @@ const DRAFT = false;
     .crew-slot::before { bottom: -26px; height: 36px; }
     .crew-slot.is-lead { grid-column: 1 / -1; }
     .crew-slot.is-lead :global(.tcard) { aspect-ratio: 4 / 3.4; }
+    .crew-slot:not(.is-lead) :global(.tcard) { aspect-ratio: 4 / 5; }
     .crew-slot:not(.is-lead) :global(.tcard-meta h3) { font-size: 0.9375rem; }
     .crew-slot:not(.is-lead) :global(.tcard-meta p) { font-size: 0.75rem; }
     .crew-title { margin-bottom: var(--s-3); }
