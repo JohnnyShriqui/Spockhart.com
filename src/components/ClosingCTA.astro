@@ -6,10 +6,11 @@ interface Props {
   primary?: { label: string; href: string };
   /** Kept so existing pages need no change; the section is short everywhere now */
   terse?: boolean;
-  /** On a dark card that stands in the room, as the last thing on the page */
+  /** On a dark card that stands in the room, as the last thing on the page (every page; false for
+      the old plain section) */
   card?: boolean;
 }
-const { title = 'Tell us where you’d like to improve.', primary = { label: 'Start a conversation', href: '/contact/' }, card = false } = Astro.props;
+const { title = 'Tell us where you’d like to improve.', primary = { label: 'Start a conversation', href: '/contact/' }, card = true } = Astro.props;
 ---
 
 {
@@ -96,6 +97,14 @@ const { title = 'Tell us where you’d like to improve.', primary = { label: 'St
     .closing-panel { grid-template-columns: minmax(0, 1fr) auto; align-items: end; column-gap: var(--s-7); }
     .closing-panel h2 { max-width: 13ch; font-size: clamp(2.5rem, 1.5rem + 2.4vw, 3.75rem); line-height: 1.04; letter-spacing: -0.02em; }
     .closing-panel .closing-actions { padding-bottom: 0.35rem; }
+  }
+  /* Laptops: the card reaches a little past the column, up to 2rem each side (keeping 2.5rem
+     clear of the screen's edge) */
+  @media (min-width: 1100px) {
+    .closing-card .closing-stand {
+      --reach: clamp(0px, max(var(--gutter), (100vw - var(--max)) / 2) - 2.5rem, 4rem);
+      margin-inline: calc(var(--reach) * -0.5);
+    }
   }
   @media (max-width: 640px) {
     .closing-panel { border-radius: 20px; }

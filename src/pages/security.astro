@@ -39,11 +39,14 @@ const practices = [
     title="Your data stays yours."
     lead="We work inside your systems and with your information. These are the commitments we make before we start."
   />
-  <PolicyGrid items={practices}>
-    <p>
-      Security questionnaire or a specific requirement? Email <a class="link" href={`mailto:${site.email}`}>{site.email}</a> and we will
-      answer it in writing.
-    </p>
-  </PolicyGrid>
-  <ClosingCTA />
+  <!-- Below the hero, the page is light, as on every other page -->
+  <div class="page-body body-security" data-body>
+    <PolicyGrid items={practices}>
+      <p>
+        Security questionnaire or a specific requirement? Email <a class="link" href={`mailto:${site.email}`}>{site.email}</a> and we will
+        answer it in writing.
+      </p>
+    </PolicyGrid>
+    <ClosingCTA />
+  </div>
 </Base>
