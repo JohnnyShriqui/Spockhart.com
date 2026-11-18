@@ -17,8 +17,17 @@ function initHeader() {
   const alwaysDark = Array.from(document.querySelectorAll<HTMLElement>('[data-hero-dark], [data-dark-page]'));
   const body = Array.from(document.querySelectorAll<HTMLElement>('[data-body]'));
   let ticking = false;
+  const remember = (compact: boolean) => {
+    try {
+      sessionStorage.setItem('spockhart:header-compact', compact ? '1' : '0');
+    } catch {
+      /* storage blocked: the header simply starts full size on the next page */
+    }
+  };
   const update = () => {
-    header.classList.toggle('is-scrolled', window.scrollY > 8);
+    const compact = window.scrollY > 8;
+    header.classList.toggle('is-scrolled', compact);
+    remember(compact);
     const mid = header.offsetHeight / 2;
     const under = (el: HTMLElement) => {
       const r = el.getBoundingClientRect();
@@ -35,7 +44,21 @@ function initHeader() {
     header.classList.toggle('over-dark', !onBody && alwaysDark.some(underDark));
     ticking = false;
   };
-  update();
+  if (header.classList.contains('is-carried')) {
+    // It arrived shrunk from the last page: settle its colours first, then let it grow back
+    // smoothly if this page is at the top
+    const compact = header.classList.contains('is-scrolled');
+    update();
+    header.classList.toggle('is-scrolled', compact);
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
+        header.classList.remove('is-carried');
+        update();
+      }),
+    );
+  } else {
+    update();
+  }
   window.addEventListener(
     'scroll',
     () => {

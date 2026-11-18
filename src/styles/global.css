@@ -749,7 +749,7 @@ html.is-focusing .focus-veil { opacity: 1; }
   ::view-transition-old(root) { animation: 180ms var(--ease) both fade reverse; }
   ::view-transition-new(root) { animation: 320ms var(--ease) 60ms both fade; }
   .site-header { view-transition-name: site-header; }
-  ::view-transition-old(site-header), ::view-transition-new(site-header) { animation: none; }
+  ::view-transition-group(site-header), ::view-transition-old(site-header), ::view-transition-new(site-header) { animation: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {

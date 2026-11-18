@@ -63,6 +63,15 @@ const isCurrent = (href: string) => (href === '/' ? path === '/' : path.startsWi
     </nav>
   </div>
 </header>
+<script is:inline>
+  // Arriving from a page where the header had shrunk: start shrunk too, so the change of page
+  // shows no jump, and let the site script grow it back smoothly (scripts/site.ts)
+  try {
+    if (sessionStorage.getItem('spockhart:header-compact') === '1') {
+      document.querySelector('[data-header]').classList.add('is-scrolled', 'is-carried');
+    }
+  } catch (e) {}
+</script>
 
 <style>
   .site-header {
@@ -75,6 +84,8 @@ const isCurrent = (href: string) => (href === '/' ? path === '/' : path.startsWi
     transition: background-color 300ms var(--ease), box-shadow 300ms var(--ease), backdrop-filter 300ms var(--ease), padding-top 300ms var(--ease);
   }
   .site-header.is-scrolled, .site-header.is-open { padding-top: 0; }
+  /* Carried over from the last page: no transition until it has settled in */
+  .site-header.is-carried, .site-header.is-carried :global(.header-inner) { transition: none; }
   .site-header.is-scrolled,
   .site-header.is-open {
     background: var(--header-bg);
