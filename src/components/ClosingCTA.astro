@@ -9,10 +9,8 @@ interface Props {
   /** On a dark card that stands in the room, as the last thing on the page (every page; false for
       the old plain section) */
   card?: boolean;
-  /** A light card that gives off light, for a dark page (Our Work), in place of the dark card */
-  light?: boolean;
 }
-const { title = 'Tell us where you’d like to improve.', primary = { label: 'Start a conversation', href: '/contact/' }, card = true, light = false } = Astro.props;
+const { title = 'Tell us where you’d like to improve.', primary = { label: 'Start a conversation', href: '/contact/' }, card = true } = Astro.props;
 ---
 
 {
@@ -20,7 +18,7 @@ const { title = 'Tell us where you’d like to improve.', primary = { label: 'St
     <section class="closing closing-card section">
       <div class="wrap">
         <div class="closing-stand stand" data-reveal>
-          <div class:list={['closing-panel', { 'is-light': light }]} data-tilt="3" data-tilt-depth="2600">
+          <div class="closing-panel" data-tilt="3" data-tilt-depth="2600">
             <h2>{title}</h2>
             <div class="closing-actions">
               <a class="btn" href={primary.href}>{primary.label} <span class="arr" aria-hidden="true">→</span></a>
@@ -99,36 +97,6 @@ const { title = 'Tell us where you’d like to improve.', primary = { label: 'St
     .closing-panel { grid-template-columns: minmax(0, 1fr) auto; align-items: end; column-gap: var(--s-7); }
     .closing-panel h2 { max-width: 13ch; font-size: clamp(2.5rem, 1.5rem + 2.4vw, 3.75rem); line-height: 1.04; letter-spacing: -0.02em; }
     .closing-panel .closing-actions { padding-bottom: 0.35rem; }
-  }
-  /* Light, on a dark page: white and navy, giving off a soft cool light in place of a shadow, with
-     a pool of light on the floor beneath it */
-  .closing-panel.is-light {
-    --ink: #1b2a3d;
-    --ink-2: #4a5d72;
-    --rule: rgb(27 42 61 / 0.1);
-    --rule-2: rgb(27 42 61 / 0.2);
-    --accent: #2c5f8a;
-    --btn-bg: #1b2a3d;
-    --btn-fg: #f0f3f7;
-    --btn-bg-hover: #2c4a6a;
-    background:
-      radial-gradient(70% 120% at 0% 0%, #ffffff, rgb(255 255 255 / 0) 70%),
-      linear-gradient(172deg, #f7f9fc 0%, #eef3f8 60%, #e5ecf3 100%);
-    box-shadow:
-      inset 0 1px 0 #ffffff,
-      inset 0 -1px 0 rgb(27 42 61 / 0.06),
-      0 0 0 1px rgb(255 255 255 / 0.3),
-      0 0 22px rgb(214 232 255 / 0.2),
-      0 0 70px 4px rgb(160 202 245 / 0.16),
-      0 40px 160px 10px rgb(110 165 230 / 0.12);
-  }
-  .closing-panel.is-light::after { opacity: 0.04; mix-blend-mode: multiply; }
-  .closing-panel.is-light h2 { color: var(--ink); text-shadow: none; }
-  .closing-stand:has(.is-light)::before {
-    bottom: -60px;
-    height: 90px;
-    background: radial-gradient(closest-side, rgb(196 222 250 / 0.24), rgb(140 186 236 / 0.09) 55%, transparent);
-    filter: blur(14px);
   }
   /* Laptops: the card reaches a little past the column, up to 2rem each side (keeping 2.5rem
      clear of the screen's edge) */

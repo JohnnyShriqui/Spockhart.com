@@ -769,11 +769,10 @@ html.is-focusing .focus-veil { opacity: 1; }
   body { background: #fff; color: #000; }
 }
 
-/* The dark areas clip anything at their edges */
-.page-body, .work-dark { overflow-x: clip; }
+/* The page below each hero clips anything at its edges */
+.page-body { overflow-x: clip; }
 
 /* Headlines: a soft shadow beneath them. They hold still once they have come in. */
-.work-dark h2 { text-shadow: 0 18px 44px rgb(0 0 0 / 0.35); }
 .hero-dark h1 {
   text-shadow: 0 14px 22px rgb(0 0 0 / 0.5), 0 34px 60px rgb(0 0 0 / 0.3);
 }

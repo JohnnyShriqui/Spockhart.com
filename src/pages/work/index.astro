@@ -52,8 +52,8 @@ const sectionsOf = (body = '') =>
     <HeroLive slot="figure" inline />
   </PageHero>
 
-  <!-- The whole page carries on in the hero's deep petrol, not just the opening -->
-  <div class="work-dark" data-dark-page>
+  <!-- Below the hero: one light room, rising over the hero like a sheet, as on the home page -->
+  <div class="page-body work-body room-light" data-body>
   <section class="projects" aria-label="Projects" data-projects>
     {
       all.map((entry, i) => {
@@ -159,7 +159,7 @@ const sectionsOf = (body = '') =>
     </style>
   </noscript>
 
-  <ClosingCTA terse light title="Your operation could be next." />
+  <ClosingCTA terse title="Your operation could be next." />
   </div>
 </Base>
 
@@ -176,6 +176,11 @@ const sectionsOf = (body = '') =>
       const panel = project.querySelector<HTMLElement>('[data-panel]');
       if (!panel) return;
       panel.dataset.open = String(open);
+      // Once it has opened, the card's shadow may reach past the panel's edge; while it opens or
+      // closes, the panel clips it so the slide stays clean
+      clearTimeout(Number(panel.dataset.settle));
+      panel.classList.remove('is-settled');
+      if (open) panel.dataset.settle = String(window.setTimeout(() => panel.classList.add('is-settled'), 600));
       project.querySelectorAll<HTMLButtonElement>('[data-toggle]').forEach((toggle) => {
         toggle.setAttribute('aria-expanded', String(open));
         const label = toggle.querySelector('[data-label]');
@@ -206,43 +211,23 @@ const sectionsOf = (body = '') =>
 </script>
 
 <style>
-  /* ---------- Dark, in the hero's colours ----------
-     One deep petrol ground for the whole page and a soft glow
-     behind each graphic (teal and blue in turn, like the hero's) that fades out well before the
-     edges of its case study, so nothing ever meets on a line. */
-  .work-dark {
-    --ink: #eef3f8;
-    --ink-2: #b5c4d3;
-    --ink-3: #94a8bc;
-    --rule: rgb(255 255 255 / 0.1);
-    --rule-2: rgb(255 255 255 / 0.22);
-    --accent: #8ec0e6;
-    --accent-soft: #6fa8d6;
-    --accent-wash: rgb(142 192 230 / 0.14);
-    --surface: rgb(255 255 255 / 0.04);
-    --btn-bg: #eef3f8;
-    --btn-fg: #14212f;
-    --btn-bg-hover: #ffffff;
-    --selection: rgb(142 192 230 / 0.3);
-    position: relative;
-    isolation: isolate;
-    color: var(--ink);
-    /* The hero's midnight blue, deepening toward black as the page goes on */
-    background: linear-gradient(180deg, #0e1f32 0%, #0c1a2b 16%, #0a1524 45%, #08101b 75%, #060c14 100%);
+  /* ---------- Below the hero: one light room, as on the home page ----------
+     It rides up over the bottom of the hero like a sheet, rounded at the top with its top edge
+     catching the light, and its rounded bottom overlaps the footer a little, so the dark shows in
+     its corners at both ends. */
+  .work-body {
+    --sheet-r: 32px;
+    z-index: 1;
+    margin-top: calc(var(--sheet-r) * -1);
+    margin-bottom: calc(var(--sheet-r) * -1);
+    border-radius: var(--sheet-r);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.9), 0 -28px 60px -24px rgb(0 0 0 / 0.5), 0 28px 60px -24px rgb(0 0 0 / 0.5);
   }
-  /* A fine grain over the whole page, as in the hero, so the dark reads as depth, not a flat fill */
-  .work-dark::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
-    background-image: var(--grain);
-    background-size: 200px;
-    opacity: 0.1;
-    mix-blend-mode: overlay;
+  .work-body.room-light::after { border-radius: inherit; }
+  .work-body :global(.closing) { border-top: 0; }
+  @media (max-width: 640px) {
+    .work-body { --sheet-r: 22px; }
   }
-  .work-dark :global(.closing) { border-top: 0; }
 
   /* The hero's disclaimer: plain, set apart by a fine rule, a step quieter than the lead */
   .work-note {
@@ -256,18 +241,16 @@ const sectionsOf = (body = '') =>
   }
   .work-note strong { font-weight: 600; color: var(--ink); }
 
+  /* Each case study: a pool of light on the wall behind its graphic, fading out well before the
+     edges of the case study, so nothing ever meets on a line */
   .project {
-    --glow: rgb(46 104 152 / 0.34);
-    --glow-x: 70%;
+    --pool-x: 70%;
     padding-block: clamp(3.5rem, 2rem + 4.5vw, 6.5rem);
     scroll-margin-top: 72px;
-    background: radial-gradient(56% 44% at var(--glow-x) 50%, var(--glow), transparent 72%);
+    background: radial-gradient(46% 40% at var(--pool-x) 50%, rgb(255 255 255 / 0.85), rgb(255 255 255 / 0.3) 45%, transparent 72%);
   }
-  .project.flip { --glow-x: 30%; }
+  .project.flip { --pool-x: 30%; }
   .project-visual :global(.scene) { will-change: transform; }
-  .project:nth-child(4n + 2), .project:nth-child(4n + 3) { --glow: rgb(58 74 146 / 0.3); }
-  .client-mark::before { background: #eef3f8 !important; }
-  .client-mark svg { stroke: #14212f !important; }
   .project-grid {
     display: grid;
     grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
@@ -431,10 +414,9 @@ const sectionsOf = (body = '') =>
   }
 
   /* ==========================================================================
-     The graphics: light cards, each a small light source in the dark room. Instead of a shadow,
-     each gives off a soft, cool white light: a bright rim, a close halo, a wider bloom, a faint
-     wash on the wall around it, and a pool of light on the floor beneath it. Inside, the same
-     drawings, set in navy and the brand's blue on white.
+     The graphics: dark cards standing in the light room, as on the home page. Midnight blue with
+     the brand's steel light in one corner, a lit top edge, a tight contact shadow and a long soft
+     one, and their shadow on the floor beneath them.
      ========================================================================== */
   .project-visual { justify-items: stretch; }
   .project-visual > .cs-toggle { justify-self: start; }
@@ -443,87 +425,59 @@ const sectionsOf = (body = '') =>
     content: '';
     position: absolute;
     z-index: -1;
-    left: 4%;
-    right: 4%;
-    bottom: -64px;
-    height: 96px;
+    left: 7%;
+    right: 7%;
+    bottom: -40px;
+    height: 60px;
     border-radius: 50%;
-    background: radial-gradient(closest-side, rgb(196 222 250 / 0.26), rgb(140 186 236 / 0.1) 55%, transparent);
-    filter: blur(14px);
+    background: var(--floor);
+    filter: blur(10px);
     pointer-events: none;
   }
   .project .rv-stage > :global(.rv) {
-    --rv-frame: #eef3f8;
-    --rv-win: #ffffff;
-    --rv-bar: #f4f7fa;
-    --rv-hot: #2c5f8a;
-    --rv-hot-rgb: 44 95 138;
-    --rv-soft: #3f5873;
-    --rv-muted: #6c8095;
-    /* Tints in a cool slate, so the quiet parts read blue-grey rather than plain grey */
-    --rv-fg: 32 54 82;
-    --rv-fg-solid: #14212f;
-    --rv-doc-dim: #d2dce7;
-    --rv-site: #b6c6d6;
-    --rv-win-shadow: 0 1px 2px rgb(12 26 41 / 0.06), 0 14px 28px -18px rgb(12 26 41 / 0.26);
+    --rv-frame: #10233a;
+    --rv-win: #14293f;
+    --rv-bar: #112338;
+    --rv-win-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06), 0 20px 40px -26px rgb(0 0 0 / 0.7);
     border-radius: 20px;
     background:
-      radial-gradient(90% 55% at 30% 0%, #ffffff, rgb(255 255 255 / 0) 70%),
-      linear-gradient(172deg, #f7f9fc 0%, #eef3f8 60%, #e5ecf3 100%);
-    box-shadow:
-      inset 0 1px 0 #ffffff,
-      inset 0 -1px 0 rgb(27 42 61 / 0.06),
-      0 0 0 1px rgb(255 255 255 / 0.3),
-      0 0 22px rgb(214 232 255 / 0.2),
-      0 0 70px 4px rgb(160 202 245 / 0.16),
-      0 40px 160px 10px rgb(110 165 230 / 0.12);
+      radial-gradient(70% 55% at 0% 0%, rgb(46 104 152 / 0.42), transparent 70%),
+      radial-gradient(50% 50% at 100% 100%, rgb(38 96 142 / 0.18), transparent 72%),
+      linear-gradient(165deg, #0f2236 0%, #0a1625 100%);
+    box-shadow: var(--lift-dark);
   }
-  .project .rv-stage > :global(.rv)::before { background: radial-gradient(circle, rgb(255 255 255 / 0.9), transparent 70%); }
-  .project .rv-stage :global(.gp-x) { stroke: #c4424f; }
 
-  /* ---------- The words beside each graphic: the same, with a little more finish ---------- */
-  /* The client's mark catches the light */
-  .client-mark { filter: drop-shadow(0 0 16px rgb(170 205 245 / 0.28)); }
-  /* "Before Spockhart" and "See the details": panes of glass, lit along their top edge */
+  /* ---------- The words beside each graphic, with a little more finish ---------- */
+  /* The client's mark stands slightly off the page */
+  .client-mark { filter: drop-shadow(0 6px 8px rgb(12 26 41 / 0.22)); }
+  /* "Before Spockhart" and "See the details": raised a little off the page, lit along their top */
   .project-origin,
   .cs-toggle {
-    border-color: rgb(255 255 255 / 0.16);
-    background: linear-gradient(180deg, rgb(255 255 255 / 0.08), rgb(255 255 255 / 0.02));
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.1), 0 10px 20px -12px rgb(0 0 0 / 0.6);
+    border: 1px solid rgb(27 42 61 / 0.1);
+    background: linear-gradient(180deg, #ffffff, #f3f6f9);
+    box-shadow: var(--lift-soft);
   }
   .cs-toggle { transition: background-color var(--dur) var(--ease), border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease); }
   .cs-toggle:hover {
-    border-color: rgb(255 255 255 / 0.32);
-    background: linear-gradient(180deg, rgb(255 255 255 / 0.14), rgb(255 255 255 / 0.04));
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.16), 0 0 24px -6px rgb(170 205 245 / 0.35), 0 10px 20px -12px rgb(0 0 0 / 0.6);
+    border-color: rgb(27 42 61 / 0.18);
+    background: #ffffff;
+    box-shadow: var(--lift-soft), 0 14px 22px -14px rgb(12 26 41 / 0.3);
   }
 
-  /* ---------- The details: a light card too, giving off the same light ---------- */
-  .cs-panel-inner > .wrap { padding-block: 2.25rem 3.5rem; }
+  /* ---------- The details: a white card, raised off the page ---------- */
+  .cs-panel-inner > .wrap { padding-block: 2.25rem 4.5rem; }
+  .cs-panel.is-settled .cs-panel-inner { overflow: visible; }
   .cs-card {
-    --ink: #1b2a3d;
-    --ink-2: #4a5d72;
-    --ink-3: #6c7f93;
-    --rule: rgb(27 42 61 / 0.1);
-    --accent: #2c5f8a;
     margin-top: 0;
-    border: 0;
+    border: 1px solid rgb(27 42 61 / 0.06);
     border-radius: 20px;
-    color: var(--ink);
-    background:
-      radial-gradient(80% 50% at 20% 0%, #ffffff, rgb(255 255 255 / 0) 70%),
-      linear-gradient(172deg, #f8fafc 0%, #eef3f8 100%);
-    box-shadow:
-      inset 0 1px 0 #ffffff,
-      0 0 0 1px rgb(255 255 255 / 0.3),
-      0 0 22px rgb(214 232 255 / 0.18),
-      0 0 70px 4px rgb(160 202 245 / 0.14);
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    box-shadow: var(--lift);
   }
-  .cs-card h3 { text-shadow: none; }
   @media (max-width: 640px) {
     .project .rv-stage > :global(.rv),
     .cs-card { border-radius: 16px; }
-    .rv-stage::after { bottom: -40px; height: 60px; }
-    .cs-panel-inner > .wrap { padding-block: 1.5rem 2.5rem; }
+    .rv-stage::after { bottom: -26px; height: 40px; }
+    .cs-panel-inner > .wrap { padding-block: 1.5rem 3rem; }
   }
 </style>
