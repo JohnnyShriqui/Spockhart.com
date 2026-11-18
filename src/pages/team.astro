@@ -1,306 +1,96 @@
 ---
 import Base from '../layouts/Base.astro';
-import Mist from '../components/Mist.astro';
-import TeamOrbit from '../components/TeamOrbit.astro';
-import AdvisorCard from '../components/AdvisorCard.astro';
+import TeamCard from '../components/TeamCard.astro';
+import DualStory from '../components/DualStory.astro';
 import ClosingCTA from '../components/ClosingCTA.astro';
-import { advisors } from '../data/advisors';
-import { founder } from '../data/team';
-import { site } from '../config/site';
-import { initials } from '../lib/format';
+import { team } from '../data/team';
 
-const board = advisors.filter((a) => a.confirmed || site.previewTeam);
+/* Draft: marks cards still waiting on a photo and shows where the LinkedIn buttons go.
+   Turn off before the page goes live. */
+const DRAFT = true;
 ---
 
 <Base
   title="Team"
-  description="Meet the people behind Spockhart: our founder, our advisory board, and the purpose-driven work we do for growing companies and nonprofits."
+  description="Meet the Spockhart team: our founder and our advisory board. Built for business, driven by purpose."
   lightHero
 >
-  <!-- Hero: the system says it, so there are no words above it -->
-  <section class="team-hero hero-light theme-team-light">
-    <Mist />
-    <h1 class="visually-hidden">The Spockhart team</h1>
-    <div class="team-hero-map">
-      <TeamOrbit />
+  <!-- The team, all on one screen -->
+  <section class="team-hero hero-light theme-team-light" aria-labelledby="team-title">
+    <div class="wrap crew">
+      <h1 id="team-title" class="crew-title load-in" style="--i:1">Our team</h1>
+      {
+        team.map((p, i) => (
+          <div class:list={['crew-slot', `crew-slot-${i}`, { 'is-lead': i === 0 }]} style={`--i:${i + 2}`}>
+            <TeamCard person={p} draft={DRAFT} />
+          </div>
+        ))
+      }
     </div>
   </section>
 
   <div class="page-body body-team" data-body>
-    <!-- Our story: purpose, and why we work with both companies and nonprofits -->
-    <section class="section story" aria-labelledby="story-title">
+    <section class="section dual-band">
       <div class="wrap">
-        <div class="story-grid">
-          <div class="story-head" data-reveal>
-            <p class="eyebrow">Our story</p>
-            <h2 id="story-title">Built for business. Driven by purpose.</h2>
-          </div>
-          <div class="story-body" data-reveal>
-            <p class="story-lead">
-              Spockhart’s roots are in the private sector. Our team spent years building the systems that help companies save time,
-              cut costs and grow.
-            </p>
-            <p>
-              Along the way, we kept meeting nonprofits facing the very same problems: dedicated teams losing hours to tedious,
-              repetitive tasks, with less time left for the people they serve.
-            </p>
-            <p>
-              So Spockhart works with both. Growing companies and nonprofits get the same team, the same engineering and the same
-              standard. We call it purpose-driven work, and it is who we are.
-            </p>
-          </div>
-        </div>
-
-        <div class="sides" data-reveal="stagger">
-          <a class="side" href="/approach/">
-            <span class="side-label">Growing companies</span>
-            <span class="side-text">Save time, cut costs and uncover new revenue.</span>
-            <span class="side-link">How we work <span aria-hidden="true">→</span></span>
-          </a>
-          <div class="side-join" aria-hidden="true">
-            <span>Same team</span>
-            <span>Same standard</span>
-          </div>
-          <a class="side side-purpose" href="/nonprofits/">
-            <span class="side-label">Nonprofits</span>
-            <span class="side-text">Free your team to put more of its time and budget into the mission.</span>
-            <span class="side-link">Nonprofits <span aria-hidden="true">→</span></span>
-          </a>
-        </div>
+        <DualStory />
       </div>
     </section>
-
-    <!-- Leadership: a portrait, a name, a role -->
-    <section class="section leader-band" id="founder" aria-labelledby="founder-title">
-      <div class="wrap leader">
-        <div class="portrait" data-reveal>
-          {
-            founder.photo ? (
-              <img src={founder.photo} alt={`Portrait of ${founder.name}`} width="1000" height="1250" loading="lazy" decoding="async" />
-            ) : (
-              <span class="portrait-initials" aria-hidden="true">{initials(founder.name)}</span>
-            )
-          }
-        </div>
-        <div class="leader-text" data-reveal>
-          <p class="eyebrow">Leadership</p>
-          <h2 id="founder-title">{founder.name}</h2>
-          <p class="leader-role">{founder.role}</p>
-          <dl class="leader-facts">
-            <div>
-              <dt>Based in</dt>
-              <dd>{site.city}</dd>
-            </div>
-            <div>
-              <dt>Background</dt>
-              <dd>Innovation consulting, mechatronics and AI</dd>
-            </div>
-            <div>
-              <dt>On every engagement</dt>
-              <dd>From the first conversation to the hand-over</dd>
-            </div>
-          </dl>
-        </div>
-      </div>
-    </section>
-
-    {
-      board.length > 0 && (
-        <section class="section board-band" id="board" aria-labelledby="board-title">
-          <div class="wrap">
-            <div class="section-head board-head" data-reveal>
-              <p class="eyebrow">Advisory board</p>
-              <h2 id="board-title">Guided by people who have done it.</h2>
-              <p>Senior leaders from business, technology and the nonprofit sector who challenge our thinking and hold our work to a high standard.</p>
-            </div>
-            <div class="board" data-reveal="stagger">
-              {board.map((a, i) => <AdvisorCard advisor={a} index={i} />)}
-            </div>
-          </div>
-        </section>
-      )
-    }
 
     <ClosingCTA title="Come meet the team." />
   </div>
 </Base>
 
 <style>
-  /* ---------- Hero ---------- */
+  /* ---------- The team ---------- */
   .team-hero {
     position: relative;
-    padding-top: clamp(5.5rem, 4rem + 4vw, 7.5rem);
-    padding-bottom: 0;
+    padding-top: clamp(7rem, 5.5rem + 4vw, 9.5rem);
+    padding-bottom: clamp(3rem, 2rem + 3vw, 5rem);
   }
-  .team-hero + .page-body .story { padding-top: clamp(1.5rem, 0.5rem + 2.5vw, 3.5rem); }
-  /* A clearer light behind the system, so the centre glows rather than greys */
-  .team-hero::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
-    background:
-      radial-gradient(42% 52% at 50% 52%, rgb(255 255 255 / 0.95), transparent 72%),
-      radial-gradient(70% 60% at 50% 55%, rgb(214 230 245 / 0.55), transparent 75%);
-  }
-  .team-hero-map {
+  .crew {
     position: relative;
     z-index: 1;
-    padding-inline: max(16px, env(safe-area-inset-left, 0px));
+    display: grid;
+    grid-template-columns: minmax(0, 3.4fr) repeat(3, minmax(0, 2.85fr));
+    column-gap: clamp(0.75rem, 0.4rem + 0.8vw, 1.25rem);
+    align-items: end;
+  }
+  .crew-title {
+    grid-column: 1;
+    align-self: start;
+    max-width: none;
+    font-size: clamp(3.5rem, 2rem + 5vw, 7.25rem);
+    font-weight: 400;
+    line-height: 0.95;
+    letter-spacing: -0.035em;
+    color: var(--ink);
+  }
+  /* Our founder's card stands a little taller than the rest */
+  .crew-slot.is-lead :global(.tcard) { aspect-ratio: 4 / 5.7; }
+  @media (prefers-reduced-motion: no-preference) {
+    .crew-slot { animation: crew-rise 1000ms var(--ease-out) both; animation-delay: calc(120ms + var(--i) * 110ms); }
+  }
+  @keyframes crew-rise {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: none; }
   }
 
-  /* ---------- Our story ---------- */
-  .story-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-    gap: clamp(2rem, 1rem + 4vw, 5.5rem);
-    align-items: start;
-  }
-  .story-head { display: grid; gap: var(--s-4); }
-  .story-head h2 { font-size: var(--step-4); line-height: 1.05; max-width: 12ch; text-wrap: balance; }
-  .story-body { display: grid; gap: var(--s-5); max-width: 62ch; }
-  .story-body p { color: var(--ink-2); font-size: var(--step-1); line-height: 1.65; }
-  .story-body .story-lead { font-family: var(--font-display); font-size: var(--step-3); line-height: 1.25; color: var(--ink); letter-spacing: -0.01em; }
+  /* ---------- Built for business. Driven by purpose. ---------- */
+  .dual-band { padding-top: clamp(4rem, 3rem + 3vw, 6rem); }
 
-  .sides {
-    margin-top: clamp(2.5rem, 1.5rem + 3vw, 4.5rem);
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-    align-items: stretch;
+  /* Tablets: the title on top, the three in a row */
+  @media (max-width: 1023px) {
+    .crew { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: var(--s-6); }
+    .crew-title { grid-column: 1 / -1; }
   }
-  .side {
-    display: grid;
-    gap: 0.6rem;
-    align-content: start;
-    padding: clamp(1.5rem, 1rem + 1.5vw, 2.25rem);
-    border-radius: 16px;
-    background: var(--card-bg);
-    border: 1px solid rgb(27 42 61 / 0.07);
-    box-shadow: 0 1px 2px rgb(27 42 61 / 0.04), 0 30px 60px -44px rgb(31 77 111 / 0.45);
-    color: inherit;
-    text-decoration: none;
-    transition: transform 500ms var(--ease-out), box-shadow 500ms var(--ease-out);
-  }
-  .side:hover { transform: translateY(-3px); box-shadow: 0 1px 2px rgb(27 42 61 / 0.04), 0 36px 64px -40px rgb(31 77 111 / 0.55); }
-  .side-purpose {
-    background: linear-gradient(160deg, #1f3f5e, #142a40 70%);
-    border-color: transparent;
-    color: #fff;
-  }
-  .side-label { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); }
-  .side-purpose .side-label { color: #8ec0e6; }
-  .side-text { font-family: var(--font-display); font-size: var(--step-2); line-height: 1.25; color: var(--ink); max-width: 26ch; }
-  .side-purpose .side-text { color: #fff; }
-  .side-link { margin-top: 0.6rem; font-weight: 600; font-size: 0.9375rem; color: var(--accent); }
-  .side-purpose .side-link { color: #b9dcf5; }
-  /* Between the two: what they share */
-  .side-join {
-    position: relative;
-    display: grid;
-    align-content: center;
-    justify-items: center;
-    gap: 0.2rem;
-    padding-inline: clamp(1rem, 0.5rem + 1.5vw, 2rem);
-    font-size: 0.6875rem;
-    font-weight: 700;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--ink-3);
-    text-align: center;
-    white-space: nowrap;
-  }
-  .side-join::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 50%;
-    height: 1px;
-    background: var(--rule-2);
-    z-index: -1;
-  }
-  .side-join span { background: var(--paper); padding-inline: 0.5rem; }
-
-  /* ---------- Leadership ---------- */
-  .leader-band {
-    scroll-margin-top: 80px;
-    border-top: 1px solid var(--rule);
-  }
-  .leader {
-    display: grid;
-    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-    gap: clamp(2rem, 1rem + 4vw, 5.5rem);
-    align-items: center;
-  }
-  .portrait {
-    position: relative;
-    aspect-ratio: 4 / 5;
-    max-width: 440px;
-    width: 100%;
-    border-radius: 18px;
-    overflow: hidden;
-    display: grid;
-    place-items: center;
-    background:
-      radial-gradient(90% 70% at 80% 0%, rgb(74 138 186 / 0.35), transparent 70%),
-      linear-gradient(165deg, #dbe7f2 0%, #f3f7fb 100%);
-    border: 1px solid rgb(27 42 61 / 0.07);
-    box-shadow: 0 40px 70px -46px rgb(31 77 111 / 0.6);
-  }
-  .portrait::before {
-    content: '';
-    position: absolute;
-    inset: 14px;
-    border: 1px solid rgb(255 255 255 / 0.7);
-    border-radius: 10px;
-    pointer-events: none;
-    z-index: 1;
-  }
-  .portrait img { width: 100%; height: 100%; object-fit: cover; }
-  .portrait-initials { font-family: var(--font-display); font-weight: 350; font-size: clamp(4rem, 3rem + 4vw, 7rem); letter-spacing: 0.04em; color: rgb(27 42 61 / 0.8); }
-  .leader-text { display: grid; gap: var(--s-4); }
-  .leader-text h2 { font-size: var(--step-5); line-height: 1; letter-spacing: -0.02em; }
-  .leader-role { font-size: var(--step-2); color: var(--accent); font-family: var(--font-display); font-style: italic; margin-top: -0.3rem; }
-  .leader-facts { margin: var(--s-4) 0 0; display: grid; border-top: 1px solid var(--rule); max-width: 560px; }
-  .leader-facts > div {
-    display: grid;
-    grid-template-columns: 10rem minmax(0, 1fr);
-    gap: var(--s-4);
-    padding-block: 0.9rem;
-    border-bottom: 1px solid var(--rule);
-  }
-  .leader-facts dt { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); padding-top: 0.15rem; }
-  .leader-facts dd { margin: 0; color: var(--ink); }
-
-  /* ---------- Advisory board ---------- */
-  .board-band {
-    scroll-margin-top: 80px;
-    background:
-      radial-gradient(40% 60% at 100% 0%, rgb(184 204 224 / 0.35), transparent 70%),
-      linear-gradient(180deg, var(--paper-2), var(--paper));
-    border-top: 1px solid var(--rule);
-  }
-  .board-head { max-width: 760px; }
-  .board { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(1.25rem, 0.75rem + 1.5vw, 2rem); }
-
-  @media (max-width: 1000px) {
-    .board { grid-template-columns: minmax(0, 1fr); max-width: 720px; }
-  }
-  @media (max-width: 960px) {
-    .story-grid, .leader { grid-template-columns: minmax(0, 1fr); }
-    .portrait { max-width: 360px; }
-  }
-  @media (max-width: 760px) {
-    .team-hero { padding-top: 5.75rem; }
-    .sides { grid-template-columns: minmax(0, 1fr); }
-    .side-join { padding: 0.85rem 0; grid-auto-flow: column; justify-content: center; gap: 0.4rem; }
-    .side-join::before { display: none; }
-    .side-join span { background: none; padding: 0; }
-    .side-join span + span::before { content: '·'; margin-right: 0.4rem; }
-  }
-  @media (max-width: 560px) {
-    .leader-facts > div { grid-template-columns: minmax(0, 1fr); gap: 0.2rem; }
-    .portrait { max-width: 100%; }
+  /* Phones: our founder full width, the advisors two up beneath */
+  @media (max-width: 640px) {
+    .team-hero { padding-top: 6.5rem; }
+    .crew { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 0.75rem; }
+    .crew-slot.is-lead { grid-column: 1 / -1; }
+    .crew-slot.is-lead :global(.tcard) { aspect-ratio: 4 / 3.4; }
+    .crew-slot:not(.is-lead) :global(.tcard-meta h3) { font-size: 0.9375rem; }
+    .crew-slot:not(.is-lead) :global(.tcard-meta p) { font-size: 0.75rem; }
+    .crew-title { margin-bottom: var(--s-3); }
   }
 </style>

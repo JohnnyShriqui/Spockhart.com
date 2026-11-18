@@ -1,0 +1,145 @@
+---
+/**
+ * One person on the Team page: a portrait with their name and title over the bottom of it,
+ * and a LinkedIn button. Without a photo, the card shows their initials on a studio-grey backdrop.
+ */
+import type { Person } from '../data/team';
+import { initials } from '../lib/format';
+
+interface Props {
+  person: Person;
+  /** Draft only: mark cards still waiting on a photo, and show where the LinkedIn button goes */
+  draft?: boolean;
+  class?: string;
+}
+const { person, draft = false, class: className = '' } = Astro.props;
+const linkedin = person.linkedin || (draft ? '#' : '');
+---
+
+<article class:list={['tcard', className, { 'no-photo': !person.photo }]}>
+  <div class="tcard-media">
+    {
+      person.photo ? (
+        <img src={person.photo} alt={`Portrait of ${person.name}`} width="1200" height="1500" loading="eager" decoding="async" />
+      ) : (
+        <span class="tcard-initials" aria-hidden="true">{initials(person.name)}</span>
+      )
+    }
+  </div>
+  <div class="tcard-shade" aria-hidden="true"></div>
+  {draft && !person.photo && <span class="tcard-draft">Photo to come</span>}
+  <div class="tcard-meta">
+    <h3>{person.name}</h3>
+    <p>{person.role}</p>
+  </div>
+  {
+    linkedin && (
+      <a class="tcard-in" href={linkedin} target="_blank" rel="noopener" aria-label={`${person.name} on LinkedIn`}>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M6.94 8.5H3.56V20h3.38V8.5zM5.25 3A1.97 1.97 0 1 0 5.25 7a1.97 1.97 0 0 0 0-3.94zM20.44 13.4c0-3.1-1.66-5.15-4.37-5.15-1.6 0-2.62.84-3.08 1.62V8.5H9.62V20H13v-5.7c0-1.5.28-2.95 2.14-2.95 1.83 0 1.86 1.71 1.86 3.05V20h3.44v-6.6z" />
+        </svg>
+      </a>
+    )
+  }
+</article>
+
+<style>
+  .tcard {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    border-radius: 22px;
+    aspect-ratio: 4 / 5;
+    width: 100%;
+    background: linear-gradient(180deg, #dde2e7 0%, #cdd4db 100%);
+    box-shadow: 0 1px 2px rgb(27 42 61 / 0.06), 0 30px 50px -34px rgb(27 42 61 / 0.55);
+  }
+  .tcard-media { position: absolute; inset: 0; display: grid; place-items: center; }
+  .tcard-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 20%;
+    transition: transform 900ms var(--ease-out);
+  }
+  .tcard:hover .tcard-media img { transform: scale(1.035); }
+  /* Without a photo: a studio-grey backdrop, lit from above, with their initials */
+  .no-photo .tcard-media {
+    background:
+      radial-gradient(70% 55% at 50% 22%, rgb(255 255 255 / 0.6), transparent 70%),
+      linear-gradient(180deg, #e3e7eb 0%, #c9d0d7 100%);
+  }
+  .tcard-initials {
+    margin-bottom: 18%;
+    font-family: var(--font-display);
+    font-weight: 350;
+    font-size: clamp(3rem, 2rem + 3vw, 5.5rem);
+    letter-spacing: 0.04em;
+    color: rgb(27 42 61 / 0.32);
+  }
+  /* A dark fade at the bottom, so the name reads on any photo */
+  .tcard-shade {
+    position: absolute;
+    inset: 45% 0 0;
+    z-index: 1;
+    background: linear-gradient(180deg, rgb(12 23 36 / 0) 0%, rgb(12 23 36 / 0.35) 45%, rgb(12 23 36 / 0.78) 100%);
+    pointer-events: none;
+  }
+  .tcard-meta {
+    position: absolute;
+    left: clamp(1rem, 0.7rem + 0.8vw, 1.4rem);
+    right: 4.25rem;
+    bottom: clamp(1rem, 0.7rem + 0.8vw, 1.35rem);
+    z-index: 2;
+    display: grid;
+    gap: 0.15rem;
+  }
+  .tcard-meta h3 {
+    font-family: var(--font-body);
+    font-size: clamp(1.0625rem, 0.95rem + 0.45vw, 1.375rem);
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: -0.005em;
+    color: #fff;
+  }
+  .tcard-meta p { font-size: 0.875rem; font-weight: 500; color: #a9d2f2; }
+  .tcard-in {
+    position: absolute;
+    right: clamp(0.9rem, 0.6rem + 0.8vw, 1.25rem);
+    bottom: clamp(1rem, 0.7rem + 0.8vw, 1.35rem);
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background: #fff;
+    color: var(--accent);
+    box-shadow: 0 6px 14px -6px rgb(0 0 0 / 0.5);
+    transition: transform 300ms var(--ease-out), background-color 300ms var(--ease);
+  }
+  .tcard-in svg { width: 1.15rem; height: 1.15rem; fill: currentColor; }
+  .tcard-in:hover { transform: translateY(-2px); }
+  .tcard-in:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+  .tcard-draft {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    z-index: 2;
+    padding: 0.25rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #8a6418;
+    background: rgb(255 248 230 / 0.92);
+    border: 1px solid rgb(181 132 36 / 0.35);
+  }
+  @media (max-width: 560px) {
+    .tcard { border-radius: 16px; }
+    .tcard-meta { right: 3.25rem; }
+    .tcard-in { width: 2.1rem; height: 2.1rem; }
+    .tcard-draft { top: 0.6rem; left: 0.6rem; font-size: 0.5625rem; }
+  }
+</style>
