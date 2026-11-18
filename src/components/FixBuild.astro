@@ -106,7 +106,7 @@ const sets = [
     <h3 class="fb-built fb-built-narrow" data-reveal>Our Team’s Experience</h3>
     <p class="fb-built-note fb-built-narrow" data-reveal>Projects our team led or worked on outside Spockhart. Client names withheld.</p>
 
-    <div class="fb-stage" data-fb-stage>
+    <div class="fb-stage lit" data-fb-stage>
       <svg class="fb-links" aria-hidden="true" data-fb-links></svg>
 
       <!-- The chart, in the same window style as the case studies -->
@@ -1156,7 +1156,7 @@ const sets = [
     /* The two example panels above sit on the same columns as the chart and the case studies, so
        their edges line up with the chart's and the list's */
     .fb :global(.ex-panels) { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1fr); column-gap: clamp(4.25rem, 2.25rem + 4vw, 5.75rem); }
-    .fb :global(.ex-panels > .ex-group:first-child) { margin-right: -3rem; }
+    .fb :global(.ex-panels > .ex-slot:first-child) { margin-right: -3rem; }
     .fb-svg-narrow { display: none; }
     .fb-svg-wide { flex: none; width: 100%; padding: 0; }
     .fb-axis-label { font-size: 10.5px; letter-spacing: 0.14em; }
@@ -1229,5 +1229,32 @@ const sets = [
   @media (max-width: 1099px) {
     .fb :global(.ex) { margin-bottom: 3rem; }
     .fb-band { padding-block: 3rem 3.5rem; }
+  }
+
+  /* ==========================================================================
+     Depth: one continuous lit room, with no band of a different ground. The chart is a dark card
+     standing in it, like the example panels above; the case studies are slim lifted rows.
+     ========================================================================== */
+  .fb-band { background: transparent; }
+  .fb-chart {
+    border-radius: 20px;
+    background:
+      radial-gradient(70% 45% at 0% 0%, rgb(46 104 152 / 0.3), transparent 70%),
+      linear-gradient(165deg, #0f1e2f 0%, #0a1521 100%);
+    /* Its lift, and its shadow on the floor */
+    box-shadow: var(--lift-dark), 0 48px 34px -36px rgb(12 26 41 / 0.42);
+  }
+  @media (max-width: 640px) {
+    .fb-chart { border-radius: 16px; }
+  }
+  @media (min-width: 1100px) {
+    .fb-card {
+      border-color: rgb(27 42 61 / 0.05);
+      border-radius: 12px;
+      box-shadow: var(--lift-soft);
+      transition: box-shadow 300ms var(--ease), border-color 300ms var(--ease);
+    }
+    .fb-card:hover { box-shadow: var(--lift-soft), 0 22px 30px -20px rgb(12 26 41 / 0.28); }
+    .fb-card.is-open { border-color: rgb(27 42 61 / 0.08); box-shadow: var(--lift); }
   }
 </style>

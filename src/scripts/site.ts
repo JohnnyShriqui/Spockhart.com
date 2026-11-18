@@ -1,9 +1,10 @@
 /**
  * Site-wide behaviour: header state, mobile menu, scroll reveals,
- * the mark's pointer tilt, and copy-to-clipboard.
+ * the mark's pointer tilt, buoyant cards, and copy-to-clipboard.
  * Every effect is decorative; the page is complete without this script.
  */
 import { initMarks } from './marks';
+import { initTilt } from './tilt';
 
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
@@ -202,4 +203,7 @@ initMenu();
 initReveals();
 initCopy();
 document.addEventListener('spockhart:view', initReveals);
+/* Buoyant cards ([data-tilt]), on every page */
+initTilt();
+document.addEventListener('spockhart:view', initTilt);
 initMarks(reduceMotion);

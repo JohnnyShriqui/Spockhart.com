@@ -6,19 +6,39 @@ interface Props {
   primary?: { label: string; href: string };
   /** Kept so existing pages need no change; the section is short everywhere now */
   terse?: boolean;
+  /** On a dark card that stands in the room, as the last thing on the page */
+  card?: boolean;
 }
-const { title = 'Tell us where you’d like to improve.', primary = { label: 'Start a conversation', href: '/contact/' } } = Astro.props;
+const { title = 'Tell us where you’d like to improve.', primary = { label: 'Start a conversation', href: '/contact/' }, card = false } = Astro.props;
 ---
 
-<section class="closing section">
-  <div class="wrap closing-inner" data-reveal>
-    <h2>{title}</h2>
-    <div class="closing-actions">
-      <a class="btn" href={primary.href}>{primary.label} <span class="arr" aria-hidden="true">→</span></a>
-      <CopyEmail />
-    </div>
-  </div>
-</section>
+{
+  card ? (
+    <section class="closing closing-card section">
+      <div class="wrap">
+        <div class="closing-stand stand" data-reveal>
+          <div class="closing-panel" data-tilt="2.5" data-tilt-depth="2600">
+            <h2>{title}</h2>
+            <div class="closing-actions">
+              <a class="btn" href={primary.href}>{primary.label} <span class="arr" aria-hidden="true">→</span></a>
+              <CopyEmail />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  ) : (
+    <section class="closing section">
+      <div class="wrap closing-inner" data-reveal>
+        <h2>{title}</h2>
+        <div class="closing-actions">
+          <a class="btn" href={primary.href}>{primary.label} <span class="arr" aria-hidden="true">→</span></a>
+          <CopyEmail />
+        </div>
+      </div>
+    </section>
+  )
+}
 
 <style>
   /* Short: the heading on one line, the buttons directly underneath */
@@ -28,5 +48,56 @@ const { title = 'Tell us where you’d like to improve.', primary = { label: 'St
   .closing-actions { display: flex; flex-wrap: wrap; gap: var(--s-3); align-items: center; }
   @media (max-width: 640px) {
     .closing-inner { gap: var(--s-4); }
+  }
+
+  /* On a card: midnight blue, as on the home page's hero, with steel-blue light in its corner, a
+     fine grain, a lit top edge, and its shadow on the floor (.stand). The heading on the left,
+     the buttons on the right. */
+  .closing-card { border-top: 0; padding-block: clamp(2.5rem, 1.5rem + 3vw, 4.5rem) clamp(5rem, 3.5rem + 4vw, 7.5rem); }
+  .closing-panel {
+    --ink: #eef3f8;
+    --ink-2: #b5c4d3;
+    --rule: rgb(255 255 255 / 0.12);
+    --rule-2: rgb(255 255 255 / 0.24);
+    --accent: #8ec0e6;
+    --btn-bg: #eef3f8;
+    --btn-fg: #14212f;
+    --btn-bg-hover: #ffffff;
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    gap: var(--s-5);
+    justify-items: start;
+    padding: clamp(2rem, 1.25rem + 2.5vw, 3.5rem) clamp(1.5rem, 0.75rem + 3vw, 4rem);
+    border-radius: 28px;
+    color: var(--ink);
+    background:
+      radial-gradient(55% 120% at 0% 0%, rgb(46 104 152 / 0.5), transparent 70%),
+      radial-gradient(45% 110% at 100% 100%, rgb(38 96 142 / 0.3), transparent 72%),
+      linear-gradient(165deg, #0d1b2c 0%, #0a1521 100%);
+    box-shadow: var(--lift-dark);
+  }
+  .closing-panel::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    pointer-events: none;
+    background-image: var(--grain);
+    background-size: 200px;
+    opacity: 0.1;
+    mix-blend-mode: overlay;
+  }
+  .closing-panel h2 { color: #fff; }
+  /* Laptops: the heading large, on two lines, on the left; the buttons on the right, level with
+     its last line */
+  @media (min-width: 900px) {
+    .closing-panel { grid-template-columns: minmax(0, 1fr) auto; align-items: end; column-gap: var(--s-7); }
+    .closing-panel h2 { max-width: 13ch; font-size: clamp(2.5rem, 1.5rem + 2.4vw, 3.75rem); line-height: 1.04; letter-spacing: -0.02em; }
+    .closing-panel .closing-actions { padding-bottom: 0.35rem; }
+  }
+  @media (max-width: 640px) {
+    .closing-panel { border-radius: 20px; }
   }
 </style>

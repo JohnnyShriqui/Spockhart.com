@@ -786,3 +786,79 @@ html.is-focusing .focus-veil { opacity: 1; }
 
 /* A dark hero that runs straight into the footer (contact, 404) gets a hairline between them */
 main > .hero-dark:last-child { border-bottom: 1px solid rgb(255 255 255 / 0.07); }
+
+/* ---------- Depth ----------
+   Every page is a lit room, and whatever sits in it stands on its floor: a lit top edge, a tight
+   contact shadow, and a long soft one. --lift is for light cards, --lift-dark for dark panels in
+   a light room, --lift-soft for small things (rows, chips). --floor is the shadow a card casts on
+   the floor beneath it, drawn as a blurred ellipse just under its bottom edge (see .stand). */
+:root {
+  --lift:
+    inset 0 1px 0 rgb(255 255 255 / 0.7),
+    0 1px 1px rgb(12 26 41 / 0.08),
+    0 6px 10px -4px rgb(12 26 41 / 0.14),
+    0 30px 44px -24px rgb(12 26 41 / 0.4),
+    0 70px 90px -46px rgb(12 26 41 / 0.38);
+  --lift-dark:
+    inset 0 1px 0 rgb(255 255 255 / 0.13),
+    inset 0 0 0 1px rgb(255 255 255 / 0.04),
+    0 1px 1px rgb(12 26 41 / 0.14),
+    0 6px 10px -4px rgb(12 26 41 / 0.22),
+    0 30px 44px -24px rgb(12 26 41 / 0.5),
+    0 70px 90px -46px rgb(12 26 41 / 0.45);
+  --lift-soft:
+    inset 0 1px 0 rgb(255 255 255 / 0.8),
+    0 1px 1px rgb(12 26 41 / 0.06),
+    0 4px 8px -4px rgb(12 26 41 / 0.12),
+    0 16px 24px -16px rgb(12 26 41 / 0.24);
+  --floor: radial-gradient(closest-side, rgb(12 26 41 / 0.32), rgb(12 26 41 / 0.12) 55%, transparent);
+}
+/* A card standing on the floor: its shadow, just under its bottom edge */
+.stand { position: relative; isolation: isolate; }
+.stand::before {
+  content: '';
+  position: absolute;
+  z-index: -2;
+  left: 7%;
+  right: 7%;
+  bottom: -40px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--floor);
+  filter: blur(10px);
+  pointer-events: none;
+}
+@media (max-width: 640px) {
+  .stand::before { bottom: -26px; height: 40px; }
+}
+
+/* A light room: lit from the front, a little darker toward the walls, with a fine grain so the
+   light reads as air rather than a flat fill. Sections inside it add pools of light behind what
+   they hold (--pool), which fade out well before their edges, so the room never shows a seam. */
+.room-light {
+  --pool: radial-gradient(62% 44% at 50% 42%, rgb(255 255 255 / 0.9), rgb(255 255 255 / 0.4) 40%, transparent 72%);
+  background:
+    linear-gradient(90deg, rgb(12 26 41 / 0.05) 0%, rgb(12 26 41 / 0) 20%, rgb(12 26 41 / 0) 80%, rgb(12 26 41 / 0.05) 100%),
+    linear-gradient(180deg, #eef2f6 0%, #e9eef3 100%);
+}
+.room-light::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: var(--grain);
+  background-size: 200px;
+  opacity: 0.05;
+  mix-blend-mode: multiply;
+}
+/* A pool of light on the wall behind whatever it's on, fading out well beyond its edges */
+.lit { position: relative; isolation: isolate; }
+.lit::after {
+  content: '';
+  position: absolute;
+  inset: -26% -9%;
+  z-index: -3;
+  pointer-events: none;
+  background: radial-gradient(closest-side, rgb(255 255 255 / 0.95), rgb(255 255 255 / 0.55) 42%, rgb(255 255 255 / 0.15) 72%, transparent);
+}

@@ -36,6 +36,7 @@ const iconFill = (i: number) => Math.max(0, Math.min(1, fteIcons - i));
 
 <section id="calculator" class="calc-section" aria-labelledby="calc-title">
   <div class="wrap">
+    <div class="calc-stand stand">
     <div class="calc" data-calc>
       <div class="calc-left">
         <div class="calc-head">
@@ -91,6 +92,7 @@ const iconFill = (i: number) => Math.max(0, Math.min(1, fteIcons - i));
         <a class="btn btn-on-brand" href="/contact/" data-calc-cta>{cta} <span class="arr" aria-hidden="true">→</span></a>
         <p class="visually-hidden" aria-live="polite" data-calc-summary></p>
       </div>
+    </div>
     </div>
   </div>
 </section>
@@ -387,5 +389,18 @@ const iconFill = (i: number) => Math.max(0, Math.min(1, fteIcons - i));
     .r-gain { padding-top: 1.1rem; margin-top: 1rem; gap: 0.35rem; }
     .calc-right .r-big { font-size: min(3.5rem, 17cqi); }
     .r-gain .r-line { font-size: 0.9375rem; }
+  }
+
+  /* ==========================================================================
+     Depth: the calculator stands in the room like the cards on the Team page, with a lit top
+     edge, a tight contact shadow and a long soft one, and its shadow on the floor (.stand)
+     ========================================================================== */
+  .calc {
+    border-color: rgb(27 42 61 / 0.06);
+    border-radius: 24px;
+    box-shadow: var(--lift);
+  }
+  @media (max-width: 640px) {
+    .calc { border-radius: 18px; }
   }
 </style>
