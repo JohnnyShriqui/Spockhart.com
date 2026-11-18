@@ -33,7 +33,7 @@ export const site = {
    * Team page preview: also shows advisors who have not confirmed yet, marked as awaiting
    * confirmation. Must be false before the Team page goes live.
    */
-  previewTeam: true,
+  previewTeam: false,
   /** Engagement facts used across the site. */
   offer: {
     prototypeDays: 30,

@@ -1,0 +1,408 @@
+---
+/**
+ * Team hero: Spockhart as a set of rings. Leadership at the core, the advisory board around it,
+ * then what we build, then the sectors the team's experience covers. Every name and label is
+ * real; the rings show how it fits together. On load the rings open outward and the nodes
+ * arrive ring by ring; small signals then run in from the outer rings to the centre.
+ * Phones get the same structure as nested panels, outermost first.
+ */
+import { advisors } from '../data/advisors';
+import { site } from '../config/site';
+import { initials } from '../lib/format';
+
+const W = 1200;
+const H = 720;
+const cx = 600;
+const cy = 360;
+const rings = [
+  { key: 'lead', label: 'Leadership', rx: 140, ry: 74 },
+  { key: 'board', label: 'Advisory board', rx: 270, ry: 146 },
+  { key: 'build', label: 'Capabilities', rx: 410, ry: 222 },
+  { key: 'sector', label: 'Sector experience', rx: 545, ry: 306 },
+];
+const at = (ring: number, deg: number) => {
+  const r = rings[ring];
+  const a = (deg * Math.PI) / 180;
+  return { x: cx + r.rx * Math.cos(a), y: cy + r.ry * Math.sin(a) };
+};
+const pct = (p: { x: number; y: number }) => `left:${((p.x / W) * 100).toFixed(3)}%;top:${((p.y / H) * 100).toFixed(3)}%`;
+
+const board = advisors.filter((a) => a.confirmed || site.previewTeam);
+/* Where the advisors sit on their ring, by how many there are */
+const boardAngles: Record<number, number[]> = {
+  1: [155],
+  2: [155, 25],
+  3: [155, 25, 90],
+  4: [155, 25, 205, 335],
+  5: [155, 25, 205, 335, 90],
+};
+const people = [
+  { id: 'js', name: 'Jonathan Shriqui', role: 'Founder', initials: 'JS', ring: 0, deg: 270, lead: true },
+  ...board.map((a, i) => ({
+    id: initials(a.name).toLowerCase(),
+    name: a.name,
+    role: 'Advisory board',
+    initials: initials(a.name),
+    ring: 1,
+    deg: (boardAngles[board.length] ?? boardAngles[5])[i % 5],
+    lead: false,
+  })),
+];
+
+const capabilities = [
+  { label: 'Engineering', deg: 215, d: 'M8.5 7 3.5 12l5 5M15.5 7l5 5-5 5' },
+  { label: 'Data and AI', deg: 325, d: 'M12 3.5c.7 4.4 3.6 7.3 8.5 8.5-4.9 1.2-7.8 4.1-8.5 8.5-.7-4.4-3.6-7.3-8.5-8.5 4.9-1.2 7.8-4.1 8.5-8.5z' },
+  { label: 'Automation', deg: 125, d: 'M4 12a8 8 0 0 1 13.7-5.6L20 8.5M20 4v4.5h-4.5M20 12a8 8 0 0 1-13.7 5.6L4 15.5M4 20v-4.5h4.5' },
+  { label: 'Product design', deg: 55, d: 'M4 20l1.2-4.6L15.6 5a2.1 2.1 0 0 1 3 3L8.2 18.4 4 20zM13.6 7l3 3' },
+];
+const sectors = [
+  { label: 'Construction', deg: 250 },
+  { label: 'Real estate', deg: 290 },
+  { label: 'Technology', deg: 350 },
+  { label: 'Manufacturing', deg: 190 },
+  { label: 'Supply chain', deg: 110 },
+  { label: 'Nonprofits', deg: 70 },
+];
+
+const spoke = (p: { x: number; y: number }) => `M${p.x.toFixed(1)} ${p.y.toFixed(1)} L${cx} ${cy}`;
+/* Signals run inward along the spokes from the two outer rings */
+const signals = [
+  ...capabilities.map((c) => at(2, c.deg)),
+  ...sectors.map((s) => at(3, s.deg)),
+];
+---
+
+<figure
+  class="tmap"
+  aria-label={`How Spockhart is structured. At the core, our founder, Jonathan Shriqui. Around him, the advisory board: ${board.map((a) => a.name).join(' and ')}. Then our capabilities: ${capabilities.map((c) => c.label.toLowerCase()).join(', ')}. And around it all, experience across ${sectors.map((s) => s.label.toLowerCase()).join(', ')}.`}
+>
+  <!-- Laptops and tablets: the rings -->
+  <div class="tmap-stage" aria-hidden="true">
+    <svg class="tmap-svg" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet">
+      <defs>
+        <radialGradient id="tmap-core" cx="50%" cy="50%" r="50%">
+          <stop offset="0" stop-color="rgb(74 138 186)" stop-opacity="0.22" />
+          <stop offset="1" stop-color="rgb(74 138 186)" stop-opacity="0" />
+        </radialGradient>
+      </defs>
+      <ellipse cx={cx} cy={cy} rx="230" ry="150" fill="url(#tmap-core)" class="tmap-glow" />
+      <g class="spokes">
+        {people.map((p) => <path d={spoke(at(p.ring, p.deg))} data-spoke={p.id} />)}
+        {capabilities.map((c, i) => <path d={spoke(at(2, c.deg))} data-spoke={`c${i}`} />)}
+        {sectors.map((s, i) => <path d={spoke(at(3, s.deg))} data-spoke={`s${i}`} />)}
+      </g>
+      {
+        rings.map((r, i) => (
+          <ellipse cx={cx} cy={cy} rx={r.rx} ry={r.ry} class={`ring ring-${i}`} style={`--r:${i}`} />
+        ))
+      }
+      {
+        rings.map((r, i) => (
+          <g class="ring-label" style={`--r:${i}`}>
+            <rect x={cx - (r.label.length * 4.6 + 14)} y={cy + r.ry - 9} width={r.label.length * 9.2 + 28} height="18" rx="9" />
+            <text x={cx} y={cy + r.ry} dominant-baseline="central" text-anchor="middle">{r.label}</text>
+          </g>
+        ))
+      }
+      <g class="signals">
+        {
+          signals.map((p, i) => (
+            <circle r="3">
+              <animateMotion dur="3.6s" begin={`${2.6 + i * 0.55}s`} repeatCount="indefinite" path={spoke(p)} />
+              <animate attributeName="opacity" dur="3.6s" begin={`${2.6 + i * 0.55}s`} repeatCount="indefinite" values="0;0.9;0.9;0" keyTimes="0;0.12;0.8;1" />
+            </circle>
+          ))
+        }
+      </g>
+    </svg>
+
+    <div class="tmap-core" style={pct({ x: cx, y: cy })}>
+      <span class="tmap-wordmark">Spockhart</span>
+    </div>
+
+    {
+      people.map((p) => (
+        <a
+          class:list={['tnode', 'person', { lead: p.lead }]}
+          href={p.lead ? '#founder' : '#board'}
+          data-node={p.id}
+          style={`${pct(at(p.ring, p.deg))};--r:${p.ring}`}
+          tabindex="-1"
+        >
+          <span class="av">{p.initials}</span>
+          <span class="person-text">
+            <span class="person-name">{p.name}</span>
+            <span class="person-role">{p.role}</span>
+          </span>
+        </a>
+      ))
+    }
+    {
+      capabilities.map((c, i) => (
+        <span class="tnode cap" data-node={`c${i}`} style={`${pct(at(2, c.deg))};--r:2;--k:${i}`}>
+          <svg viewBox="0 0 24 24">
+            <path d={c.d} />
+          </svg>
+          {c.label}
+        </span>
+      ))
+    }
+    {
+      sectors.map((s, i) => {
+        const p = at(3, s.deg);
+        return (
+          <span class:list={['tnode', 'sector', p.y < cy ? 'above' : 'below']} data-node={`s${i}`} style={`${pct(p)};--r:3;--k:${i}`}>
+            <span class="sector-dot" />
+            <span class="sector-label">{s.label}</span>
+          </span>
+        );
+      })
+    }
+  </div>
+
+  <!-- Phones: the same rings as nested panels, from the outside in -->
+  <div class="tnest">
+    <div class="nest nest-3">
+      <p class="nest-label">Sector experience</p>
+      <div class="nest-tags">{sectors.map((s) => <span class="ntag">{s.label}</span>)}</div>
+      <div class="nest nest-2">
+        <p class="nest-label">Capabilities</p>
+        <div class="nest-tags">{capabilities.map((c) => <span class="ntag ntag-cap">{c.label}</span>)}</div>
+        <div class="nest nest-1">
+          <p class="nest-label">Advisory board</p>
+          <div class="nest-people">
+            {
+              board.map((a) => (
+                <span class="nperson">
+                  <span class="av">{initials(a.name)}</span>
+                  {a.name}
+                </span>
+              ))
+            }
+          </div>
+          <div class="nest nest-0">
+            <p class="nest-label">Leadership</p>
+            <span class="nperson">
+              <span class="av av-lead">JS</span>
+              Jonathan Shriqui, Founder
+            </span>
+            <span class="nest-core">Spockhart</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</figure>
+
+<script>
+  // Pointing at a node lights its spoke back to the centre
+  function initTeamMap() {
+    document.querySelectorAll<HTMLElement>('.tmap').forEach((map) => {
+      if (map.dataset.ready) return;
+      map.dataset.ready = '1';
+      map.querySelectorAll<HTMLElement>('[data-node]').forEach((node) => {
+        const line = map.querySelector(`[data-spoke="${node.dataset.node}"]`);
+        if (!line) return;
+        node.addEventListener('mouseenter', () => line.classList.add('is-hot'));
+        node.addEventListener('mouseleave', () => line.classList.remove('is-hot'));
+      });
+    });
+  }
+  initTeamMap();
+  document.addEventListener('spockhart:view', initTeamMap);
+</script>
+
+<style>
+  .tmap { margin: 0; width: 100%; }
+  .tmap-stage {
+    position: relative;
+    width: 100%;
+    max-width: 1200px;
+    margin-inline: auto;
+    aspect-ratio: 1200 / 720;
+    container-type: inline-size;
+  }
+  .tmap-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+
+  .spokes path { fill: none; stroke: rgb(27 42 61 / 0.07); stroke-width: 1; transition: stroke 300ms var(--ease); }
+  .spokes path.is-hot { stroke: var(--accent-soft); stroke-width: 1.4; }
+  .ring { fill: none; stroke: var(--rule-2); stroke-width: 1.2; transform-box: view-box; transform-origin: 600px 360px; }
+  .ring-0 { stroke: var(--accent-soft); stroke-width: 1.5; }
+  .ring-1 { stroke: rgb(74 138 186 / 0.55); }
+  .ring-2 { stroke: rgb(74 138 186 / 0.45); stroke-dasharray: 3 6; stroke-linecap: round; }
+  .ring-3 { stroke: rgb(88 107 128 / 0.45); stroke-dasharray: 0.5 8; stroke-linecap: round; stroke-width: 2; }
+  .ring-label rect { fill: #f3f6fa; }
+  .ring-label text {
+    font-family: var(--font-body);
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    fill: var(--ink-3);
+  }
+  .signals circle { fill: var(--accent); opacity: 0; }
+
+  .tmap-core,
+  .tnode { position: absolute; transform: translate(-50%, -50%); }
+  .tmap-core {
+    display: grid;
+    place-items: center;
+    padding: 0.85em 1.5em;
+    font-size: clamp(10px, 1.15cqi, 14px);
+    border-radius: 999px;
+    background: var(--navy);
+    box-shadow: 0 0 0 6px rgb(255 255 255 / 0.7), 0 18px 34px -14px rgb(27 42 61 / 0.55);
+  }
+  .tmap-wordmark {
+    font-family: var(--font-wordmark);
+    font-size: 1em;
+    letter-spacing: 0.34em;
+    margin-right: -0.34em;
+    text-transform: uppercase;
+    color: #fff;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .person {
+    display: flex;
+    align-items: center;
+    gap: 0.7em;
+    padding: 0.45em 1.1em 0.45em 0.45em;
+    font-size: clamp(11px, 1.2cqi, 15px);
+    border-radius: 999px;
+    background: #fff;
+    border: 1px solid rgb(27 42 61 / 0.08);
+    box-shadow: 0 1px 2px rgb(27 42 61 / 0.05), 0 14px 28px -16px rgb(31 77 111 / 0.45);
+    text-decoration: none;
+    color: var(--ink);
+    white-space: nowrap;
+    transition: transform 400ms var(--ease-out), box-shadow 400ms var(--ease-out);
+  }
+  .person:hover { transform: translate(-50%, calc(-50% - 3px)); box-shadow: 0 1px 2px rgb(27 42 61 / 0.05), 0 20px 34px -16px rgb(31 77 111 / 0.55); }
+  .av {
+    display: grid;
+    place-items: center;
+    width: 2.6em;
+    height: 2.6em;
+    flex: none;
+    border-radius: 50%;
+    font-family: var(--font-display);
+    font-size: 0.95em;
+    font-weight: 500;
+    color: var(--ink);
+    background: linear-gradient(160deg, #e6eef6, #cfdeeb);
+  }
+  .person[data-node='hk'] .av, .nest-people .nperson:nth-child(2) .av { background: linear-gradient(160deg, #ecebf8, #d6d3ef); }
+  .lead .av, .av-lead { color: #fff; background: linear-gradient(160deg, var(--accent), var(--brand)); }
+  .person-text { display: grid; line-height: 1.2; }
+  .person-name { font-weight: 600; font-size: 1em; }
+  .person-role { font-size: 0.8em; color: var(--ink-3); }
+  .lead { box-shadow: 0 0 0 4px rgb(74 138 186 / 0.14), 0 14px 28px -16px rgb(31 77 111 / 0.5); }
+
+  .cap {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    padding: 0.55em 1em 0.55em 0.75em;
+    font-size: clamp(10.5px, 1.1cqi, 14px);
+    font-weight: 600;
+    color: var(--ink);
+    border-radius: 10px;
+    background: rgb(255 255 255 / 0.88);
+    border: 1px solid var(--rule);
+    white-space: nowrap;
+    backdrop-filter: blur(4px);
+  }
+  .cap svg { width: 1.25em; height: 1.25em; fill: none; stroke: var(--accent); stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+
+  .sector { display: grid; justify-items: center; font-size: clamp(10px, 1.05cqi, 13.5px); }
+  .sector-dot {
+    width: 0.75em;
+    height: 0.75em;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid var(--ink-3);
+  }
+  .sector-label {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font-weight: 600;
+    color: var(--ink-2);
+    letter-spacing: 0.01em;
+  }
+  .sector.above .sector-label { bottom: calc(100% + 0.45em); }
+  .sector.below .sector-label { top: calc(100% + 0.45em); }
+
+  /* On load: the rings open outward, and each ring's nodes arrive as it does */
+  @media (prefers-reduced-motion: no-preference) {
+    .tmap-glow { animation: tmap-fade 1600ms var(--ease) 200ms both; }
+    .ring { animation: tmap-ring 1100ms var(--ease-out) both; animation-delay: calc(250ms + var(--r) * 260ms); }
+    .ring-label { animation: tmap-fade 700ms var(--ease) both; animation-delay: calc(900ms + var(--r) * 260ms); }
+    .spokes { animation: tmap-fade 1200ms var(--ease) 1500ms both; }
+    .tmap-core { animation: tmap-pop 700ms var(--ease-out) 150ms both; }
+    .tnode { animation: tmap-pop 650ms var(--ease-out) both; animation-delay: calc(520ms + var(--r) * 260ms + var(--k, 0) * 70ms); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .signals { display: none; }
+  }
+  @keyframes tmap-ring { from { opacity: 0; transform: scale(0.82); } to { opacity: 1; transform: none; } }
+  @keyframes tmap-fade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes tmap-pop {
+    from { opacity: 0; transform: translate(-50%, -50%) scale(0.7); }
+    to { opacity: 1; transform: translate(-50%, -50%); }
+  }
+
+  /* ---------- Phones: nested panels ---------- */
+  .tnest { display: none; }
+  @media (max-width: 760px) {
+    .tmap-stage { display: none; }
+    .tnest { display: block; }
+  }
+  .nest {
+    display: grid;
+    gap: 0.75rem;
+    padding: 1rem 0.85rem 0.85rem;
+    border-radius: 16px;
+    border: 1px dashed rgb(88 107 128 / 0.35);
+    background: rgb(255 255 255 / 0.35);
+  }
+  .nest-2 { border-style: dashed; border-color: rgb(74 138 186 / 0.45); background: rgb(255 255 255 / 0.5); }
+  .nest-1 { border-style: solid; border-color: rgb(74 138 186 / 0.45); background: rgb(255 255 255 / 0.7); }
+  .nest-0 { border-style: solid; border-color: var(--accent-soft); background: #fff; box-shadow: 0 14px 28px -18px rgb(31 77 111 / 0.5); }
+  .nest-label {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  .nest-tags { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+  .ntag {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--ink-2);
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.8);
+    border: 1px solid var(--rule);
+  }
+  .ntag-cap { color: var(--accent); border-radius: 8px; }
+  .nest-people { display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; }
+  .nperson { display: inline-flex; align-items: center; gap: 0.55rem; font-size: 0.9375rem; font-weight: 600; color: var(--ink); }
+  .nperson .av { font-size: 0.8125rem; }
+  .nest-core {
+    justify-self: center;
+    margin-top: 0.4rem;
+    padding: 0.7rem 1.3rem;
+    border-radius: 999px;
+    background: var(--navy);
+    color: #fff;
+    font-family: var(--font-wordmark);
+    font-size: 0.75rem;
+    letter-spacing: 0.34em;
+    text-transform: uppercase;
+  }
+</style>

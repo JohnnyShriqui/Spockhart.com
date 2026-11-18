@@ -17,6 +17,8 @@ export type Advisor = {
   title: string;
   focus: string;
   confirmed: boolean;
+  /** Where their experience comes from, shown as tags on their card */
+  experience: string[];
   photo?: string;
   linkedin?: string;
 };
@@ -27,23 +29,27 @@ export const advisors: Advisor[] = [
     title: 'Chief Information Officer at one of Canada’s largest construction companies',
     focus: 'Technology, systems and scale',
     confirmed: true,
+    experience: ['Technology', 'Construction', 'Real estate'],
   },
   {
     name: 'Howie Kroon',
     title: 'Business leader with deep ties across Canada’s nonprofit and public sectors',
     focus: 'Strategy and relationships',
-    confirmed: false,
+    confirmed: true,
+    experience: ['Business', 'Nonprofit sector'],
   },
   {
     name: 'Rick Ekstein',
     title: 'Former chief executive, and chairman of a hands-on charitable organization',
     focus: 'Growth and philanthropy',
     confirmed: false,
+    experience: ['Business', 'Philanthropy'],
   },
   {
     name: 'Steve Merker',
     title: 'Vice President, Corporate and Community Partnerships, at one of Canada’s leading cancer foundations',
     focus: 'Fundraising and partnerships',
     confirmed: false,
+    experience: ['Nonprofit sector', 'Fundraising'],
   },
 ];
