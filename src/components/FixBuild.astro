@@ -1257,4 +1257,30 @@ const sets = [
     .fb-card:hover { box-shadow: var(--lift-soft), 0 22px 30px -20px rgb(12 26 41 / 0.28); }
     .fb-card.is-open { border-color: rgb(27 42 61 / 0.08); box-shadow: var(--lift); }
   }
+
+  /* Lightsaber bars, as on the Team page and in the home hero: every bar a neon outline with a
+     faint fill and its own glow, revenue in blue and costs in red. Before stands a step dimmer,
+     as on the Team page, so the eye goes to what changed. */
+  .fb-grid { stroke: rgb(var(--saber-blue) / 0.06); }
+  .fb-axis { stroke: rgb(var(--saber-blue) / 0.3); stroke-width: 1.5; }
+  .fb-rev,
+  .fb-rev-after,
+  .fb-pre .fb-rev-after {
+    fill: rgb(var(--saber-blue) / 0.1);
+    stroke: rgb(var(--saber-blue));
+    stroke-width: 2;
+    filter: drop-shadow(0 0 5px rgb(var(--saber-blue) / 0.7));
+  }
+  .fb-cost,
+  .fb-cost-after,
+  .fb-pre .fb-cost-after {
+    fill: rgb(var(--saber-red) / 0.1);
+    stroke: rgb(var(--saber-red));
+    stroke-width: 2;
+    filter: drop-shadow(0 0 5px rgb(var(--saber-red) / 0.7));
+  }
+  /* Costs shrink as the cuts land: the outline keeps its weight as the bar scales */
+  .fb-cost-after { vector-effect: non-scaling-stroke; }
+  .fb-rev:not(.fb-rev-after),
+  .fb-cost:not(.fb-cost-after) { opacity: 0.5; }
 </style>
