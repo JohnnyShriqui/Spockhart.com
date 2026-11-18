@@ -12,27 +12,28 @@ const DRAFT = true;
 
 <Base
   title="Team"
-  description="Meet the Spockhart team: our founder and our advisory board. Built for business, driven by purpose."
+  description="Built for business. Driven by purpose. Spockhart works within growing organizations and nonprofits. Meet our founder and advisory board."
   lightHero
 >
-  <!-- The team, all on one screen -->
-  <section class="team-hero hero-light theme-team-light" aria-labelledby="team-title">
-    <div class="wrap crew">
-      <h1 id="team-title" class="crew-title load-in" style="--i:1">Our team</h1>
-      {
-        team.map((p, i) => (
-          <div class:list={['crew-slot', `crew-slot-${i}`, { 'is-lead': i === 0 }]} style={`--i:${i + 2}`}>
-            <TeamCard person={p} draft={DRAFT} />
-          </div>
-        ))
-      }
+  <!-- Who we are first: business and purpose, side by side -->
+  <section class="team-hero hero-light theme-team-light">
+    <div class="wrap">
+      <DualStory level={1} />
     </div>
   </section>
 
   <div class="page-body body-team" data-body>
-    <section class="section dual-band">
-      <div class="wrap">
-        <DualStory />
+    <!-- Then the people -->
+    <section class="section crew-band" aria-labelledby="team-title">
+      <div class="wrap crew" data-reveal="stagger">
+        <h2 id="team-title" class="crew-title">Our team</h2>
+        {
+          team.map((p, i) => (
+            <div class:list={['crew-slot', { 'is-lead': i === 0 }]}>
+              <TeamCard person={p} draft={DRAFT} />
+            </div>
+          ))
+        }
       </div>
     </section>
 
@@ -41,15 +42,16 @@ const DRAFT = true;
 </Base>
 
 <style>
-  /* ---------- The team ---------- */
   .team-hero {
     position: relative;
-    padding-top: clamp(7rem, 5.5rem + 4vw, 9.5rem);
-    padding-bottom: clamp(3rem, 2rem + 3vw, 5rem);
+    padding-top: clamp(7.5rem, 6rem + 4vw, 10rem);
+    padding-bottom: clamp(2.5rem, 1.5rem + 3vw, 4.5rem);
   }
+  .team-hero > .wrap { position: relative; z-index: 1; }
+
+  /* ---------- The team ---------- */
+  .crew-band { padding-top: clamp(3rem, 2rem + 3vw, 5rem); }
   .crew {
-    position: relative;
-    z-index: 1;
     display: grid;
     grid-template-columns: minmax(0, 3.4fr) repeat(3, minmax(0, 2.85fr));
     column-gap: clamp(0.75rem, 0.4rem + 0.8vw, 1.25rem);
@@ -58,7 +60,7 @@ const DRAFT = true;
   .crew-title {
     grid-column: 1;
     align-self: start;
-    max-width: none;
+    max-width: 5ch;
     font-size: clamp(3.5rem, 2rem + 5vw, 7.25rem);
     font-weight: 400;
     line-height: 0.95;
@@ -67,21 +69,11 @@ const DRAFT = true;
   }
   /* Our founder's card stands a little taller than the rest */
   .crew-slot.is-lead :global(.tcard) { aspect-ratio: 4 / 5.7; }
-  @media (prefers-reduced-motion: no-preference) {
-    .crew-slot { animation: crew-rise 1000ms var(--ease-out) both; animation-delay: calc(120ms + var(--i) * 110ms); }
-  }
-  @keyframes crew-rise {
-    from { opacity: 0; transform: translateY(24px); }
-    to { opacity: 1; transform: none; }
-  }
-
-  /* ---------- Built for business. Driven by purpose. ---------- */
-  .dual-band { padding-top: clamp(4rem, 3rem + 3vw, 6rem); }
 
   /* Tablets: the title on top, the three in a row */
   @media (max-width: 1023px) {
     .crew { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: var(--s-6); }
-    .crew-title { grid-column: 1 / -1; }
+    .crew-title { grid-column: 1 / -1; max-width: none; }
   }
   /* Phones: our founder full width, the advisors two up beneath */
   @media (max-width: 640px) {
