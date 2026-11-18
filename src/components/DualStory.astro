@@ -1,9 +1,10 @@
 ---
 /**
- * Who we are, in one image: the screen split edge to edge. On the left, in daylight, "Built for
- * business." with the live revenue vs costs graph from the home page. On the right, in deep
- * navy, "Driven by purpose." with the demand and resources chart from the Nonprofits page.
- * A fine line marks the seam between them.
+ * Who we are, in one sentence across one card: "Built for Business, Driven by Purpose".
+ * The card fades from daylight on the left to deep navy on the right, with no line between.
+ * Left, for corporations, the revenue vs costs bars from the home page. Right, for nonprofits,
+ * the demand and resources chart from the Nonprofits page. Both are held on their finished frame.
+ * The two sides mirror each other, so the middle stays open for the fade.
  */
 import HeroLive from './HeroLive.astro';
 import GapChart from './GapChart.astro';
@@ -17,81 +18,106 @@ const Heading = level === 1 ? 'h1' : 'h2';
 const Label = level === 1 ? 'h2' : 'h3';
 ---
 
-<section class="bp" aria-label="Built for business. Driven by purpose.">
-  <Heading class="visually-hidden">Built for business. Driven by purpose.</Heading>
+<section class="bp" aria-label="Built for Business, Driven by Purpose">
+  <Heading class="visually-hidden">Built for Business, Driven by Purpose</Heading>
 
-  <div class="side side-biz">
-    <p class="side-title load-in" style="--i:1" aria-hidden="true">Built for business.</p>
-    <div class="side-copy load-in" style="--i:2">
-      <Label class="side-label">Corporations</Label>
+  <div class="bp-card">
+    <div class="side side-biz">
+      <p class="side-title load-in" style="--i:1" aria-hidden="true">Built for Business,</p>
+      <Label class="side-label load-in" style="--i:2">Corporations</Label>
+      <div class="side-figure load-fade">
+        <HeroLive inline light still labels />
+      </div>
+      <a class="side-link" href="/approach/">How we work <span aria-hidden="true">→</span></a>
     </div>
-    <div class="side-figure load-fade">
-      <HeroLive inline light still />
-    </div>
-    <a class="side-link" href="/approach/">How we work <span aria-hidden="true">→</span></a>
-  </div>
 
-  <div class="side side-np">
-    <p class="side-title load-in" style="--i:2" aria-hidden="true">Driven by purpose.</p>
-    <div class="side-copy load-in" style="--i:3">
-      <Label class="side-label">Nonprofits</Label>
+    <div class="side side-np">
+      <p class="side-title load-in" style="--i:2" aria-hidden="true">Driven by Purpose</p>
+      <Label class="side-label load-in" style="--i:3">Nonprofits</Label>
+      <div class="side-figure load-fade">
+        <GapChart still />
+      </div>
+      <a class="side-link" href="/nonprofits/">Nonprofits <span aria-hidden="true">→</span></a>
     </div>
-    <div class="side-figure load-fade">
-      <GapChart still />
-    </div>
-    <a class="side-link" href="/nonprofits/">Nonprofits <span aria-hidden="true">→</span></a>
-  </div>
-
-  <div class="seam" aria-hidden="true">
-    <span class="seam-line"></span>
   </div>
 </section>
 
 <style>
   .bp {
-    --pad-out: max(var(--gutter), calc((100vw - var(--max)) / 2));
-    --pad-in: clamp(2rem, 1rem + 3.5vw, 5rem);
-    position: relative;
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    /* The two sides share rows, so titles, text, graphics and links line up across the seam */
-    grid-template-rows: auto auto 1fr auto;
+    padding-inline: max(var(--gutter), env(safe-area-inset-left, 0px));
   }
-  .side {
+  .bp-card {
     position: relative;
     isolation: isolate;
+    max-width: var(--max);
+    margin-inline: auto;
     display: grid;
-    grid-row: 1 / span 4;
-    grid-template-rows: subgrid;
-    row-gap: clamp(0.9rem, 0.6rem + 0.8vw, 1.4rem);
-    padding-block: clamp(2.5rem, 1.5rem + 2.5vw, 3.75rem) clamp(2rem, 1.25rem + 1.75vw, 2.75rem);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    /* The two sides share rows, so titles, labels, graphics and links line up */
+    grid-template-rows: auto auto 1fr auto;
+    border-radius: 28px;
     overflow: hidden;
-  }
-  .side-biz {
-    grid-column: 1;
-    padding-left: var(--pad-out);
-    padding-right: var(--pad-in);
+    /* Daylight to deep navy, eased through the middle so the two sides melt into one */
     background:
-      radial-gradient(60% 50% at 0% 0%, rgb(255 255 255 / 0.9), transparent 70%),
-      linear-gradient(180deg, #f7f9fc 0%, #edf2f7 100%);
+      radial-gradient(55% 70% at 0% 0%, rgb(255 255 255 / 0.85), transparent 70%),
+      radial-gradient(50% 80% at 100% 0%, rgb(46 104 152 / 0.5), transparent 70%),
+      radial-gradient(40% 60% at 100% 100%, rgb(42 95 142 / 0.25), transparent 72%),
+      linear-gradient(
+        90deg,
+        #f5f8fb 0%,
+        #eef2f7 33%,
+        #dbe3ec 39%,
+        #b4c3d3 44%,
+        #7d93aa 49%,
+        #4a6480 53.5%,
+        #26405b 58%,
+        #172e46 63%,
+        #11253a 69%,
+        #0d1e30 100%
+      );
+    box-shadow: 0 1px 2px rgb(12 26 41 / 0.08), 0 50px 90px -50px rgb(12 26 41 / 0.55);
   }
-  /* Engineering paper: a fine grid, fading out toward the text */
-  .side-biz::before {
+  /* Engineering paper on the light side, fading out before the middle */
+  .bp-card::before {
     content: '';
     position: absolute;
     inset: 0;
     z-index: -1;
     background-image:
-      linear-gradient(rgb(27 42 61 / 0.045) 1px, transparent 1px),
-      linear-gradient(90deg, rgb(27 42 61 / 0.045) 1px, transparent 1px);
-    background-size: 44px 44px;
-    -webkit-mask-image: linear-gradient(180deg, transparent 20%, #000 75%);
-    mask-image: linear-gradient(180deg, transparent 20%, #000 75%);
+      linear-gradient(rgb(27 42 61 / 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(27 42 61 / 0.05) 1px, transparent 1px);
+    background-size: 40px 40px;
+    -webkit-mask-image: linear-gradient(90deg, #000 0%, rgb(0 0 0 / 0.6) 25%, transparent 42%);
+    mask-image: linear-gradient(90deg, #000 0%, rgb(0 0 0 / 0.6) 25%, transparent 42%);
   }
+  /* A fine grain on the navy side */
+  .bp-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image: var(--grain);
+    background-size: 200px;
+    opacity: 0.12;
+    mix-blend-mode: overlay;
+    -webkit-mask-image: linear-gradient(90deg, transparent 45%, #000 70%);
+    mask-image: linear-gradient(90deg, transparent 45%, #000 70%);
+  }
+
+  .side {
+    display: grid;
+    grid-row: 1 / span 4;
+    grid-template-rows: subgrid;
+    row-gap: 0.85rem;
+    padding: clamp(2.25rem, 1.5rem + 2vw, 3.25rem) clamp(1.75rem, 1rem + 2.5vw, 3.5rem) clamp(2rem, 1.25rem + 1.75vw, 2.75rem);
+  }
+  .side-biz { grid-column: 1; justify-items: start; }
+  /* The right side mirrors the left */
   .side-np {
     grid-column: 2;
-    padding-left: var(--pad-in);
-    padding-right: var(--pad-out);
+    justify-items: end;
+    text-align: right;
     /* The dark-hero colours, so the nonprofit chart reads as it does on its own page */
     --ink: #eef3f8;
     --ink-2: #b5c4d3;
@@ -102,83 +128,80 @@ const Label = level === 1 ? 'h2' : 'h3';
     --accent-soft: #6fa8d6;
     --paper: #102236;
     color: var(--ink);
-    background:
-      radial-gradient(70% 55% at 100% 0%, rgb(46 104 152 / 0.55), transparent 70%),
-      radial-gradient(60% 50% at 0% 100%, rgb(42 95 142 / 0.35), transparent 72%),
-      linear-gradient(170deg, #13283e 0%, #0e1f31 55%, #0a1624 100%);
-  }
-  .side-np::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
-    background-image: var(--grain);
-    background-size: 200px;
-    opacity: 0.12;
-    mix-blend-mode: overlay;
   }
 
   .side-title {
     font-family: var(--font-display);
-    font-size: clamp(2.75rem, 1.2rem + 3.3vw, 5rem);
+    font-size: clamp(2.25rem, 1.25rem + 2.4vw, 3.25rem);
     font-weight: 450;
-    line-height: 1;
-    text-wrap: balance;
-    letter-spacing: -0.03em;
+    line-height: 1.05;
+    letter-spacing: -0.025em;
     color: #1b2a3d;
+    white-space: nowrap;
   }
-  .side-np .side-title { color: #fff; font-style: italic; font-weight: 400; text-shadow: 0 18px 40px rgb(0 0 0 / 0.35); }
+  .side-np .side-title { color: #fff; font-style: italic; font-weight: 400; }
 
-  .side-copy { display: grid; gap: 0.5rem; align-content: start; max-width: 44ch; }
   .side-label {
     font-family: var(--font-body);
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
     font-weight: 700;
-    letter-spacing: 0.16em;
+    line-height: 1.3;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
     color: #2c5f8a;
   }
-  .side-np .side-label { color: #8ec0e6; }
+  .side-np .side-label { color: #8ec0e6; margin-right: -0.18em; }
 
-  .side-figure { align-self: end; width: 100%; max-width: 400px; margin-top: 0.5rem; }
+  .side-figure { align-self: end; width: 100%; max-width: 380px; margin-top: 1.25rem; }
   .side-biz .side-figure :global(.live-inline) { max-width: none; margin: 0; }
   .side-np .side-figure :global(.gap) { max-width: none; }
 
   .side-link {
-    justify-self: start;
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
-    padding: 0.7rem 1.15rem;
+    margin-top: 0.75rem;
+    padding: 0.6rem 1.05rem;
     border-radius: 999px;
     font-weight: 600;
-    font-size: 0.9375rem;
+    font-size: 0.875rem;
     text-decoration: none;
     color: #1b2a3d;
     border: 1px solid rgb(27 42 61 / 0.18);
+    background: rgb(255 255 255 / 0.5);
     transition: background-color 300ms var(--ease), border-color 300ms var(--ease);
   }
   .side-link:hover { background: #fff; border-color: rgb(27 42 61 / 0.35); }
-  .side-np .side-link { color: #fff; border-color: rgb(255 255 255 / 0.25); }
-  .side-np .side-link:hover { background: rgb(255 255 255 / 0.08); border-color: rgb(255 255 255 / 0.5); }
+  .side-np .side-link { color: #fff; border-color: rgb(255 255 255 / 0.25); background: rgb(255 255 255 / 0.04); }
+  .side-np .side-link:hover { background: rgb(255 255 255 / 0.1); border-color: rgb(255 255 255 / 0.5); }
 
-  /* The seam: one firm, holding both */
-  .seam { position: absolute; inset: 0 auto 0 50%; z-index: 3; pointer-events: none; }
-  .seam-line {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: -0.5px;
-    width: 1px;
-    background: linear-gradient(180deg, rgb(142 192 230 / 0) 0%, rgb(142 192 230 / 0.7) 30%, rgb(142 192 230 / 0.7) 70%, rgb(142 192 230 / 0) 100%);
-  }
-
-  /* Tablets and phones: one side above the other, the mark on the join */
+  /* Tablets and phones: one side above the other, fading top to bottom */
   @media (max-width: 900px) {
-    .bp { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; min-height: 0; }
-    .side { grid-row: auto; grid-column: auto; grid-template-rows: none; padding-inline: max(var(--gutter), env(safe-area-inset-left, 0px)); }
-    .side-np { padding-top: clamp(4rem, 3rem + 4vw, 5rem); }
-    .seam { inset: auto 0 auto 0; top: var(--seam-y, 50%); }
-    .seam-line { display: none; }
-  </style>
+    .bp-card {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: none;
+      border-radius: 22px;
+      background:
+        radial-gradient(80% 40% at 0% 0%, rgb(255 255 255 / 0.85), transparent 70%),
+        radial-gradient(80% 40% at 100% 100%, rgb(46 104 152 / 0.45), transparent 70%),
+        linear-gradient(
+          180deg,
+          #f5f8fb 0%,
+          #eef2f7 38%,
+          #c9d4e0 45%,
+          #7d93aa 50%,
+          #34506d 55%,
+          #172e46 61%,
+          #0d1e30 100%
+        );
+    }
+    .bp-card::before { -webkit-mask-image: linear-gradient(180deg, #000 0%, transparent 42%); mask-image: linear-gradient(180deg, #000 0%, transparent 42%); }
+    .bp-card::after { -webkit-mask-image: linear-gradient(180deg, transparent 48%, #000 65%); mask-image: linear-gradient(180deg, transparent 48%, #000 65%); }
+    .side { grid-row: auto; grid-column: auto; grid-template-rows: none; }
+    .side-biz { padding-bottom: 3.5rem; }
+    .side-np { padding-top: 3.5rem; justify-items: start; text-align: left; }
+    .side-np .side-label { margin-right: 0; }
+    .side-figure { max-width: 420px; }
+    .side-title { white-space: normal; }
+  }
+</style>

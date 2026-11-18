@@ -17,8 +17,10 @@ interface Props {
   light?: boolean;
   /** Shows the finished chart and holds still (the Team page) */
   still?: boolean;
+  /** Names the original bars, Revenue and Costs, in place of the caption above the chart */
+  labels?: boolean;
 }
-const { inline = false, light = false, still = false, href = inline ? undefined : '#experience' } = Astro.props;
+const { inline = false, light = false, still = false, labels = false, href = inline ? undefined : '#experience' } = Astro.props;
 const Tag = href ? 'a' : 'div';
 const VB_W = 560;
 const VB_H = 440;
@@ -194,7 +196,7 @@ ${run('hl-lock', 'hl-lock', 'ease-in-out')}
 ---
 
 <Tag
-  class:list={['live', { 'live-inline': inline, 'live-light': light, 'live-still': still }]}
+  class:list={['live', { 'live-inline': inline, 'live-light': light, 'live-still': still, 'live-labelled': labels }]}
   href={href}
   role={href ? undefined : 'img'}
   aria-label={href ? 'Revenue vs costs: see how, case study by case study' : 'Revenue vs costs: costs cut and new revenue added'}
@@ -218,6 +220,15 @@ ${run('hl-lock', 'hl-lock', 'ease-in-out')}
       <rect x={before.rev} y={revTop} width={W} height={REV} rx="2" class="hl-rev" />
       <rect x={before.cost} y={costTop} width={W} height={COST} rx="2" class="hl-cost" />
     </g>
+
+    {
+      labels && (
+        <g class="hl-labels">
+          <text x={before.rev + W / 2} y={revTop - 14} text-anchor="middle" class="hl-lbl hl-lbl-rev">Revenue</text>
+          <text x={before.cost + W / 2} y={costTop - 14} text-anchor="middle" class="hl-lbl hl-lbl-cost">Costs</text>
+        </g>
+      )
+    }
 
     <!-- The copy, pasted, then improved -->
     <g class="hl-after">
@@ -324,6 +335,13 @@ ${run('hl-lock', 'hl-lock', 'ease-in-out')}
     .live-caret { animation: hl-caret 1.1s steps(1) infinite; }
     @keyframes hl-caret { 50% { opacity: 0; } }
   }
+  /* Labels on the original bars, like the line labels on the nonprofit chart */
+  .live-labelled .live-cap { display: none; }
+  .live-labelled .live-svg { margin-top: 0; }
+  .hl-lbl { font-family: var(--font-body); font-size: 17px; font-weight: 600; letter-spacing: 0.01em; }
+  .hl-lbl-rev { fill: var(--blue); }
+  .hl-lbl-cost { fill: var(--red); }
+
   /* Held still on its finished frame, whatever the motion setting */
   .live-still :is(.hl-cut, .hl-add, .hl-after) { opacity: 1 !important; animation: none !important; }
   .live-still .hl-before { opacity: 0.35 !important; animation: none !important; }

@@ -44,11 +44,12 @@ export const site = {
 
 export type NavItem = { label: string; href: string };
 
+/* Who, what, how, why */
 export const primaryNav: NavItem[] = [
-  { label: 'Approach', href: '/approach/' },
-  { label: 'Our work', href: '/work/' },
-  { label: 'Nonprofits', href: '/nonprofits/' },
   { label: 'Team', href: '/team/' },
+  { label: 'Our work', href: '/work/' },
+  { label: 'Approach', href: '/approach/' },
+  { label: 'Nonprofits', href: '/nonprofits/' },
 ];
 
 export const footerNav: { heading: string; items: NavItem[] }[] = [

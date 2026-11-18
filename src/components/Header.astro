@@ -32,7 +32,7 @@ const isCurrent = (href: string) => (href === '/' ? path === '/' : path.startsWi
           }
         </ul>
       </nav>
-      <a class="header-cta" href="/contact/" aria-current={isCurrent('/contact/') ? 'page' : undefined}><span class="cta-l">Start a conversation</span></a>
+      <a class="header-cta" href="/contact/" aria-current={isCurrent('/contact/') ? 'page' : undefined}><span class="cta-l">Start a conversation</span><span class="cta-arr" aria-hidden="true">→</span></a>
       <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-nav" data-menu-toggle>
         <span class="menu-label">Menu</span>
         <span class="menu-icon" aria-hidden="true"><i></i><i></i></span>
@@ -170,30 +170,28 @@ const isCurrent = (href: string) => (href === '/' ? path === '/' : path.startsWi
   .nav a:hover .nav-l, .nav a[aria-current='page'] .nav-l { background-size: 100% 1px; }
   .nav a:hover .nav-n, .nav a[aria-current='page'] .nav-n { color: var(--accent-soft); }
 
-  /* Underlined exactly like the links' current-page line, so the two sit at the same height */
+  /* The call to action stands apart from the links: a solid pill in the button colours, which
+     flip to light over a dark hero */
   .header-cta {
     display: inline-flex;
-    align-items: baseline;
-    padding-block: 0.4rem;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.05rem 0.6rem 1.2rem;
+    border-radius: 999px;
     white-space: nowrap;
-    color: var(--ink);
+    color: var(--btn-fg);
+    background: var(--btn-bg);
     text-decoration: none;
+    box-shadow: 0 8px 18px -10px rgb(12 26 41 / 0.55);
+    transition: background-color 250ms var(--ease), transform 250ms var(--ease);
   }
-  .cta-l {
-    font-size: 1.0625rem;
-    font-weight: 500;
-    letter-spacing: -0.005em;
-    background-image: linear-gradient(var(--accent-soft), var(--accent-soft));
-    background-size: 100% 1px;
-    background-position: 0 100%;
-    background-repeat: no-repeat;
-    padding-bottom: 2px;
-    transition: background-size 200ms var(--ease);
-  }
-  .header-cta:hover .cta-l { background-image: linear-gradient(var(--accent), var(--accent)); background-size: 100% 2px; }
+  .header-cta:hover { background: var(--btn-bg-hover); transform: translateY(-1px); }
+  .header-cta[aria-current='page'] { box-shadow: 0 0 0 2px var(--accent-soft); }
+  .cta-l { font-size: 0.9375rem; font-weight: 600; letter-spacing: -0.005em; }
+  .cta-arr { font-size: 0.9375rem; transition: transform 250ms var(--ease); }
+  .header-cta:hover .cta-arr { transform: translateX(2px); }
 
-  /* Baselines line up, so the call to action sits level with the numbered links */
-  .header-actions { display: flex; align-items: baseline; gap: clamp(1.75rem, 0.5rem + 2.4vw, 3.25rem); }
+  .header-actions { display: flex; align-items: center; gap: clamp(1.75rem, 0.5rem + 2.4vw, 3.25rem); }
 
   .menu-toggle {
     display: none;

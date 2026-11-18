@@ -12,7 +12,7 @@ const DRAFT = false;
 
 <Base
   title="Team"
-  description="Built for business. Driven by purpose. Spockhart works with corporations and nonprofits. Meet our founder and advisory board."
+  description="Built for Business, Driven by Purpose. Spockhart works with corporations and nonprofits. Meet our founder and advisory board."
   lightHero
 >
   <!-- Who we are first: business and purpose, edge to edge -->
@@ -40,11 +40,11 @@ const DRAFT = false;
 </Base>
 
 <style>
-  /* The split starts just under the header */
-  .team-top { padding-top: 88px; background: var(--paper); }
+  /* The card sits just under the header */
+  .team-top { padding-top: clamp(6.5rem, 5.5rem + 2.5vw, 8rem); background: var(--paper); }
 
   /* ---------- The team ---------- */
-  .crew-band { padding-top: clamp(4rem, 3rem + 3vw, 6.5rem); }
+  .crew-band { padding-top: clamp(3.5rem, 2.5rem + 3vw, 5.5rem); }
   .crew {
     display: grid;
     grid-template-columns: minmax(0, 3.4fr) repeat(3, minmax(0, 2.85fr));
@@ -69,7 +69,7 @@ const DRAFT = false;
     .crew-title { grid-column: 1 / -1; max-width: none; }
   }
   @media (max-width: 640px) {
-    .team-top { padding-top: 72px; }
+    .team-top { padding-top: 5.5rem; }
     .crew { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 0.75rem; }
     .crew-slot.is-lead { grid-column: 1 / -1; }
     .crew-slot.is-lead :global(.tcard) { aspect-ratio: 4 / 3.4; }
