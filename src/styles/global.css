@@ -749,7 +749,10 @@ html.is-focusing .focus-veil { opacity: 1; }
   ::view-transition-old(root) { animation: 180ms var(--ease) both fade reverse; }
   ::view-transition-new(root) { animation: 320ms var(--ease) 60ms both fade; }
   .site-header { view-transition-name: site-header; }
-  ::view-transition-group(site-header), ::view-transition-old(site-header), ::view-transition-new(site-header) { animation: none; }
+  /* The header never crossfades: the old page's header is dropped at once and the new page's live
+     header is shown as it is (it arrives at the size the last one left at, see Header.astro) */
+  ::view-transition-group(site-header), ::view-transition-new(site-header) { animation: none; }
+  ::view-transition-old(site-header) { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {

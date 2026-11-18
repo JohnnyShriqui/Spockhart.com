@@ -71,6 +71,18 @@ const isCurrent = (href: string) => (href === '/' ? path === '/' : path.startsWi
       document.querySelector('[data-header]').classList.add('is-scrolled', 'is-carried');
     }
   } catch (e) {}
+  // Resolves once the page change has finished (or at once, when there is no transition)
+  window.__spockhartRevealed = new Promise(function (done) {
+    window.addEventListener(
+      'pagereveal',
+      function (e) {
+        var vt = e.viewTransition;
+        if (vt && vt.finished) vt.finished.then(done, done);
+        else done();
+      },
+      { once: true },
+    );
+  });
 </script>
 
 <style>

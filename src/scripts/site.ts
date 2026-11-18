@@ -50,12 +50,18 @@ function initHeader() {
     const compact = header.classList.contains('is-scrolled');
     update();
     header.classList.toggle('is-scrolled', compact);
-    requestAnimationFrame(() =>
-      requestAnimationFrame(() => {
-        header.classList.remove('is-carried');
-        update();
-      }),
-    );
+    // Grow back only once the page change has finished: while it runs, the browser shows the
+    // header at the size it started with, so growing sooner would snap at the end
+    const release = () =>
+      requestAnimationFrame(() =>
+        requestAnimationFrame(() => {
+          header.classList.remove('is-carried');
+          update();
+        }),
+      );
+    const revealed = (window as unknown as { __spockhartRevealed?: Promise<unknown> }).__spockhartRevealed;
+    const fallback = new Promise((done) => setTimeout(done, 900));
+    Promise.race([revealed ?? Promise.resolve(), fallback]).then(release);
   } else {
     update();
   }
