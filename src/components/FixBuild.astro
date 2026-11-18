@@ -1285,13 +1285,13 @@ const sets = [
   .fb-rev,
   .fb-cost { opacity: 0.5; }
 
-  /* Laptops: the chart and the case studies reach out past the column, closer to the edges of the
-     screen (up to 4rem each side, keeping 2.5rem clear of it). The space between them stays as it
-     is; the chart grows to the left and the list to the right. */
+  /* Laptops: the chart and the case studies reach out past the column, as far as the closing card
+     does (up to 2rem each side). The space between them stays as it is; the chart grows to the
+     left and the list to the right. */
   @media (min-width: 1100px) {
     .fb-stage {
       --reach: clamp(0px, max(var(--gutter), (100vw - var(--max)) / 2) - 2.5rem, 4rem);
-      margin-inline: calc(var(--reach) * -1);
+      margin-inline: calc(var(--reach) * -0.5);
     }
   }
 </style>
