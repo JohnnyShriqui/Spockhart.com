@@ -1259,8 +1259,9 @@ const sets = [
   }
 
   /* Lightsaber bars, as on the Team page and in the home hero: every bar a neon outline with a
-     faint fill and its own glow, revenue in blue and costs in red. Before stands a step dimmer,
-     as on the Team page, so the eye goes to what changed. */
+     faint fill and its own glow, revenue in blue and costs in red. What was already there (the
+     Before bars, and the same revenue and remaining costs under After) stands a step dimmer, so
+     the eye goes to what changed: the new revenue and the cuts. */
   .fb-grid { stroke: rgb(var(--saber-blue) / 0.06); }
   .fb-axis { stroke: rgb(var(--saber-blue) / 0.3); stroke-width: 1.5; }
   .fb-rev,
@@ -1281,6 +1282,6 @@ const sets = [
   }
   /* Costs shrink as the cuts land: the outline keeps its weight as the bar scales */
   .fb-cost-after { vector-effect: non-scaling-stroke; }
-  .fb-rev:not(.fb-rev-after),
-  .fb-cost:not(.fb-cost-after) { opacity: 0.5; }
+  .fb-rev,
+  .fb-cost { opacity: 0.5; }
 </style>
