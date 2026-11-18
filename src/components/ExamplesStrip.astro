@@ -63,8 +63,8 @@ const Slot = panels ? 'div' : Fragment;
 
 <div class:list={['ex', className, { 'ex-panels lit': panels }]}>
   {
-    groups.map((g) => (
-      <Slot class="ex-slot stand">
+    groups.map((g, gi) => (
+      <Slot class="ex-slot stand" data-depth={panels ? (gi === 0 ? '0.03' : '0.08') : undefined}>
       <section class:list={['ex-group', `ex-${g.key}`]} aria-label={g.title} data-tilt={panels ? '3' : undefined} data-tilt-depth={panels ? '2200' : undefined}>
         <p class="ex-head">
           <span class="ex-title">{g.title}</span>
@@ -321,9 +321,9 @@ const Slot = panels ? 'div' : Fragment;
     mix-blend-mode: overlay;
   }
   /* The note sits clear of the panels' shadows on the floor */
-  .ex-panels .ex-more { margin-top: 2.6rem; text-align: center; }
+  .ex-panels .ex-more { margin-top: 2.6rem; }
   @media (max-width: 640px) {
     .ex-panels .ex-group { border-radius: 16px; }
-    .ex-panels .ex-more { margin-top: 1.75rem; text-align: left; }
+    .ex-panels .ex-more { margin-top: 1.75rem; }
   }
 </style>
