@@ -16,6 +16,8 @@ export type Advisor = {
   name: string;
   title: string;
   focus: string;
+  /** A few words for the Team page map, under their name */
+  short: string;
   confirmed: boolean;
   /** Where their experience comes from, shown as tags on their card */
   experience: string[];
@@ -28,6 +30,7 @@ export const advisors: Advisor[] = [
     name: 'Brandon Milner',
     title: 'Chief Information Officer at one of Canada’s largest construction companies',
     focus: 'Technology, systems and scale',
+    short: 'Chief Information Officer',
     confirmed: true,
     experience: ['Technology', 'Construction', 'Real estate'],
   },
@@ -35,6 +38,7 @@ export const advisors: Advisor[] = [
     name: 'Howie Kroon',
     title: 'Business leader with deep ties across Canada’s nonprofit and public sectors',
     focus: 'Strategy and relationships',
+    short: 'Business leader',
     confirmed: true,
     experience: ['Business', 'Nonprofit sector'],
   },
@@ -42,6 +46,7 @@ export const advisors: Advisor[] = [
     name: 'Rick Ekstein',
     title: 'Former chief executive, and chairman of a hands-on charitable organization',
     focus: 'Growth and philanthropy',
+    short: 'Former chief executive',
     confirmed: false,
     experience: ['Business', 'Philanthropy'],
   },
@@ -49,6 +54,7 @@ export const advisors: Advisor[] = [
     name: 'Steve Merker',
     title: 'Vice President, Corporate and Community Partnerships, at one of Canada’s leading cancer foundations',
     focus: 'Fundraising and partnerships',
+    short: 'Vice President, Partnerships',
     confirmed: false,
     experience: ['Nonprofit sector', 'Fundraising'],
   },
