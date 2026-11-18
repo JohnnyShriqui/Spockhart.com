@@ -110,7 +110,7 @@ const sets = [
       <svg class="fb-links" aria-hidden="true" data-fb-links></svg>
 
       <!-- The chart, in the same window style as the case studies -->
-      <figure class="fb-chart" aria-label="Before, costs are just under revenue. After, revenue is up and costs are down.">
+      <figure class="fb-chart" data-tilt="4" data-tilt-depth="1800" aria-label="Before, costs are just under revenue. After, revenue is up and costs are down.">
         <div class="fb-win">
           <div class="fb-win-bar"><span class="fb-dots"><i></i><i></i><i></i></span>Revenue vs costs</div>
           {
@@ -370,6 +370,8 @@ const sets = [
         };
         follow = requestAnimationFrame(step);
       };
+      // As the chart leans under the pointer (see tilt.ts), the lines stay on their slices
+      chartFig.addEventListener('tilt', draw);
 
       /* ---------- The drawing is as tall as the list (laptops) ----------
          The tall drawing is cropped to itself, from the top of the new revenue down to the

@@ -4,6 +4,11 @@
  * floating. data-tilt is the most it leans, in degrees; data-tilt-depth is the perspective, in px
  * (larger for wider cards, so the lean stays as gentle). Laptops and desktops only, and never
  * with reduced motion.
+ *
+ * Each frame of movement fires a `tilt` event on the card, so anything drawn to line up with it
+ * (the lines from the home page chart to its case studies) can follow. While a control inside the
+ * card is held (dragging a slider), the card settles flat and stays still, so it never moves under
+ * the pointer.
  */
 export function initTilt() {
   if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
@@ -20,6 +25,7 @@ export function initTilt() {
     let x = 0;
     let y = 0;
     let raf = 0;
+    let held = false;
 
     const frame = () => {
       x += (tx - x) * 0.09;
@@ -28,26 +34,36 @@ export function initTilt() {
       if (settled && tx === 0 && ty === 0) {
         el.style.transform = '';
         raf = 0;
+        el.dispatchEvent(new CustomEvent('tilt'));
         return;
       }
       // The point under the pointer recedes: right side back for x > 0, top back for y < 0
       el.style.transform = `perspective(${depth}px) rotateX(${(-y * max).toFixed(3)}deg) rotateY(${(x * max).toFixed(3)}deg)`;
+      el.dispatchEvent(new CustomEvent('tilt'));
       raf = settled ? 0 : requestAnimationFrame(frame);
     };
     const kick = () => {
       if (!raf) raf = requestAnimationFrame(frame);
     };
+    const rest = () => {
+      tx = 0;
+      ty = 0;
+      kick();
+    };
 
     el.addEventListener('pointermove', (e) => {
+      if (held) return;
       const r = el.getBoundingClientRect();
       tx = Math.max(-0.5, Math.min(0.5, (e.clientX - r.left) / r.width - 0.5));
       ty = Math.max(-0.5, Math.min(0.5, (e.clientY - r.top) / r.height - 0.5));
       kick();
     });
-    el.addEventListener('pointerleave', () => {
-      tx = 0;
-      ty = 0;
-      kick();
+    el.addEventListener('pointerleave', rest);
+    el.addEventListener('pointerdown', (e) => {
+      if (!(e.target as Element).closest('input, select, textarea')) return;
+      held = true;
+      rest();
+      window.addEventListener('pointerup', () => (held = false), { once: true });
     });
   });
 }
