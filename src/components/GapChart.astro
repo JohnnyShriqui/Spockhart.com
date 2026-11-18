@@ -30,10 +30,15 @@ const down = { y1: at(demand, AX) + 6, y2: at(demandUs, AX) - 6 };
 const up = { y1: at(resources, AX) - 6, y2: at(resUs, AX) + 6 };
 const arrowDown = `M${AX} ${down.y1.toFixed(1)} V${down.y2.toFixed(1)} M${AX - 4} ${(down.y2 - 5).toFixed(1)} L${AX} ${down.y2.toFixed(1)} L${AX + 4} ${(down.y2 - 5).toFixed(1)}`;
 const arrowUp = `M${AX} ${up.y1.toFixed(1)} V${up.y2.toFixed(1)} M${AX - 4} ${(up.y2 + 5).toFixed(1)} L${AX} ${up.y2.toFixed(1)} L${AX + 4} ${(up.y2 + 5).toFixed(1)}`;
+interface Props {
+  /** Shows the finished chart and holds still (the Team page) */
+  still?: boolean;
+}
+const { still = false } = Astro.props;
 ---
 
 <figure class="gap" aria-label="Illustration: without Spockhart, demand on a nonprofit rises while resources stay flat, and the gap grows. With Spockhart, demand is brought down and resources are brought up, so the gap narrows.">
-  <svg viewBox="0 0 480 360" class="scene" data-scene data-rate="1" data-loop="11" data-still="10" style="--loop:11;--still:10">
+  <svg viewBox="0 0 480 360" class="scene" data-scene={still ? undefined : ''} data-rate="1" data-loop="11" data-still="10" style="--loop:11;--still:10">
     <defs>
       <pattern id="gap-hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
         <rect width="8" height="8" fill="rgb(74 138 186 / 0.07)" />

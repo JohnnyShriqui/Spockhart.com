@@ -3,7 +3,7 @@
  * Who we are, in one image: the screen split edge to edge. On the left, in daylight, "Built for
  * business." with the live revenue vs costs graph from the home page. On the right, in deep
  * navy, "Driven by purpose." with the demand and resources chart from the Nonprofits page.
- * Spockhart sits on the seam between them.
+ * A fine line marks the seam between them.
  */
 import HeroLive from './HeroLive.astro';
 import GapChart from './GapChart.astro';
@@ -26,7 +26,7 @@ const Label = level === 1 ? 'h2' : 'h3';
       <Label class="side-label">Corporations</Label>
     </div>
     <div class="side-figure load-fade">
-      <HeroLive inline light />
+      <HeroLive inline light still />
     </div>
     <a class="side-link" href="/approach/">How we work <span aria-hidden="true">→</span></a>
   </div>
@@ -37,7 +37,7 @@ const Label = level === 1 ? 'h2' : 'h3';
       <Label class="side-label">Nonprofits</Label>
     </div>
     <div class="side-figure load-fade">
-      <GapChart />
+      <GapChart still />
     </div>
     <a class="side-link" href="/nonprofits/">Nonprofits <span aria-hidden="true">→</span></a>
   </div>
@@ -45,8 +45,6 @@ const Label = level === 1 ? 'h2' : 'h3';
   <div class="seam" aria-hidden="true">
     <span class="seam-line"></span>
   </div>
-  <!-- On the seam, level with the two graphics: the firm that joins them -->
-  <span class="seam-mark" aria-hidden="true">Spockhart</span>
 </section>
 
 <style>
@@ -175,27 +173,6 @@ const Label = level === 1 ? 'h2' : 'h3';
     width: 1px;
     background: linear-gradient(180deg, rgb(142 192 230 / 0) 0%, rgb(142 192 230 / 0.7) 30%, rgb(142 192 230 / 0.7) 70%, rgb(142 192 230 / 0) 100%);
   }
-  .seam-mark {
-    grid-column: 1 / -1;
-    grid-row: 3;
-    justify-self: center;
-    align-self: center;
-    z-index: 3;
-    margin-top: 1.5rem;
-    padding: 0.85rem 1.4rem;
-    border-radius: 999px;
-    background: #fff;
-    border: 1px solid rgb(27 42 61 / 0.1);
-    box-shadow: 0 16px 34px -14px rgb(12 26 41 / 0.55);
-    font-family: var(--font-wordmark);
-    font-size: 0.75rem;
-    letter-spacing: 0.34em;
-    text-indent: 0.34em;
-    text-transform: uppercase;
-    color: #1b2a3d;
-    line-height: 1;
-    white-space: nowrap;
-  }
 
   /* Tablets and phones: one side above the other, the mark on the join */
   @media (max-width: 900px) {
@@ -204,6 +181,4 @@ const Label = level === 1 ? 'h2' : 'h3';
     .side-np { padding-top: clamp(4rem, 3rem + 4vw, 5rem); }
     .seam { inset: auto 0 auto 0; top: var(--seam-y, 50%); }
     .seam-line { display: none; }
-    .seam-mark { display: none; }
-  }
-</style>
+  </style>
