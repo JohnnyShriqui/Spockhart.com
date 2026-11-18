@@ -33,11 +33,13 @@ const arrowUp = `M${AX} ${up.y1.toFixed(1)} V${up.y2.toFixed(1)} M${AX - 4} ${(u
 interface Props {
   /** Shows the finished chart and holds still (the Team page) */
   still?: boolean;
+  /** Drawn for a light background (the Team page) */
+  light?: boolean;
 }
-const { still = false } = Astro.props;
+const { still = false, light = false } = Astro.props;
 ---
 
-<figure class="gap" aria-label="Illustration: without Spockhart, demand on a nonprofit rises while resources stay flat, and the gap grows. With Spockhart, demand is brought down and resources are brought up, so the gap narrows.">
+<figure class:list={["gap", { "gap-light": light }]} aria-label="Illustration: without Spockhart, demand on a nonprofit rises while resources stay flat, and the gap grows. With Spockhart, demand is brought down and resources are brought up, so the gap narrows.">
   <svg viewBox="0 0 480 360" class="scene" data-scene={still ? undefined : ''} data-rate="1" data-loop="11" data-still="10" style="--loop:11;--still:10">
     <defs>
       <pattern id="gap-hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
@@ -124,6 +126,13 @@ const { still = false } = Astro.props;
   .dot-us { fill: var(--accent); stroke: var(--paper); stroke-width: 2; }
   .arrow { fill: none; stroke: rgb(238 243 248 / 0.6); stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
   .arrow-up { stroke: var(--accent); }
+  /* On a light background: the faint lines and areas drawn in navy rather than white */
+  .gap-light .line-was-demand { stroke: rgb(27 42 61 / 0.4); }
+  .gap-light .line-was-res { stroke: rgb(88 107 128 / 0.45); }
+  .gap-light .area-eased { fill: rgb(27 42 61 / 0.05); }
+  .gap-light .area-gained { fill: rgb(44 95 138 / 0.18); }
+  .gap-light .arrow { stroke: rgb(27 42 61 / 0.45); }
+  .gap-light .arrow-up { stroke: var(--accent); }
 
   .label { font-family: var(--font-body); font-size: 15px; font-weight: 600; }
   .label-demand { fill: var(--ink); }

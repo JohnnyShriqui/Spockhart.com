@@ -1,9 +1,10 @@
 ---
 /**
  * Who we are, in one sentence across one card: "Built for Business, Driven by Purpose".
- * The card fades from daylight on the left to deep navy on the right, with no line between.
- * Left, for corporations, the revenue vs costs bars from the home page. Right, for nonprofits,
- * the demand and resources chart from the Nonprofits page. Both are held on their finished frame.
+ * The card fades from the home page's midnight blue on the left to daylight on the right, with no
+ * line between. Left, for corporations, the neon revenue vs costs bars from the home page. Right,
+ * for nonprofits, the demand and resources chart from the Nonprofits page, drawn for the light.
+ * Both are held on their finished frame.
  * The two sides mirror each other, so the middle stays open for the fade.
  */
 import HeroLive from './HeroLive.astro';
@@ -18,11 +19,11 @@ const { level = 2 } = Astro.props;
 const Heading = level === 1 ? 'h1' : 'h2';
 const Label = level === 1 ? 'h2' : 'h3';
 
-/* Daylight to deep navy: flat at each side, one long smooth blend across the middle */
+/* Midnight blue to daylight: flat at each side, one long smooth blend across the middle */
+const DARK = '#0c1a2b';
 const LIGHT = '#f2f5f9';
-const NAVY = '#0f2135';
-const fadeX = smoothFade('90deg', LIGHT, NAVY, 18, 82, 40);
-const fadeY = smoothFade('180deg', LIGHT, NAVY, 40, 62, 40);
+const fadeX = smoothFade('90deg', DARK, LIGHT, 18, 82, 40);
+const fadeY = smoothFade('180deg', DARK, LIGHT, 40, 62, 40);
 ---
 
 <section class="bp" aria-label="Built for Business, Driven by Purpose">
@@ -34,7 +35,7 @@ const fadeY = smoothFade('180deg', LIGHT, NAVY, 40, 62, 40);
       <p class="side-title load-in" style="--i:1" aria-hidden="true">Built for Business,</p>
       <Label class="side-label load-in" style="--i:2">Corporations</Label>
       <div class="side-figure load-fade">
-        <HeroLive inline light still labels />
+        <HeroLive inline still labels />
       </div>
       <a class="side-link" href="/approach/">How we work <span aria-hidden="true">→</span></a>
     </div>
@@ -43,7 +44,7 @@ const fadeY = smoothFade('180deg', LIGHT, NAVY, 40, 62, 40);
       <p class="side-title load-in" style="--i:2" aria-hidden="true">Driven by Purpose</p>
       <Label class="side-label load-in" style="--i:3">Nonprofits</Label>
       <div class="side-figure load-fade">
-        <GapChart still />
+        <GapChart still light />
       </div>
       <a class="side-link" href="/nonprofits/">Nonprofits <span aria-hidden="true">→</span></a>
     </div>
@@ -64,14 +65,16 @@ const fadeY = smoothFade('180deg', LIGHT, NAVY, 40, 62, 40);
     grid-template-rows: auto auto 1fr auto;
     border-radius: 28px;
     overflow: hidden;
-    /* Daylight to deep navy (see --fade-x), with a soft glow in each top corner */
+    /* Midnight to daylight (see --fade-x): steel-blue light in the dark corner, as on the home
+       page, and a soft white glow in the light one */
     background:
-      radial-gradient(50% 70% at 0% 0%, rgb(255 255 255 / 0.7), transparent 70%),
-      radial-gradient(45% 75% at 100% 0%, rgb(46 104 152 / 0.42), transparent 70%),
+      radial-gradient(50% 75% at 0% 0%, rgb(46 104 152 / 0.5), transparent 70%),
+      radial-gradient(45% 70% at 0% 100%, rgb(38 96 142 / 0.3), transparent 72%),
+      radial-gradient(50% 70% at 100% 0%, rgb(255 255 255 / 0.7), transparent 70%),
       var(--fade-x);
     /* Standing in the room: a lit top edge, a tight contact shadow, and a long soft one */
     box-shadow:
-      inset 0 1px 0 rgb(255 255 255 / 0.55),
+      inset 0 1px 0 rgb(255 255 255 / 0.35),
       0 1px 1px rgb(12 26 41 / 0.08),
       0 6px 10px -4px rgb(12 26 41 / 0.14),
       0 34px 50px -26px rgb(12 26 41 / 0.42),
@@ -101,10 +104,10 @@ const fadeY = smoothFade('180deg', LIGHT, NAVY, 40, 62, 40);
       linear-gradient(rgb(27 42 61 / 0.05) 1px, transparent 1px),
       linear-gradient(90deg, rgb(27 42 61 / 0.05) 1px, transparent 1px);
     background-size: 40px 40px;
-    -webkit-mask-image: linear-gradient(90deg, #000 0%, rgb(0 0 0 / 0.5) 20%, transparent 40%);
-    mask-image: linear-gradient(90deg, #000 0%, rgb(0 0 0 / 0.5) 20%, transparent 40%);
+    -webkit-mask-image: linear-gradient(90deg, transparent 60%, rgb(0 0 0 / 0.5) 80%, #000 100%);
+    mask-image: linear-gradient(90deg, transparent 60%, rgb(0 0 0 / 0.5) 80%, #000 100%);
   }
-  /* A fine grain across the card: texture on the navy, and a dither that keeps the blend from banding */
+  /* A fine grain across the card: texture on the dark side, and a dither that keeps the blend from banding */
   .bp-card::after {
     content: '';
     position: absolute;
@@ -124,22 +127,12 @@ const fadeY = smoothFade('180deg', LIGHT, NAVY, 40, 62, 40);
     row-gap: 0.85rem;
     padding: clamp(2.25rem, 1.5rem + 2vw, 3.25rem) clamp(1.75rem, 1rem + 2.5vw, 3.5rem) clamp(2rem, 1.25rem + 1.75vw, 2.75rem);
   }
-  .side-biz { grid-column: 1; justify-items: start; }
+  .side-biz { grid-column: 1; justify-items: start; color: #eef3f8; }
   /* The right side mirrors the left */
   .side-np {
     grid-column: 2;
     justify-items: end;
     text-align: right;
-    /* The dark-hero colours, so the nonprofit chart reads as it does on its own page */
-    --ink: #eef3f8;
-    --ink-2: #b5c4d3;
-    --ink-3: #94a8bc;
-    --rule: rgb(255 255 255 / 0.1);
-    --rule-2: rgb(255 255 255 / 0.2);
-    --accent: #8ec0e6;
-    --accent-soft: #6fa8d6;
-    --paper: #102236;
-    color: var(--ink);
   }
 
   .side-title {
@@ -148,10 +141,11 @@ const fadeY = smoothFade('180deg', LIGHT, NAVY, 40, 62, 40);
     font-weight: 450;
     line-height: 1.05;
     letter-spacing: -0.025em;
-    color: #1b2a3d;
+    color: #fff;
     white-space: nowrap;
   }
-  .side-np .side-title { color: #fff; font-style: italic; font-weight: 400; }
+  .side-biz .side-title { text-shadow: 0 14px 30px rgb(0 0 0 / 0.35); }
+  .side-np .side-title { color: #1b2a3d; font-style: italic; font-weight: 400; }
 
   .side-label {
     font-family: var(--font-body);
@@ -160,9 +154,9 @@ const fadeY = smoothFade('180deg', LIGHT, NAVY, 40, 62, 40);
     line-height: 1.3;
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: #2c5f8a;
+    color: #8ec0e6;
   }
-  .side-np .side-label { color: #8ec0e6; margin-right: -0.18em; }
+  .side-np .side-label { color: #2c5f8a; margin-right: -0.18em; }
 
   .side-figure { align-self: end; width: 100%; max-width: 380px; margin-top: 1.25rem; }
   .side-biz .side-figure :global(.live-inline) { max-width: none; margin: 0; }
@@ -178,14 +172,14 @@ const fadeY = smoothFade('180deg', LIGHT, NAVY, 40, 62, 40);
     font-weight: 600;
     font-size: 0.875rem;
     text-decoration: none;
-    color: #1b2a3d;
-    border: 1px solid rgb(27 42 61 / 0.18);
-    background: rgb(255 255 255 / 0.5);
+    color: #fff;
+    border: 1px solid rgb(255 255 255 / 0.25);
+    background: rgb(255 255 255 / 0.04);
     transition: background-color 300ms var(--ease), border-color 300ms var(--ease);
   }
-  .side-link:hover { background: #fff; border-color: rgb(27 42 61 / 0.35); }
-  .side-np .side-link { color: #fff; border-color: rgb(255 255 255 / 0.25); background: rgb(255 255 255 / 0.04); }
-  .side-np .side-link:hover { background: rgb(255 255 255 / 0.1); border-color: rgb(255 255 255 / 0.5); }
+  .side-link:hover { background: rgb(255 255 255 / 0.1); border-color: rgb(255 255 255 / 0.5); }
+  .side-np .side-link { color: #1b2a3d; border-color: rgb(27 42 61 / 0.18); background: rgb(255 255 255 / 0.5); }
+  .side-np .side-link:hover { background: #fff; border-color: rgb(27 42 61 / 0.35); }
 
   /* Tablets and phones: one side above the other, fading top to bottom */
   @media (max-width: 900px) {
@@ -194,11 +188,11 @@ const fadeY = smoothFade('180deg', LIGHT, NAVY, 40, 62, 40);
       grid-template-rows: none;
       border-radius: 22px;
       background:
-        radial-gradient(80% 30% at 0% 0%, rgb(255 255 255 / 0.7), transparent 70%),
-        radial-gradient(80% 30% at 100% 100%, rgb(46 104 152 / 0.4), transparent 70%),
+        radial-gradient(80% 30% at 0% 0%, rgb(46 104 152 / 0.5), transparent 70%),
+        radial-gradient(80% 30% at 100% 100%, rgb(255 255 255 / 0.7), transparent 70%),
         var(--fade-y);
     }
-    .bp-card::before { -webkit-mask-image: linear-gradient(180deg, #000 0%, transparent 42%); mask-image: linear-gradient(180deg, #000 0%, transparent 42%); }
+    .bp-card::before { -webkit-mask-image: linear-gradient(180deg, transparent 58%, #000 100%); mask-image: linear-gradient(180deg, transparent 58%, #000 100%); }
     .side { grid-row: auto; grid-column: auto; grid-template-rows: none; }
     .side-biz { padding-bottom: 4.5rem; }
     .side-np { padding-top: 4.5rem; justify-items: start; text-align: left; }
