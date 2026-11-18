@@ -20,7 +20,7 @@ export type Person = {
 
 export const founder: Person = {
   name: 'Jonathan Shriqui',
-  role: 'Founder',
+  role: 'Principal',
   photo: '',
   linkedin: 'https://www.linkedin.com/in/johnnyshriqui/',
 };
