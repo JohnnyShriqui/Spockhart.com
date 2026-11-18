@@ -33,6 +33,7 @@ export const advisors: Advisor[] = [
     short: 'Chief Information Officer',
     confirmed: true,
     experience: ['Technology', 'Construction', 'Real estate'],
+    linkedin: 'https://www.linkedin.com/in/bmilner/',
   },
   {
     name: 'Howie Kroon',
@@ -41,6 +42,7 @@ export const advisors: Advisor[] = [
     short: 'Business leader',
     confirmed: true,
     experience: ['Business', 'Nonprofit sector'],
+    linkedin: 'https://www.linkedin.com/in/howie-kroon-8781408/',
   },
   {
     name: 'Rick Ekstein',

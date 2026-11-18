@@ -22,7 +22,7 @@ export const founder: Person = {
   name: 'Jonathan Shriqui',
   role: 'Founder',
   photo: '',
-  linkedin: '',
+  linkedin: 'https://www.linkedin.com/in/johnnyshriqui/',
 };
 
 export const team: Person[] = [

@@ -23,8 +23,7 @@ const Label = level === 1 ? 'h2' : 'h3';
   <div class="side side-biz">
     <p class="side-title load-in" style="--i:1" aria-hidden="true">Built for business.</p>
     <div class="side-copy load-in" style="--i:2">
-      <Label class="side-label">Growing organizations</Label>
-      <p class="side-text">We work within growing organizations to improve cost efficiency and expand operations.</p>
+      <Label class="side-label">Corporations</Label>
     </div>
     <div class="side-figure load-fade">
       <HeroLive inline light />
@@ -36,7 +35,6 @@ const Label = level === 1 ? 'h2' : 'h3';
     <p class="side-title load-in" style="--i:2" aria-hidden="true">Driven by purpose.</p>
     <div class="side-copy load-in" style="--i:3">
       <Label class="side-label">Nonprofits</Label>
-      <p class="side-text">Every nonprofit faces the same fundamental challenge: unlimited demand on limited resources. We exist to close that gap.</p>
     </div>
     <div class="side-figure load-fade">
       <GapChart />
@@ -60,7 +58,6 @@ const Label = level === 1 ? 'h2' : 'h3';
     grid-template-columns: repeat(2, minmax(0, 1fr));
     /* The two sides share rows, so titles, text, graphics and links line up across the seam */
     grid-template-rows: auto auto 1fr auto;
-    min-height: min(calc(100svh - 88px), 980px);
   }
   .side {
     position: relative;
@@ -68,8 +65,8 @@ const Label = level === 1 ? 'h2' : 'h3';
     display: grid;
     grid-row: 1 / span 4;
     grid-template-rows: subgrid;
-    row-gap: clamp(1.25rem, 0.75rem + 1vw, 1.75rem);
-    padding-block: clamp(3.5rem, 2rem + 3vw, 5rem) clamp(2.25rem, 1.5rem + 2vw, 3.25rem);
+    row-gap: clamp(0.9rem, 0.6rem + 0.8vw, 1.4rem);
+    padding-block: clamp(2.5rem, 1.5rem + 2.5vw, 3.75rem) clamp(2rem, 1.25rem + 1.75vw, 2.75rem);
     overflow: hidden;
   }
   .side-biz {
@@ -138,19 +135,16 @@ const Label = level === 1 ? 'h2' : 'h3';
   .side-copy { display: grid; gap: 0.5rem; align-content: start; max-width: 44ch; }
   .side-label {
     font-family: var(--font-body);
-    font-size: 0.8125rem;
+    font-size: 0.875rem;
     font-weight: 700;
     letter-spacing: 0.16em;
     text-transform: uppercase;
     color: #2c5f8a;
   }
   .side-np .side-label { color: #8ec0e6; }
-  .side-text { font-size: var(--step-1); line-height: 1.55; color: #4a5d72; }
-  .side-np .side-text { color: rgb(238 243 248 / 0.8); }
 
-  .side-figure { align-self: end; width: 100%; max-width: 460px; }
+  .side-figure { align-self: end; width: 100%; max-width: 400px; margin-top: 0.5rem; }
   .side-biz .side-figure :global(.live-inline) { max-width: none; margin: 0; }
-  .side-biz .side-figure :global(.live-cap) { display: none; }
   .side-np .side-figure :global(.gap) { max-width: none; }
 
   .side-link {
@@ -187,7 +181,7 @@ const Label = level === 1 ? 'h2' : 'h3';
     justify-self: center;
     align-self: center;
     z-index: 3;
-    margin-top: clamp(2rem, 1rem + 3vw, 4rem);
+    margin-top: 1.5rem;
     padding: 0.85rem 1.4rem;
     border-radius: 999px;
     background: #fff;
