@@ -8,15 +8,16 @@ import NonprofitImpact from '../components/NonprofitImpact.astro';
 <Base
   title="Nonprofits"
   description="Every nonprofit faces the same fundamental challenge: unlimited demand on limited resources. Spockhart closes that gap by taking tedious, repetitive tasks off your team."
+  lightHero
 >
-  <!-- The horizon: night to day as the gap between demand and resources closes, then the light
-       room the rest of the page sits in -->
-  <Horizon
-    setup="Every nonprofit faces the same fundamental challenge:"
-    title={'Unlimited\u00A0demand on\u00A0limited resources.'}
-  />
-
+  <!-- One light room. It opens on the problem in words, over a card cut to the shape of the chart,
+       which closes its own gap as the page scrolls (Horizon.astro) -->
   <div class="page-body body-nonprofit room-light" data-body>
+    <Horizon
+      setup="Every nonprofit faces the same fundamental challenge:"
+      title={'Unlimited\u00A0demand on\u00A0limited resources.'}
+    />
+
     <NonprofitImpact />
 
     <ClosingCTA
