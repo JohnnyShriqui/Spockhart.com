@@ -7,15 +7,15 @@
  *   0 Diagnose   The lanes appear and the process is mapped, step by step. Then a piece of work
  *                runs through it, slows where the same data is typed twice, those steps turn red,
  *                and the waste is called out.
- *   1 Prototype  An empty window, Day 1. Grey wireframe rows (the design), filled with real
- *                records (the build), the day count running to 30. Then it works: each invoice
- *                is approved in turn.
+ *   1 Prototype  An empty window. Grey wireframe rows (the design), filled with real records
+ *                (the build). Then it works: each invoice is approved in turn.
  *   2 Build      The hub assembles. The tools already in use arrive one at a time, each wired in
  *                and lit as data flows. The team arrives and is trained, one by one; it goes live.
  *   3 Handover   The kit is put together on a pass, item by item, then handed across to your
  *                team, and becomes theirs.
  *
- * Timed by the scene engine (scripts/scenes.ts), which writes the story's time to --t. Each part
+ * Timed by the scene engine (scripts/scenes.ts), which writes the story's time to --t, unhurried
+ * (a little over half speed), so the stories sit calmly beside the words. Each part
  * comes in at its moment (--a) and some leave at another (--b). With reduced motion, or before
  * the script runs, it rests on the finished picture.
  */
@@ -72,13 +72,12 @@ const team = [
 const kit = ['Source code', 'Documentation', 'Admin access', 'Training notes'];
 ---
 
-<div class={`pv pv-${step}`} aria-hidden="true" data-pv data-scene data-loop={LOOP} data-still={STILL} data-rate="1" style={`--t:${STILL};--L:${LOOP}`}>
+<div class={`pv pv-${step}`} aria-hidden="true" data-pv data-scene data-loop={LOOP} data-still={STILL} data-rate="0.58" style={`--t:${STILL};--L:${LOOP}`}>
   <div class="pv-win">
   <div class="pv-bar">
     <span class="pv-dots"><i></i><i></i><i></i></span>
     <span class="pv-bar-title">{titles[step]}</span>
     {step === 0 && <span class="pv-bar-right pv-bar-tag">Process map</span>}
-    {step === 1 && <span class="pv-bar-right pv-day in" style={at(0.6)} data-count="0.7 1, 6.6 30" data-fmt="Day {}">Day 30</span>}
   </div>
   <div class="pv-body">
   <svg viewBox={views[step]} preserveAspectRatio="xMidYMid meet">
@@ -456,19 +455,6 @@ const kit = ['Source code', 'Documentation', 'Admin access', 'Training notes'];
   .pv-bar-title { color: #c9d8e6; }
   .pv-bar-right { margin-left: auto; }
   .pv-bar-tag { font-size: 0.66rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: rgb(170 195 220 / 0.6); }
-  /* The day count: it lights when the prototype is working */
-  .pv-day {
-    --on: clamp(0, (var(--t) - 6.7) * 4, 1);
-    padding: 0.18rem 0.65rem;
-    border-radius: 999px;
-    font-size: 0.72rem;
-    font-weight: 700;
-    font-variant-numeric: tabular-nums;
-    color: #8fe3ff;
-    background: rgb(63 208 255 / calc(0.08 + 0.1 * var(--on)));
-    border: 1px solid rgb(63 208 255 / calc(0.35 + 0.4 * var(--on)));
-    box-shadow: 0 0 calc(var(--on) * 12px) rgb(63 208 255 / 0.55);
-  }
   .pv-body { flex: 1; min-height: 0; display: grid; padding: clamp(0.35rem, 0.2rem + 0.5vw, 0.75rem); }
   .pv text { font-family: var(--font-body); }
 
@@ -543,7 +529,7 @@ const kit = ['Source code', 'Documentation', 'Admin access', 'Training notes'];
     stroke-linecap: round;
     stroke-dasharray: 2 12;
     filter: drop-shadow(0 0 3px rgb(63 208 255 / 0.8));
-    animation: pv-flow 1.6s linear infinite;
+    animation: pv-flow 2.8s linear infinite;
   }
   @keyframes pv-flow { to { stroke-dashoffset: -28; } }
   .pv-tile { fill: #142538; filter: drop-shadow(0 10px 16px rgb(0 0 0 / 0.35)); }
