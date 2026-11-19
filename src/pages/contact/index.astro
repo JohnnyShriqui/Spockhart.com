@@ -5,9 +5,11 @@ import Logo from '../../components/Logo.astro';
 import { site } from '../../config/site';
 ---
 
-<Base title="Contact" description="Start a conversation with Spockhart. Tell us what your team could accomplish with more time and we will reply within one business day.">
-  <!-- The desk: a dark room lit by one lamp, the form a letter lying on the desk beneath it -->
-  <section class="contact hero-dark desk" data-hero-dark>
+<Base title="Contact" description="Start a conversation with Spockhart. Tell us what your team could accomplish with more time and we will reply within one business day." lightHero>
+  <!-- A light room, like every other page; the form is the one dark card in it, standing in a pool
+       of light, and the ways to reach us directly are small raised chips beside it -->
+  <div class="page-body body-contact room-light" data-body>
+  <section class="contact">
     <div class="wrap contact-grid">
       <div class="contact-intro">
         <h1 class="load-in" style="--i:1">Start a conversation.</h1>
@@ -17,19 +19,19 @@ import { site } from '../../config/site';
           <div class="direct-options">
             <div class="direct-option">
               <p class="label">Email</p>
-              <CopyEmail />
+              <CopyEmail tilt />
             </div>
             <div class="direct-option">
               <p class="label">Phone</p>
-              <CopyEmail value={site.phone} />
+              <CopyEmail value={site.phone} tilt />
             </div>
           </div>
           <p class="small muted">{site.city}, {site.country}</p>
         </div>
       </div>
 
-      <div class="letter-stand load-in" style="--i:2">
-      <div class="contact-form-wrap on-light letter">
+      <div class="contact-stand stand lit load-in" style="--i:2">
+      <div class="contact-form-wrap contact-card" data-tilt="3" data-tilt-depth="2200" data-tilt-focus="still">
         <div class="letterhead" aria-hidden="true">
           <Logo mark={false} />
           <span class="lh-meta">{site.city}, {site.country}</span>
@@ -98,6 +100,7 @@ import { site } from '../../config/site';
       </div>
     </div>
   </section>
+  </div>
 </Base>
 
 <script>
@@ -107,7 +110,7 @@ import { site } from '../../config/site';
 
 <style>
   .contact {
-    padding-top: clamp(8.5rem, 6rem + 6vw, 11.5rem);
+    padding-top: clamp(7rem, 4.5rem + 5vw, 10rem);
     padding-bottom: var(--section);
   }
   .contact-grid {
@@ -179,55 +182,54 @@ import { site } from '../../config/site';
   }
 
   /* ==========================================================================
-     The desk. A dark room in the home page's midnight blue, lit by one lamp from above: a soft
-     light from the top of the room, and a warm pool of it on the desk where the letter lies.
+     The room and the card. The page is a light room; the form is a midnight card standing in a
+     pool of light on the wall, lifted off the floor, its letterhead and its fields written in
+     light. It leans under the pointer like every card, and holds still while you write in it.
      ========================================================================== */
-  .desk {
-    background:
-      radial-gradient(34% 40% at 72% 70%, rgb(255 242 224 / 0.13), transparent 70%),
-      radial-gradient(34% 55% at 72% -6%, rgb(214 228 250 / 0.11), transparent 72%),
-      radial-gradient(52% 72% at 82% 36%, rgb(46 104 152 / 0.28), transparent 72%),
-      radial-gradient(50% 70% at 0% 108%, rgb(42 95 142 / 0.3), transparent 72%),
-      linear-gradient(165deg, #09131e 0%, #0d1c2d 55%, #10233a 100%);
-  }
+  .contact-intro h1 { color: #1b2a3d; }
+  .contact-intro .lead { color: #4a5d72; }
+  .contact-stand { position: relative; }
+  .contact-stand.lit::after { inset: -14% -10%; }
 
-  /* ---------- The letter: paper lying back on the desk, lit from above ----------
-     It leans away from you a little, as paper on a desk does, and comes up to face you when you
-     point at it or start writing. Its shadow falls on the desk beneath it. */
-  .letter-stand { position: relative; isolation: isolate; perspective: 1800px; }
-  .letter-stand::before {
-    content: '';
-    position: absolute;
-    z-index: -1;
-    left: 3%;
-    right: 3%;
-    bottom: -34px;
-    height: 70px;
-    border-radius: 50%;
-    background: radial-gradient(closest-side, rgb(0 0 0 / 0.6), rgb(0 0 0 / 0.2) 60%, transparent);
-    filter: blur(12px);
-    pointer-events: none;
-  }
-  .letter {
+  .contact-card {
+    --ink: #eef3f8;
+    --ink-2: #b5c4d3;
+    --ink-3: #8fa1b4;
+    --rule: rgb(255 255 255 / 0.12);
+    --rule-2: rgb(255 255 255 / 0.24);
+    --accent: #8ec0e6;
+    --accent-soft: #8ec0e6;
+    --btn-bg: #eef3f8;
+    --btn-fg: #14212f;
+    --btn-bg-hover: #ffffff;
+    --paper: rgb(255 255 255 / 0.05);
+    --selection: rgb(142 192 230 / 0.3);
     position: relative;
+    isolation: isolate;
     padding: clamp(1.5rem, 1rem + 2vw, 2.75rem) clamp(1.5rem, 1rem + 2.4vw, 3rem);
     border: 0;
-    border-radius: 6px;
+    border-radius: 24px;
+    color: var(--ink);
+    color-scheme: dark;
     background:
-      radial-gradient(90% 40% at 50% 0%, #ffffff, rgb(255 255 255 / 0) 70%),
-      linear-gradient(180deg, #fcfdfe 0%, #f5f7fa 65%, #edf1f5 100%);
-    box-shadow:
-      inset 0 1px 0 #ffffff,
-      0 1px 1px rgb(0 0 0 / 0.25),
-      0 14px 24px -12px rgb(0 0 0 / 0.5),
-      0 44px 70px -30px rgb(0 0 0 / 0.65),
-      0 0 90px -20px rgb(255 242 224 / 0.16);
-    transform-origin: 50% 100%;
-    transform: rotateX(8deg);
-    transition: transform 900ms var(--ease-out);
+      radial-gradient(60% 70% at 0% 0%, rgb(46 104 152 / 0.45), transparent 70%),
+      radial-gradient(50% 60% at 100% 100%, rgb(38 96 142 / 0.28), transparent 72%),
+      linear-gradient(165deg, #0e1d2e 0%, #0a1521 100%);
+    box-shadow: var(--lift-dark);
   }
-  .letter-stand:hover .letter,
-  .letter:focus-within { transform: rotateX(0deg); }
+  /* A fine grain, so the dark reads as a material rather than a flat fill */
+  .contact-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    pointer-events: none;
+    background-image: var(--grain);
+    background-size: 200px;
+    opacity: 0.1;
+    mix-blend-mode: overlay;
+  }
 
   /* The letterhead: the wordmark and where we are, over a fine rule */
   .letterhead {
@@ -238,45 +240,74 @@ import { site } from '../../config/site';
     gap: 0.5rem 1rem;
     padding-bottom: 1rem;
     margin-bottom: clamp(1.25rem, 1rem + 0.8vw, 1.75rem);
-    border-bottom: 1px solid rgb(27 42 61 / 0.12);
+    border-bottom: 1px solid rgb(255 255 255 / 0.1);
   }
-  .letterhead :global(.logo) { color: #1b2a3d; }
-  .lh-meta { font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: #6c7f93; }
+  .letterhead :global(.logo) { color: #eef3f8; }
+  .lh-meta { font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: #8fa1b4; }
 
-  /* The fields, written on the page: a line under each, and ruled lines for the message */
-  .letter :is(.input, .select, .textarea) {
+  /* The fields, written in light: a line under each, which glows blue while you write on it,
+     and ruled lines for the message */
+  .contact-card .field label { color: #c9d6e2; }
+  .contact-card :is(.input, .select, .textarea) {
     padding-inline: 0;
     border: 0;
-    border-bottom: 1px solid rgb(27 42 61 / 0.22);
+    border-bottom: 1px solid rgb(255 255 255 / 0.2);
     border-radius: 0;
     background-color: transparent;
     box-shadow: none;
+    color: #eef3f8;
+    caret-color: #8ec0e6;
   }
-  .letter .select { padding-right: 1.75rem; background-position: calc(100% - 0.6rem) 55%, calc(100% - 0.25rem) 55%; }
-  .letter :is(.input, .select, .textarea):hover { border-bottom-color: rgb(27 42 61 / 0.45); }
-  .letter :is(.input, .select, .textarea):focus { border-bottom-color: #2c5f8a; box-shadow: 0 1px 0 #2c5f8a; }
-  .letter .textarea {
+  .contact-card :is(.input, .textarea)::placeholder { color: #6f849a; }
+  .contact-card .select {
+    padding-right: 1.75rem;
+    background-image: linear-gradient(45deg, transparent 50%, #b5c4d3 50%), linear-gradient(135deg, #b5c4d3 50%, transparent 50%);
+    background-position: calc(100% - 0.6rem) 55%, calc(100% - 0.25rem) 55%;
+  }
+  .contact-card .select option { color: #14212f; background: #eef3f8; }
+  .contact-card :is(.input, .select, .textarea):hover { border-bottom-color: rgb(255 255 255 / 0.4); }
+  .contact-card :is(.input, .select):focus {
+    border-bottom-color: #8ec0e6;
+    box-shadow: 0 1px 0 #8ec0e6, 0 8px 14px -10px rgb(63 208 255 / 0.55);
+  }
+  .contact-card .textarea {
     padding-top: 0.15rem;
     line-height: 2rem;
     border-bottom: 0;
-    background-image: repeating-linear-gradient(180deg, rgb(255 255 255 / 0) 0, rgb(255 255 255 / 0) calc(2rem - 1px), rgb(27 42 61 / 0.14) calc(2rem - 1px), rgb(27 42 61 / 0.14) 2rem);
+    background-image: repeating-linear-gradient(180deg, rgb(255 255 255 / 0) 0, rgb(255 255 255 / 0) calc(2rem - 1px), rgb(255 255 255 / 0.12) calc(2rem - 1px), rgb(255 255 255 / 0.12) 2rem);
     background-attachment: local;
   }
-  .letter .textarea:focus { box-shadow: none; }
+  .contact-card .textarea:focus {
+    box-shadow: none;
+    background-image: repeating-linear-gradient(180deg, rgb(255 255 255 / 0) 0, rgb(255 255 255 / 0) calc(2rem - 1px), rgb(142 192 230 / 0.45) calc(2rem - 1px), rgb(142 192 230 / 0.45) 2rem);
+  }
+  /* A browser's autofill keeps the card's colours rather than painting the field pale */
+  .contact-card :is(.input, .textarea):-webkit-autofill {
+    -webkit-text-fill-color: #eef3f8;
+    box-shadow: 0 0 0 100px #0f1f31 inset;
+    transition: background-color 9999s;
+  }
+  .contact-card .btn { box-shadow: inset 0 1px 0 #ffffff, 0 10px 22px -12px rgb(0 0 0 / 0.6); }
+  .contact-card .btn-ghost { color: #eef3f8; border-color: rgb(255 255 255 / 0.28); box-shadow: none; }
+  .contact-card .btn-ghost:hover { border-color: #eef3f8; }
+  .contact-card .small.muted, .contact-card .muted { color: #8fa1b4; }
+  .contact-card .form-error { color: #ff9aaa; }
+  .contact-card .eyebrow { color: #8ec0e6; }
+  .contact-card .compose h2 { color: #ffffff; }
 
-  /* The direct lines beside it: panes of glass, lit along their top */
+  /* The direct lines beside it: small white chips, raised off the wall, that lean under the pointer */
   .contact-direct :global(.copy-email) {
-    border-color: rgb(255 255 255 / 0.16);
-    background: linear-gradient(180deg, rgb(255 255 255 / 0.08), rgb(255 255 255 / 0.02));
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.1), 0 10px 20px -12px rgb(0 0 0 / 0.6);
+    border: 1px solid rgb(12 26 41 / 0.06);
+    border-radius: 12px;
+    background: linear-gradient(180deg, #ffffff 0%, #f6f8fb 100%);
+    color: #1b2a3d;
+    box-shadow: var(--lift-soft);
   }
+  .contact-direct :global(.copy-email:hover) { border-color: rgb(12 26 41 / 0.12); background: linear-gradient(180deg, #ffffff 0%, #f6f8fb 100%); }
 
-  /* Phones and tablets: the letter lies flat, so it is easy to fill in */
+  /* Phones and tablets: the card lies flat and full width */
   @media (max-width: 960px) {
-    .letter { transform: none; transition: none; }
-    .letter-stand { order: 1; margin-top: var(--s-2); }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .letter { transition: none; }
+    .contact-stand { order: 1; margin-top: var(--s-2); }
+    .contact-card { border-radius: 20px; }
   }
 </style>

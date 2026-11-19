@@ -11,7 +11,8 @@
  * Each frame of movement fires a `tilt` event on the card, so anything drawn to line up with it
  * (the lines from the home page chart to its case studies) can follow. While a control inside the
  * card is held (dragging a slider), the card settles flat and stays still, so it never moves under
- * the pointer.
+ * the pointer. A card marked data-tilt-focus="still" (the contact form) also stays flat for as long
+ * as you are writing in it.
  */
 const STRENGTH = 1.6;
 const MAX_DEG = 10;
@@ -32,6 +33,8 @@ export function initTilt() {
     let y = 0;
     let raf = 0;
     let held = false;
+    const still = el.dataset.tiltFocus === 'still';
+    const writing = () => still && el.matches(':focus-within');
 
     const frame = () => {
       x += (tx - x) * 0.09;
@@ -58,13 +61,14 @@ export function initTilt() {
     };
 
     el.addEventListener('pointermove', (e) => {
-      if (held) return;
+      if (held || writing()) return;
       const r = el.getBoundingClientRect();
       tx = Math.max(-0.5, Math.min(0.5, (e.clientX - r.left) / r.width - 0.5));
       ty = Math.max(-0.5, Math.min(0.5, (e.clientY - r.top) / r.height - 0.5));
       kick();
     });
     el.addEventListener('pointerleave', rest);
+    if (still) el.addEventListener('focusin', rest);
     el.addEventListener('pointerdown', (e) => {
       if (!(e.target as Element).closest('input, select, textarea')) return;
       held = true;
