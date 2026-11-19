@@ -12,10 +12,12 @@
  * An illustration, not data.
  */
 interface Props {
+  /** The opening of the sentence, quieter */
+  setup: string;
+  /** Its end, in full: the problem itself */
   title: string;
-  lead: string;
 }
-const { title, lead } = Astro.props;
+const { setup, title } = Astro.props;
 import Mist from './Mist.astro';
 ---
 
@@ -37,9 +39,8 @@ import Mist from './Mist.astro';
     </svg>
 
     <div class="wrap hz-copy">
-      <h1 id="hz-title" class="load-in" style="--i:1">{title}</h1>
+      <h1 id="hz-title" class="load-in" style="--i:1"><span class="hz-setup">{setup}</span> {title}</h1>
       <div class="accent-rule load-in" style="--i:2"></div>
-      <p class="lead load-in" style="--i:2">{lead}</p>
       <!-- Comes in as the gap closes -->
       <p class="hz-state">
         <span class="hz-state-1">We exist to close that gap.</span>
@@ -318,12 +319,25 @@ import Mist from './Mist.astro';
     padding-top: clamp(8.5rem, 3.5rem + 13vh, 12.5rem);
     color: color-mix(in oklab, var(--ink) calc(var(--ps) * 100%), #eef3f8);
   }
+  /* One sentence: its opening quieter, then the problem itself in full */
   .hz-copy h1 {
-    max-width: 12ch;
+    max-width: 11em;
+    font-size: clamp(2.5rem, 1.5rem + 3.2vw, 4.75rem);
+    line-height: 1.04;
+    text-wrap: balance;
     color: color-mix(in oklab, #1b2a3d calc(var(--ps) * 100%), #ffffff);
     text-shadow: 0 14px 30px rgb(0 0 0 / calc(0.4 * (1 - var(--ps))));
   }
-  .hz-copy .lead { max-width: 34rem; color: color-mix(in oklab, #4a5d72 calc(var(--ps) * 100%), #b5c4d3); }
+  .hz-setup {
+    display: block;
+    margin-bottom: 0.5em;
+    font-size: clamp(1.1875rem, 0.8rem + 1.1vw, 1.875rem);
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    text-wrap: pretty;
+    color: color-mix(in oklab, #5b6e83 calc(var(--ps) * 100%), #9fb2c6);
+    text-shadow: none;
+  }
   .hz-copy .accent-rule { background: color-mix(in oklab, #2c5f8a calc(var(--ps) * 100%), #8ec0e6); }
   /* What we are for, arriving as the gap closes */
   /* The answer, large, in the brand's blue: it rises into place as the gap closes */
@@ -347,6 +361,7 @@ import Mist from './Mist.astro';
 
   @media (max-width: 640px) {
     .hz-copy { padding-top: 6.5rem; gap: var(--s-4); }
+    .hz-copy h1 { font-size: clamp(2rem, 1.2rem + 3.6vw, 2.5rem); }
     .hz-label { font-size: 11px; }
     .hz-label-gap { font-size: 17px; }
   }
