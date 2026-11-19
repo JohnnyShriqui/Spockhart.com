@@ -27,6 +27,10 @@ const { step } = Astro.props;
 
 const LOOP = 12;
 const STILL = 10.6;
+/* Each story sits in a window, as the graphics on Our Work do: its title bar, then the picture,
+   framed to what that story draws */
+const titles = ['Order to invoice', 'Invoice approvals', 'Connected to your tools', 'Handover'];
+const views = ['6 80 548 298', '40 108 482 232', '44 26 472 322', '50 58 506 284'];
 const at = (a: number, b?: number, d?: number) => `--a:${a}${b !== undefined ? `;--b:${b}` : ''}${d !== undefined ? `;--d:${d}` : ''}`;
 
 /* An arrowhead, landing at (x, y), pointing r, l, u or d */
@@ -69,7 +73,15 @@ const kit = ['Source code', 'Documentation', 'Admin access', 'Training notes'];
 ---
 
 <div class={`pv pv-${step}`} aria-hidden="true" data-pv data-scene data-loop={LOOP} data-still={STILL} data-rate="1" style={`--t:${STILL};--L:${LOOP}`}>
-  <svg viewBox="0 0 560 400" preserveAspectRatio="xMidYMid meet">
+  <div class="pv-win">
+  <div class="pv-bar">
+    <span class="pv-dots"><i></i><i></i><i></i></span>
+    <span class="pv-bar-title">{titles[step]}</span>
+    {step === 0 && <span class="pv-bar-right pv-bar-tag">Process map</span>}
+    {step === 1 && <span class="pv-bar-right pv-day in" style={at(0.6)} data-count="0.7 1, 6.6 30" data-fmt="Day {}">Day 30</span>}
+  </div>
+  <div class="pv-body">
+  <svg viewBox={views[step]} preserveAspectRatio="xMidYMid meet">
     <defs>
       <pattern id={`pv-dots-${step}`} width="22" height="22" patternUnits="userSpaceOnUse">
         <circle cx="1" cy="1" r="1" fill="rgb(255 255 255 / 0.06)"></circle>
@@ -101,8 +113,6 @@ const kit = ['Source code', 'Documentation', 'Admin access', 'Training notes'];
       {
         step === 0 && (
           <g>
-            <text x="12" y="40" class="pv-kicker in" style={at(0.2)}>Process map</text>
-            <text x="12" y="64" class="pv-title in" style={at(0.35)}>Order to invoice</text>
 
             {/* The lanes */}
             <path d="M24 84 H536 Q550 84 550 98 V358 Q550 372 536 372 H24 Q10 372 10 358 V98 Q10 84 24 84 Z" pathLength="1" class="pv-lanes draw" style={at(0.3, undefined, 1)}></path>
@@ -205,24 +215,6 @@ const kit = ['Source code', 'Documentation', 'Admin access', 'Training notes'];
       {
         step === 1 && (
           <g>
-            {/* The window: empty at first */}
-            <g class="pop" style={at(0.2)}>
-              <rect x="34" y="44" width="492" height="316" rx="18" class="pv-window"></rect>
-              <rect x="34" y="44" width="492" height="316" rx="18" class="pv-window-edge"></rect>
-              <circle cx="60" cy="70" r="5" class="pv-dot"></circle>
-              <circle cx="77" cy="70" r="5" class="pv-dot"></circle>
-              <circle cx="94" cy="70" r="5" class="pv-dot"></circle>
-              <line x1="34" y1="96" x2="526" y2="96" class="pv-hair"></line>
-            </g>
-            <text x="118" y="75.5" class="pv-app-title in" style={at(0.6)}>Invoice approvals</text>
-            {/* The day count, running to 30 as it is designed and built */}
-            <g transform="translate(468 70)">
-              <g class="in" style={at(0.6)}>
-                <rect x="-38" y="-13" width="76" height="26" rx="13" class="pv-tag-cyan"></rect>
-              </g>
-              <rect x="-38" y="-13" width="76" height="26" rx="13" class="pv-tag-cyan-on in" style={at(6.7)}></rect>
-              <text x="0" y="4.5" text-anchor="middle" class="pv-tag-cyan-text in" style={at(0.6)} data-count="0.7 1, 6.6 30" data-fmt="Day {}">Day 30</text>
-            </g>
             <g class="in" style={at(1.0)}>
               <text x="62" y="126" class="pv-col">Invoice</text>
               <text x="178" y="126" class="pv-col">Supplier</text>
@@ -422,6 +414,8 @@ const kit = ['Source code', 'Documentation', 'Admin access', 'Training notes'];
       }
     </g>
   </svg>
+  </div>
+  </div>
 </div>
 
 <script>
@@ -431,8 +425,51 @@ const kit = ['Source code', 'Documentation', 'Admin access', 'Training notes'];
 </script>
 
 <style>
-  .pv { position: relative; width: 100%; height: 100%; display: grid; place-items: center; }
+  .pv { position: relative; width: 100%; height: 100%; }
   .pv svg { display: block; width: 100%; height: 100%; max-height: 100%; overflow: visible; }
+
+  /* ---------- The window the story sits in: lit along its top, standing off the dark card ---------- */
+  .pv-win {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    border-radius: 14px;
+    background: #14293f;
+    border: 1px solid rgb(255 255 255 / 0.1);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06), 0 24px 44px -24px rgb(0 0 0 / 0.75), 0 2px 6px rgb(0 0 0 / 0.2);
+    overflow: hidden;
+  }
+  .pv-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 0.9rem;
+    background: #112338;
+    border-bottom: 1px solid rgb(255 255 255 / 0.08);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: #9fb6cb;
+  }
+  .pv-dots { display: flex; gap: 5px; }
+  .pv-dots i { width: 8px; height: 8px; border-radius: 50%; background: rgb(255 255 255 / 0.18); }
+  .pv-bar-title { color: #c9d8e6; }
+  .pv-bar-right { margin-left: auto; }
+  .pv-bar-tag { font-size: 0.66rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: rgb(170 195 220 / 0.6); }
+  /* The day count: it lights when the prototype is working */
+  .pv-day {
+    --on: clamp(0, (var(--t) - 6.7) * 4, 1);
+    padding: 0.18rem 0.65rem;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: #8fe3ff;
+    background: rgb(63 208 255 / calc(0.08 + 0.1 * var(--on)));
+    border: 1px solid rgb(63 208 255 / calc(0.35 + 0.4 * var(--on)));
+    box-shadow: 0 0 calc(var(--on) * 12px) rgb(63 208 255 / 0.55);
+  }
+  .pv-body { flex: 1; min-height: 0; display: grid; padding: clamp(0.35rem, 0.2rem + 0.5vw, 0.75rem); }
   .pv text { font-family: var(--font-body); }
 
   /* ---------- The story's timing: --t is now, --a when a part comes in, --b when it leaves ---------- */
