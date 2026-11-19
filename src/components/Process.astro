@@ -34,14 +34,14 @@ const steps = [
   },
   {
     when: `Months 2 to ${site.offer.minimumMonths}`,
-    name: 'Build and embed.',
+    name: 'Build.',
     body: 'We develop the solution, prove it where it will be used, and refine it.',
     inside: 'Integrated with your systems, and your team ready to use it.',
     customers: 'Tested with real customers, demand measured, the offering refined.',
   },
   {
     when: `Month ${site.offer.minimumMonths}`,
-    name: 'Hand over.',
+    name: 'Handover.',
     body: 'We hand it over fully documented, for your team to own and run.',
     inside: 'A documented solution your team owns and operates.',
     customers: 'Brought to market, with your team equipped to run and grow it.',
@@ -172,18 +172,6 @@ const steps = [
         l.setAttribute('y2', String(h));
         l.setAttribute('class', 'proc-col');
         cols.append(l);
-      });
-      // Each step's stretch of time, as a bar of light along its tread, as on a Gantt chart
-      pts.forEach((p, i) => {
-        const b = document.createElementNS(NS, 'line');
-        b.setAttribute('x1', String(p.x + 7));
-        b.setAttribute('x2', String(xs[i + 1] - (i < 3 ? R + 4 : 0)));
-        b.setAttribute('y1', String(p.y));
-        b.setAttribute('y2', String(p.y));
-        b.setAttribute('pathLength', '1');
-        b.setAttribute('class', 'proc-bar');
-        b.style.setProperty('--n', String(i));
-        barsG.append(b);
       });
       // A point where each step begins, and one where the last ends
       xs.forEach((x, i) => {
