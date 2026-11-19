@@ -45,9 +45,13 @@ const sectionsOf = (body = '') =>
   lightHero
 >
 
-  <!-- One light room from top to bottom, opening straight on the case studies -->
-  <div class="page-body work-body room-light" data-body>
-  <h1 class="visually-hidden">Our Work</h1>
+  <!-- One light room from top to bottom: a title on the wall, as on the other pages, then the
+       case studies -->
+  <div class="page-body work-body room-light room-blue" data-body>
+  <header class="wrap page-head">
+    <h1 class="load-in" style="--i:1">Our Work.</h1>
+    <p class="lead load-in" style="--i:2">What we’re building now, and what our team delivered before Spockhart.</p>
+  </header>
 
   <section class="projects" aria-label="Case studies" data-projects>
     {
@@ -480,8 +484,10 @@ const sectionsOf = (body = '') =>
     .rv-stage::after { bottom: -26px; height: 40px; }
     .cs-panel-inner > .wrap { padding-block: 1.5rem 3rem; }
   }
-  /* The first case study opens the page, clear of the header */
-  .projects > .project:first-child { padding-top: clamp(7.5rem, 5.5rem + 4vw, 10.5rem); }
+  /* The title sits where Contact's does; the first case study follows a short way below */
+  .page-head { padding-top: clamp(7rem, 4.5rem + 5vw, 10rem); }
+  .page-head .lead { margin-top: var(--s-4); }
+  .projects > .project:first-child { padding-top: clamp(2.5rem, 1.5rem + 2.5vw, 4rem); }
 
   /* ---------- The marker above each case study, and what it means on hover ---------- */
   .project-origin { position: relative; cursor: default; outline: none; }
@@ -552,7 +558,8 @@ const sectionsOf = (body = '') =>
   }
   .client-logo :global(svg) { width: 70%; height: auto; }
   @media (max-width: 640px) {
-    .projects > .project:first-child { padding-top: 6rem; }
+    .page-head { padding-top: 6.5rem; }
+    .projects > .project:first-child { padding-top: 2rem; }
     .client-logo { width: 41px; height: 41px; border-radius: 11px; }
   }
 

@@ -852,6 +852,27 @@ main > .hero-dark:last-child { border-bottom: 1px solid rgb(255 255 255 / 0.07);
   opacity: 0.05;
   mix-blend-mode: multiply;
 }
+/* The light room in blue and white: the home hero's light, by day. Soft steel-blue glows wash in
+   from the edges, one in the top corner and then alternating sides all the way down, over a
+   white wall that cools toward blue as the page goes on. */
+.room-light.room-blue {
+  background:
+    radial-gradient(520px 420px at 96% 2%, rgb(78 140 206 / 0.32), transparent 72%) no-repeat,
+    radial-gradient(900px 700px at 100% 0%, rgb(122 174 226 / 0.58), rgb(122 174 226 / 0.22) 48%, transparent 76%) no-repeat,
+    radial-gradient(620px 420px at 6% 150px, rgb(255 255 255 / 0.9), rgb(255 255 255 / 0.35) 50%, transparent 76%) no-repeat,
+    radial-gradient(640px 760px at 0% 50%, rgb(98 156 214 / 0.42), rgb(98 156 214 / 0.14) 50%, transparent 74%) left 0 top 760px / 1200px 2400px repeat-y,
+    radial-gradient(700px 780px at 100% 50%, rgb(118 172 228 / 0.46), rgb(118 172 228 / 0.16) 50%, transparent 74%) right 0 top 1960px / 1200px 2400px repeat-y,
+    linear-gradient(180deg, #f6f9fc 0%, #eef3f8 45%, #e6eef6 100%);
+}
+@media (max-width: 760px) {
+  .room-light.room-blue {
+    background:
+      radial-gradient(460px 400px at 100% 0%, rgb(118 172 226 / 0.55), rgb(118 172 226 / 0.2) 50%, transparent 76%) no-repeat,
+      radial-gradient(380px 520px at 0% 50%, rgb(98 156 214 / 0.36), transparent 74%) left 0 top 700px / 100% 1800px repeat-y,
+      radial-gradient(400px 540px at 100% 50%, rgb(118 172 228 / 0.4), transparent 74%) right 0 top 1600px / 100% 1800px repeat-y,
+      linear-gradient(180deg, #f6f9fc 0%, #eef3f8 45%, #e6eef6 100%);
+  }
+}
 /* A pool of light on the wall behind whatever it's on, fading out well beyond its edges */
 .lit { position: relative; isolation: isolate; }
 .lit::after {

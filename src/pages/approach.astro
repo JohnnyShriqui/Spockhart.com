@@ -12,9 +12,12 @@ import { site } from '../config/site';
 >
   <!-- One light room. It opens straight on the process: four steps, each a large card, descending
        to the right as a staircase (Process.astro), then the closing card -->
-  <div class="page-body body-approach room-light" data-body>
-    <!-- The page opens straight on the first step; its title is there for screen readers and search -->
-    <h1 class="visually-hidden">Approach: how we work, in four steps</h1>
+  <div class="page-body body-approach room-light room-blue" data-body>
+    <!-- A title on the wall, as on the other pages, then the four steps -->
+    <header class="wrap page-head">
+      <h1 class="load-in" style="--i:1">Our Approach.</h1>
+      <p class="lead load-in" style="--i:2">From first look to handover, in four steps.</p>
+    </header>
 
     <Process />
 
@@ -27,9 +30,12 @@ import { site } from '../config/site';
 </Base>
 
 <style>
-  /* The page opens straight on the first step, just under the header */
-  .body-approach :global(.proc) { padding-top: clamp(8.5rem, 7rem + 3vw, 10.5rem); }
+  /* The title sits where Contact's does; the first step follows a short way below */
+  .page-head { padding-top: clamp(7rem, 4.5rem + 5vw, 10rem); }
+  .page-head .lead { margin-top: var(--s-4); }
+  .body-approach :global(.proc) { padding-top: clamp(3rem, 2rem + 2.5vw, 4.5rem); }
   @media (max-width: 640px) {
-    .body-approach :global(.proc) { padding-top: 6.75rem; }
+    .page-head { padding-top: 6.5rem; }
+    .body-approach :global(.proc) { padding-top: 2.5rem; }
   }
 </style>
