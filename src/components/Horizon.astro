@@ -38,20 +38,13 @@ const { setup, title } = Astro.props;
         <!-- The card's shadow on the floor -->
         <div class="hz-floor"></div>
         <div class="hz-card" data-tilt="3" data-tilt-depth="2400">
-          <!-- The card's body, on a layer of its own, so its shadow is cast by the graphics card
-               rather than redrawn with every frame -->
-          <svg class="hz-svg hz-body">
+          <svg class="hz-svg" data-hz-svg>
             <defs>
+              <clipPath id="hz-clip"><path data-hz-clip /></clipPath>
               <linearGradient id="hz-fill" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0" data-hz-fill-top />
                 <stop offset="1" data-hz-fill-low />
               </linearGradient>
-            </defs>
-            <path class="hz-shape" data-hz-shape />
-          </svg>
-          <svg class="hz-svg" data-hz-svg>
-            <defs>
-              <clipPath id="hz-clip"><path data-hz-clip /></clipPath>
               <radialGradient id="hz-glow" cx="0.8" cy="0.15" r="0.65">
                 <stop offset="0" stop-color="#2e6898" stop-opacity="0.55" />
                 <stop offset="1" stop-color="#2e6898" stop-opacity="0" />
@@ -77,6 +70,8 @@ const { setup, title } = Astro.props;
               </linearGradient>
             </defs>
 
+            <!-- The card -->
+            <path class="hz-shape" data-hz-shape />
             <g clip-path="url(#hz-clip)">
               <rect class="hz-glow" width="100%" height="100%" fill="url(#hz-glow)" />
               <rect class="hz-dawn" data-hz-dawn fill="url(#hz-dawn)" />
@@ -86,8 +81,6 @@ const { setup, title } = Astro.props;
               <path class="hz-gap" data-hz-gap />
               <path class="hz-gap-hatch" data-hz-gap-hatch />
               <path class="hz-was hz-was-res" data-hz-was-res />
-              <path class="hz-soft hz-res-soft" data-hz-res-soft />
-              <path class="hz-soft hz-res-glow" data-hz-res-glow />
               <path class="hz-line hz-res" data-hz-res />
               <path class="hz-core" data-hz-res-core />
               <!-- Time, along the foot of the card -->
@@ -104,8 +97,6 @@ const { setup, title } = Astro.props;
             <path class="hz-was hz-was-demand" data-hz-was-demand />
             <path class="hz-move hz-move-down" data-hz-move-down />
             <!-- Its top edge: the demand line -->
-            <path class="hz-soft hz-edge-soft" data-hz-edge-soft />
-            <path class="hz-soft hz-edge-glow" data-hz-edge-glow />
             <path class="hz-edge" data-hz-edge />
             <path class="hz-core" data-hz-edge-core />
             <g class="hz-node hz-node-res">
@@ -190,8 +181,6 @@ const { setup, title } = Astro.props;
       gapHatch: q<SVGPathElement>('gap-hatch'),
       wasRes: q<SVGPathElement>('was-res'),
       res: q<SVGPathElement>('res'),
-      resGlow: q<SVGPathElement>('res-glow'),
-      resSoft: q<SVGPathElement>('res-soft'),
       resCore: q<SVGPathElement>('res-core'),
       axis: q<SVGPathElement>('axis'),
       time: q<SVGTextElement>('time'),
@@ -201,8 +190,6 @@ const { setup, title } = Astro.props;
       wasDemand: q<SVGPathElement>('was-demand'),
       moveDown: q<SVGPathElement>('move-down'),
       edge: q<SVGPathElement>('edge'),
-      edgeGlow: q<SVGPathElement>('edge-glow'),
-      edgeSoft: q<SVGPathElement>('edge-soft'),
       edgeCore: q<SVGPathElement>('edge-core'),
       dotRes: q<SVGCircleElement>('dot-res'),
       haloRes: q<SVGCircleElement>('halo-res'),
@@ -219,6 +206,7 @@ const { setup, title } = Astro.props;
     let r = 22;
     let ex = 0;
     let phone = false;
+    let ticking = false;
 
     // The card's own size: its foot along the bottom, the top of the drawing just under its top
     const measure = () => {
@@ -280,15 +268,14 @@ const { setup, title } = Astro.props;
       return `M0 ${(y0 + r).toFixed(1)} Q0 ${y0.toFixed(1)} ${r} ${at(d, r).toFixed(1)} ${part(d, r, W - r)} Q${W.toFixed(1)} ${y1.toFixed(1)} ${W.toFixed(1)} ${(y1 + r).toFixed(1)}`;
     };
 
-    // How far through the scene the page has scrolled, 0 to 1
-    const scrolled = () => {
-      if (reduce.matches) return 1;
-      const b = hz.getBoundingClientRect();
-      const run = b.height - window.innerHeight;
-      return run > 0 ? clamp(-b.top / run) : 1;
-    };
-
-    const render = (p: number) => {
+    const draw = () => {
+      ticking = false;
+      let p = 1;
+      if (!reduce.matches) {
+        const b = hz.getBoundingClientRect();
+        const run = b.height - window.innerHeight;
+        p = run > 0 ? clamp(-b.top / run) : 1;
+      }
       // The lines move first; the card brightens with them; the lines and tags turn from their
       // night colours to their day ones together, quickly, as the card passes the middle
       const pl = smooth(0.06, 0.78, p);
@@ -313,9 +300,11 @@ const { setup, title } = Astro.props;
       el.shape.setAttribute('d', shape);
       el.clip.setAttribute('d', shape);
       const rim = edge(d);
-      for (const e of [el.edge, el.edgeCore, el.edgeGlow, el.edgeSoft]) e.setAttribute('d', rim);
+      el.edge.setAttribute('d', rim);
+      el.edgeCore.setAttribute('d', rim);
       const sPath = curve(s);
-      for (const e of [el.res, el.resCore, el.resGlow, el.resSoft]) e.setAttribute('d', sPath);
+      el.res.setAttribute('d', sPath);
+      el.resCore.setAttribute('d', sPath);
       el.met.setAttribute('d', `${sPath} L${W.toFixed(1)} ${base} L0 ${base} Z`);
       el.gap.setAttribute('d', `${curve(d)} ${back(s)} Z`);
       el.gapHatch.setAttribute('d', `${curve(d)} ${back(s)} Z`);
@@ -355,39 +344,20 @@ const { setup, title } = Astro.props;
       el.moveDown.setAttribute('d', arrow(at(demand0, mx), at(d, mx)));
       el.moveUp.setAttribute('d', arrow(at(res0, mx), at(s, mx)));
     };
-    /* The scene follows the scroll with a little give: it glides to where the page has got to
-       rather than jumping there, so a mouse wheel's steps become one continuous movement */
-    let target = scrolled();
-    let shown = target;
-    let last = 0;
-    let raf = 0;
-    const frame = (now: number) => {
-      const dt = last ? Math.min(64, now - last) : 16;
-      last = now;
-      shown += (target - shown) * (1 - Math.exp(-dt / 120));
-      if (Math.abs(target - shown) < 0.0004) shown = target;
-      render(shown);
-      if (shown !== target) raf = requestAnimationFrame(frame);
-      else {
-        raf = 0;
-        last = 0;
-      }
-    };
-    const follow = () => {
-      target = scrolled();
-      if (!raf && target !== shown) raf = requestAnimationFrame(frame);
+    const queue = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(draw);
     };
 
     if (!reduce.matches) hz.classList.add('hz-live');
     measure();
-    target = shown = scrolled();
-    render(shown);
+    draw();
     hz.classList.add('hz-drawn');
-    window.addEventListener('scroll', follow, { passive: true });
+    window.addEventListener('scroll', queue, { passive: true });
     window.addEventListener('resize', () => {
       measure();
-      render(shown);
-      follow();
+      queue();
     }, { passive: true });
   }
   initHorizon();
@@ -508,18 +478,15 @@ const { setup, title } = Astro.props;
   .hz:not(.hz-drawn) .hz-svg, .hz:not(.hz-drawn) .hz-chip { visibility: hidden; }
 
   /* The card itself: lifted off the floor, its edge lit, in whatever colour the hour gives it */
-  .hz-body {
-    filter:
-      drop-shadow(0 1px 1px rgb(12 26 41 / 0.12))
-      drop-shadow(0 8px 10px rgb(12 26 41 / 0.13))
-      drop-shadow(0 30px 34px rgb(12 26 41 / 0.22));
-    will-change: filter;
-  }
   .hz-shape {
     fill: url(#hz-fill);
     stroke: color-mix(in oklab, rgb(12 26 41 / 0.07) calc(var(--ps) * 100%), rgb(255 255 255 / 0.07));
     stroke-width: 1;
     pointer-events: visiblePainted;
+    filter:
+      drop-shadow(0 1px 1px rgb(12 26 41 / 0.12))
+      drop-shadow(0 8px 10px rgb(12 26 41 / calc(0.1 + 0.06 * (1 - var(--ps)))))
+      drop-shadow(0 30px 34px rgb(12 26 41 / calc(0.16 + 0.12 * (1 - var(--ps)))));
   }
   .hz-glow { opacity: var(--night); }
   .hz-dawn { opacity: var(--dawn); }
@@ -539,15 +506,19 @@ const { setup, title } = Astro.props;
   /* The lines: lightsabers by night, a glowing colour with a white-hot core; by day, the brand's red
      and blue, drawn firmly */
   .hz-line, .hz-edge { fill: none; stroke-width: calc(2.5px + 0.5px * var(--ps)); stroke-linecap: round; stroke-linejoin: round; }
-  .hz-edge { stroke: color-mix(in oklab, #b0463e calc(var(--ps) * 100%), #ff3b5c); }
-  .hz-res { stroke: color-mix(in oklab, #2c5f8a calc(var(--ps) * 100%), #3fd0ff); }
-  /* Their glow by night: soft, wider strokes beneath them, drawn rather than blurred, so the
-     scene stays smooth as it moves */
-  .hz-soft { fill: none; stroke-linecap: round; stroke-linejoin: round; }
-  .hz-edge-glow, .hz-edge-soft { stroke: #ff3b5c; }
-  .hz-res-glow, .hz-res-soft { stroke: #3fd0ff; }
-  .hz-edge-glow, .hz-res-glow { stroke-width: 6; opacity: calc(0.2 * (1 - var(--ps))); }
-  .hz-edge-soft, .hz-res-soft { stroke-width: 15; opacity: calc(0.07 * (1 - var(--ps))); }
+  .hz-edge {
+    stroke: color-mix(in oklab, #b0463e calc(var(--ps) * 100%), #ff3b5c);
+    filter:
+      drop-shadow(0 0 3px rgb(255 59 92 / calc(0.95 * (1 - var(--ps)))))
+      drop-shadow(0 0 16px rgb(255 59 92 / calc(0.45 * (1 - var(--ps)))));
+  }
+  .hz-res {
+    stroke: color-mix(in oklab, #2c5f8a calc(var(--ps) * 100%), #3fd0ff);
+    filter:
+      drop-shadow(0 0 3px rgb(63 208 255 / calc(0.95 * (1 - var(--ps)))))
+      drop-shadow(0 0 16px rgb(63 208 255 / calc(0.45 * (1 - var(--ps)))))
+      drop-shadow(0 4px 5px rgb(12 26 41 / calc(0.16 * var(--ps))));
+  }
   .hz-core { fill: none; stroke: #ffffff; stroke-width: 0.9; stroke-linecap: round; opacity: calc(0.7 * (1 - var(--ps))); }
 
   /* Where things go without us: dashed, appearing as the lines move away. Demand's old line is
@@ -573,6 +544,7 @@ const { setup, title } = Astro.props;
     fill: none;
     stroke: color-mix(in oklab, #b0463e calc(var(--ps) * 100%), #ff8a9c);
     stroke-width: 1.25;
+    filter: drop-shadow(0 0 3px rgb(255 59 92 / calc(0.6 * (1 - var(--ps)))));
   }
   .hz-label-gap {
     font-family: var(--font-display);
@@ -597,6 +569,7 @@ const { setup, title } = Astro.props;
     fill: var(--c);
     stroke: color-mix(in oklab, #ffffff calc(var(--ps) * 100%), #e9f6ff);
     stroke-width: 2;
+    filter: drop-shadow(0 0 6px var(--c)) drop-shadow(0 2px 3px rgb(12 26 41 / calc(0.3 * var(--ps))));
   }
 
   /* The names of the lines, in small glass tags that ride beside their ends. Demand's sits out on
@@ -617,19 +590,21 @@ const { setup, title } = Astro.props;
     letter-spacing: 0.16em;
     text-transform: uppercase;
     white-space: nowrap;
+    -webkit-backdrop-filter: blur(10px) saturate(1.3);
+    backdrop-filter: blur(10px) saturate(1.3);
     will-change: translate;
   }
   .hz-chip i { width: 7px; height: 7px; border-radius: 50%; background: var(--c); box-shadow: 0 0 8px var(--c); }
   .hz-chip-demand {
     --c: color-mix(in oklab, #b0463e calc(var(--ps) * 100%), #ff3b5c);
     color: #2a3b4f;
-    background: rgb(255 255 255 / 0.94);
+    background: rgb(255 255 255 / 0.8);
     box-shadow: var(--lift-soft);
   }
   .hz-chip-res {
     --c: color-mix(in oklab, #2c5f8a calc(var(--ps) * 100%), #3fd0ff);
     color: color-mix(in oklab, #2a3b4f calc(var(--ps) * 100%), #dbe6f0);
-    background: color-mix(in oklab, rgb(255 255 255 / 0.94) calc(var(--ps) * 100%), rgb(16 32 50 / 0.86));
+    background: color-mix(in oklab, rgb(255 255 255 / 0.8) calc(var(--ps) * 100%), rgb(16 32 50 / 0.6));
     box-shadow:
       inset 0 1px 0 rgb(255 255 255 / calc(0.12 + 0.68 * var(--ps))),
       inset 0 0 0 1px color-mix(in oklab, rgb(12 26 41 / 0.06) calc(var(--ps) * 100%), rgb(255 255 255 / 0.1)),
