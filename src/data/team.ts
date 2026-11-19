@@ -29,5 +29,5 @@ export const team: Person[] = [
   founder,
   ...advisors
     .filter((a) => a.confirmed || site.previewTeam)
-    .map((a) => ({ name: a.name, role: 'Advisory Board', photo: a.photo, linkedin: a.linkedin })),
+    .map((a) => ({ name: a.name, role: 'Advisor', photo: a.photo, linkedin: a.linkedin })),
 ];
