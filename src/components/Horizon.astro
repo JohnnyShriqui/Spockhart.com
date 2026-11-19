@@ -1,0 +1,340 @@
+---
+/**
+ * Nonprofits: the horizon. The page opens edge to edge on a night sky, with demand and resources
+ * drawn across the full width of the screen, low, like a horizon: resources nearly flat along the
+ * bottom, demand climbing away from it, and the gap between them glowing. The scene holds still on
+ * screen while you scroll through it: the lines move (demand eases down, resources rise), the gap
+ * closes, and the sky brightens from night, through dawn, to day, where the light page below
+ * carries on. The old lines stay behind, dashed, as where things go without us.
+ *
+ * Drawn to the screen's own size, so the lines always run from edge to edge. With reduced motion
+ * it opens on the finished picture, in daylight; without JavaScript, on the night scene, still.
+ * An illustration, not data.
+ */
+interface Props {
+  title: string;
+  lead: string;
+}
+const { title, lead } = Astro.props;
+---
+
+<section class="hz" data-hz data-hero-dark aria-labelledby="hz-title">
+  <div class="hz-stage">
+    <div class="hz-sky" aria-hidden="true"></div>
+    <svg class="hz-chart" aria-hidden="true" data-hz-svg>
+      <g data-hz-stars class="hz-stars"></g>
+      <line class="hz-base" data-hz-base />
+      <path class="hz-gap" data-hz-gap />
+      <path class="hz-was" data-hz-was-demand />
+      <path class="hz-was" data-hz-was-res />
+      <path class="hz-line hz-res" data-hz-res />
+      <path class="hz-line hz-demand" data-hz-demand />
+      <circle class="hz-dot hz-dot-res" r="5" data-hz-dot-res />
+      <circle class="hz-dot hz-dot-demand" r="5" data-hz-dot-demand />
+      <text class="hz-label hz-label-demand" text-anchor="end" data-hz-label-demand>Demand</text>
+      <text class="hz-label hz-label-res" text-anchor="end" data-hz-label-res>Resources</text>
+      <text class="hz-label hz-label-gap" text-anchor="middle" data-hz-label-gap>The gap</text>
+    </svg>
+
+    <div class="wrap hz-copy">
+      <h1 id="hz-title" class="load-in" style="--i:1">{title}</h1>
+      <div class="accent-rule load-in" style="--i:2"></div>
+      <p class="lead load-in" style="--i:2">{lead}</p>
+      <p class="hz-state load-in" style="--i:3" aria-hidden="true">
+        <span class="hz-state-0">Without help, demand keeps outgrowing resources.</span>
+        <span class="hz-state-1">With Spockhart, the gap closes.</span>
+      </p>
+    </div>
+  </div>
+</section>
+
+<script>
+  const NS = 'http://www.w3.org/2000/svg';
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const clamp = (v: number, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+  const smooth = (a: number, b: number, v: number) => {
+    const t = clamp((v - a) / (b - a));
+    return t * t * (3 - 2 * t);
+  };
+  const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+
+  /* The sky, top to horizon, at each moment: night, the blue hour, morning, then day (the light
+     room below). Between them it blends smoothly, never through grey. */
+  const SKY: [number, string, string, string][] = [
+    [0, '#060d17', '#0b1727', '#13253c'],
+    [0.42, '#0a1b30', '#183858', '#34679a'],
+    [0.66, '#86a9c8', '#acc6dd', '#cfe0ee'],
+    [1, '#e4eaf1', '#eaeff4', '#eef2f6'],
+  ];
+  const rgb = (h: string) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+  const skyAt = (p: number) => {
+    let k = 0;
+    while (k < SKY.length - 2 && p > SKY[k + 1][0]) k++;
+    const [a, b] = [SKY[k], SKY[k + 1]];
+    const t = smooth(a[0], b[0], p);
+    return [1, 2, 3].map((i) => {
+      const x = rgb(a[i] as string);
+      const y = rgb(b[i] as string);
+      return `rgb(${x.map((v, j) => Math.round(lerp(v, y[j], t))).join(' ')})`;
+    });
+  };
+
+  /* Each line as a cubic across the full width: four heights (0 at the baseline, 1 at the top of
+     the drawing), at x = 0, 1/3, 2/3 and 1 of the width */
+  type Curve = [number, number, number, number];
+  const demand0: Curve = [0.2, 0.26, 0.5, 0.98];
+  const res0: Curve = [0.1, 0.1, 0.12, 0.14];
+  const demand1: Curve = [0.2, 0.25, 0.4, 0.6];
+  const res1: Curve = [0.1, 0.14, 0.32, 0.5];
+
+  function initHorizon() {
+    const hz = document.querySelector<HTMLElement>('[data-hz]');
+    if (!hz || hz.dataset.ready) return;
+    hz.dataset.ready = '1';
+    const svg = hz.querySelector<SVGSVGElement>('[data-hz-svg]')!;
+    const q = <T extends Element>(k: string) => hz.querySelector<T>(`[data-hz-${k}]`)!;
+    const parts = {
+      base: q<SVGLineElement>('base'),
+      gap: q<SVGPathElement>('gap'),
+      wasDemand: q<SVGPathElement>('was-demand'),
+      wasRes: q<SVGPathElement>('was-res'),
+      res: q<SVGPathElement>('res'),
+      demand: q<SVGPathElement>('demand'),
+      dotRes: q<SVGCircleElement>('dot-res'),
+      dotDemand: q<SVGCircleElement>('dot-demand'),
+      labelDemand: q<SVGTextElement>('label-demand'),
+      labelRes: q<SVGTextElement>('label-res'),
+      labelGap: q<SVGTextElement>('label-gap'),
+      stars: q<SVGGElement>('stars'),
+    };
+    let W = 0;
+    let H = 0;
+    let top = 0;
+    let bottom = 0;
+    let p = 0;
+    let ticking = false;
+
+    // Where the drawing sits on screen: a band across the lower part of it
+    const measure = () => {
+      const r = svg.getBoundingClientRect();
+      W = r.width;
+      H = r.height;
+      const phone = W < 641;
+      // Phones: lower, below the words
+      top = H * (phone ? 0.68 : 0.36);
+      bottom = H * (phone ? 0.94 : 0.88);
+      svg.setAttribute('viewBox', `0 0 ${W.toFixed(0)} ${H.toFixed(0)}`);
+      parts.base.setAttribute('x1', '0');
+      parts.base.setAttribute('x2', W.toFixed(0));
+      parts.base.setAttribute('y1', bottom.toFixed(1));
+      parts.base.setAttribute('y2', bottom.toFixed(1));
+      // A few faint stars in the sky above the lines, the same ones every time
+      parts.stars.replaceChildren();
+      let seed = 7;
+      const rnd = () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646;
+      const n = Math.round((W * H) / 22000);
+      for (let i = 0; i < n; i++) {
+        const c = document.createElementNS(NS, 'circle');
+        c.setAttribute('cx', (rnd() * W).toFixed(1));
+        c.setAttribute('cy', (rnd() * H * 0.62).toFixed(1));
+        c.setAttribute('r', (0.5 + rnd() * 0.9).toFixed(2));
+        c.setAttribute('opacity', (0.2 + rnd() * 0.6).toFixed(2));
+        parts.stars.append(c);
+      }
+    };
+
+    const Y = (h: number) => bottom - (bottom - top) * h;
+    const curve = (c: Curve) => `M0 ${Y(c[0]).toFixed(1)} C${(W / 3).toFixed(1)} ${Y(c[1]).toFixed(1)} ${((2 * W) / 3).toFixed(1)} ${Y(c[2]).toFixed(1)} ${W.toFixed(1)} ${Y(c[3]).toFixed(1)}`;
+    const back = (c: Curve) => `L${W.toFixed(1)} ${Y(c[3]).toFixed(1)} C${((2 * W) / 3).toFixed(1)} ${Y(c[2]).toFixed(1)} ${(W / 3).toFixed(1)} ${Y(c[1]).toFixed(1)} 0 ${Y(c[0]).toFixed(1)}`;
+    const at = (c: Curve, x: number) => {
+      const t = x / W;
+      const s = 1 - t;
+      return Y(s * s * s * c[0] + 3 * s * s * t * c[1] + 3 * s * t * t * c[2] + t * t * t * c[3]);
+    };
+    const mix = (a: Curve, b: Curve, t: number) => a.map((v, i) => lerp(v, b[i], t)) as Curve;
+
+    const draw = () => {
+      ticking = false;
+      if (!reduce.matches) {
+        const r = hz.getBoundingClientRect();
+        const run = r.height - window.innerHeight;
+        p = run > 0 ? clamp(-r.top / run) : 1;
+      } else p = 1;
+      // The lines move first; the sky brightens behind them; the words and the lines turn from
+      // their night colours to their day ones together, quickly, as the sky passes the middle
+      const pl = smooth(0.06, 0.78, p);
+      const ps = smooth(0.52, 0.66, p);
+      const [top, mid, low] = skyAt(p);
+      hz.style.setProperty('--pl', pl.toFixed(3));
+      hz.style.setProperty('--ps', ps.toFixed(3));
+      hz.style.setProperty('--night', (1 - smooth(0.15, 0.5, p)).toFixed(3));
+      hz.style.setProperty('--sky-top', top);
+      hz.style.setProperty('--sky-mid', mid);
+      hz.style.setProperty('--sky-low', low);
+      // Light enough that the header reads dark on it
+      if (ps > 0.5) hz.removeAttribute('data-hero-dark');
+      else hz.setAttribute('data-hero-dark', '');
+
+      const d = mix(demand0, demand1, pl);
+      const s = mix(res0, res1, pl);
+      parts.demand.setAttribute('d', curve(d));
+      parts.res.setAttribute('d', curve(s));
+      parts.gap.setAttribute('d', `${curve(d)} ${back(s)} Z`);
+      parts.wasDemand.setAttribute('d', curve(demand0));
+      parts.wasRes.setAttribute('d', curve(res0));
+      const ex = W - Math.max(28, W * 0.05);
+      parts.dotDemand.setAttribute('cx', ex.toFixed(1));
+      parts.dotDemand.setAttribute('cy', at(d, ex).toFixed(1));
+      parts.dotRes.setAttribute('cx', ex.toFixed(1));
+      parts.dotRes.setAttribute('cy', at(s, ex).toFixed(1));
+      parts.labelDemand.setAttribute('x', (ex - 14).toFixed(1));
+      parts.labelDemand.setAttribute('y', (at(d, ex) - 16).toFixed(1));
+      parts.labelRes.setAttribute('x', (ex - 14).toFixed(1));
+      parts.labelRes.setAttribute('y', (at(s, ex) + 26).toFixed(1));
+      const gx = W * 0.74;
+      parts.labelGap.setAttribute('x', gx.toFixed(1));
+      parts.labelGap.setAttribute('y', ((at(d, gx) + at(s, gx)) / 2 + 6).toFixed(1));
+    };
+    const queue = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(draw);
+    };
+
+    if (!reduce.matches) hz.classList.add('hz-live');
+    measure();
+    draw();
+    window.addEventListener('scroll', queue, { passive: true });
+    window.addEventListener('resize', () => {
+      measure();
+      queue();
+    }, { passive: true });
+  }
+  initHorizon();
+  document.addEventListener('spockhart:view', initHorizon);
+</script>
+
+<style>
+  .hz {
+    --pl: 0;
+    --ps: 0;
+    --night: 1;
+    position: relative;
+    isolation: isolate;
+    height: 100vh;
+    height: 100svh;
+  }
+  /* Live: the scene holds on screen for a while as the page scrolls, and plays as it does */
+  .hz.hz-live { height: calc(100svh + 120vh); }
+  .hz-stage {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    height: 100svh;
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  /* ---------- The sky: night, the blue hour, morning, then day (colours from the script) ---------- */
+  .hz-sky {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(50% 60% at 86% 18%, rgb(46 102 150 / calc(0.4 * var(--night))), transparent 72%),
+      radial-gradient(40% 50% at 8% 6%, rgb(70 84 140 / calc(0.3 * var(--night))), transparent 72%),
+      radial-gradient(70% 50% at 50% 12%, rgb(255 255 255 / calc(0.7 * var(--ps))), transparent 72%),
+      /* By day, a little darker toward the walls, as the room below is, so the two meet without a seam */
+      linear-gradient(90deg, rgb(12 26 41 / calc(0.05 * var(--ps))) 0%, rgb(12 26 41 / 0) 20%, rgb(12 26 41 / 0) 80%, rgb(12 26 41 / calc(0.05 * var(--ps))) 100%),
+      linear-gradient(180deg, var(--sky-top, #060d17) 0%, var(--sky-mid, #0b1727) 58%, var(--sky-low, #13253c) 100%);
+  }
+  .hz-sky::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: var(--grain);
+    background-size: 200px;
+    opacity: calc(0.04 + 0.08 * var(--night));
+    mix-blend-mode: overlay;
+  }
+
+  /* ---------- The drawing, edge to edge ---------- */
+  .hz-chart { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  .hz-stars { fill: #fff; opacity: var(--night); }
+  .hz-base { stroke: color-mix(in oklab, rgb(27 42 61 / 0.25) calc(var(--ps) * 100%), rgb(142 192 230 / 0.35)); stroke-width: 1; }
+  /* The lines: lightsabers by night, the brand's red and blue by day */
+  .hz-line { fill: none; stroke-width: 2.75; stroke-linecap: round; }
+  .hz-demand {
+    stroke: color-mix(in oklab, #b0463e calc(var(--ps) * 100%), #ff3b5c);
+    filter: drop-shadow(0 0 4px rgb(255 59 92 / calc(0.9 * (1 - var(--ps))))) drop-shadow(0 0 14px rgb(255 59 92 / calc(0.4 * (1 - var(--ps)))));
+  }
+  .hz-res {
+    stroke: color-mix(in oklab, #2c5f8a calc(var(--ps) * 100%), #3fd0ff);
+    filter: drop-shadow(0 0 4px rgb(63 208 255 / calc(0.9 * (1 - var(--ps))))) drop-shadow(0 0 14px rgb(63 208 255 / calc(0.4 * (1 - var(--ps)))));
+  }
+  /* The gap, glowing between them */
+  .hz-gap { fill: color-mix(in oklab, rgb(176 70 62 / 0.1) calc(var(--ps) * 100%), rgb(255 59 92 / 0.12)); }
+  /* Where the lines would have gone without us: dashed, appearing as the lines move away */
+  .hz-was {
+    fill: none;
+    stroke: color-mix(in oklab, rgb(27 42 61 / 0.32) calc(var(--ps) * 100%), rgb(255 255 255 / 0.4));
+    stroke-width: 1.5;
+    stroke-dasharray: 5 7;
+    opacity: var(--pl);
+  }
+  .hz-dot-demand { fill: color-mix(in oklab, #b0463e calc(var(--ps) * 100%), #ff3b5c); }
+  .hz-dot-res { fill: color-mix(in oklab, #2c5f8a calc(var(--ps) * 100%), #3fd0ff); }
+  .hz-dot { stroke: color-mix(in oklab, #eef2f6 calc(var(--ps) * 100%), #0b1522); stroke-width: 2; }
+  .hz-label {
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    fill: color-mix(in oklab, #4a5d72 calc(var(--ps) * 100%), #b5c4d3);
+  }
+  .hz-label-gap {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 400;
+    letter-spacing: 0;
+    text-transform: none;
+    font-style: italic;
+    fill: color-mix(in oklab, #b0463e calc(var(--ps) * 100%), #ff8a9c);
+    /* It fades as the gap closes, so it never sits on the lines */
+    opacity: calc(1 - var(--pl) * 1.2);
+  }
+
+  /* ---------- The words, top left, white by night and navy by day ---------- */
+  .hz-copy {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: var(--s-5);
+    justify-items: start;
+    padding-top: clamp(7.5rem, 5.5rem + 5vh, 10rem);
+    color: color-mix(in oklab, var(--ink) calc(var(--ps) * 100%), #eef3f8);
+  }
+  .hz-copy h1 {
+    max-width: 12ch;
+    color: color-mix(in oklab, #1b2a3d calc(var(--ps) * 100%), #ffffff);
+    text-shadow: 0 14px 30px rgb(0 0 0 / calc(0.4 * (1 - var(--ps))));
+  }
+  .hz-copy .lead { max-width: 34rem; color: color-mix(in oklab, #4a5d72 calc(var(--ps) * 100%), #b5c4d3); }
+  .hz-copy .accent-rule { background: color-mix(in oklab, #2c5f8a calc(var(--ps) * 100%), #8ec0e6); }
+  /* What the scene is saying: without help, then with us */
+  .hz-state { display: grid; margin-top: var(--s-2); font-family: var(--font-display); font-size: clamp(1.125rem, 1rem + 0.4vw, 1.375rem); }
+  .hz-state > span { grid-area: 1 / 1; transition: opacity 500ms var(--ease); }
+  .hz-state-0 { color: color-mix(in oklab, #b0463e calc(var(--ps) * 100%), #ff8a9c); opacity: calc(1 - var(--pl) * 2.2); }
+  .hz-state-1 { color: color-mix(in oklab, #2c5f8a calc(var(--ps) * 100%), #8ec0e6); opacity: calc(var(--pl) * 2.2 - 1.2); }
+
+  @media (max-width: 640px) {
+    .hz-copy { padding-top: 6.5rem; gap: var(--s-4); }
+    .hz-label { font-size: 11px; }
+    .hz-label-gap { font-size: 17px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hz-state-0 { display: none; }
+    .hz-state-1 { opacity: 1; }
+  }
+</style>
