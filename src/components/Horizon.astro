@@ -24,19 +24,48 @@ import Mist from './Mist.astro';
 <section class="hz" data-hz data-hero-dark aria-labelledby="hz-title">
   <div class="hz-stage">
     <div class="hz-sky" aria-hidden="true"><Mist /></div>
+    <!-- Graph paper, fine, ruled to the horizon; strongest where the drawing is -->
+    <div class="hz-grid" aria-hidden="true"></div>
+    <!-- The ground the drawing stands on, with the horizon's lit edge -->
+    <div class="hz-floor" aria-hidden="true"></div>
     <svg class="hz-chart" aria-hidden="true" data-hz-svg>
-      <line class="hz-base" data-hz-base />
+      <defs>
+        <pattern id="hz-hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+          <line x1="0" y1="0" x2="0" y2="8" class="hz-hatch-line" />
+        </pattern>
+        <linearGradient id="hz-gapfill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" class="hz-gapfill-top" />
+          <stop offset="1" class="hz-gapfill-low" />
+        </linearGradient>
+      </defs>
+      <g class="hz-ticks" data-hz-ticks></g>
+      <text class="hz-axis" text-anchor="end" data-hz-time>Time</text>
       <path class="hz-gap" data-hz-gap />
+      <path class="hz-gap-hatch" data-hz-gap-hatch />
       <path class="hz-was" data-hz-was-demand />
       <path class="hz-was" data-hz-was-res />
       <path class="hz-line hz-res" data-hz-res />
+      <path class="hz-core" data-hz-res-core />
       <path class="hz-line hz-demand" data-hz-demand />
-      <circle class="hz-dot hz-dot-res" r="5" data-hz-dot-res />
-      <circle class="hz-dot hz-dot-demand" r="5" data-hz-dot-demand />
-      <text class="hz-label hz-label-demand" text-anchor="end" data-hz-label-demand>Demand</text>
-      <text class="hz-label hz-label-res" text-anchor="end" data-hz-label-res>Resources</text>
-      <text class="hz-label hz-label-gap" text-anchor="middle" data-hz-label-gap>The gap</text>
+      <path class="hz-core" data-hz-demand-core />
+      <!-- By night, the gap measured; as it closes, what moved: demand eased down, resources raised -->
+      <g class="hz-measure">
+        <path class="hz-bracket" data-hz-bracket />
+        <text class="hz-label-gap" text-anchor="end" data-hz-label-gap>The gap</text>
+      </g>
+      <path class="hz-move hz-move-down" data-hz-move-down />
+      <path class="hz-move hz-move-up" data-hz-move-up />
+      <g class="hz-node hz-node-res">
+        <circle class="hz-halo" r="12" data-hz-halo-res />
+        <circle class="hz-dot" r="4.5" data-hz-dot-res />
+      </g>
+      <g class="hz-node hz-node-demand">
+        <circle class="hz-halo" r="12" data-hz-halo-demand />
+        <circle class="hz-dot" r="4.5" data-hz-dot-demand />
+      </g>
     </svg>
+    <span class="hz-chip hz-chip-demand" aria-hidden="true" data-hz-chip-demand><i></i>Demand</span>
+    <span class="hz-chip hz-chip-res" aria-hidden="true" data-hz-chip-res><i></i>Resources</span>
 
     <div class="wrap hz-copy">
       <h1 id="hz-title" class="load-in" style="--i:1"><span class="hz-setup">{setup}</span> {title}</h1>
@@ -95,17 +124,26 @@ import Mist from './Mist.astro';
     const svg = hz.querySelector<SVGSVGElement>('[data-hz-svg]')!;
     const q = <T extends Element>(k: string) => hz.querySelector<T>(`[data-hz-${k}]`)!;
     const parts = {
-      base: q<SVGLineElement>('base'),
+      ticks: q<SVGGElement>('ticks'),
+      time: q<SVGTextElement>('time'),
       gap: q<SVGPathElement>('gap'),
+      gapHatch: q<SVGPathElement>('gap-hatch'),
       wasDemand: q<SVGPathElement>('was-demand'),
       wasRes: q<SVGPathElement>('was-res'),
       res: q<SVGPathElement>('res'),
+      resCore: q<SVGPathElement>('res-core'),
       demand: q<SVGPathElement>('demand'),
-      dotRes: q<SVGCircleElement>('dot-res'),
-      dotDemand: q<SVGCircleElement>('dot-demand'),
-      labelDemand: q<SVGTextElement>('label-demand'),
-      labelRes: q<SVGTextElement>('label-res'),
+      demandCore: q<SVGPathElement>('demand-core'),
+      bracket: q<SVGPathElement>('bracket'),
       labelGap: q<SVGTextElement>('label-gap'),
+      moveDown: q<SVGPathElement>('move-down'),
+      moveUp: q<SVGPathElement>('move-up'),
+      dotRes: q<SVGCircleElement>('dot-res'),
+      haloRes: q<SVGCircleElement>('halo-res'),
+      dotDemand: q<SVGCircleElement>('dot-demand'),
+      haloDemand: q<SVGCircleElement>('halo-demand'),
+      chipDemand: q<HTMLElement>('chip-demand'),
+      chipRes: q<HTMLElement>('chip-res'),
     };
     let W = 0;
     let H = 0;
@@ -115,19 +153,35 @@ import Mist from './Mist.astro';
     let ticking = false;
 
     // Where the drawing sits on screen: a band across the lower part of it
+    let phone = false;
+    let ex = 0;
     const measure = () => {
       const r = svg.getBoundingClientRect();
       W = r.width;
       H = r.height;
-      const phone = W < 641;
+      phone = W < 641;
       // Phones: lower, below the words
       top = H * (phone ? 0.68 : 0.42);
       bottom = H * (phone ? 0.94 : 0.93);
+      ex = W - Math.max(28, W * 0.05);
       svg.setAttribute('viewBox', `0 0 ${W.toFixed(0)} ${H.toFixed(0)}`);
-      parts.base.setAttribute('x1', '0');
-      parts.base.setAttribute('x2', W.toFixed(0));
-      parts.base.setAttribute('y1', bottom.toFixed(1));
-      parts.base.setAttribute('y2', bottom.toFixed(1));
+      // The grid is ruled from the horizon up, and from the end of the lines leftward
+      const cell = phone ? 40 : 60;
+      hz.style.setProperty('--cell', `${cell}px`);
+      hz.style.setProperty('--base', `${bottom.toFixed(1)}px`);
+      hz.style.setProperty('--grid-x', `${(ex % cell).toFixed(1)}px`);
+      // A tick under every other line of the grid, along the horizon
+      parts.ticks.replaceChildren();
+      for (let x = ex % (cell * 2); x < W; x += cell * 2) {
+        const t = document.createElementNS(NS, 'line');
+        t.setAttribute('x1', x.toFixed(1));
+        t.setAttribute('x2', x.toFixed(1));
+        t.setAttribute('y1', bottom.toFixed(1));
+        t.setAttribute('y2', (bottom + 6).toFixed(1));
+        parts.ticks.append(t);
+      }
+      parts.time.setAttribute('x', ex.toFixed(1));
+      parts.time.setAttribute('y', (bottom + (phone ? 20 : 24)).toFixed(1));
     };
 
     const Y = (h: number) => bottom - (bottom - top) * h;
@@ -157,6 +211,11 @@ import Mist from './Mist.astro';
       hz.style.setProperty('--say', smooth(0.42, 0.86, pl).toFixed(3));
       hz.style.setProperty('--ps', ps.toFixed(3));
       hz.style.setProperty('--night', (1 - smooth(0.15, 0.5, p)).toFixed(3));
+      // First light at the horizon: it rises through the blue hour, then settles as the day comes
+      hz.style.setProperty('--dawn', (smooth(0.3, 0.56, p) * (1 - 0.65 * smooth(0.64, 0.96, p))).toFixed(3));
+      // The gap's measure fades as it closes; the arrows showing what moved come in after it
+      hz.style.setProperty('--measure', (1 - smooth(0.18, 0.5, pl)).toFixed(3));
+      hz.style.setProperty('--moves', smooth(0.45, 0.85, pl).toFixed(3));
       hz.style.setProperty('--sky-top', top);
       hz.style.setProperty('--sky-mid', mid);
       hz.style.setProperty('--sky-low', low);
@@ -170,23 +229,48 @@ import Mist from './Mist.astro';
 
       const d = mix(demand0, demand1, pl);
       const s = mix(res0, res1, pl);
-      parts.demand.setAttribute('d', curve(d));
-      parts.res.setAttribute('d', curve(s));
-      parts.gap.setAttribute('d', `${curve(d)} ${back(s)} Z`);
+      const dPath = curve(d);
+      const sPath = curve(s);
+      parts.demand.setAttribute('d', dPath);
+      parts.demandCore.setAttribute('d', dPath);
+      parts.res.setAttribute('d', sPath);
+      parts.resCore.setAttribute('d', sPath);
+      parts.gap.setAttribute('d', `${dPath} ${back(s)} Z`);
+      parts.gapHatch.setAttribute('d', `${dPath} ${back(s)} Z`);
       parts.wasDemand.setAttribute('d', curve(demand0));
       parts.wasRes.setAttribute('d', curve(res0));
-      const ex = W - Math.max(28, W * 0.05);
-      parts.dotDemand.setAttribute('cx', ex.toFixed(1));
-      parts.dotDemand.setAttribute('cy', at(d, ex).toFixed(1));
-      parts.dotRes.setAttribute('cx', ex.toFixed(1));
-      parts.dotRes.setAttribute('cy', at(s, ex).toFixed(1));
-      parts.labelDemand.setAttribute('x', (ex - 14).toFixed(1));
-      parts.labelDemand.setAttribute('y', (at(d, ex) - 16).toFixed(1));
-      parts.labelRes.setAttribute('x', (ex - 14).toFixed(1));
-      parts.labelRes.setAttribute('y', (at(s, ex) + 26).toFixed(1));
-      const gx = W * 0.74;
-      parts.labelGap.setAttribute('x', gx.toFixed(1));
-      parts.labelGap.setAttribute('y', ((at(d, gx) + at(s, gx)) / 2 + 6).toFixed(1));
+
+      // The ends of the lines, and their names, in small glass tags beside them
+      const dy = at(d, ex);
+      const sy = at(s, ex);
+      for (const [c, y] of [[parts.dotDemand, dy], [parts.haloDemand, dy], [parts.dotRes, sy], [parts.haloRes, sy]] as const) {
+        c.setAttribute('cx', ex.toFixed(1));
+        c.setAttribute('cy', y.toFixed(1));
+      }
+      const gapTo = phone ? 14 : 20;
+      parts.chipDemand.style.translate = `calc(${(ex - gapTo).toFixed(1)}px - 100%) calc(${(dy - (phone ? 20 : 26)).toFixed(1)}px - 50%)`;
+      parts.chipRes.style.translate = `calc(${(ex - gapTo).toFixed(1)}px - 100%) calc(${(sy + (phone ? 20 : 26)).toFixed(1)}px - 50%)`;
+
+      // The gap, measured, as on a drawing: a dimension line between the two, with its name
+      const gx = W * (phone ? 0.62 : 0.72);
+      const gt = at(d, gx) + 8;
+      const gb = at(s, gx) - 8;
+      const cap = 6;
+      parts.bracket.setAttribute('d', gb - gt > 12 ? `M${gx - cap} ${gt} H${gx + cap} M${gx} ${gt} V${gb} M${gx - cap} ${gb} H${gx + cap}` : '');
+      parts.labelGap.setAttribute('x', (gx - 14).toFixed(1));
+      parts.labelGap.setAttribute('y', ((gt + gb) / 2 + 7).toFixed(1));
+
+      // What moved, once it has: demand eased down from where it was headed, resources raised
+      const mx = W * (phone ? 0.5 : 0.66);
+      const arrow = (from: number, to: number) => {
+        const dir = Math.sign(to - from);
+        if (Math.abs(to - from) < 26) return '';
+        const a = from + dir * 7;
+        const b = to - dir * 7;
+        return `M${mx} ${a.toFixed(1)} V${b.toFixed(1)} M${mx - 4.5} ${(b - dir * 6).toFixed(1)} L${mx} ${b.toFixed(1)} L${mx + 4.5} ${(b - dir * 6).toFixed(1)}`;
+      };
+      parts.moveDown.setAttribute('d', arrow(at(demand0, mx), at(d, mx)));
+      parts.moveUp.setAttribute('d', arrow(at(res0, mx), at(s, mx)));
     };
     const queue = () => {
       if (ticking) return;
@@ -212,6 +296,11 @@ import Mist from './Mist.astro';
     --pl: 0;
     --ps: 0;
     --night: 1;
+    --dawn: 0;
+    --measure: 1;
+    --moves: 0;
+    --cell: 60px;
+    --base: 93%;
     position: relative;
     isolation: isolate;
     height: 100vh;
@@ -244,6 +333,10 @@ import Mist from './Mist.astro';
       radial-gradient(50% 70% at 0% 108%, rgb(42 95 142 / calc(0.42 * var(--night))), transparent 72%),
       radial-gradient(42% 46% at 38% -8%, rgb(56 66 132 / calc(0.32 * var(--night))), transparent 72%),
       radial-gradient(70% 50% at 50% 12%, rgb(255 255 255 / calc(0.7 * var(--ps))), transparent 72%),
+      /* First light, low on the horizon behind where demand climbs: pale gold through the blue hour,
+         settling into a soft white by day */
+      radial-gradient(48% 46% at 74% 100%, rgb(255 236 214 / calc(0.62 * var(--dawn, 0))), transparent 72%),
+      radial-gradient(90% 60% at 70% 100%, rgb(255 246 236 / calc(0.3 * var(--dawn, 0))), transparent 75%),
       /* By day, a little darker toward the walls, as the room below is, so the two meet without a seam */
       linear-gradient(90deg, rgb(12 26 41 / calc(0.05 * var(--ps))) 0%, rgb(12 26 41 / 0) 20%, rgb(12 26 41 / 0) 80%, rgb(12 26 41 / calc(0.05 * var(--ps))) 100%),
       linear-gradient(180deg, var(--sky-top, #09131e) 0%, var(--sky-mid, #0d1c2d) 58%, var(--sky-low, #10233a) 100%);
@@ -263,51 +356,183 @@ import Mist from './Mist.astro';
     mix-blend-mode: overlay;
   }
 
+  /* ---------- Graph paper, ruled to the horizon ---------- */
+  .hz-grid {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: var(--base);
+    z-index: -1;
+    --rule: color-mix(in oklab, rgb(27 42 61 / 0.075) calc(var(--ps) * 100%), rgb(142 192 230 / 0.085));
+    background-image:
+      linear-gradient(to top, var(--rule) 1px, transparent 1px),
+      linear-gradient(to right, var(--rule) 1px, transparent 1px);
+    background-size: var(--cell) var(--cell);
+    background-position: var(--grid-x, 0) 100%;
+    /* Strongest around the drawing, gone behind the words */
+    -webkit-mask-image: radial-gradient(ellipse 70% 95% at 74% 100%, #000 30%, transparent 78%);
+    mask-image: radial-gradient(ellipse 70% 95% at 74% 100%, #000 30%, transparent 78%);
+  }
+
+  /* ---------- The ground, and the horizon's lit edge ---------- */
+  .hz-floor {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: var(--base);
+    bottom: 0;
+    z-index: -1;
+    background: linear-gradient(180deg,
+      color-mix(in oklab, rgb(12 26 41 / 0.04) calc(var(--ps) * 100%), rgb(4 10 18 / 0.5)),
+      color-mix(in oklab, rgb(12 26 41 / 0) calc(var(--ps) * 100%), rgb(4 10 18 / 0.2)));
+  }
+  .hz-floor::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -1px;
+    height: 1px;
+    background: linear-gradient(90deg,
+      transparent,
+      color-mix(in oklab, rgb(27 42 61 / 0.22) calc(var(--ps) * 100%), rgb(160 205 240 / 0.6)) 45%,
+      color-mix(in oklab, rgb(27 42 61 / 0.22) calc(var(--ps) * 100%), rgb(210 232 250 / 0.75)) 74%,
+      color-mix(in oklab, rgb(27 42 61 / 0.12) calc(var(--ps) * 100%), rgb(160 205 240 / 0.3)));
+  }
+  /* The light the horizon gives off by night, just above its edge */
+  .hz-floor::after {
+    content: '';
+    position: absolute;
+    left: 10%;
+    right: -10%;
+    top: -60px;
+    height: 60px;
+    background: radial-gradient(ellipse 55% 100% at 62% 100%, rgb(80 150 210 / calc(0.22 * (1 - var(--ps)))), transparent 70%);
+    pointer-events: none;
+  }
+
   /* ---------- The drawing, edge to edge ---------- */
-  .hz-chart { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-  .hz-base { stroke: color-mix(in oklab, rgb(27 42 61 / 0.25) calc(var(--ps) * 100%), rgb(142 192 230 / 0.35)); stroke-width: 1; }
-  /* The lines: lightsabers by night, the brand's red and blue by day */
-  .hz-line { fill: none; stroke-width: 2.75; stroke-linecap: round; }
+  .hz-chart {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    /* The lines come out of the haze at the left edge */
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 9%);
+    mask-image: linear-gradient(90deg, transparent, #000 9%);
+  }
+  .hz-ticks { stroke: color-mix(in oklab, rgb(27 42 61 / 0.3) calc(var(--ps) * 100%), rgb(160 205 240 / 0.4)); stroke-width: 1; }
+  .hz-axis {
+    font-family: var(--font-body);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    fill: color-mix(in oklab, #6b7d91 calc(var(--ps) * 100%), #7f95ab);
+  }
+
+  /* The lines: lightsabers by night, a glowing colour with a white-hot core; by day, the brand's red
+     and blue, drawn firmly, lifted a little off the paper */
+  .hz-line { fill: none; stroke-width: calc(2.5px + 0.5px * var(--ps)); stroke-linecap: round; }
   .hz-demand {
     stroke: color-mix(in oklab, #b0463e calc(var(--ps) * 100%), #ff3b5c);
-    filter: drop-shadow(0 0 4px rgb(255 59 92 / calc(0.9 * (1 - var(--ps))))) drop-shadow(0 0 14px rgb(255 59 92 / calc(0.4 * (1 - var(--ps)))));
+    filter:
+      drop-shadow(0 0 3px rgb(255 59 92 / calc(0.95 * (1 - var(--ps)))))
+      drop-shadow(0 0 16px rgb(255 59 92 / calc(0.45 * (1 - var(--ps)))))
+      drop-shadow(0 6px 7px rgb(12 26 41 / calc(0.2 * var(--ps))));
   }
   .hz-res {
     stroke: color-mix(in oklab, #2c5f8a calc(var(--ps) * 100%), #3fd0ff);
-    filter: drop-shadow(0 0 4px rgb(63 208 255 / calc(0.9 * (1 - var(--ps))))) drop-shadow(0 0 14px rgb(63 208 255 / calc(0.4 * (1 - var(--ps)))));
+    filter:
+      drop-shadow(0 0 3px rgb(63 208 255 / calc(0.95 * (1 - var(--ps)))))
+      drop-shadow(0 0 16px rgb(63 208 255 / calc(0.45 * (1 - var(--ps)))))
+      drop-shadow(0 6px 7px rgb(12 26 41 / calc(0.2 * var(--ps))));
   }
-  /* The gap, glowing between them */
-  .hz-gap { fill: color-mix(in oklab, rgb(176 70 62 / 0.1) calc(var(--ps) * 100%), rgb(255 59 92 / 0.12)); }
+  .hz-core { fill: none; stroke: #ffffff; stroke-width: 0.9; stroke-linecap: round; opacity: calc(0.7 * (1 - var(--ps))); }
+
+  /* The gap: lit from the demand line down, and hatched, as the home page marks what is cut */
+  .hz-gap { fill: url(#hz-gapfill); }
+  .hz-gapfill-top { stop-color: color-mix(in oklab, rgb(176 70 62 / 0.14) calc(var(--ps) * 100%), rgb(255 59 92 / 0.22)); }
+  .hz-gapfill-low { stop-color: color-mix(in oklab, rgb(176 70 62 / 0.03) calc(var(--ps) * 100%), rgb(255 59 92 / 0.03)); }
+  .hz-gap-hatch { fill: url(#hz-hatch); }
+  .hz-hatch-line { stroke: color-mix(in oklab, rgb(176 70 62 / 0.32) calc(var(--ps) * 100%), rgb(255 90 120 / 0.3)); stroke-width: 1; }
+
   /* Where the lines would have gone without us: dashed, appearing as the lines move away */
   .hz-was {
     fill: none;
-    stroke: color-mix(in oklab, rgb(27 42 61 / 0.32) calc(var(--ps) * 100%), rgb(255 255 255 / 0.4));
-    stroke-width: 1.5;
-    stroke-dasharray: 5 7;
+    stroke: color-mix(in oklab, rgb(27 42 61 / 0.36) calc(var(--ps) * 100%), rgb(255 255 255 / 0.4));
+    stroke-width: 1.25;
+    stroke-dasharray: 4 6;
     opacity: var(--pl);
   }
-  .hz-dot-demand { fill: color-mix(in oklab, #b0463e calc(var(--ps) * 100%), #ff3b5c); }
-  .hz-dot-res { fill: color-mix(in oklab, #2c5f8a calc(var(--ps) * 100%), #3fd0ff); }
-  .hz-dot { stroke: color-mix(in oklab, #eef2f6 calc(var(--ps) * 100%), #0b1522); stroke-width: 2; }
-  .hz-label {
-    font-family: var(--font-body);
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    fill: color-mix(in oklab, #4a5d72 calc(var(--ps) * 100%), #b5c4d3);
+
+  /* The gap's measure, by night */
+  .hz-measure { opacity: var(--measure); }
+  .hz-bracket {
+    fill: none;
+    stroke: color-mix(in oklab, #b0463e calc(var(--ps) * 100%), #ff8a9c);
+    stroke-width: 1.25;
+    filter: drop-shadow(0 0 3px rgb(255 59 92 / calc(0.6 * (1 - var(--ps)))));
   }
   .hz-label-gap {
     font-family: var(--font-display);
     font-size: 22px;
-    font-weight: 400;
-    letter-spacing: 0;
-    text-transform: none;
     font-style: italic;
-    fill: color-mix(in oklab, #b0463e calc(var(--ps) * 100%), #ff8a9c);
-    /* It fades as the gap closes, so it never sits on the lines */
-    opacity: calc(1 - var(--pl) * 1.2);
+    fill: color-mix(in oklab, #b0463e calc(var(--ps) * 100%), #ff9aaa);
   }
+  /* What moved */
+  .hz-move { fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; opacity: var(--moves); }
+  .hz-move-down { stroke: color-mix(in oklab, #6b7d91 calc(var(--ps) * 100%), #b5c4d3); }
+  .hz-move-up { stroke: color-mix(in oklab, #2c5f8a calc(var(--ps) * 100%), #3fd0ff); }
+
+  /* The ends of the lines: a point of light in a soft ring */
+  .hz-node-demand { --c: color-mix(in oklab, #b0463e calc(var(--ps) * 100%), #ff3b5c); }
+  .hz-node-res { --c: color-mix(in oklab, #2c5f8a calc(var(--ps) * 100%), #3fd0ff); }
+  .hz-halo {
+    fill: color-mix(in oklab, var(--c) 14%, transparent);
+    stroke: color-mix(in oklab, var(--c) 45%, transparent);
+    stroke-width: 1;
+  }
+  .hz-dot {
+    fill: var(--c);
+    stroke: color-mix(in oklab, #ffffff calc(var(--ps) * 100%), #e9f6ff);
+    stroke-width: 2;
+    filter: drop-shadow(0 0 6px var(--c)) drop-shadow(0 2px 3px rgb(12 26 41 / calc(0.3 * var(--ps))));
+  }
+
+  /* The names of the lines, in small glass tags that ride beside their ends */
+  .hz-chip {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55em;
+    padding: 0.5em 0.95em 0.5em 0.8em;
+    border-radius: 999px;
+    font-family: var(--font-body);
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: color-mix(in oklab, #2a3b4f calc(var(--ps) * 100%), #dbe6f0);
+    background: color-mix(in oklab, rgb(255 255 255 / 0.78) calc(var(--ps) * 100%), rgb(16 32 50 / 0.55));
+    -webkit-backdrop-filter: blur(10px) saturate(1.3);
+    backdrop-filter: blur(10px) saturate(1.3);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / calc(0.12 + 0.68 * var(--ps))),
+      inset 0 0 0 1px color-mix(in oklab, rgb(12 26 41 / 0.06) calc(var(--ps) * 100%), rgb(255 255 255 / 0.1)),
+      0 1px 1px rgb(12 26 41 / calc(0.06 + 0.1 * (1 - var(--ps)))),
+      0 10px 22px -10px rgb(4 12 22 / calc(0.22 + 0.33 * (1 - var(--ps))));
+    will-change: translate;
+  }
+  .hz-chip i { width: 7px; height: 7px; border-radius: 50%; background: var(--c); box-shadow: 0 0 8px var(--c); }
+  .hz-chip-demand { --c: color-mix(in oklab, #b0463e calc(var(--ps) * 100%), #ff3b5c); }
+  .hz-chip-res { --c: color-mix(in oklab, #2c5f8a calc(var(--ps) * 100%), #3fd0ff); }
 
   /* ---------- The words, top left, white by night and navy by day ---------- */
   .hz-copy {
@@ -362,7 +587,7 @@ import Mist from './Mist.astro';
   @media (max-width: 640px) {
     .hz-copy { padding-top: 6.5rem; gap: var(--s-4); }
     .hz-copy h1 { font-size: clamp(2rem, 1.2rem + 3.6vw, 2.5rem); }
-    .hz-label { font-size: 11px; }
+    .hz-chip { font-size: 10px; letter-spacing: 0.14em; }
     .hz-label-gap { font-size: 17px; }
   }
   @media (prefers-reduced-motion: reduce) {
