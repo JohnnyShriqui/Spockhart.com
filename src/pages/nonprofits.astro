@@ -12,7 +12,7 @@ import NonprofitImpact from '../components/NonprofitImpact.astro';
 >
   <!-- One light room. It opens on the problem in words, over a card cut to the shape of the chart,
        which closes its own gap as the page scrolls (Horizon.astro) -->
-  <div class="page-body body-nonprofit room-light" data-body>
+  <div class="page-body body-nonprofit room-light room-blue blue-nonprofits" data-body>
     <Horizon
       setup="Every nonprofit faces the same fundamental challenge:"
       title={'Unlimited\u00A0demand on\u00A0limited resources.'}
@@ -26,3 +26,26 @@ import NonprofitImpact from '../components/NonprofitImpact.astro';
     />
   </div>
 </Base>
+
+<style>
+  /* The blue of the room, held in the opening scene: it stays put with the card while the scene
+     plays as the page scrolls, behind the pool of light on the wall */
+  .body-nonprofit :global(.hz-stage)::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -3;
+    pointer-events: none;
+    background:
+      radial-gradient(860px 620px at 100% 0%, rgb(118 172 228 / 0.5), rgb(118 172 228 / 0.18) 50%, transparent 76%),
+      radial-gradient(460px 360px at 98% 0%, rgb(78 140 206 / 0.26), transparent 72%),
+      radial-gradient(720px 520px at 0% 100%, rgb(98 156 214 / 0.3), rgb(98 156 214 / 0.1) 50%, transparent 74%);
+  }
+  @media (max-width: 760px) {
+    .body-nonprofit :global(.hz-stage)::after {
+      background:
+        radial-gradient(440px 380px at 100% 0%, rgb(118 172 228 / 0.48), rgb(118 172 228 / 0.16) 50%, transparent 76%),
+        radial-gradient(400px 320px at 0% 100%, rgb(98 156 214 / 0.3), transparent 74%);
+    }
+  }
+</style>

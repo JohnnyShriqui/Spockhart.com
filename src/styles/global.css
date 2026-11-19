@@ -853,24 +853,87 @@ main > .hero-dark:last-child { border-bottom: 1px solid rgb(255 255 255 / 0.07);
   mix-blend-mode: multiply;
 }
 /* The light room in blue and white: the home hero's light, by day. Soft steel-blue glows wash in
-   from the edges, one in the top corner and then alternating sides all the way down, over a
-   white wall that cools toward blue as the page goes on. */
+   from the edges over a white wall that cools toward blue as the page goes on. Each page lights
+   its room its own way, so the blue moves around the site:
+     Our Experience  the top right corner, then alternating sides all the way down
+     Approach        the top left, then down to the right with the staircase, then back
+     Home            a wide glow where the sheet rises over the hero, then right, left, and on
+     Nonprofits      held in the scene while it plays (Horizon), then left and lower right
+     Contact         a halo behind the form, and a glow rising from the lower left */
 .room-light.room-blue {
+  --wall: linear-gradient(180deg, #f6f9fc 0%, #eef3f8 45%, #e6eef6 100%);
   background:
     radial-gradient(520px 420px at 96% 2%, rgb(78 140 206 / 0.32), transparent 72%) no-repeat,
     radial-gradient(900px 700px at 100% 0%, rgb(122 174 226 / 0.58), rgb(122 174 226 / 0.22) 48%, transparent 76%) no-repeat,
     radial-gradient(620px 420px at 6% 150px, rgb(255 255 255 / 0.9), rgb(255 255 255 / 0.35) 50%, transparent 76%) no-repeat,
     radial-gradient(640px 760px at 0% 50%, rgb(98 156 214 / 0.42), rgb(98 156 214 / 0.14) 50%, transparent 74%) left 0 top 760px / 1200px 2400px repeat-y,
     radial-gradient(700px 780px at 100% 50%, rgb(118 172 228 / 0.46), rgb(118 172 228 / 0.16) 50%, transparent 74%) right 0 top 1960px / 1200px 2400px repeat-y,
-    linear-gradient(180deg, #f6f9fc 0%, #eef3f8 45%, #e6eef6 100%);
+    var(--wall);
 }
+.room-light.room-blue.blue-approach {
+  background:
+    radial-gradient(860px 640px at 0% 0%, rgb(118 172 228 / 0.52), rgb(118 172 228 / 0.18) 50%, transparent 76%) no-repeat,
+    radial-gradient(480px 380px at 2% 0%, rgb(78 140 206 / 0.28), transparent 72%) no-repeat,
+    radial-gradient(760px 860px at 100% 1050px, rgb(98 156 214 / 0.44), rgb(98 156 214 / 0.15) 50%, transparent 74%) no-repeat,
+    radial-gradient(700px 760px at 0% 2150px, rgb(128 180 232 / 0.42), rgb(128 180 232 / 0.14) 50%, transparent 74%) no-repeat,
+    radial-gradient(900px 620px at 100% 100%, rgb(110 166 222 / 0.4), transparent 74%) no-repeat,
+    var(--wall);
+}
+.room-light.room-blue.blue-home {
+  background:
+    radial-gradient(1100px 560px at 50% 0%, rgb(128 180 232 / 0.44), rgb(128 180 232 / 0.15) 52%, transparent 76%) no-repeat,
+    radial-gradient(520px 340px at 50% 0%, rgb(78 140 206 / 0.2), transparent 72%) no-repeat,
+    radial-gradient(680px 800px at 100% 50%, rgb(98 156 214 / 0.42), rgb(98 156 214 / 0.14) 50%, transparent 74%) right 0 top 1100px / 1200px 2800px repeat-y,
+    radial-gradient(700px 800px at 0% 50%, rgb(118 172 228 / 0.44), rgb(118 172 228 / 0.15) 50%, transparent 74%) left 0 top 2500px / 1200px 2800px repeat-y,
+    var(--wall);
+}
+.room-light.room-blue.blue-nonprofits {
+  background:
+    radial-gradient(760px 820px at 0% calc(100% - 1150px), rgb(118 172 228 / 0.44), rgb(118 172 228 / 0.15) 50%, transparent 74%) no-repeat,
+    radial-gradient(900px 640px at 100% 100%, rgb(98 156 214 / 0.42), rgb(98 156 214 / 0.14) 50%, transparent 74%) no-repeat,
+    var(--wall);
+}
+.room-light.room-blue.blue-contact {
+  background:
+    radial-gradient(820px 660px at 84% 46%, rgb(118 172 228 / 0.5), rgb(118 172 228 / 0.18) 52%, transparent 76%) no-repeat,
+    radial-gradient(760px 560px at 0% 100%, rgb(98 156 214 / 0.38), rgb(98 156 214 / 0.12) 50%, transparent 74%) no-repeat,
+    radial-gradient(600px 440px at 14% 32%, rgb(255 255 255 / 0.9), rgb(255 255 255 / 0.3) 50%, transparent 74%) no-repeat,
+    var(--wall);
+}
+/* Phones: the same arrangements, drawn smaller */
 @media (max-width: 760px) {
   .room-light.room-blue {
     background:
       radial-gradient(460px 400px at 100% 0%, rgb(118 172 226 / 0.55), rgb(118 172 226 / 0.2) 50%, transparent 76%) no-repeat,
       radial-gradient(380px 520px at 0% 50%, rgb(98 156 214 / 0.36), transparent 74%) left 0 top 700px / 100% 1800px repeat-y,
       radial-gradient(400px 540px at 100% 50%, rgb(118 172 228 / 0.4), transparent 74%) right 0 top 1600px / 100% 1800px repeat-y,
-      linear-gradient(180deg, #f6f9fc 0%, #eef3f8 45%, #e6eef6 100%);
+      var(--wall);
+  }
+  .room-light.room-blue.blue-approach {
+    background:
+      radial-gradient(460px 420px at 0% 0%, rgb(118 172 228 / 0.52), rgb(118 172 228 / 0.18) 50%, transparent 76%) no-repeat,
+      radial-gradient(400px 540px at 100% 50%, rgb(98 156 214 / 0.38), transparent 74%) right 0 top 900px / 100% 1900px repeat-y,
+      radial-gradient(380px 520px at 0% 50%, rgb(128 180 232 / 0.36), transparent 74%) left 0 top 1850px / 100% 1900px repeat-y,
+      var(--wall);
+  }
+  .room-light.room-blue.blue-home {
+    background:
+      radial-gradient(520px 360px at 50% 0%, rgb(128 180 232 / 0.44), rgb(128 180 232 / 0.15) 52%, transparent 76%) no-repeat,
+      radial-gradient(400px 540px at 100% 50%, rgb(98 156 214 / 0.38), transparent 74%) right 0 top 900px / 100% 2000px repeat-y,
+      radial-gradient(380px 520px at 0% 50%, rgb(118 172 228 / 0.38), transparent 74%) left 0 top 1900px / 100% 2000px repeat-y,
+      var(--wall);
+  }
+  .room-light.room-blue.blue-nonprofits {
+    background:
+      radial-gradient(400px 520px at 0% calc(100% - 900px), rgb(118 172 228 / 0.4), transparent 74%) no-repeat,
+      radial-gradient(460px 420px at 100% 100%, rgb(98 156 214 / 0.4), transparent 74%) no-repeat,
+      var(--wall);
+  }
+  .room-light.room-blue.blue-contact {
+    background:
+      radial-gradient(460px 520px at 100% 62%, rgb(118 172 228 / 0.48), rgb(118 172 228 / 0.16) 52%, transparent 76%) no-repeat,
+      radial-gradient(420px 360px at 0% 100%, rgb(98 156 214 / 0.36), transparent 74%) no-repeat,
+      var(--wall);
   }
 }
 /* A pool of light on the wall behind whatever it's on, fading out well beyond its edges */
