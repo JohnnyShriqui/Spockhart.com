@@ -13,7 +13,7 @@ import { site } from '../../config/site';
     <div class="wrap contact-grid">
       <div class="contact-intro">
         <h1 class="load-in" style="--i:1">Start a conversation.</h1>
-        <p class="lead load-in" style="--i:2">Tell us what your team could accomplish with more time. We reply within {site.offer.replyWithin}.</p>
+        <p class="lead load-in" style="--i:2">We reply within {site.offer.replyWithin}.</p>
 
         <div class="load-in contact-direct" style="--i:3">
           <div class="direct-options">
@@ -117,7 +117,8 @@ import { site } from '../../config/site';
     display: grid;
     grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
     gap: var(--s-8);
-    align-items: start;
+    /* The words and the card share a middle */
+    align-items: center;
   }
   .contact-intro { display: grid; gap: var(--s-5); align-content: start; }
   .contact-intro h1 { font-size: var(--step-5); max-width: 9ch; }
