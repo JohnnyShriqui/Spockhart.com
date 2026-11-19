@@ -1,7 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
-import PageHero from '../../components/PageHero.astro';
 import HeroLive from '../../components/HeroLive.astro';
 import ResultVisual from '../../components/ResultVisual.astro';
 import ClosingCTA from '../../components/ClosingCTA.astro';
@@ -41,19 +40,29 @@ const sectionsOf = (body = '') =>
 <Base
   title="Our Work"
   description="What the people behind Spockhart have delivered: platforms, marketplaces, sales systems, production floors and engineering prototypes. Client names withheld."
+  lightHero
 >
-  <PageHero
-    class="work-hero"
-    theme="work"
-    title="Our team’s experience."
-    lead="Spockhart is a new firm built on years of experience. Our team has transformed operations and built technology at some of North America’s largest organizations."
-  >
-    <p class="work-note"><strong>Please note:</strong> these are projects our team led or worked on outside Spockhart. Client names are withheld.</p>
-    <HeroLive slot="figure" inline />
-  </PageHero>
 
-  <!-- Below the hero: one light room, rising over the hero like a sheet, as on the home page -->
+  <!-- One light room from top to bottom. It opens on a dark card, standing just under the header,
+       with the page's title and the live revenue vs costs chart; the case studies follow. -->
   <div class="page-body work-body room-light" data-body>
+  <section class="work-top" aria-labelledby="work-title">
+    <div class="work-stage stand">
+      <div class="work-card" data-tilt="3" data-tilt-depth="2600">
+        <div class="work-copy">
+          <h1 id="work-title" class="load-in" style="--i:1">Our team’s experience.</h1>
+          <div class="accent-rule load-in" style="--i:2"></div>
+          <p class="work-note load-in" style="--i:3">
+            <strong>Please note:</strong> some of these projects were led or worked on by our team outside Spockhart, and their client names are withheld.
+          </p>
+        </div>
+        <div class="work-figure load-fade">
+          <HeroLive inline />
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section class="projects" aria-label="Projects" data-projects>
     {
       all.map((entry, i) => {
@@ -211,17 +220,15 @@ const sectionsOf = (body = '') =>
 </script>
 
 <style>
-  /* ---------- Below the hero: one light room, as on the home page ----------
-     It rides up over the bottom of the hero like a sheet, rounded at the top with its top edge
-     catching the light, and its rounded bottom overlaps the footer a little, so the dark shows in
-     its corners at both ends. */
+  /* ---------- One light room, top to bottom ----------
+     Its rounded bottom overlaps the footer a little, so the footer shows in its corners, as on the
+     home page. */
   .work-body {
     --sheet-r: 32px;
     z-index: 1;
-    margin-top: calc(var(--sheet-r) * -1);
     margin-bottom: calc(var(--sheet-r) * -1);
-    border-radius: var(--sheet-r);
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.9), 0 -28px 60px -24px rgb(0 0 0 / 0.5), 0 28px 60px -24px rgb(0 0 0 / 0.5);
+    border-radius: 0 0 var(--sheet-r) var(--sheet-r);
+    box-shadow: 0 28px 60px -24px rgb(0 0 0 / 0.5);
   }
   .work-body.room-light::after { border-radius: inherit; }
   .work-body :global(.closing) { border-top: 0; }
@@ -229,17 +236,77 @@ const sectionsOf = (body = '') =>
     .work-body { --sheet-r: 22px; }
   }
 
-  /* The hero's disclaimer: plain, set apart by a fine rule, a step quieter than the lead */
+  /* ---------- The opening card ----------
+     Midnight blue, as in the home page's hero: the brand's steel light rising in one corner, a fine
+     grain, a lit top edge, and its shadow on the floor (.stand). The title and the note on the
+     left, the live chart on the right. As wide as the closing card. */
+  .work-top { padding-top: clamp(7rem, 5.5rem + 3.5vw, 9.5rem); padding-bottom: clamp(1.5rem, 0.75rem + 2vw, 3rem); }
+  .work-stage { max-width: var(--max); margin-inline: auto; }
+  .work-top { padding-inline: max(var(--gutter), env(safe-area-inset-left, 0px)); }
+  @media (min-width: 1100px) {
+    .work-stage {
+      --reach: clamp(0px, max(var(--gutter), (100vw - var(--max)) / 2) - 2.5rem, 4rem);
+      max-width: calc(var(--max) + var(--reach));
+    }
+  }
+  .work-card {
+    --ink: #eef3f8;
+    --ink-2: #b5c4d3;
+    --accent: #8ec0e6;
+    --accent-soft: #6fa8d6;
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    gap: var(--s-7);
+    align-items: center;
+    padding: clamp(2.5rem, 1.5rem + 3.5vw, 4.75rem) clamp(1.75rem, 0.75rem + 4vw, 5rem);
+    border-radius: 28px;
+    color: var(--ink);
+    background:
+      radial-gradient(55% 90% at 85% 15%, rgb(46 104 152 / 0.5), transparent 70%),
+      radial-gradient(50% 80% at 0% 110%, rgb(42 95 142 / 0.32), transparent 72%),
+      radial-gradient(40% 60% at 35% -10%, rgb(56 66 132 / 0.28), transparent 72%),
+      linear-gradient(165deg, #09131e 0%, #0d1c2d 55%, #10233a 100%);
+    box-shadow: var(--lift-dark);
+  }
+  .work-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    pointer-events: none;
+    background-image: var(--grain);
+    background-size: 200px;
+    opacity: 0.12;
+    mix-blend-mode: overlay;
+  }
+  .work-copy { display: grid; gap: var(--s-5); justify-items: start; }
+  .work-copy h1 { max-width: 9ch; color: #fff; text-shadow: 0 12px 26px rgb(0 0 0 / 0.3); }
+  .work-figure { width: 100%; max-width: 440px; justify-self: end; }
+  .work-figure :global(.live-inline) { max-width: none; }
+  /* The disclaimer: plain, set apart by a fine rule, a step quieter than the title */
   .work-note {
-    max-width: 44rem;
+    max-width: 30rem;
+    margin-top: var(--s-2);
     padding-left: 0.95rem;
     border-left: 2px solid var(--accent-soft);
-    font-size: 0.8125rem;
-    line-height: 1.5;
-    text-wrap: balance;
+    font-size: 0.875rem;
+    line-height: 1.55;
+    text-wrap: pretty;
     color: var(--ink-2);
   }
   .work-note strong { font-weight: 600; color: var(--ink); }
+  @media (max-width: 960px) {
+    .work-card { grid-template-columns: minmax(0, 1fr); }
+    .work-figure { justify-self: start; max-width: 420px; }
+  }
+  @media (max-width: 640px) {
+    .work-top { padding-top: 5.5rem; padding-bottom: 1.75rem; }
+    .work-card { border-radius: 20px; }
+    .work-figure { display: none; }
+  }
 
   /* Each case study: a pool of light on the wall behind its graphic, fading out well before the
      edges of the case study, so nothing ever meets on a line */
@@ -410,7 +477,6 @@ const sectionsOf = (body = '') =>
     .cs-m-label { font-size: 0.8125rem; }
     .cs-col { grid-template-columns: minmax(0, 1fr); gap: var(--s-1); padding-block: var(--s-3); }
     .cs-text p { font-size: 0.9375rem; }
-    :global(.work-hero .hero-figure) { display: none; }
   }
 
   /* ==========================================================================
