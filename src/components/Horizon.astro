@@ -120,8 +120,8 @@ import Mist from './Mist.astro';
       H = r.height;
       const phone = W < 641;
       // Phones: lower, below the words
-      top = H * (phone ? 0.68 : 0.36);
-      bottom = H * (phone ? 0.94 : 0.88);
+      top = H * (phone ? 0.68 : 0.42);
+      bottom = H * (phone ? 0.94 : 0.93);
       svg.setAttribute('viewBox', `0 0 ${W.toFixed(0)} ${H.toFixed(0)}`);
       parts.base.setAttribute('x1', '0');
       parts.base.setAttribute('x2', W.toFixed(0));
@@ -315,7 +315,7 @@ import Mist from './Mist.astro';
     display: grid;
     gap: var(--s-5);
     justify-items: start;
-    padding-top: clamp(7.5rem, 5.5rem + 5vh, 10rem);
+    padding-top: clamp(8.5rem, 3.5rem + 13vh, 12.5rem);
     color: color-mix(in oklab, var(--ink) calc(var(--ps) * 100%), #eef3f8);
   }
   .hz-copy h1 {
