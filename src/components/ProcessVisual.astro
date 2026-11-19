@@ -1,0 +1,400 @@
+---
+/**
+ * The display on each step of the process (Process.astro): a dark, screen-like panel with one
+ * luminous, minimal scene, moving slowly. Illustrations, not client data.
+ *
+ *   0 Diagnose       a process drawn as a line of light; a pulse runs along it and slows where
+ *                    the same data is typed twice
+ *   1 Prototype      a working app: approvals turn from Pending to Approved, row by row
+ *   2 Build, embed   the tools already in use, as glass tiles, feeding one hub; the team below
+ *   3 Hand over      the handover kit as a pass that checks itself off and catches the light
+ *
+ * The motion is SVG animation; with reduced motion it is paused on a finished frame.
+ */
+import { upperPath, lowerPath } from '../lib/logo';
+interface Props {
+  step: 0 | 1 | 2 | 3;
+}
+const { step } = Astro.props;
+
+/* 1. The process: five points along a gentle arc */
+const nodes = [
+  { x: 72, y: 262, label: 'Order in' },
+  { x: 176, y: 206, label: 'Typed in CRM', waste: true },
+  { x: 280, y: 190, label: 'Typed in books', waste: true },
+  { x: 384, y: 206, label: 'Manager OK' },
+  { x: 488, y: 262, label: 'Invoice sent' },
+];
+const flow = 'M72 262 C112 262 136 206 176 206 C216 206 240 190 280 190 C320 190 344 206 384 206 C424 206 448 262 488 262';
+
+/* 2. The app */
+const rows = [
+  ['INV-1042', 'Northline Supply', '$4,280'],
+  ['INV-1043', 'Harbour Print', '$960'],
+  ['INV-1044', 'Cedar Logistics', '$12,400'],
+  ['INV-1045', 'Fieldstone Labs', '$2,115'],
+];
+
+/* 3. The tools, around the hub */
+const hub = { x: 280, y: 168 };
+const tiles = [
+  { x: 112, y: 86, label: 'Email', glyph: 'mail' },
+  { x: 448, y: 86, label: 'Accounting', glyph: 'ledger' },
+  { x: 112, y: 250, label: 'CRM', glyph: 'card' },
+  { x: 448, y: 250, label: 'Calendar', glyph: 'cal' },
+];
+const team = [
+  { x: 206, label: 'Finance', i: 'F' },
+  { x: 280, label: 'Operations', i: 'O' },
+  { x: 354, label: 'Admin', i: 'A' },
+];
+
+/* 4. The kit */
+const kit = ['Source code', 'Documentation', 'Admin access', 'Training notes'];
+---
+
+<div class={`pv pv-${step}`} aria-hidden="true" data-pv>
+  <svg viewBox="0 0 560 400" preserveAspectRatio="xMidYMid meet">
+    <defs>
+      <pattern id={`pv-dots-${step}`} width="22" height="22" patternUnits="userSpaceOnUse">
+        <circle cx="1" cy="1" r="1" fill="rgb(255 255 255 / 0.06)"></circle>
+      </pattern>
+      <linearGradient id={`pv-cyan-${step}`} x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#3fd0ff" stop-opacity="0.2"></stop>
+        <stop offset="0.5" stop-color="#7fe0ff"></stop>
+        <stop offset="1" stop-color="#3fd0ff" stop-opacity="0.2"></stop>
+      </linearGradient>
+      <radialGradient id={`pv-red-${step}`}>
+        <stop offset="0" stop-color="#ff4d6a" stop-opacity="0.55"></stop>
+        <stop offset="1" stop-color="#ff4d6a" stop-opacity="0"></stop>
+      </radialGradient>
+      <radialGradient id={`pv-glow-${step}`}>
+        <stop offset="0" stop-color="#3fd0ff" stop-opacity="0.35"></stop>
+        <stop offset="1" stop-color="#3fd0ff" stop-opacity="0"></stop>
+      </radialGradient>
+      <linearGradient id={`pv-hub-${step}`} x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#3b82c4"></stop>
+        <stop offset="1" stop-color="#173a5a"></stop>
+      </linearGradient>
+      <linearGradient id={`pv-pass-${step}`} x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#2f6fa6"></stop>
+        <stop offset="0.55" stop-color="#1f4d6f"></stop>
+        <stop offset="1" stop-color="#14324d"></stop>
+      </linearGradient>
+      <linearGradient id={`pv-sheen-${step}`} x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#fff" stop-opacity="0"></stop>
+        <stop offset="0.5" stop-color="#fff" stop-opacity="0.22"></stop>
+        <stop offset="1" stop-color="#fff" stop-opacity="0"></stop>
+      </linearGradient>
+      <clipPath id={`pv-passclip-${step}`}><rect x="120" y="86" width="320" height="232" rx="20"></rect></clipPath>
+    </defs>
+
+    <rect width="560" height="400" fill={`url(#pv-dots-${step})`}></rect>
+
+    {
+      step === 0 && (
+        <g>
+          <text x="28" y="40" class="pv-kicker">Process map</text>
+          <text x="28" y="64" class="pv-title">Order to invoice</text>
+          <g transform="translate(280 238) scale(1.1) translate(-280 -215)">
+          {/* The waste, called out */}
+          <circle cx="176" cy="206" r="34" fill="url(#pv-red-0)" class="pv-breathe"></circle>
+          <circle cx="280" cy="190" r="34" fill="url(#pv-red-0)" class="pv-breathe pv-late"></circle>
+          <path d="M176 182 V150 H280 V166" fill="none" class="pv-call"></path>
+          <g transform="translate(228 132)">
+            <rect x="-86" y="-15" width="172" height="30" rx="15" class="pv-tag-red"></rect>
+            <text x="0" y="5" text-anchor="middle" class="pv-tag-red-text">Same data, typed twice</text>
+          </g>
+          {/* The process, as a line of light */}
+          <path d={flow} fill="none" class="pv-track"></path>
+          <path d={flow} fill="none" class="pv-flow"></path>
+          {nodes.map((n) => (
+            <g>
+              <circle cx={n.x} cy={n.y} r="8" class={n.waste ? 'pv-node pv-node-waste' : 'pv-node'}></circle>
+              <circle cx={n.x} cy={n.y} r="2.6" class={n.waste ? 'pv-node-core-waste' : 'pv-node-core'}></circle>
+              <text x={n.x} y={n.y + 34} text-anchor="middle" class="pv-label">{n.label}</text>
+            </g>
+          ))}
+          {/* A pulse runs the process, and slows where the work is done twice */}
+          <circle r="5" class="pv-pulse">
+            <animateMotion dur="5.6s" repeatCount="indefinite" path={flow} keyPoints="0;0.22;0.52;1" keyTimes="0;0.22;0.72;1" calcMode="linear"></animateMotion>
+          </circle>
+          <circle r="14" fill="url(#pv-glow-0)">
+            <animateMotion dur="5.6s" repeatCount="indefinite" path={flow} keyPoints="0;0.22;0.52;1" keyTimes="0;0.22;0.72;1" calcMode="linear"></animateMotion>
+          </circle>
+          </g>
+        </g>
+      )
+    }
+
+    {
+      step === 1 && (
+        <g>
+          {/* The app, in its window */}
+          <rect x="34" y="44" width="492" height="316" rx="18" class="pv-window"></rect>
+          <rect x="34" y="44" width="492" height="316" rx="18" class="pv-window-edge"></rect>
+          <circle cx="60" cy="70" r="5" class="pv-dot"></circle>
+          <circle cx="77" cy="70" r="5" class="pv-dot"></circle>
+          <circle cx="94" cy="70" r="5" class="pv-dot"></circle>
+          <text x="118" y="75.5" class="pv-app-title">Invoice approvals</text>
+          <g transform="translate(468 70)">
+            <rect x="-36" y="-13" width="72" height="26" rx="13" class="pv-tag-cyan"></rect>
+            <text x="0" y="4.5" text-anchor="middle" class="pv-tag-cyan-text">Day 30</text>
+          </g>
+          <line x1="34" y1="96" x2="526" y2="96" class="pv-hair"></line>
+          <text x="62" y="126" class="pv-col">Invoice</text>
+          <text x="178" y="126" class="pv-col">Supplier</text>
+          <text x="372" y="126" text-anchor="end" class="pv-col">Amount</text>
+          <text x="458" y="126" text-anchor="middle" class="pv-col">Status</text>
+          {/* The row being worked on, moving down the list */}
+          <rect x="46" y="140" width="468" height="44" rx="11" class="pv-focus"></rect>
+          {rows.map((r, i) => (
+            <g class="pv-row" style={`--d:${(i * 1.1 - 1.5).toFixed(1)}s`}>
+              {i < 3 && <line x1="54" y1={186 + i * 48} x2="506" y2={186 + i * 48} class="pv-hair pv-hair-soft"></line>}
+              <text x="62" y={167 + i * 48} class="pv-cell pv-cell-strong">{r[0]}</text>
+              <text x="178" y={167 + i * 48} class="pv-cell">{r[1]}</text>
+              <text x="372" y={167 + i * 48} text-anchor="end" class="pv-cell pv-cell-num">{r[2]}</text>
+              <g transform={`translate(458 ${162 + i * 48})`}>
+                <g class="pv-pending">
+                  <rect x="-42" y="-13" width="84" height="26" rx="13" class="pv-pill-amber"></rect>
+                  <text x="0" y="4.5" text-anchor="middle" class="pv-pill-amber-text">Pending</text>
+                </g>
+                <g class="pv-approved">
+                  <rect x="-42" y="-13" width="84" height="26" rx="13" class="pv-pill-green"></rect>
+                  <text x="0" y="4.5" text-anchor="middle" class="pv-pill-green-text">Approved</text>
+                </g>
+              </g>
+            </g>
+          ))}
+        </g>
+      )
+    }
+
+    {
+      step === 2 && (
+        <g transform="translate(280 200) scale(1.08) translate(-280 -196)">
+          {/* Each tool feeds the hub along a line of light */}
+          {tiles.map((t, i) => (
+            <g>
+              <line x1={t.x} y1={t.y} x2={hub.x} y2={hub.y} class="pv-track"></line>
+              <line x1={t.x} y1={t.y} x2={hub.x} y2={hub.y} class="pv-flow pv-flow-in" style={`--d:${i * 0.35}s`}></line>
+              <circle r="4" class="pv-pulse">
+                <animateMotion dur="2.8s" begin={`${i * 0.7}s`} repeatCount="indefinite" path={`M${t.x} ${t.y} L${hub.x} ${hub.y}`}></animateMotion>
+              </circle>
+            </g>
+          ))}
+          <circle cx={hub.x} cy={hub.y} r="90" fill="url(#pv-glow-2)" class="pv-breathe"></circle>
+          {tiles.map((t) => (
+            <g transform={`translate(${t.x} ${t.y})`}>
+              <rect x="-30" y="-30" width="60" height="60" rx="17" class="pv-tile"></rect>
+              <rect x="-30" y="-30" width="60" height="60" rx="17" class="pv-tile-edge"></rect>
+              {t.glyph === 'mail' && (
+                <g class="pv-glyph">
+                  <rect x="-13" y="-9.5" width="26" height="19" rx="3.5"></rect>
+                  <path d="M-12 -7 L0 2 L12 -7"></path>
+                </g>
+              )}
+              {t.glyph === 'ledger' && (
+                <g class="pv-glyph">
+                  <rect x="-11" y="-13" width="22" height="26" rx="3.5"></rect>
+                  <path d="M-6 -6 H6 M-6 0 H6 M-6 6 H2"></path>
+                </g>
+              )}
+              {t.glyph === 'card' && (
+                <g class="pv-glyph">
+                  <rect x="-14" y="-10" width="28" height="20" rx="3.5"></rect>
+                  <circle cx="-5.5" cy="-1.5" r="3.5"></circle>
+                  <path d="M-11 6.5 C-9.5 2.5 -1.5 2.5 0 6.5 M4 -3 H10 M4 2 H9"></path>
+                </g>
+              )}
+              {t.glyph === 'cal' && (
+                <g class="pv-glyph">
+                  <rect x="-13" y="-11" width="26" height="24" rx="3.5"></rect>
+                  <path d="M-13 -4 H13 M-6 -15 V-8 M6 -15 V-8"></path>
+                  <circle cx="-5" cy="4" r="1.3" class="pv-glyph-fill"></circle>
+                  <circle cx="0" cy="4" r="1.3" class="pv-glyph-fill"></circle>
+                  <circle cx="5" cy="4" r="1.3" class="pv-glyph-fill"></circle>
+                </g>
+              )}
+              <text x="0" y="50" text-anchor="middle" class="pv-label">{t.label}</text>
+            </g>
+          ))}
+          {/* The hub: the Spockhart mark */}
+          <g transform={`translate(${hub.x} ${hub.y})`}>
+            <rect x="-46" y="-46" width="92" height="92" rx="26" fill="url(#pv-hub-2)" class="pv-hub"></rect>
+            <rect x="-46" y="-46" width="92" height="92" rx="26" class="pv-tile-edge pv-hub-edge"></rect>
+            <g transform="scale(0.17)" class="pv-mark">
+              <path d={upperPath}></path>
+              <path d={lowerPath}></path>
+            </g>
+          </g>
+          {/* The team, trained to run it */}
+          <text x="280" y="268" text-anchor="middle" class="pv-kicker">Your team</text>
+          {team.map((m, i) => (
+            <g transform={`translate(${m.x} 300)`}>
+              <circle r="17" class="pv-person"></circle>
+              <text x="0" y="5" text-anchor="middle" class="pv-person-i">{m.i}</text>
+              <g class="pv-badge" style={`--d:${0.6 + i * 0.5}s`}>
+                <circle cx="12" cy="-12" r="7.5" class="pv-badge-dot"></circle>
+                <path d="M8.6 -12 L11 -9.6 L15.4 -14.2" class="pv-badge-tick"></path>
+              </g>
+              <text x="0" y="36" text-anchor="middle" class="pv-label pv-label-sm">{m.label}</text>
+            </g>
+          ))}
+        </g>
+      )
+    }
+
+    {
+      step === 3 && (
+        <g transform="translate(280 200) scale(1.12) translate(-280 -196)">
+          {/* A second pass behind, for depth */}
+          <rect x="150" y="62" width="300" height="214" rx="20" class="pv-pass-back" transform="rotate(-5 300 170)"></rect>
+          <rect x="120" y="86" width="320" height="232" rx="20" class="pv-pass-shadow"></rect>
+          <rect x="120" y="86" width="320" height="232" rx="20" fill="url(#pv-pass-3)"></rect>
+          <g clip-path="url(#pv-passclip-3)">
+            <rect x="-120" y="60" width="140" height="300" fill="url(#pv-sheen-3)" class="pv-sheen" transform="skewX(-18)"></rect>
+          </g>
+          <rect x="120" y="86" width="320" height="232" rx="20" class="pv-tile-edge pv-pass-edge"></rect>
+          <g transform="translate(150 118) scale(0.095)" class="pv-mark">
+            <path d={upperPath}></path>
+            <path d={lowerPath}></path>
+          </g>
+          <text x="168" y="123" class="pv-pass-brand">Spockhart</text>
+          <text x="412" y="123" text-anchor="end" class="pv-pass-kicker">Handover kit</text>
+          <line x1="144" y1="144" x2="416" y2="144" class="pv-pass-rule"></line>
+          {kit.map((k, i) => (
+            <g transform={`translate(150 ${172 + i * 30})`} class="pv-kit" style={`--d:${0.4 + i * 0.55}s`}>
+              <circle cx="0" cy="-4" r="9" class="pv-kit-ring"></circle>
+              <circle cx="0" cy="-4" r="9" class="pv-kit-fill"></circle>
+              <path d="M-4 -4 L-1 -1 L4.5 -7" class="pv-kit-tick"></path>
+              <text x="22" y="1" class="pv-kit-text">{k}</text>
+            </g>
+          ))}
+          <line x1="144" y1="284" x2="416" y2="284" class="pv-pass-rule"></line>
+          <text x="144" y="305" class="pv-pass-kicker">Yours to run</text>
+          <g transform="translate(404 299)" class="pv-key">
+            <circle cx="-6" cy="0" r="6"></circle>
+            <path d="M0 0 H14 M10 0 V5 M14 0 V4"></path>
+          </g>
+        </g>
+      )
+    }
+  </svg>
+</div>
+
+<script>
+  // With reduced motion, every scene rests on a finished frame
+  function stillScenes() {
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    document.querySelectorAll<SVGSVGElement>('[data-pv] svg').forEach((s) => {
+      s.pauseAnimations();
+      s.setCurrentTime(2);
+    });
+  }
+  stillScenes();
+  document.addEventListener('spockhart:view', stillScenes);
+</script>
+
+<style>
+  .pv { position: relative; width: 100%; height: 100%; display: grid; place-items: center; }
+  .pv svg { display: block; width: 100%; height: 100%; max-height: 100%; overflow: visible; }
+  .pv text { font-family: var(--font-body); }
+
+  .pv-kicker { font-size: 11px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; fill: rgb(170 195 220 / 0.6); }
+  .pv-title { font-size: 17px; font-weight: 600; fill: #eef3f8; }
+  .pv-label { font-size: 13px; font-weight: 500; fill: rgb(220 232 244 / 0.82); }
+  .pv-label-sm { font-size: 11.5px; fill: rgb(200 216 232 / 0.65); }
+  .pv-hair { stroke: rgb(255 255 255 / 0.08); stroke-width: 1; }
+  .pv-hair-soft { stroke: rgb(255 255 255 / 0.05); }
+
+  /* Lines of light */
+  .pv-track { stroke: rgb(142 192 230 / 0.22); stroke-width: 2; stroke-linecap: round; }
+  .pv-flow {
+    stroke: #3fd0ff;
+    stroke-width: 2.25;
+    stroke-linecap: round;
+    stroke-dasharray: 2 12;
+    filter: drop-shadow(0 0 3px rgb(63 208 255 / 0.8));
+    animation: pv-flow 1.6s linear infinite;
+    animation-delay: var(--d, 0s);
+  }
+  @keyframes pv-flow { to { stroke-dashoffset: -28; } }
+  .pv-pulse { fill: #ffffff; filter: drop-shadow(0 0 4px #3fd0ff) drop-shadow(0 0 10px rgb(63 208 255 / 0.7)); }
+
+  /* 1. The process */
+  .pv-node { fill: #0c1a2a; stroke: rgb(142 192 230 / 0.7); stroke-width: 1.75; }
+  .pv-node-core { fill: #cfeeff; }
+  .pv-node-waste { stroke: #ff6b82; }
+  .pv-node-core-waste { fill: #ff8a9c; }
+  .pv-call { stroke: rgb(255 107 130 / 0.55); stroke-width: 1.25; stroke-dasharray: 3 4; }
+  .pv-tag-red { fill: rgb(255 77 106 / 0.12); stroke: rgb(255 107 130 / 0.5); stroke-width: 1; }
+  .pv-tag-red-text { font-size: 12.5px; font-weight: 600; fill: #ffb3bf; }
+  .pv-breathe { transform-box: fill-box; transform-origin: center; animation: pv-breathe 3.2s ease-in-out infinite; }
+  .pv-late { animation-delay: 0.6s; }
+  @keyframes pv-breathe { 50% { opacity: 0.45; scale: 0.86; } }
+
+  /* 2. The app */
+  .pv-window { fill: #12233a; filter: drop-shadow(0 18px 30px rgb(0 0 0 / 0.45)); }
+  .pv-window-edge, .pv-tile-edge { fill: none; stroke: rgb(255 255 255 / 0.09); stroke-width: 1; }
+  .pv-dot { fill: rgb(255 255 255 / 0.16); }
+  .pv-app-title { font-size: 15.5px; font-weight: 600; fill: #eef3f8; }
+  .pv-tag-cyan { fill: rgb(63 208 255 / 0.12); stroke: rgb(63 208 255 / 0.5); stroke-width: 1; }
+  .pv-tag-cyan-text { font-size: 12px; font-weight: 700; fill: #8fe3ff; }
+  .pv-col { font-size: 10.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; fill: rgb(170 195 220 / 0.5); }
+  .pv-cell { font-size: 14px; fill: rgb(220 232 244 / 0.72); }
+  .pv-cell-strong { font-weight: 600; fill: #eef3f8; }
+  .pv-cell-num { font-variant-numeric: tabular-nums; fill: #eef3f8; }
+  .pv-focus { fill: rgb(63 208 255 / 0.07); stroke: rgb(63 208 255 / 0.22); stroke-width: 1; animation: pv-focus 4.4s steps(1, end) infinite; animation-delay: -1.5s; }
+  @keyframes pv-focus {
+    0% { translate: 0 0; }
+    25% { translate: 0 48px; }
+    50% { translate: 0 96px; }
+    75% { translate: 0 144px; }
+  }
+  .pv-pill-amber { fill: rgb(255 184 77 / 0.12); stroke: rgb(255 184 77 / 0.45); stroke-width: 1; }
+  .pv-pill-amber-text { font-size: 11.5px; font-weight: 700; fill: #ffcf87; }
+  .pv-pill-green { fill: rgb(52 211 153 / 0.14); stroke: rgb(52 211 153 / 0.5); stroke-width: 1; }
+  .pv-pill-green-text { font-size: 11.5px; font-weight: 700; fill: #7ff0c3; }
+  .pv-pending { animation: pv-out 4.4s ease infinite; animation-delay: var(--d); }
+  .pv-approved { opacity: 0; animation: pv-in 4.4s ease infinite; animation-delay: var(--d); }
+  @keyframes pv-in { 0%, 18% { opacity: 0; } 24%, 92% { opacity: 1; } 100% { opacity: 0; } }
+  @keyframes pv-out { 0%, 18% { opacity: 1; } 24%, 92% { opacity: 0; } 100% { opacity: 1; } }
+
+  /* 3. The hub */
+  .pv-tile { fill: rgb(255 255 255 / 0.06); filter: drop-shadow(0 10px 16px rgb(0 0 0 / 0.35)); }
+  .pv-glyph { fill: none; stroke: #dcecf8; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+  .pv-glyph-fill { fill: #dcecf8; stroke: none; }
+  .pv-hub { filter: drop-shadow(0 14px 24px rgb(0 0 0 / 0.45)) drop-shadow(0 0 22px rgb(63 208 255 / 0.25)); }
+  .pv-hub-edge { stroke: rgb(255 255 255 / 0.2); }
+  .pv-mark { fill: #ffffff; }
+  .pv-person { fill: rgb(255 255 255 / 0.07); stroke: rgb(255 255 255 / 0.18); stroke-width: 1; }
+  .pv-person-i { font-size: 13px; font-weight: 700; fill: #dcecf8; }
+  .pv-badge { opacity: 0; animation: pv-badge 4.6s ease infinite; animation-delay: var(--d); }
+  .pv-badge-dot { fill: #34d399; stroke: #0d1b2b; stroke-width: 2; }
+  .pv-badge-tick { fill: none; stroke: #06281c; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  @keyframes pv-badge { 0%, 10% { opacity: 0; scale: 0.6; } 18%, 88% { opacity: 1; scale: 1; } 100% { opacity: 0; } }
+  .pv-badge { transform-box: fill-box; transform-origin: center; }
+
+  /* 4. The pass */
+  .pv-pass-back { fill: #1a3550; opacity: 0.75; }
+  .pv-pass-shadow { fill: #000; opacity: 0.35; filter: blur(14px); transform: translateY(14px); }
+  .pv-pass-edge { stroke: rgb(255 255 255 / 0.22); }
+  .pv-sheen { animation: pv-sheen 5.5s ease-in-out infinite; }
+  @keyframes pv-sheen { 0%, 35% { translate: 0 0; } 75%, 100% { translate: 620px 0; } }
+  .pv-pass-brand { font-size: 13px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; fill: #ffffff; }
+  .pv-pass-kicker { font-size: 10.5px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; fill: rgb(220 236 250 / 0.7); }
+  .pv-pass-rule { stroke: rgb(255 255 255 / 0.16); stroke-width: 1; }
+  .pv-kit-ring { fill: none; stroke: rgb(255 255 255 / 0.4); stroke-width: 1.5; }
+  .pv-kit-fill { fill: #ffffff; opacity: 0; animation: pv-kit 4.8s ease infinite; animation-delay: var(--d); transform-box: fill-box; transform-origin: center; }
+  .pv-kit-tick { fill: none; stroke: #1f4d6f; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; opacity: 0; animation: pv-kit 4.8s ease infinite; animation-delay: var(--d); }
+  .pv-kit-text { font-size: 14px; font-weight: 500; fill: #eef6fd; }
+  @keyframes pv-kit { 0%, 8% { opacity: 0; scale: 0.6; } 16%, 90% { opacity: 1; scale: 1; } 100% { opacity: 0; } }
+  .pv-key { fill: none; stroke: #ffffff; stroke-width: 1.75; stroke-linecap: round; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pv * { animation: none !important; }
+    .pv-approved, .pv-badge, .pv-kit-fill, .pv-kit-tick { opacity: 1; }
+    .pv-pending { opacity: 0; }
+  }
+</style>

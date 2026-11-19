@@ -1,49 +1,47 @@
 ---
 /**
  * Approach: one process, four steps, whether the problem is inside a client's operation or in
- * front of their customers. Each step is a large card, one to a screen: as the page scrolls, the
- * next card slides up over the last, which steps back a little, its top edge still showing, so
- * the steps stack like a deck. A line of light beside the deck lights each step as it arrives.
+ * front of their customers. Laid out like a Gantt chart, made beautiful: the steps descend to the
+ * right as a staircase. A line of light is the staircase itself: it runs along above each card for
+ * that step's stretch of time, labelled with its timing, then drops to the next. Faint columns
+ * behind mark the stretches. Each card hangs from its tread.
  *
- * Each card: its timing and name, one line of what we do, then what that step means inside your
- * operation and for your customers, with the step's live graphic beside it (PhaseGraphic.astro,
- * played by scripts/scenes.ts).
+ * Every card is the same material: white, deeply rounded, lifted, leaning under the pointer. On
+ * the left, the step's name, one line of what we do, and what that means inside your operation and
+ * for your customers. On the right, a dark display with the step's scene (ProcessVisual.astro).
  *
- * Phones, short screens, and reduced motion change nothing about the content: on phones and short
- * screens the cards simply follow one another down the page.
+ * The line draws itself once, the first time the staircase comes into view, and the cards come in
+ * with it. Nothing is tied to scrolling. On tablets and phones the cards simply follow one another;
+ * with reduced motion everything is simply there.
  */
 import { site } from '../config/site';
-import PhaseGraphic from './PhaseGraphic.astro';
+import ProcessVisual from './ProcessVisual.astro';
 
 const steps = [
   {
-    n: '01',
     when: 'Weeks 1 to 2',
-    name: 'Diagnose',
+    name: 'Diagnose.',
     body: 'We map how the work gets done and where it stalls, and uncover the opportunities worth acting on.',
     inside: 'Your workflows and the bottlenecks in them.',
     customers: 'Your customers, your market, and your capabilities.',
   },
   {
-    n: '02',
     when: `By day ${site.offer.prototypeDays}`,
-    name: 'Prototype',
+    name: 'Prototype.',
     body: 'We design and build a working prototype of the strongest idea, around your team’s needs.',
     inside: 'Built around your team’s needs and requirements.',
     customers: 'The opportunities weighed, and the strongest concept made real.',
   },
   {
-    n: '03',
     when: `Months 2 to ${site.offer.minimumMonths}`,
-    name: 'Build and embed',
+    name: 'Build and embed.',
     body: 'We develop the solution, prove it where it will be used, and refine it.',
     inside: 'Integrated with your systems, and your team ready to use it.',
     customers: 'Tested with real customers, demand measured, the offering refined.',
   },
   {
-    n: '04',
     when: `Month ${site.offer.minimumMonths}`,
-    name: 'Hand over',
+    name: 'Hand over.',
     body: 'We hand it over fully documented, for your team to own and run.',
     inside: 'A documented solution your team owns and operates.',
     customers: 'Brought to market, with your team equipped to run and grow it.',
@@ -57,102 +55,170 @@ const steps = [
     <h2 id="proc-title">One process, inside your operation or in front of your customers.</h2>
   </div>
 
-  <div class="wrap proc-wrap">
-    <!-- The line of light beside the deck: it fills as the steps arrive -->
-    <div class="proc-rail" aria-hidden="true">
-      <div class="proc-rail-inner">
-        <span class="proc-rail-line"><span class="proc-rail-lit"></span></span>
-        {steps.map((_, i) => <span class="proc-rail-node" data-proc-node style={`--i:${i}`}></span>)}
-      </div>
-    </div>
+  <div class="wrap">
+    <div class="proc-stair" data-proc-stair>
+      <!-- The staircase of light, and the columns behind it (drawn to the cards' places) -->
+      <svg class="proc-line" aria-hidden="true">
+        <g data-proc-cols></g>
+        <path class="proc-track" data-proc-track></path>
+        <path class="proc-lit" data-proc-lit></path>
+        <g data-proc-bars></g>
+        <g data-proc-nodes></g>
+      </svg>
 
-    <ol class="proc-steps" data-rate="0.54">
-      {
-        steps.map((s, i) => (
-          <li class={`proc-step proc-step-${i + 1}`} style={`--i:${i}`} data-proc-step>
-            <article
-              class="proc-card"
-              data-tilt="3"
-              data-tilt-depth="2400"
-              data-scene
-              data-loop="6.5"
-              data-still="6.2"
-              style="--loop:6.5;--still:6.2"
-            >
-              <div class="proc-text">
-                <p class="proc-meta">
-                  <span class="tabular">{s.n}</span>
-                  <span aria-hidden="true">·</span>
-                  {s.when}
-                </p>
-                <h3>{s.name}</h3>
-                <p class="proc-body">{s.body}</p>
-                <dl class="proc-pair">
-                  <div>
-                    <dt>Inside your operation</dt>
-                    <dd>{s.inside}</dd>
-                  </div>
-                  <div>
-                    <dt>For your customers</dt>
-                    <dd>{s.customers}</dd>
-                  </div>
-                </dl>
-              </div>
-              <div class="proc-visual">
-                <PhaseGraphic phase={i as 0 | 1 | 2 | 3} />
-              </div>
-            </article>
-          </li>
-        ))
-      }
-    </ol>
+      <ol class="proc-steps">
+        {
+          steps.map((s, i) => (
+            <li class="proc-step" style={`--i:${i}`} data-proc-step>
+              <p class="proc-when">
+                <span class="proc-n tabular">0{i + 1}</span>
+                {s.when}
+              </p>
+              <article class="proc-card" data-tilt="3" data-tilt-depth="2200">
+                <div class="proc-text">
+                  <h3>{s.name}</h3>
+                  <p class="proc-body">{s.body}</p>
+                  <ul class="proc-pair">
+                    <li>
+                      <span class="proc-ic" aria-hidden="true">
+                        <svg viewBox="0 0 24 24"><path d="M4 20V9.5L12 5l8 4.5V20" /><path d="M9 20v-5h6v5" /><path d="M3 20h18" /></svg>
+                      </span>
+                      <span>
+                        <strong>Inside your operation</strong>
+                        {s.inside}
+                      </span>
+                    </li>
+                    <li>
+                      <span class="proc-ic" aria-hidden="true">
+                        <svg viewBox="0 0 24 24"><circle cx="9" cy="8.5" r="3.25" /><path d="M3.5 19c.8-3.4 3-5 5.5-5s4.7 1.6 5.5 5" /><circle cx="16.5" cy="9.5" r="2.5" /><path d="M15.6 14.1c2.4-.2 4.3 1.3 4.9 4.4" /></svg>
+                      </span>
+                      <span>
+                        <strong>For your customers</strong>
+                        {s.customers}
+                      </span>
+                    </li>
+                  </ul>
+                </div>
+                <div class="proc-display">
+                  <ProcessVisual step={i as 0 | 1 | 2 | 3} />
+                </div>
+              </article>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
   </div>
 </section>
 
 <script>
-  import { initScenes } from '../scripts/scenes';
-  initScenes();
-  document.addEventListener('spockhart:view', initScenes);
-
-  const clamp = (v: number) => Math.max(0, Math.min(1, v));
+  const NS = 'http://www.w3.org/2000/svg';
 
   function initProcess() {
-    const root = document.querySelector<HTMLElement>('[data-proc]');
-    if (!root || root.dataset.ready) return;
-    root.dataset.ready = '1';
-    const steps = Array.from(root.querySelectorAll<HTMLElement>('[data-proc-step]'));
-    const nodes = Array.from(root.querySelectorAll<HTMLElement>('[data-proc-node]'));
-    const stacked = window.matchMedia('(min-width: 901px) and (min-height: 620px)');
-    let ticking = false;
+    const stair = document.querySelector<HTMLElement>('[data-proc-stair]');
+    if (!stair || stair.dataset.ready) return;
+    stair.dataset.ready = '1';
+    const steps = Array.from(stair.querySelectorAll<HTMLElement>('[data-proc-step]'));
+    const track = stair.querySelector<SVGPathElement>('[data-proc-track]')!;
+    const lit = stair.querySelector<SVGPathElement>('[data-proc-lit]')!;
+    const cols = stair.querySelector<SVGGElement>('[data-proc-cols]')!;
+    const nodesG = stair.querySelector<SVGGElement>('[data-proc-nodes]')!;
+    const barsG = stair.querySelector<SVGGElement>('[data-proc-bars]')!;
+    const wide = window.matchMedia('(min-width: 1001px)');
+    const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window);
+    const R = 14;
 
-    const update = () => {
-      ticking = false;
-      if (!stacked.matches) {
-        steps.forEach((s) => s.style.removeProperty('--cover'));
+    // The staircase, from the cards' places: a tread above each card, for its stretch, then a
+    // drop to the next, with rounded corners; the columns behind it at each stretch's start
+    const draw = () => {
+      cols.replaceChildren();
+      nodesG.replaceChildren();
+      barsG.replaceChildren();
+      if (!wide.matches) {
+        track.setAttribute('d', '');
+        lit.setAttribute('d', '');
         return;
       }
-      const tops = steps.map((s) => s.getBoundingClientRect().top);
-      const h = steps[0].getBoundingClientRect().height;
-      // How far each card is covered by the one after it, 0 to 1: it steps back as it goes under
-      const cover = steps.map((_, i) => (i + 1 < steps.length ? clamp(1 - (tops[i + 1] - tops[i]) / h) : 0));
-      steps.forEach((s, i) => s.style.setProperty('--cover', cover[i].toFixed(3)));
-      // The step that has arrived: the last card to reach its place in the deck
-      let active = -1;
-      steps.forEach((s, i) => {
-        if (tops[i] <= parseFloat(getComputedStyle(s).top) + 1) active = i;
+      const box = stair.getBoundingClientRect();
+      const pts = steps.map((s) => {
+        const r = s.getBoundingClientRect();
+        const when = s.querySelector('.proc-when')!.getBoundingClientRect();
+        return { x: r.left - box.left, y: when.bottom - box.top + 9 };
       });
-      const progress = active < 0 ? 0 : clamp((active + cover[active]) / (steps.length - 1));
-      root.style.setProperty('--prog', progress.toFixed(3));
-      nodes.forEach((n, i) => n.classList.toggle('is-on', i <= active));
+      const step = pts[1].x - pts[0].x;
+      const xs = [...pts.map((p) => p.x), pts[3].x + step];
+      let d = `M${xs[0]} ${pts[0].y}`;
+      for (let i = 0; i < pts.length; i++) {
+        const y = pts[i].y;
+        const xEnd = xs[i + 1];
+        if (i < pts.length - 1) {
+          const yNext = pts[i + 1].y;
+          d += ` H${xEnd - R} Q${xEnd} ${y} ${xEnd} ${y + R} V${yNext - R} Q${xEnd} ${yNext} ${xEnd + R} ${yNext}`;
+        } else {
+          d += ` H${xEnd}`;
+        }
+      }
+      track.setAttribute('d', d);
+      lit.setAttribute('d', d);
+      const len = lit.getTotalLength();
+      lit.style.setProperty('--len', String(len));
+      // Columns: faint, from the top of the staircase to the bottom
+      const h = box.height;
+      xs.forEach((x) => {
+        const l = document.createElementNS(NS, 'line');
+        l.setAttribute('x1', String(x));
+        l.setAttribute('x2', String(x));
+        l.setAttribute('y1', String(pts[0].y - 34));
+        l.setAttribute('y2', String(h));
+        l.setAttribute('class', 'proc-col');
+        cols.append(l);
+      });
+      // Each step's stretch of time, as a bar of light along its tread, as on a Gantt chart
+      pts.forEach((p, i) => {
+        const b = document.createElementNS(NS, 'line');
+        b.setAttribute('x1', String(p.x + 7));
+        b.setAttribute('x2', String(xs[i + 1] - (i < 3 ? R + 4 : 0)));
+        b.setAttribute('y1', String(p.y));
+        b.setAttribute('y2', String(p.y));
+        b.setAttribute('pathLength', '1');
+        b.setAttribute('class', 'proc-bar');
+        b.style.setProperty('--n', String(i));
+        barsG.append(b);
+      });
+      // A point where each step begins, and one where the last ends
+      xs.forEach((x, i) => {
+        const c = document.createElementNS(NS, 'circle');
+        c.setAttribute('cx', String(x));
+        c.setAttribute('cy', String(pts[Math.min(i, 3)].y));
+        c.setAttribute('r', i === 4 ? '5' : '4.5');
+        c.setAttribute('class', i === 4 ? 'proc-node proc-node-end' : 'proc-node');
+        c.style.setProperty('--n', String(i));
+        nodesG.append(c);
+      });
     };
-    const queue = () => {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(update);
-    };
-    update();
-    window.addEventListener('scroll', queue, { passive: true });
-    window.addEventListener('resize', queue, { passive: true });
+
+    draw();
+    // Fonts and images settle the cards' heights; redraw once they have
+    window.addEventListener('load', draw, { once: true });
+    window.addEventListener('resize', draw, { passive: true });
+    if ('ResizeObserver' in window) new ResizeObserver(() => draw()).observe(stair);
+
+    // The first time it comes into view: the line draws down the stairs, the cards with it
+    if (still) {
+      stair.classList.add('is-drawn');
+      return;
+    }
+    stair.classList.add('is-waiting');
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((e) => e.isIntersecting)) return;
+        io.disconnect();
+        stair.classList.remove('is-waiting');
+        stair.classList.add('is-drawn');
+      },
+      { threshold: 0.12 },
+    );
+    io.observe(stair);
   }
   initProcess();
   document.addEventListener('spockhart:view', initProcess);
@@ -160,162 +226,162 @@ const steps = [
 
 <style>
   .proc {
-    --stick: 92px;
-    --offset: 18px;
-    --card-h: min(600px, calc(100svh - var(--stick) - 3 * var(--offset) - 40px));
-    --prog: 0;
-    padding-top: clamp(3rem, 2rem + 3vw, 5rem);
+    padding-top: clamp(3.5rem, 2rem + 4vw, 6rem);
     padding-bottom: clamp(4rem, 3rem + 4vw, 7rem);
   }
-  .proc-head { display: grid; gap: 0.6rem; margin-bottom: clamp(2rem, 1rem + 2vw, 3rem); }
-  .proc-label {
+  .proc-head { display: grid; gap: 0.75rem; margin-bottom: clamp(2.5rem, 1.5rem + 2.5vw, 4rem); }
+  .proc-label { font-size: 0.8125rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); }
+  .proc-head h2 { font-size: clamp(2rem, 1.3rem + 2vw, 3.25rem); line-height: 1.06; letter-spacing: -0.02em; max-width: 20ch; }
+
+  /* ---------- The staircase ---------- */
+  .proc-stair {
+    --card-w: 100%;
+    --step: 0%;
+    position: relative;
+  }
+  .proc-line { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; z-index: 0; }
+  .proc-steps { position: relative; z-index: 1; list-style: none; margin: 0; padding: 0; display: grid; gap: clamp(1.5rem, 1rem + 1.5vw, 2.5rem); }
+  .proc-step { width: var(--card-w); margin-left: calc(var(--i) * var(--step)); }
+
+  /* The timing, sitting on the tread above its card */
+  .proc-when {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    margin-bottom: 1.75rem;
     font-size: 0.8125rem;
     font-weight: 700;
-    letter-spacing: 0.18em;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: var(--accent);
+    color: #5b6e83;
   }
-  .proc-head h2 { font-size: var(--step-3); max-width: 24ch; }
+  .proc-n {
+    font-weight: 700;
+    background: linear-gradient(90deg, #2c5f8a, #2a8fc4);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
 
-  .proc-wrap { position: relative; }
-  .proc-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-5); }
+  /* The line of light: a faint track, and the light drawn along it */
+  .proc-line :global(.proc-col) { stroke: rgb(27 42 61 / 0.07); stroke-width: 1; stroke-dasharray: 2 6; }
+  .proc-track { fill: none; stroke: rgb(27 42 61 / 0.1); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .proc-lit {
+    fill: none;
+    stroke: #2a74b8;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    filter: drop-shadow(0 0 2.5px rgb(63 208 255 / 0.9)) drop-shadow(0 0 9px rgb(63 208 255 / 0.35));
+    stroke-dasharray: var(--len, 4000);
+    stroke-dashoffset: 0;
+  }
+  /* The bars: each step's stretch, thick and glowing, drawn along its tread */
+  .proc-line :global(.proc-bar) {
+    stroke: url(#proc-bar-grad);
+    stroke: #2f86c8;
+    stroke-width: 7;
+    stroke-linecap: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+    filter: drop-shadow(0 0 4px rgb(63 208 255 / 0.55)) drop-shadow(0 4px 8px rgb(12 26 41 / 0.15));
+  }
+  .proc-line :global(.proc-node) { fill: #ffffff; stroke: #2a74b8; stroke-width: 2; filter: drop-shadow(0 0 5px rgb(63 208 255 / 0.75)); }
+  .proc-line :global(.proc-node-end) { fill: #2a74b8; }
 
-  /* ---------- Each step: a large card, its words on the step's colour, its graphic beside ---------- */
+  /* Coming in, the first time: the line draws down the stairs and each card rises as it is reached */
+  .proc-stair.is-waiting .proc-lit { stroke-dashoffset: var(--len, 4000); }
+  .proc-stair.is-waiting :global(.proc-node) { opacity: 0; }
+  .proc-stair.is-waiting :global(.proc-bar) { stroke-dashoffset: 1; }
+  .proc-stair.is-drawn :global(.proc-bar) { transition: stroke-dashoffset 700ms var(--ease-out); transition-delay: calc(var(--n) * 560ms + 150ms); }
+  .proc-stair.is-waiting .proc-step { opacity: 0; translate: 0 26px; }
+  .proc-stair.is-drawn .proc-lit { transition: stroke-dashoffset 2600ms cubic-bezier(0.45, 0, 0.25, 1); }
+  .proc-stair.is-drawn :global(.proc-node) { transition: opacity 500ms var(--ease); transition-delay: calc(var(--n) * 560ms); }
+  .proc-stair.is-drawn .proc-step {
+    transition: opacity 900ms var(--ease), translate 1100ms var(--ease-out);
+    transition-delay: calc(var(--i) * 560ms + 120ms);
+  }
+
+  /* ---------- The card: white, deeply rounded, lifted; its words on the left and a dark
+     display on the right, inset with the same curve ---------- */
   .proc-card {
-    position: relative;
+    --r: 30px;
+    --inset: 12px;
     display: grid;
-    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
-    min-height: 100%;
-    border-radius: 24px;
-    overflow: hidden;
-    background: #ffffff;
-    box-shadow: var(--lift);
-    transform-origin: 50% 0;
-    scale: calc(1 - var(--cover, 0) * 0.05);
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+    padding: var(--inset);
+    border-radius: var(--r);
+    background: linear-gradient(180deg, #ffffff 0%, #fbfcfd 100%);
+    box-shadow:
+      inset 0 1px 0 #ffffff,
+      0 0 0 1px rgb(12 26 41 / 0.04),
+      0 2px 4px rgb(12 26 41 / 0.04),
+      0 18px 34px -16px rgb(12 26 41 / 0.2),
+      0 60px 90px -40px rgb(12 26 41 / 0.3);
   }
-  /* Stepping back under the next card, it falls a little into shadow */
-  .proc-card::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    background: rgb(12 26 41 / calc(var(--cover, 0) * 0.14));
-    pointer-events: none;
-  }
-  .proc-step-1 { --seg: var(--mist-1); --seg-ink: var(--navy); --seg-ink-2: #2f4760; --seg-meta: var(--brand); --seg-rule: rgb(27 42 61 / 0.16); }
-  .proc-step-2 { --seg: var(--accent); --seg-ink: #fff; --seg-ink-2: rgb(255 255 255 / 0.86); --seg-meta: rgb(255 255 255 / 0.72); --seg-rule: rgb(255 255 255 / 0.2); }
-  .proc-step-3 { --seg: var(--brand); --seg-ink: #fff; --seg-ink-2: rgb(255 255 255 / 0.86); --seg-meta: rgb(255 255 255 / 0.72); --seg-rule: rgb(255 255 255 / 0.2); }
-  .proc-step-4 { --seg: #142a40; --seg-ink: #fff; --seg-ink-2: rgb(255 255 255 / 0.86); --seg-meta: rgb(255 255 255 / 0.72); --seg-rule: rgb(255 255 255 / 0.16); }
-
   .proc-text {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: 0.9rem;
-    padding: clamp(1.75rem, 1rem + 2.4vw, 3.25rem);
-    background: var(--seg);
-    color: var(--seg-ink);
+    padding: clamp(1.25rem, 0.75rem + 1.6vw, 2.5rem) clamp(1.1rem, 0.5rem + 1.6vw, 2.25rem);
   }
-  .proc-meta {
-    display: flex;
-    align-items: center;
-    gap: 0.45rem;
-    font-size: 0.8125rem;
-    font-weight: 600;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--seg-meta);
-  }
-  .proc-text h3 { font-size: clamp(2.25rem, 1.4rem + 2.2vw, 3.5rem); line-height: 1.04; letter-spacing: -0.02em; color: var(--seg-ink); }
-  .proc-body { max-width: 30ch; font-size: clamp(1.0625rem, 0.95rem + 0.35vw, 1.25rem); line-height: 1.5; color: var(--seg-ink-2); }
-  .proc-pair {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1.25rem;
-    margin-top: 0.6rem;
-    padding-top: 1.1rem;
-    border-top: 1px solid var(--seg-rule);
-  }
-  .proc-pair dt {
-    font-size: 0.6875rem;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--seg-meta);
-  }
-  .proc-pair dd { margin: 0.35rem 0 0; font-size: 0.9375rem; line-height: 1.45; color: var(--seg-ink-2); }
-
-  .proc-visual {
+  .proc-text h3 { font-size: clamp(2rem, 1.35rem + 1.6vw, 2.875rem); font-weight: 450; line-height: 1; letter-spacing: -0.03em; color: #14202e; }
+  .proc-body { max-width: 30ch; margin-top: 0.9rem; font-size: clamp(1rem, 0.92rem + 0.3vw, 1.1875rem); line-height: 1.45; color: #5f6f80; }
+  .proc-pair { list-style: none; margin: clamp(1.25rem, 1rem + 0.8vw, 1.75rem) 0 0; padding: 0; display: grid; gap: 0.85rem; }
+  .proc-pair li { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 0.8rem; align-items: start; font-size: 0.9rem; line-height: 1.42; color: #6b7a8a; }
+  .proc-pair strong { display: block; margin-bottom: 0.1rem; font-size: 0.84rem; font-weight: 650; color: #1b2a3d; }
+  .proc-ic {
     display: grid;
     place-items: center;
-    padding: clamp(1.5rem, 1rem + 2vw, 3rem);
-    background: linear-gradient(180deg, #f8fafc 0%, #eef2f6 100%);
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: linear-gradient(180deg, #f2f6fa, #e8eef4);
+    box-shadow: inset 0 1px 0 #ffffff, 0 0 0 1px rgb(12 26 41 / 0.05);
   }
-  .proc-visual :global(.pg) { width: 100%; margin: 0; padding: 0; }
-  .proc-visual :global(.pg svg) { max-height: none; background: transparent; border: 0; padding: 0; }
+  .proc-ic svg { width: 18px; height: 18px; fill: none; stroke: #2c5f8a; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
 
-  /* ---------- Laptops: one card to a screen, each sliding up over the last ---------- */
-  @media (min-width: 901px) and (min-height: 620px) {
-    .proc-steps { gap: 26vh; padding-bottom: 14vh; }
-    .proc-step { position: sticky; top: calc(var(--stick) + var(--i) * var(--offset)); height: var(--card-h); }
-    .proc-card { height: 100%; }
+  .proc-display {
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    place-items: center;
+    min-height: clamp(16rem, 10rem + 12vw, 22rem);
+    padding: clamp(0.6rem, 0.3rem + 0.8vw, 1.25rem);
+    border-radius: calc(var(--r) - var(--inset));
+    overflow: hidden;
+    background:
+      radial-gradient(70% 60% at 85% 0%, rgb(46 104 152 / 0.55), transparent 70%),
+      radial-gradient(60% 60% at 0% 100%, rgb(38 96 142 / 0.35), transparent 72%),
+      linear-gradient(160deg, #0f1f31 0%, #0a1522 100%);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.08), inset 0 0 0 1px rgb(255 255 255 / 0.04);
+  }
+  .proc-display::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-image: var(--grain);
+    background-size: 200px;
+    opacity: 0.08;
+    mix-blend-mode: overlay;
+    pointer-events: none;
   }
 
-  /* The line of light beside the deck: a faint track, lit as far as the steps have come, with a
-     point for each step that lights as it arrives */
-  .proc-rail { display: none; }
-  @media (min-width: 1100px) and (min-height: 620px) {
-    .proc-rail {
-      display: block;
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      left: calc(var(--gutter) - 34px);
-      width: 14px;
-      pointer-events: none;
-    }
-    .proc-rail-inner { position: sticky; top: var(--stick); height: var(--card-h); }
-    .proc-rail-line {
-      position: absolute;
-      left: 6px;
-      top: 0;
-      bottom: 0;
-      width: 2px;
-      border-radius: 2px;
-      background: rgb(27 42 61 / 0.12);
-    }
-    .proc-rail-lit {
-      position: absolute;
-      inset: 0 0 auto;
-      height: calc(var(--prog) * 100%);
-      border-radius: 2px;
-      background: #2a74b8;
-      box-shadow: 0 0 3px rgb(63 208 255 / 0.9), 0 0 10px rgb(63 208 255 / 0.4);
-    }
-    .proc-rail-node {
-      position: absolute;
-      left: 7px;
-      top: calc(var(--i) / 3 * 100%);
-      width: 11px;
-      height: 11px;
-      border-radius: 50%;
-      translate: -50% -50%;
-      background: #eef2f6;
-      border: 1.5px solid rgb(27 42 61 / 0.25);
-      transition: background-color 400ms var(--ease), border-color 400ms var(--ease), box-shadow 400ms var(--ease);
-    }
-    .proc-rail-node.is-on { background: #fff; border: 2px solid #2a74b8; box-shadow: 0 0 6px rgb(63 208 255 / 0.85); }
+  /* ---------- Laptops: the staircase, descending to the right ---------- */
+  @media (min-width: 1001px) {
+    .proc-stair { --card-w: 64%; --step: calc((100% - var(--card-w)) / 3); }
+    /* The timing sits just right of where its bar begins, clear of the line coming down */
+    .proc-when { padding-left: 1.4rem; }
   }
 
   /* ---------- Tablets and phones: the cards follow one another down the page ---------- */
-  @media (max-width: 900px) {
-    .proc-card { grid-template-columns: minmax(0, 1fr); border-radius: 20px; }
-    .proc-visual { padding: 1.25rem 1.25rem 1.5rem; }
+  @media (max-width: 1000px) {
+    .proc-when { margin-bottom: 0.9rem; }
   }
-  @media (max-width: 640px) {
-    .proc-head h2 { font-size: clamp(1.75rem, 1.2rem + 2.4vw, 2.25rem); }
-    .proc-text { padding: 1.4rem 1.25rem 1.5rem; gap: 0.7rem; }
-    .proc-pair { grid-template-columns: minmax(0, 1fr); gap: 0.9rem; }
-    .proc-card { border-radius: 16px; }
+  @media (max-width: 760px) {
+    .proc-card { --r: 22px; --inset: 8px; grid-template-columns: minmax(0, 1fr); }
+    .proc-display { min-height: 0; aspect-ratio: 7 / 5; }
+    .proc-text { padding: 1.25rem 1rem 1.5rem; }
   }
 </style>
