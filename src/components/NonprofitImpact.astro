@@ -111,6 +111,8 @@ const charts = [
       <h2 id="npi-title" class="npi-title">More Impact per Dollar</h2>
       <figure
         data-npi-chart
+        data-tilt="4"
+        data-tilt-depth="1800"
         class="npi-chart"
         aria-label="Illustration: without Spockhart, demand keeps rising and resources stay flat, so the gap keeps growing. With Spockhart, resources go further (1) and new funding comes in (2) while demand is brought down (3), so the gap narrows."
       >
@@ -412,4 +414,17 @@ const charts = [
   .hatch-line { stroke: rgb(var(--demand-rgb) / 0.4); }
   .end-demand { fill: #ff8a9c; }
   .end-res { fill: #8fe3ff; }
+
+  /* Depth: the chart stands in the room like the dark cards on the home page, with steel light in
+     its corner and its shadow on the floor */
+  .npi-chart {
+    border-radius: 20px;
+    background:
+      radial-gradient(70% 45% at 0% 0%, rgb(46 104 152 / 0.32), transparent 70%),
+      linear-gradient(165deg, #0f1e2f 0%, #0a1521 100%);
+    box-shadow: var(--lift-dark), 0 48px 34px -36px rgb(12 26 41 / 0.42);
+  }
+  @media (max-width: 640px) {
+    .npi-chart { border-radius: 16px; }
+  }
 </style>
