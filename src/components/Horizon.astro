@@ -24,6 +24,8 @@ import Mist from './Mist.astro';
 <section class="hz" data-hz data-hero-dark aria-labelledby="hz-title">
   <div class="hz-stage">
     <div class="hz-sky" aria-hidden="true"><Mist /></div>
+    <!-- First light, rising from behind the horizon -->
+    <div class="hz-dawn" aria-hidden="true"></div>
     <!-- Graph paper, fine, ruled to the horizon; strongest where the drawing is -->
     <div class="hz-grid" aria-hidden="true"></div>
     <!-- The ground the drawing stands on, with the horizon's lit edge -->
@@ -333,10 +335,6 @@ import Mist from './Mist.astro';
       radial-gradient(50% 70% at 0% 108%, rgb(42 95 142 / calc(0.42 * var(--night))), transparent 72%),
       radial-gradient(42% 46% at 38% -8%, rgb(56 66 132 / calc(0.32 * var(--night))), transparent 72%),
       radial-gradient(70% 50% at 50% 12%, rgb(255 255 255 / calc(0.7 * var(--ps))), transparent 72%),
-      /* First light, low on the horizon behind where demand climbs: pale gold through the blue hour,
-         settling into a soft white by day */
-      radial-gradient(48% 46% at 74% 100%, rgb(255 236 214 / calc(0.62 * var(--dawn, 0))), transparent 72%),
-      radial-gradient(90% 60% at 70% 100%, rgb(255 246 236 / calc(0.3 * var(--dawn, 0))), transparent 75%),
       /* By day, a little darker toward the walls, as the room below is, so the two meet without a seam */
       linear-gradient(90deg, rgb(12 26 41 / calc(0.05 * var(--ps))) 0%, rgb(12 26 41 / 0) 20%, rgb(12 26 41 / 0) 80%, rgb(12 26 41 / calc(0.05 * var(--ps))) 100%),
       linear-gradient(180deg, var(--sky-top, #09131e) 0%, var(--sky-mid, #0d1c2d) 58%, var(--sky-low, #10233a) 100%);
@@ -354,6 +352,20 @@ import Mist from './Mist.astro';
     background-size: 200px;
     opacity: calc(0.04 + 0.08 * var(--night));
     mix-blend-mode: overlay;
+  }
+
+  /* ---------- First light: pale gold behind where demand climbs, rising from the horizon through
+     the blue hour and settling into a soft white by day. The ground below stays in shadow. ---------- */
+  .hz-dawn {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: var(--base);
+    z-index: -1;
+    background:
+      radial-gradient(40% 52% at 74% 100%, rgb(255 234 210 / calc(0.62 * var(--dawn))), transparent 72%),
+      radial-gradient(85% 70% at 68% 100%, rgb(255 245 234 / calc(0.32 * var(--dawn))), transparent 76%);
   }
 
   /* ---------- Graph paper, ruled to the horizon ---------- */
