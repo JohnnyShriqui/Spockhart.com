@@ -406,36 +406,40 @@ const { setup, title } = Astro.props;
     display: grid;
     gap: var(--s-5);
     justify-items: start;
-    padding-top: clamp(7.5rem, 3rem + 10vh, 11rem);
+    padding-top: clamp(8rem, 3.5rem + 11vh, 11.5rem);
   }
-  /* One sentence: its opening quieter, then the problem itself in full */
+  /* One sentence, one voice: its opening a quiet line in the text face, then the problem itself,
+     the only large serif on the wall */
   .hz-copy h1 {
     max-width: 11em;
-    font-size: clamp(2.5rem, 1.5rem + 3.2vw, 4.75rem);
-    line-height: 1.04;
+    font-size: clamp(2.25rem, 1.3rem + 2.7vw, 4.125rem);
+    line-height: 1.06;
     text-wrap: balance;
     color: #1b2a3d;
   }
   .hz-setup {
     display: block;
-    margin-bottom: 0.5em;
-    font-size: clamp(1.1875rem, 0.8rem + 1.1vw, 1.875rem);
-    line-height: 1.25;
-    letter-spacing: -0.01em;
+    margin-bottom: 0.85rem;
+    font-family: var(--font-body);
+    font-size: clamp(1rem, 0.86rem + 0.4vw, 1.25rem);
+    font-weight: 400;
+    line-height: 1.45;
+    letter-spacing: 0;
     text-wrap: pretty;
     color: #5b6e83;
   }
   .hz-copy .accent-rule { background: #2c5f8a; }
-  /* The answer, large, in the brand's blue: it rises into place as the gap closes */
+  /* The answer, in the brand's blue: it rises into place as the gap closes, under the problem
+     and smaller than it, so it reads as the answer rather than a second headline */
   .hz-state {
     display: grid;
-    margin-top: clamp(0.25rem, 0rem + 0.8vw, 1.25rem);
+    margin-top: -0.15rem;
     font-family: var(--font-display);
-    font-size: clamp(1.875rem, 1.1rem + 2.6vw, 3.375rem);
+    font-size: clamp(1.5rem, 1rem + 1.45vw, 2.5rem);
     font-weight: 400;
     font-style: italic;
-    line-height: 1.08;
-    letter-spacing: -0.02em;
+    line-height: 1.12;
+    letter-spacing: -0.015em;
   }
   .hz-state > span { grid-area: 1 / 1; }
   .hz-state-1 {
@@ -614,7 +618,7 @@ const { setup, title } = Astro.props;
 
   @media (max-width: 640px) {
     .hz-copy { padding-top: 6.5rem; gap: var(--s-4); }
-    .hz-copy h1 { font-size: clamp(2rem, 1.2rem + 3.6vw, 2.5rem); }
+    .hz-copy h1 { font-size: clamp(1.875rem, 1.1rem + 3.4vw, 2.25rem); }
     .hz-lane { top: 47%; height: 47%; }
     .hz-floor { bottom: -24px; height: 40px; }
     .hz-chip { font-size: 10px; letter-spacing: 0.14em; }
