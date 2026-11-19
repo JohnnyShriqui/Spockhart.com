@@ -10,16 +10,13 @@ import { site } from '../config/site';
   description={`How Spockhart works: embedded with your team, a working prototype in ${site.offer.prototypeDays} days, and systems you own.`}
   lightHero
 >
-  <!-- One light room. It opens on the title, then one process in four steps, each a large card
-       that slides up over the last as the page scrolls (Process.astro) -->
+  <!-- One light room. It opens straight on the process: four steps, each a large card, descending
+       to the right as a staircase (Process.astro), then the closing card -->
   <div class="page-body body-approach room-light" data-body>
     <div class="ap-dots" aria-hidden="true"></div>
 
-    <section class="ap-top" aria-labelledby="ap-title">
-      <div class="wrap ap-head">
-        <h1 id="ap-title" class="load-in" style="--i:1">Embedded from day one.</h1>
-      </div>
-    </section>
+    <!-- The page opens straight on the first step; its title is there for screen readers and search -->
+    <h1 class="visually-hidden">Approach: how we work, in four steps</h1>
 
     <Process />
 
@@ -47,11 +44,9 @@ import { site } from '../config/site';
     mask-image: linear-gradient(180deg, #000 0, rgb(0 0 0 / 0.55) 30%, rgb(0 0 0 / 0.3) 80%, transparent 100%);
   }
 
-  /* The opening: the title, on one line */
-  .ap-top { padding-top: clamp(7rem, 5.5rem + 3.5vw, 9.5rem); }
-  .ap-head { display: grid; }
-  .ap-head h1 { font-size: clamp(2.75rem, 1.4rem + 3.6vw, 5rem); max-width: none; letter-spacing: -0.03em; }
+  /* The page opens straight on the first step, just under the header */
+  .body-approach :global(.proc) { padding-top: clamp(6.5rem, 5rem + 3vw, 8.5rem); }
   @media (max-width: 640px) {
-    .ap-top { padding-top: 5.5rem; }
+    .body-approach :global(.proc) { padding-top: 5.75rem; }
   }
 </style>
