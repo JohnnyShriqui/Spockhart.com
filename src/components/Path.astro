@@ -4,10 +4,11 @@
  * turns and climbs beneath them like a staircase, a step up for each phase, and after the last set
  * it carries on down to the closing card.
  *
- * Laptops and desktops: the first set draws itself when the page opens, each phase stepping
- * forward as the line reaches it; the rest of the line draws as you scroll, its bright tip keeping
- * pace a little below the middle of the screen. Phones: no line; each phase steps forward as it
- * comes into view. With reduced motion, or without JavaScript, everything is simply there.
+ * Laptops and desktops: each set draws itself as it comes into view (the first when the page
+ * opens), the line running down from the set above and along beneath the phases, each phase
+ * stepping forward as the line reaches it; the last stretch draws into the closing card as that
+ * comes into view. Phones: no line; each phase steps forward as it comes into view. With reduced
+ * motion, or without JavaScript, everything is simply there.
  *
  * The phases it reads are the [data-path-steps] lists (Timeline.astro with `path`); the closing
  * card is .closing-panel. Decorative, behind the content.
@@ -22,11 +23,10 @@
   const NS = 'http://www.w3.org/2000/svg';
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
   const wide = window.matchMedia('(min-width: 901px)');
-  // The line's tip keeps pace this far down the screen
-  const ANCHOR = 0.62;
-  // The opening draw, in ms: a short wait, then the whole of the first set
-  const INTRO_WAIT = 350;
-  const INTRO_DUR = 2600;
+  // A stretch of line starts drawing once the top of what it leads to is this far up the screen
+  const TRIGGER = 0.8;
+  // Each draw, in ms: a short wait, then the stretch of line
+  const WAIT = 300;
 
   type Node = { at: number; dot: SVGCircleElement; card?: HTMLElement };
   type Seg = {
@@ -34,17 +34,16 @@
     head: SVGCircleElement;
     len: number;
     nodes: Node[];
-    intro: boolean;
-    startY: number;
-    turnY: number;
-    turnLen: number;
-    tail: number;
+    /* It starts once the page has scrolled this far (host coordinates), and takes dur ms */
+    triggerY: number;
+    dur: number;
   };
 
   let segs: Seg[] = [];
   let cards: HTMLElement[] = [];
-  let introStart = 0;
-  let introDone = false;
+  // When each stretch started drawing (kept across redraws), and when the page opened
+  let started: number[] = [];
+  let opened = 0;
   let hostTop = 0;
   let ticking = false;
 
@@ -118,7 +117,7 @@
       return d.join(' ');
     };
 
-    const add = (d: string, intro: boolean, startY: number, turnY: number, tail: number, points: { x: number; y: number; card?: HTMLElement }[], end = false) => {
+    const add = (d: string, triggerY: number, dur: number, points: { x: number; y: number; card?: HTMLElement }[], end = false) => {
       g.append(el('path', { d, class: 'pa-guide' }));
       const lit = el('path', { d, class: 'pa-lit' });
       g.append(lit);
@@ -133,20 +132,20 @@
       if (end) nodes[nodes.length - 1].at = len;
       const head = el('circle', { cx: 0, cy: 0, r: 5, class: 'pa-head' });
       g.append(head);
-      segs.push({ lit, head, len, nodes, intro, startY, turnY, turnLen: Math.max(0, turnY - startY), tail });
+      segs.push({ lit, head, len, nodes, triggerY, dur });
     };
-    const vh = window.innerHeight;
+    const listTop = (k: number) => Y(lists[k].getBoundingClientRect().top);
 
     // The first set: from beside its heading, drawn on opening
     const s0 = sets[0];
     const start0 = s0.headTop + 8;
     g.append(el('circle', { cx: sx, cy: start0, r: 6.5, class: 'pa-source' }));
-    add(stairs(start0, s0), true, start0, s0.floors[0], vh * 0.45, s0.items.map((c, k) => ({ x: c.left + 26, y: s0.floors[k], card: c.card })));
+    add(stairs(start0, s0), -Infinity, 2600, s0.items.map((c, k) => ({ x: c.left + 26, y: s0.floors[k], card: c.card })));
 
     // Every set after it: on down the left from the turn above, drawn as you scroll
     let fromY = s0.floors[0] - 14;
-    sets.slice(1).forEach((s) => {
-      add(stairs(fromY, s), false, fromY, s.floors[0], vh * 0.45, s.items.map((c, k) => ({ x: c.left + 26, y: s.floors[k], card: c.card })));
+    sets.slice(1).forEach((s, k) => {
+      add(stairs(fromY, s), listTop(k + 1), 2800, s.items.map((c, k) => ({ x: c.left + 26, y: s.floors[k], card: c.card })));
       fromY = s.floors[0] - 14;
     });
 
@@ -156,7 +155,7 @@
       const pr = panel.getBoundingClientRect();
       const cy = Y(pr.top + pr.height / 2);
       const px = X(pr.left);
-      add(`M${sx} ${fromY} V${cy - 14} Q${sx} ${cy} ${sx + 14} ${cy} H${px}`, false, fromY, cy, vh * 0.12, [{ x: px, y: cy }], true);
+      add(`M${sx} ${fromY} V${cy - 14} Q${sx} ${cy} ${sx + 14} ${cy} H${px}`, Y(pr.top), 1400, [{ x: px, y: cy }], true);
     }
     queue();
   }
@@ -172,13 +171,17 @@
       });
       return;
     }
-    const anchor = window.scrollY + vh * ANCHOR - hostTop;
-    const introP = introDone ? 1 : clamp((performance.now() - introStart - INTRO_WAIT) / INTRO_DUR);
-    for (const s of segs) {
-      let len: number;
-      if (s.intro) len = s.len * ease(introP);
-      else if (anchor < s.turnY) len = clamp(anchor - s.startY, 0, s.turnLen);
-      else len = s.turnLen + clamp((anchor - s.turnY) / s.tail) * (s.len - s.turnLen);
+    const reach = window.scrollY + vh * TRIGGER - hostTop;
+    const now = performance.now();
+    let moving = false;
+    segs.forEach((s, i) => {
+      // A stretch starts once what it leads to comes into view, and only after the one before it
+      if (started[i] === undefined && reach >= s.triggerY && (i === 0 || started[i - 1] !== undefined)) {
+        started[i] = i === 0 ? opened : Math.max(now, started[i - 1] + WAIT + segs[i - 1].dur);
+      }
+      const t = started[i] === undefined ? 0 : clamp((now - started[i] - WAIT) / s.dur);
+      if (started[i] !== undefined && t < 1) moving = true;
+      const len = s.len * ease(t);
       s.lit.style.strokeDashoffset = (s.len - len).toFixed(1);
       if (len > 0.5 && len < s.len - 0.5) {
         const p = s.lit.getPointAtLength(len);
@@ -192,9 +195,8 @@
         // Once a phase has stepped forward it stays forward
         if (on) n.card?.classList.add('is-on');
       }
-    }
-    if (!introDone && introP < 1) queue();
-    else introDone = true;
+    });
+    if (moving) queue();
   }
 
   function queue() {
@@ -207,8 +209,8 @@
     const host = document.querySelector<HTMLElement>('[data-path]');
     if (!host || host.dataset.ready) return;
     host.dataset.ready = '1';
-    introStart = performance.now();
-    introDone = false;
+    opened = performance.now();
+    started = [];
     let raf = 0;
     const soon = () => {
       cancelAnimationFrame(raf);

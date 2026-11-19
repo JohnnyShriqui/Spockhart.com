@@ -1,6 +1,6 @@
 ---
 /**
- * Nonprofits: the horizon. The page opens edge to edge on a night sky, with demand and resources
+ * Nonprofits: the horizon. The page opens edge to edge in the home page hero's midnight blue, with demand and resources
  * drawn across the full width of the screen, low, like a horizon: resources nearly flat along the
  * bottom, demand climbing away from it, and the gap between them glowing. The scene holds still on
  * screen while you scroll through it: the lines move (demand eases down, resources rise), the gap
@@ -16,13 +16,13 @@ interface Props {
   lead: string;
 }
 const { title, lead } = Astro.props;
+import Mist from './Mist.astro';
 ---
 
 <section class="hz" data-hz data-hero-dark aria-labelledby="hz-title">
   <div class="hz-stage">
-    <div class="hz-sky" aria-hidden="true"></div>
+    <div class="hz-sky" aria-hidden="true"><Mist /></div>
     <svg class="hz-chart" aria-hidden="true" data-hz-svg>
-      <g data-hz-stars class="hz-stars"></g>
       <line class="hz-base" data-hz-base />
       <path class="hz-gap" data-hz-gap />
       <path class="hz-was" data-hz-was-demand />
@@ -40,9 +40,9 @@ const { title, lead } = Astro.props;
       <h1 id="hz-title" class="load-in" style="--i:1">{title}</h1>
       <div class="accent-rule load-in" style="--i:2"></div>
       <p class="lead load-in" style="--i:2">{lead}</p>
-      <p class="hz-state load-in" style="--i:3" aria-hidden="true">
-        <span class="hz-state-0">Without help, demand keeps outgrowing resources.</span>
-        <span class="hz-state-1">With Spockhart, the gap closes.</span>
+      <!-- Comes in as the gap closes -->
+      <p class="hz-state">
+        <span class="hz-state-1">We exist to close that gap.</span>
       </p>
     </div>
   </div>
@@ -61,7 +61,7 @@ const { title, lead } = Astro.props;
   /* The sky, top to horizon, at each moment: night, the blue hour, morning, then day (the light
      room below). Between them it blends smoothly, never through grey. */
   const SKY: [number, string, string, string][] = [
-    [0, '#060d17', '#0b1727', '#13253c'],
+    [0, '#09131e', '#0d1c2d', '#10233a'],
     [0.42, '#0a1b30', '#183858', '#34679a'],
     [0.66, '#86a9c8', '#acc6dd', '#cfe0ee'],
     [1, '#e4eaf1', '#eaeff4', '#eef2f6'],
@@ -105,7 +105,6 @@ const { title, lead } = Astro.props;
       labelDemand: q<SVGTextElement>('label-demand'),
       labelRes: q<SVGTextElement>('label-res'),
       labelGap: q<SVGTextElement>('label-gap'),
-      stars: q<SVGGElement>('stars'),
     };
     let W = 0;
     let H = 0;
@@ -128,19 +127,6 @@ const { title, lead } = Astro.props;
       parts.base.setAttribute('x2', W.toFixed(0));
       parts.base.setAttribute('y1', bottom.toFixed(1));
       parts.base.setAttribute('y2', bottom.toFixed(1));
-      // A few faint stars in the sky above the lines, the same ones every time
-      parts.stars.replaceChildren();
-      let seed = 7;
-      const rnd = () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646;
-      const n = Math.round((W * H) / 22000);
-      for (let i = 0; i < n; i++) {
-        const c = document.createElementNS(NS, 'circle');
-        c.setAttribute('cx', (rnd() * W).toFixed(1));
-        c.setAttribute('cy', (rnd() * H * 0.62).toFixed(1));
-        c.setAttribute('r', (0.5 + rnd() * 0.9).toFixed(2));
-        c.setAttribute('opacity', (0.2 + rnd() * 0.6).toFixed(2));
-        parts.stars.append(c);
-      }
     };
 
     const Y = (h: number) => bottom - (bottom - top) * h;
@@ -240,13 +226,25 @@ const { title, lead } = Astro.props;
     position: absolute;
     inset: 0;
     z-index: -1;
+    /* By night, the home page hero exactly: midnight blue, the brand's steel light on the right and
+       rising from the lower corners, a little indigo at the top. It fades as the day comes up. */
+    --mist-1: #2a6496;
+    --mist-2: #2a5f8e;
+    --mist-3: #3a4c8c;
     background:
-      radial-gradient(50% 60% at 86% 18%, rgb(46 102 150 / calc(0.4 * var(--night))), transparent 72%),
-      radial-gradient(40% 50% at 8% 6%, rgb(70 84 140 / calc(0.3 * var(--night))), transparent 72%),
+      radial-gradient(52% 72% at 80% 40%, rgb(46 104 152 / calc(0.5 * var(--night))), transparent 72%),
+      radial-gradient(55% 75% at 100% 105%, rgb(38 96 142 / calc(0.48 * var(--night))), transparent 72%),
+      radial-gradient(50% 70% at 0% 108%, rgb(42 95 142 / calc(0.42 * var(--night))), transparent 72%),
+      radial-gradient(42% 46% at 38% -8%, rgb(56 66 132 / calc(0.32 * var(--night))), transparent 72%),
       radial-gradient(70% 50% at 50% 12%, rgb(255 255 255 / calc(0.7 * var(--ps))), transparent 72%),
       /* By day, a little darker toward the walls, as the room below is, so the two meet without a seam */
       linear-gradient(90deg, rgb(12 26 41 / calc(0.05 * var(--ps))) 0%, rgb(12 26 41 / 0) 20%, rgb(12 26 41 / 0) 80%, rgb(12 26 41 / calc(0.05 * var(--ps))) 100%),
-      linear-gradient(180deg, var(--sky-top, #060d17) 0%, var(--sky-mid, #0b1727) 58%, var(--sky-low, #13253c) 100%);
+      linear-gradient(180deg, var(--sky-top, #09131e) 0%, var(--sky-mid, #0d1c2d) 58%, var(--sky-low, #10233a) 100%);
+  }
+  .hz-sky :global(.mist) {
+    opacity: var(--night);
+    -webkit-mask-image: linear-gradient(180deg, #000 45%, transparent 90%);
+    mask-image: linear-gradient(180deg, #000 45%, transparent 90%);
   }
   .hz-sky::after {
     content: '';
@@ -260,7 +258,6 @@ const { title, lead } = Astro.props;
 
   /* ---------- The drawing, edge to edge ---------- */
   .hz-chart { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-  .hz-stars { fill: #fff; opacity: var(--night); }
   .hz-base { stroke: color-mix(in oklab, rgb(27 42 61 / 0.25) calc(var(--ps) * 100%), rgb(142 192 230 / 0.35)); stroke-width: 1; }
   /* The lines: lightsabers by night, the brand's red and blue by day */
   .hz-line { fill: none; stroke-width: 2.75; stroke-linecap: round; }
@@ -322,10 +319,9 @@ const { title, lead } = Astro.props;
   }
   .hz-copy .lead { max-width: 34rem; color: color-mix(in oklab, #4a5d72 calc(var(--ps) * 100%), #b5c4d3); }
   .hz-copy .accent-rule { background: color-mix(in oklab, #2c5f8a calc(var(--ps) * 100%), #8ec0e6); }
-  /* What the scene is saying: without help, then with us */
+  /* What we are for, arriving as the gap closes */
   .hz-state { display: grid; margin-top: var(--s-2); font-family: var(--font-display); font-size: clamp(1.125rem, 1rem + 0.4vw, 1.375rem); }
   .hz-state > span { grid-area: 1 / 1; transition: opacity 500ms var(--ease); }
-  .hz-state-0 { color: color-mix(in oklab, #b0463e calc(var(--ps) * 100%), #ff8a9c); opacity: calc(1 - var(--pl) * 2.2); }
   .hz-state-1 { color: color-mix(in oklab, #2c5f8a calc(var(--ps) * 100%), #8ec0e6); opacity: calc(var(--pl) * 2.2 - 1.2); }
 
   @media (max-width: 640px) {
@@ -334,7 +330,6 @@ const { title, lead } = Astro.props;
     .hz-label-gap { font-size: 17px; }
   }
   @media (prefers-reduced-motion: reduce) {
-    .hz-state-0 { display: none; }
     .hz-state-1 { opacity: 1; }
   }
 </style>
