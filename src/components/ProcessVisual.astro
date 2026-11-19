@@ -1,15 +1,23 @@
 ---
 /**
- * The display on each step of the process (Process.astro): a dark, screen-like panel with one
- * luminous, minimal scene, moving slowly. Illustrations, not client data.
+ * The display on each step of the process (Process.astro): a dark, screen-like panel where the
+ * step's work is seen being done, as a short story that plays while it is on screen and loops.
+ * Illustrations, not client data.
  *
- *   0 Diagnose       a process map in two lanes, the customer and your team, with the step where
- *                    the same data is typed twice called out; the work slows as it passes it
- *   1 Prototype      a working app: approvals turn from Pending to Approved, row by row
- *   2 Build          the tools already in use, as glass tiles, feeding one hub; the team below
- *   3 Handover       the handover kit as a pass that checks itself off and catches the light
+ *   0 Diagnose   The lanes appear and the process is mapped, step by step. Then a piece of work
+ *                runs through it, slows where the same data is typed twice, those steps turn red,
+ *                and the waste is called out.
+ *   1 Prototype  An empty window, Day 1. Grey wireframe rows (the design), filled with real
+ *                records (the build), the day count running to 30. Then it works: each invoice
+ *                is approved in turn.
+ *   2 Build      The hub assembles. The tools already in use arrive one at a time, each wired in
+ *                and lit as data flows. The team arrives and is trained, one by one; it goes live.
+ *   3 Handover   The kit is put together on a pass, item by item, then handed across to your
+ *                team, and becomes theirs.
  *
- * The motion is SVG animation; with reduced motion it is paused on a finished frame.
+ * Timed by the scene engine (scripts/scenes.ts), which writes the story's time to --t. Each part
+ * comes in at its moment (--a) and some leave at another (--b). With reduced motion, or before
+ * the script runs, it rests on the finished picture.
  */
 import { upperPath, lowerPath } from '../lib/logo';
 interface Props {
@@ -17,57 +25,55 @@ interface Props {
 }
 const { step } = Astro.props;
 
-/* 1. The process: five points along a gentle arc */
-const nodes = [
-  { x: 72, y: 262, label: 'Order in' },
-  { x: 176, y: 206, label: 'Typed in CRM', waste: true },
-  { x: 280, y: 190, label: 'Typed in books', waste: true },
-  { x: 384, y: 206, label: 'Manager OK' },
-  { x: 488, y: 262, label: 'Invoice sent' },
-];
-const flow = 'M72 262 C112 262 136 206 176 206 C216 206 240 190 280 190 C320 190 344 206 384 206 C424 206 448 262 488 262';
+const LOOP = 12;
+const STILL = 10.6;
+const at = (a: number, b?: number, d?: number) => `--a:${a}${b !== undefined ? `;--b:${b}` : ''}${d !== undefined ? `;--d:${d}` : ''}`;
 
-/* 2. The app */
+/* An arrowhead, landing at (x, y), pointing r, l, u or d */
+const head = (x: number, y: number, dir: 'r' | 'l' | 'u' | 'd') => {
+  const s = 5;
+  const pts = {
+    r: [[x, y], [x - s * 1.4, y - s], [x - s * 1.4, y + s]],
+    l: [[x, y], [x + s * 1.4, y - s], [x + s * 1.4, y + s]],
+    u: [[x, y], [x - s, y + s * 1.4], [x + s, y + s * 1.4]],
+    d: [[x, y], [x - s, y - s * 1.4], [x + s, y - s * 1.4]],
+  }[dir];
+  return pts.map((p) => p.join(',')).join(' ');
+};
+
+/* 2. The app's records */
 const rows = [
   ['INV-1042', 'Northline Supply', '$4,280'],
   ['INV-1043', 'Harbour Print', '$960'],
   ['INV-1044', 'Cedar Logistics', '$12,400'],
   ['INV-1045', 'Fieldstone Labs', '$2,115'],
 ];
+const flips = [7.3, 7.9, 8.5, 9.1];
 
 /* 3. The tools, around the hub */
-const hub = { x: 280, y: 168 };
+const hub = { x: 280, y: 158 };
 const tiles = [
-  { x: 112, y: 86, label: 'Email', glyph: 'mail' },
-  { x: 448, y: 86, label: 'Accounting', glyph: 'ledger' },
-  { x: 112, y: 250, label: 'CRM', glyph: 'card' },
-  { x: 448, y: 250, label: 'Calendar', glyph: 'cal' },
+  { x: 112, y: 80, label: 'Email', glyph: 'mail', a: 1.4 },
+  { x: 448, y: 80, label: 'Accounting', glyph: 'ledger', a: 2.2 },
+  { x: 112, y: 236, label: 'CRM', glyph: 'card', a: 3.0 },
+  { x: 448, y: 236, label: 'Calendar', glyph: 'cal', a: 3.8 },
 ];
 const team = [
-  { x: 206, label: 'Finance', i: 'F' },
-  { x: 280, label: 'Operations', i: 'O' },
-  { x: 354, label: 'Admin', i: 'A' },
+  { x: 206, label: 'Finance', i: 'F', a: 5.1, c: 6.0 },
+  { x: 280, label: 'Operations', i: 'O', a: 5.3, c: 6.6 },
+  { x: 354, label: 'Admin', i: 'A', a: 5.5, c: 7.2 },
 ];
 
 /* 4. The kit */
 const kit = ['Source code', 'Documentation', 'Admin access', 'Training notes'];
 ---
 
-<div class={`pv pv-${step}`} aria-hidden="true" data-pv>
+<div class={`pv pv-${step}`} aria-hidden="true" data-pv data-scene data-loop={LOOP} data-still={STILL} data-rate="1" style={`--t:${STILL};--L:${LOOP}`}>
   <svg viewBox="0 0 560 400" preserveAspectRatio="xMidYMid meet">
     <defs>
       <pattern id={`pv-dots-${step}`} width="22" height="22" patternUnits="userSpaceOnUse">
         <circle cx="1" cy="1" r="1" fill="rgb(255 255 255 / 0.06)"></circle>
       </pattern>
-      <linearGradient id={`pv-cyan-${step}`} x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0" stop-color="#3fd0ff" stop-opacity="0.2"></stop>
-        <stop offset="0.5" stop-color="#7fe0ff"></stop>
-        <stop offset="1" stop-color="#3fd0ff" stop-opacity="0.2"></stop>
-      </linearGradient>
-      <radialGradient id={`pv-red-${step}`}>
-        <stop offset="0" stop-color="#ff4d6a" stop-opacity="0.55"></stop>
-        <stop offset="1" stop-color="#ff4d6a" stop-opacity="0"></stop>
-      </radialGradient>
       <radialGradient id={`pv-glow-${step}`}>
         <stop offset="0" stop-color="#3fd0ff" stop-opacity="0.35"></stop>
         <stop offset="1" stop-color="#3fd0ff" stop-opacity="0"></stop>
@@ -83,7 +89,7 @@ const kit = ['Source code', 'Documentation', 'Admin access', 'Training notes'];
       </linearGradient>
       <linearGradient id={`pv-sheen-${step}`} x1="0" y1="0" x2="1" y2="0">
         <stop offset="0" stop-color="#fff" stop-opacity="0"></stop>
-        <stop offset="0.5" stop-color="#fff" stop-opacity="0.22"></stop>
+        <stop offset="0.5" stop-color="#fff" stop-opacity="0.24"></stop>
         <stop offset="1" stop-color="#fff" stop-opacity="0"></stop>
       </linearGradient>
       <clipPath id={`pv-passclip-${step}`}><rect x="120" y="86" width="320" height="232" rx="20"></rect></clipPath>
@@ -91,248 +97,337 @@ const kit = ['Source code', 'Documentation', 'Admin access', 'Training notes'];
 
     <rect width="560" height="400" fill={`url(#pv-dots-${step})`}></rect>
 
-    {
-      step === 0 && (
-        <g>
-          <defs>
-            <marker id="pv-arrow-0" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-              <path d="M0 0 L10 5 L0 10 Z" class="pv-arrowhead"></path>
-            </marker>
-            <marker id="pv-open-0" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
-              <path d="M1 1 L9 5 L1 9" class="pv-openhead"></path>
-            </marker>
-          </defs>
-          <text x="12" y="40" class="pv-kicker">Process map</text>
-          <text x="12" y="64" class="pv-title">Order to invoice</text>
+    <g class="pv-stage">
+      {
+        step === 0 && (
+          <g>
+            <text x="12" y="40" class="pv-kicker in" style={at(0.2)}>Process map</text>
+            <text x="12" y="64" class="pv-title in" style={at(0.35)}>Order to invoice</text>
 
-          {/* Two lanes: the customer, and your team */}
-          <rect x="10" y="84" width="540" height="288" rx="14" class="pv-lanes"></rect>
-          <line x1="10" y1="182" x2="550" y2="182" class="pv-lane-rule"></line>
-          <line x1="36" y1="84" x2="36" y2="372" class="pv-lane-rule"></line>
-          <text transform="translate(27 133) rotate(-90)" text-anchor="middle" class="pv-lane-name">Customer</text>
-          <text transform="translate(27 277) rotate(-90)" text-anchor="middle" class="pv-lane-name">Your team</text>
+            {/* The lanes */}
+            <path d="M24 84 H536 Q550 84 550 98 V358 Q550 372 536 372 H24 Q10 372 10 358 V98 Q10 84 24 84 Z" pathLength="1" class="pv-lanes draw" style={at(0.3, undefined, 1)}></path>
+            <path d="M10 182 H550" pathLength="1" class="pv-lane-rule draw" style={at(0.8, undefined, 0.6)}></path>
+            <path d="M36 84 V372" pathLength="1" class="pv-lane-rule draw" style={at(0.8, undefined, 0.6)}></path>
+            <text transform="translate(27 133) rotate(-90)" text-anchor="middle" class="pv-lane-name in" style={at(1)}>Customer</text>
+            <text transform="translate(27 277) rotate(-90)" text-anchor="middle" class="pv-lane-name in" style={at(1.1)}>Your team</text>
 
-          {/* Messages between the lanes */}
-          <path d="M110 154 V211" class="pv-msg" marker-end="url(#pv-open-0)"></path>
-          <path d="M444 213 V156" class="pv-msg" marker-end="url(#pv-open-0)"></path>
+            {/* Mapped, step by step, as the work actually runs */}
+            <circle cx="52" cy="137" r="8" class="pv-event pop" style={at(1.3)}></circle>
+            <path d="M60 137 H66" pathLength="1" class="pv-seq draw" style={at(1.45, undefined, 0.2)}></path>
+            <polygon points={head(70, 137, 'r')} class="pv-head in" style={at(1.6)}></polygon>
+            <g class="pop" style={at(1.65)}>
+              <rect x="70" y="120" width="80" height="34" rx="9" class="pv-task"></rect>
+              <text x="110" y="141" text-anchor="middle" class="pv-task-text">Place order</text>
+            </g>
+            <path d="M110 154 V207" class="pv-msg in" style={at(2.0)}></path>
+            <polyline points="105,201 110,209 115,201" class="pv-openhead in" style={at(2.1)}></polyline>
+            <g class="pop" style={at(2.3)}>
+              <rect x="70" y="213" width="80" height="34" rx="9" class="pv-task"></rect>
+              <text x="110" y="234" text-anchor="middle" class="pv-task-text">Order in</text>
+            </g>
+            <path d="M150 230 H160" pathLength="1" class="pv-seq draw" style={at(2.6, undefined, 0.2)}></path>
+            <polygon points={head(166, 230, 'r')} class="pv-head in" style={at(2.75)}></polygon>
+            <g class="pop" style={at(2.85)}>
+              <rect x="166" y="213" width="80" height="34" rx="9" class="pv-task"></rect>
+              <text x="206" y="234" text-anchor="middle" class="pv-task-text">Typed in CRM</text>
+            </g>
+            <path d="M246 230 H256" pathLength="1" class="pv-seq draw" style={at(3.15, undefined, 0.2)}></path>
+            <polygon points={head(262, 230, 'r')} class="pv-head in" style={at(3.3)}></polygon>
+            <g class="pop" style={at(3.4)}>
+              <rect x="262" y="213" width="80" height="34" rx="9" class="pv-task"></rect>
+              <text x="302" y="234" text-anchor="middle" class="pv-task-text">Typed in books</text>
+            </g>
+            <path d="M342 230 H352" pathLength="1" class="pv-seq draw" style={at(3.7, undefined, 0.2)}></path>
+            <polygon points={head(358, 230, 'r')} class="pv-head in" style={at(3.85)}></polygon>
+            <g class="pop" style={at(3.95)}>
+              <path d="M372 216 L386 230 L372 244 L358 230 Z" class="pv-gate"></path>
+              <path d="M367 225 L377 235 M377 225 L367 235" class="pv-gate-x"></path>
+            </g>
+            <path d="M386 230 H398" pathLength="1" class="pv-seq draw" style={at(4.25, undefined, 0.2)}></path>
+            <polygon points={head(404, 230, 'r')} class="pv-head in" style={at(4.4)}></polygon>
+            <g class="pop" style={at(4.5)}>
+              <rect x="404" y="213" width="80" height="34" rx="9" class="pv-task"></rect>
+              <text x="444" y="234" text-anchor="middle" class="pv-task-text">Invoice sent</text>
+            </g>
+            <path d="M484 230 H500" pathLength="1" class="pv-seq draw" style={at(4.8, undefined, 0.25)}></path>
+            <polygon points={head(506, 230, 'r')} class="pv-head in" style={at(5.0)}></polygon>
+            <circle cx="514" cy="230" r="8" class="pv-event-end pop" style={at(5.1)}></circle>
+            {/* The other way through the decision: a manager's approval */}
+            <path d="M372 244 V302 Q372 310 380 310 H398" pathLength="1" class="pv-seq draw" style={at(4.6, undefined, 0.5)}></path>
+            <polygon points={head(404, 310, 'r')} class="pv-head in" style={at(5.1)}></polygon>
+            <g class="pop" style={at(5.2)}>
+              <rect x="404" y="293" width="80" height="34" rx="9" class="pv-task"></rect>
+              <text x="444" y="314" text-anchor="middle" class="pv-task-text">Manager OK</text>
+            </g>
+            <path d="M444 293 V253" pathLength="1" class="pv-seq draw" style={at(5.5, undefined, 0.3)}></path>
+            <polygon points={head(444, 247, 'u')} class="pv-head in" style={at(5.8)}></polygon>
+            {/* Back to the customer */}
+            <path d="M444 213 V158" class="pv-msg in" style={at(5.9)}></path>
+            <polyline points="439,162 444,154 449,162" class="pv-openhead in" style={at(6.0)}></polyline>
+            <g class="pop" style={at(6.2)}>
+              <rect x="404" y="120" width="80" height="34" rx="9" class="pv-task"></rect>
+              <text x="444" y="141" text-anchor="middle" class="pv-task-text">Get invoice</text>
+            </g>
+            <path d="M484 137 H500" pathLength="1" class="pv-seq draw" style={at(6.5, undefined, 0.25)}></path>
+            <polygon points={head(506, 137, 'r')} class="pv-head in" style={at(6.7)}></polygon>
+            <circle cx="514" cy="137" r="8" class="pv-event-end pop" style={at(6.8)}></circle>
 
-          {/* The customer's side */}
-          <circle cx="52" cy="137" r="8" class="pv-event"></circle>
-          <path d="M60 137 H68" class="pv-seq" marker-end="url(#pv-arrow-0)"></path>
-          <rect x="70" y="120" width="80" height="34" rx="9" class="pv-task"></rect>
-          <text x="110" y="141" text-anchor="middle" class="pv-task-text">Place order</text>
-          <rect x="404" y="120" width="80" height="34" rx="9" class="pv-task"></rect>
-          <text x="444" y="141" text-anchor="middle" class="pv-task-text">Get invoice</text>
-          <path d="M484 137 H504" class="pv-seq" marker-end="url(#pv-arrow-0)"></path>
-          <circle cx="514" cy="137" r="8" class="pv-event-end"></circle>
+            {/* The waste found: as the work passes, the two typing steps turn red */}
+            <g class="in" style={at(7.8)}>
+              <rect x="166" y="213" width="80" height="34" rx="9" class="pv-task pv-task-waste"></rect>
+              <text x="206" y="234" text-anchor="middle" class="pv-task-text pv-task-text-waste">Typed in CRM</text>
+            </g>
+            <g class="in" style={at(8.6)}>
+              <rect x="262" y="213" width="80" height="34" rx="9" class="pv-task pv-task-waste"></rect>
+              <text x="302" y="234" text-anchor="middle" class="pv-task-text pv-task-text-waste">Typed in books</text>
+            </g>
+            <rect x="166" y="213" width="176" height="34" rx="9" class="pv-waste-glow in" style={at(8.9)}></rect>
+            <path d="M206 249 V276 M302 249 V276" class="pv-call in" style={at(9.1)}></path>
+            <g transform="translate(254 290)">
+              <g class="pop" style={at(9.3)}>
+                <rect x="-84" y="-14" width="168" height="28" rx="14" class="pv-tag-red"></rect>
+                <text x="0" y="4.5" text-anchor="middle" class="pv-tag-red-text">Same data, typed twice</text>
+              </g>
+            </g>
 
-          {/* Your team's side */}
-          <rect x="70" y="213" width="80" height="34" rx="9" class="pv-task"></rect>
-          <text x="110" y="234" text-anchor="middle" class="pv-task-text">Order in</text>
-          <path d="M150 230 H164" class="pv-seq" marker-end="url(#pv-arrow-0)"></path>
-          <rect x="166" y="213" width="80" height="34" rx="9" class="pv-task pv-task-waste"></rect>
-          <text x="206" y="234" text-anchor="middle" class="pv-task-text pv-task-text-waste">Typed in CRM</text>
-          <path d="M246 230 H260" class="pv-seq" marker-end="url(#pv-arrow-0)"></path>
-          <rect x="262" y="213" width="80" height="34" rx="9" class="pv-task pv-task-waste"></rect>
-          <text x="302" y="234" text-anchor="middle" class="pv-task-text pv-task-text-waste">Typed in books</text>
-          <path d="M342 230 H356" class="pv-seq" marker-end="url(#pv-arrow-0)"></path>
-          {/* A decision: does it need a manager's approval? */}
-          <path d="M372 216 L386 230 L372 244 L358 230 Z" class="pv-gate"></path>
-          <path d="M367 225 L377 235 M377 225 L367 235" class="pv-gate-x"></path>
-          <path d="M386 230 H402" class="pv-seq" marker-end="url(#pv-arrow-0)"></path>
-          <rect x="404" y="213" width="80" height="34" rx="9" class="pv-task"></rect>
-          <text x="444" y="234" text-anchor="middle" class="pv-task-text">Invoice sent</text>
-          <path d="M484 230 H504" class="pv-seq" marker-end="url(#pv-arrow-0)"></path>
-          <circle cx="514" cy="230" r="8" class="pv-event-end"></circle>
-          {/* The other way out of the decision */}
-          <path d="M372 244 V302 Q372 310 380 310 H402" class="pv-seq" marker-end="url(#pv-arrow-0)"></path>
-          <rect x="404" y="293" width="80" height="34" rx="9" class="pv-task"></rect>
-          <text x="444" y="314" text-anchor="middle" class="pv-task-text">Manager OK</text>
-          <path d="M444 293 V249" class="pv-seq" marker-end="url(#pv-arrow-0)"></path>
-
-          {/* The waste, called out */}
-          <rect x="166" y="213" width="176" height="34" rx="9" class="pv-waste-glow"></rect>
-          <path d="M206 249 V276 M302 249 V276" class="pv-call"></path>
-          <g transform="translate(254 290)">
-            <rect x="-84" y="-14" width="168" height="28" rx="14" class="pv-tag-red"></rect>
-            <text x="0" y="4.5" text-anchor="middle" class="pv-tag-red-text">Same data, typed twice</text>
+            {/* A piece of work running the process: it slows where it is done twice */}
+            <path id="pv-run-0" d="M110 230 H444" fill="none" stroke="none"></path>
+            <g data-along="#pv-run-0" data-keys="6.9 0, 7.5 0.17, 8.9 0.69, 9.5 1">
+              <g class="inout" style={at(6.9, 9.7)}>
+                <circle r="13" fill={`url(#pv-glow-0)`}></circle>
+                <circle r="4.5" class="pv-pulse"></circle>
+              </g>
+            </g>
           </g>
+        )
+      }
 
-          {/* The work moving through: it slows where it is done twice */}
-          <circle r="4.5" class="pv-pulse">
-            <animateMotion dur="5.4s" repeatCount="indefinite" path="M110 230 H444" keyPoints="0;0.17;0.69;1" keyTimes="0;0.18;0.72;1" calcMode="linear"></animateMotion>
-          </circle>
-        </g>
-      )
-    }
+      {
+        step === 1 && (
+          <g>
+            {/* The window: empty at first */}
+            <g class="pop" style={at(0.2)}>
+              <rect x="34" y="44" width="492" height="316" rx="18" class="pv-window"></rect>
+              <rect x="34" y="44" width="492" height="316" rx="18" class="pv-window-edge"></rect>
+              <circle cx="60" cy="70" r="5" class="pv-dot"></circle>
+              <circle cx="77" cy="70" r="5" class="pv-dot"></circle>
+              <circle cx="94" cy="70" r="5" class="pv-dot"></circle>
+              <line x1="34" y1="96" x2="526" y2="96" class="pv-hair"></line>
+            </g>
+            <text x="118" y="75.5" class="pv-app-title in" style={at(0.6)}>Invoice approvals</text>
+            {/* The day count, running to 30 as it is designed and built */}
+            <g transform="translate(468 70)">
+              <g class="in" style={at(0.6)}>
+                <rect x="-38" y="-13" width="76" height="26" rx="13" class="pv-tag-cyan"></rect>
+              </g>
+              <rect x="-38" y="-13" width="76" height="26" rx="13" class="pv-tag-cyan-on in" style={at(6.7)}></rect>
+              <text x="0" y="4.5" text-anchor="middle" class="pv-tag-cyan-text in" style={at(0.6)} data-count="0.7 1, 6.6 30" data-fmt="Day {}">Day 30</text>
+            </g>
+            <g class="in" style={at(1.0)}>
+              <text x="62" y="126" class="pv-col">Invoice</text>
+              <text x="178" y="126" class="pv-col">Supplier</text>
+              <text x="372" y="126" text-anchor="end" class="pv-col">Amount</text>
+              <text x="458" y="126" text-anchor="middle" class="pv-col">Status</text>
+            </g>
 
-    {
-      step === 1 && (
-        <g>
-          {/* The app, in its window */}
-          <rect x="34" y="44" width="492" height="316" rx="18" class="pv-window"></rect>
-          <rect x="34" y="44" width="492" height="316" rx="18" class="pv-window-edge"></rect>
-          <circle cx="60" cy="70" r="5" class="pv-dot"></circle>
-          <circle cx="77" cy="70" r="5" class="pv-dot"></circle>
-          <circle cx="94" cy="70" r="5" class="pv-dot"></circle>
-          <text x="118" y="75.5" class="pv-app-title">Invoice approvals</text>
-          <g transform="translate(468 70)">
-            <rect x="-36" y="-13" width="72" height="26" rx="13" class="pv-tag-cyan"></rect>
-            <text x="0" y="4.5" text-anchor="middle" class="pv-tag-cyan-text">Day 30</text>
-          </g>
-          <line x1="34" y1="96" x2="526" y2="96" class="pv-hair"></line>
-          <text x="62" y="126" class="pv-col">Invoice</text>
-          <text x="178" y="126" class="pv-col">Supplier</text>
-          <text x="372" y="126" text-anchor="end" class="pv-col">Amount</text>
-          <text x="458" y="126" text-anchor="middle" class="pv-col">Status</text>
-          {/* The row being worked on, moving down the list */}
-          <rect x="46" y="140" width="468" height="44" rx="11" class="pv-focus"></rect>
-          {rows.map((r, i) => (
-            <g class="pv-row" style={`--d:${(i * 1.1 - 1.5).toFixed(1)}s`}>
-              {i < 3 && <line x1="54" y1={186 + i * 48} x2="506" y2={186 + i * 48} class="pv-hair pv-hair-soft"></line>}
-              <text x="62" y={167 + i * 48} class="pv-cell pv-cell-strong">{r[0]}</text>
-              <text x="178" y={167 + i * 48} class="pv-cell">{r[1]}</text>
-              <text x="372" y={167 + i * 48} text-anchor="end" class="pv-cell pv-cell-num">{r[2]}</text>
-              <g transform={`translate(458 ${162 + i * 48})`}>
-                <g class="pv-pending">
-                  <rect x="-42" y="-13" width="84" height="26" rx="13" class="pv-pill-amber"></rect>
-                  <text x="0" y="4.5" text-anchor="middle" class="pv-pill-amber-text">Pending</text>
+            {/* The row being worked on, once it works */}
+            <path id="pv-focus-1" d="M0 0 V144" fill="none" stroke="none"></path>
+            <g data-along="#pv-focus-1" data-keys="7.0 0, 7.5 0, 7.8 0.3333, 8.4 0.6667, 9.0 1">
+              <rect x="46" y="140" width="468" height="44" rx="11" class="pv-focus inout" style={at(6.95, 10.3)}></rect>
+            </g>
+
+            {rows.map((r, i) => (
+              <g>
+                {/* First the design: grey wireframe rows */}
+                <g class="inout" style={at(1.3 + i * 0.18, 2.9 + i * 0.5)}>
+                  <rect x="62" y={160 + i * 48} width="62" height="9" rx="4.5" class="pv-skel"></rect>
+                  <rect x="178" y={160 + i * 48} width={88 - i * 8} height="9" rx="4.5" class="pv-skel"></rect>
+                  <rect x={330 - (i % 2) * 10} y={160 + i * 48} width={42 + (i % 2) * 10} height="9" rx="4.5" class="pv-skel"></rect>
+                  <rect x="416" y={153 + i * 48} width="84" height="22" rx="11" class="pv-skel pv-skel-soft"></rect>
                 </g>
-                <g class="pv-approved">
-                  <rect x="-42" y="-13" width="84" height="26" rx="13" class="pv-pill-green"></rect>
-                  <text x="0" y="4.5" text-anchor="middle" class="pv-pill-green-text">Approved</text>
+                {/* Then the build: real records */}
+                {i < 3 && <line x1="54" y1={186 + i * 48} x2="506" y2={186 + i * 48} class="pv-hair pv-hair-soft in" style={at(1.3)}></line>}
+                <g class="in" style={at(2.95 + i * 0.5)}>
+                  <text x="62" y={167 + i * 48} class="pv-cell pv-cell-strong">{r[0]}</text>
+                  <text x="178" y={167 + i * 48} class="pv-cell">{r[1]}</text>
+                  <text x="372" y={167 + i * 48} text-anchor="end" class="pv-cell pv-cell-num">{r[2]}</text>
+                </g>
+                <g transform={`translate(458 ${162 + i * 48})`}>
+                  <g class="inout" style={at(3.25 + i * 0.5, flips[i])}>
+                    <rect x="-42" y="-13" width="84" height="26" rx="13" class="pv-pill-amber"></rect>
+                    <text x="0" y="4.5" text-anchor="middle" class="pv-pill-amber-text">Pending</text>
+                  </g>
+                  {/* Then it works: approved, one by one */}
+                  <g class="pop" style={at(flips[i])}>
+                    <rect x="-42" y="-13" width="84" height="26" rx="13" class="pv-pill-green"></rect>
+                    <text x="0" y="4.5" text-anchor="middle" class="pv-pill-green-text">Approved</text>
+                  </g>
+                </g>
+              </g>
+            ))}
+          </g>
+        )
+      }
+
+      {
+        step === 2 && (
+          <g>
+            <circle cx={hub.x} cy={hub.y} r="96" fill={`url(#pv-glow-2)`} class="in" style={at(0.3)}></circle>
+            <circle cx={hub.x} cy={hub.y} r="120" fill={`url(#pv-glow-2)`} class="in" style={at(7.8)}></circle>
+            {/* Each tool, wired in, then lit as data flows to the hub */}
+            {tiles.map((t, i) => (
+              <g>
+                <path d={`M${t.x} ${t.y} L${hub.x} ${hub.y}`} pathLength="1" class="pv-track draw" style={at(t.a + 0.3, undefined, 0.5)}></path>
+                <path d={`M${t.x} ${t.y} L${hub.x} ${hub.y}`} class="pv-flow in" style={at(t.a + 0.85)}></path>
+                <path id={`pv-wire-${i}`} d={`M${t.x} ${t.y} L${hub.x} ${hub.y}`} fill="none" stroke="none"></path>
+                <g data-along={`#pv-wire-${i}`} data-speed="0.42" data-offset={String(i * 0.27)}>
+                  <circle r="4" class="pv-pulse in" style={at(t.a + 0.9)}></circle>
+                </g>
+              </g>
+            ))}
+            {tiles.map((t) => (
+              <g transform={`translate(${t.x} ${t.y})`}>
+                <g class="pop" style={at(t.a)}>
+                  <rect x="-30" y="-30" width="60" height="60" rx="17" class="pv-tile"></rect>
+                  <rect x="-30" y="-30" width="60" height="60" rx="17" class="pv-tile-edge"></rect>
+                  {t.glyph === 'mail' && (
+                    <g class="pv-glyph">
+                      <rect x="-13" y="-9.5" width="26" height="19" rx="3.5"></rect>
+                      <path d="M-12 -7 L0 2 L12 -7"></path>
+                    </g>
+                  )}
+                  {t.glyph === 'ledger' && (
+                    <g class="pv-glyph">
+                      <rect x="-11" y="-13" width="22" height="26" rx="3.5"></rect>
+                      <path d="M-6 -6 H6 M-6 0 H6 M-6 6 H2"></path>
+                    </g>
+                  )}
+                  {t.glyph === 'card' && (
+                    <g class="pv-glyph">
+                      <rect x="-14" y="-10" width="28" height="20" rx="3.5"></rect>
+                      <circle cx="-5.5" cy="-1.5" r="3.5"></circle>
+                      <path d="M-11 6.5 C-9.5 2.5 -1.5 2.5 0 6.5 M4 -3 H10 M4 2 H9"></path>
+                    </g>
+                  )}
+                  {t.glyph === 'cal' && (
+                    <g class="pv-glyph">
+                      <rect x="-13" y="-11" width="26" height="24" rx="3.5"></rect>
+                      <path d="M-13 -4 H13 M-6 -15 V-8 M6 -15 V-8"></path>
+                      <circle cx="-5" cy="4" r="1.3" class="pv-glyph-fill"></circle>
+                      <circle cx="0" cy="4" r="1.3" class="pv-glyph-fill"></circle>
+                      <circle cx="5" cy="4" r="1.3" class="pv-glyph-fill"></circle>
+                    </g>
+                  )}
+                  <text x="0" y="50" text-anchor="middle" class="pv-label">{t.label}</text>
+                </g>
+              </g>
+            ))}
+            {/* The hub assembles: the two halves of the mark come together */}
+            <g transform={`translate(${hub.x} ${hub.y})`}>
+              <g class="pop" style={at(0.3)}>
+                <rect x="-46" y="-46" width="92" height="92" rx="26" fill={`url(#pv-hub-2)`} class="pv-hub"></rect>
+                <rect x="-46" y="-46" width="92" height="92" rx="26" class="pv-tile-edge pv-hub-edge"></rect>
+              </g>
+              <g transform="scale(0.17)" class="pv-mark">
+                <path d={upperPath} class="pv-half pv-half-up" style={at(0.6)}></path>
+                <path d={lowerPath} class="pv-half pv-half-down" style={at(0.6)}></path>
+              </g>
+              {/* Live */}
+              <g transform="translate(0 -66)">
+                <g class="pop" style={at(7.8)}>
+                  <rect x="-28" y="-12" width="56" height="24" rx="12" class="pv-live"></rect>
+                  <circle cx="-14" cy="0" r="3.5" class="pv-live-dot"></circle>
+                  <text x="5" y="4.2" text-anchor="middle" class="pv-live-text">Live</text>
                 </g>
               </g>
             </g>
-          ))}
-        </g>
-      )
-    }
-
-    {
-      step === 2 && (
-        <g transform="translate(280 200) scale(1.08) translate(-280 -196)">
-          {/* Each tool feeds the hub along a line of light */}
-          {tiles.map((t, i) => (
-            <g>
-              <line x1={t.x} y1={t.y} x2={hub.x} y2={hub.y} class="pv-track"></line>
-              <line x1={t.x} y1={t.y} x2={hub.x} y2={hub.y} class="pv-flow pv-flow-in" style={`--d:${i * 0.35}s`}></line>
-              <circle r="4" class="pv-pulse">
-                <animateMotion dur="2.8s" begin={`${i * 0.7}s`} repeatCount="indefinite" path={`M${t.x} ${t.y} L${hub.x} ${hub.y}`}></animateMotion>
-              </circle>
-            </g>
-          ))}
-          <circle cx={hub.x} cy={hub.y} r="90" fill="url(#pv-glow-2)" class="pv-breathe"></circle>
-          {tiles.map((t) => (
-            <g transform={`translate(${t.x} ${t.y})`}>
-              <rect x="-30" y="-30" width="60" height="60" rx="17" class="pv-tile"></rect>
-              <rect x="-30" y="-30" width="60" height="60" rx="17" class="pv-tile-edge"></rect>
-              {t.glyph === 'mail' && (
-                <g class="pv-glyph">
-                  <rect x="-13" y="-9.5" width="26" height="19" rx="3.5"></rect>
-                  <path d="M-12 -7 L0 2 L12 -7"></path>
+            {/* The team, arriving, then trained one by one */}
+            <text x="280" y="268" text-anchor="middle" class="pv-kicker in" style={at(4.9)}>Your team</text>
+            {team.map((m) => (
+              <g transform={`translate(${m.x} 300)`}>
+                <g class="pop" style={at(m.a)}>
+                  <circle r="17" class="pv-person"></circle>
+                  <text x="0" y="5" text-anchor="middle" class="pv-person-i">{m.i}</text>
+                  <text x="0" y="36" text-anchor="middle" class="pv-label pv-label-sm">{m.label}</text>
                 </g>
-              )}
-              {t.glyph === 'ledger' && (
-                <g class="pv-glyph">
-                  <rect x="-11" y="-13" width="22" height="26" rx="3.5"></rect>
-                  <path d="M-6 -6 H6 M-6 0 H6 M-6 6 H2"></path>
+                <circle r="17" class="pv-person-ring in" style={at(m.c)}></circle>
+                <g class="pop" style={at(m.c)}>
+                  <circle cx="12" cy="-12" r="7.5" class="pv-badge-dot"></circle>
+                  <path d="M8.6 -12 L11 -9.6 L15.4 -14.2" class="pv-badge-tick"></path>
                 </g>
-              )}
-              {t.glyph === 'card' && (
-                <g class="pv-glyph">
-                  <rect x="-14" y="-10" width="28" height="20" rx="3.5"></rect>
-                  <circle cx="-5.5" cy="-1.5" r="3.5"></circle>
-                  <path d="M-11 6.5 C-9.5 2.5 -1.5 2.5 0 6.5 M4 -3 H10 M4 2 H9"></path>
-                </g>
-              )}
-              {t.glyph === 'cal' && (
-                <g class="pv-glyph">
-                  <rect x="-13" y="-11" width="26" height="24" rx="3.5"></rect>
-                  <path d="M-13 -4 H13 M-6 -15 V-8 M6 -15 V-8"></path>
-                  <circle cx="-5" cy="4" r="1.3" class="pv-glyph-fill"></circle>
-                  <circle cx="0" cy="4" r="1.3" class="pv-glyph-fill"></circle>
-                  <circle cx="5" cy="4" r="1.3" class="pv-glyph-fill"></circle>
-                </g>
-              )}
-              <text x="0" y="50" text-anchor="middle" class="pv-label">{t.label}</text>
-            </g>
-          ))}
-          {/* The hub: the Spockhart mark */}
-          <g transform={`translate(${hub.x} ${hub.y})`}>
-            <rect x="-46" y="-46" width="92" height="92" rx="26" fill="url(#pv-hub-2)" class="pv-hub"></rect>
-            <rect x="-46" y="-46" width="92" height="92" rx="26" class="pv-tile-edge pv-hub-edge"></rect>
-            <g transform="scale(0.17)" class="pv-mark">
-              <path d={upperPath}></path>
-              <path d={lowerPath}></path>
-            </g>
-          </g>
-          {/* The team, trained to run it */}
-          <text x="280" y="268" text-anchor="middle" class="pv-kicker">Your team</text>
-          {team.map((m, i) => (
-            <g transform={`translate(${m.x} 300)`}>
-              <circle r="17" class="pv-person"></circle>
-              <text x="0" y="5" text-anchor="middle" class="pv-person-i">{m.i}</text>
-              <g class="pv-badge" style={`--d:${0.6 + i * 0.5}s`}>
-                <circle cx="12" cy="-12" r="7.5" class="pv-badge-dot"></circle>
-                <path d="M8.6 -12 L11 -9.6 L15.4 -14.2" class="pv-badge-tick"></path>
               </g>
-              <text x="0" y="36" text-anchor="middle" class="pv-label pv-label-sm">{m.label}</text>
-            </g>
-          ))}
-        </g>
-      )
-    }
+            ))}
+          </g>
+        )
+      }
 
-    {
-      step === 3 && (
-        <g transform="translate(280 200) scale(1.12) translate(-280 -196)">
-          {/* A second pass behind, for depth */}
-          <rect x="150" y="62" width="300" height="214" rx="20" class="pv-pass-back" transform="rotate(-5 300 170)"></rect>
-          <rect x="120" y="86" width="320" height="232" rx="20" class="pv-pass-shadow"></rect>
-          <rect x="120" y="86" width="320" height="232" rx="20" fill="url(#pv-pass-3)"></rect>
-          <g clip-path="url(#pv-passclip-3)">
-            <rect x="-120" y="60" width="140" height="300" fill="url(#pv-sheen-3)" class="pv-sheen" transform="skewX(-18)"></rect>
-          </g>
-          <rect x="120" y="86" width="320" height="232" rx="20" class="pv-tile-edge pv-pass-edge"></rect>
-          <g transform="translate(150 118) scale(0.095)" class="pv-mark">
-            <path d={upperPath}></path>
-            <path d={lowerPath}></path>
-          </g>
-          <text x="168" y="123" class="pv-pass-brand">Spockhart</text>
-          <text x="412" y="123" text-anchor="end" class="pv-pass-kicker">Handover kit</text>
-          <line x1="144" y1="144" x2="416" y2="144" class="pv-pass-rule"></line>
-          {kit.map((k, i) => (
-            <g transform={`translate(150 ${172 + i * 30})`} class="pv-kit" style={`--d:${0.4 + i * 0.55}s`}>
-              <circle cx="0" cy="-4" r="9" class="pv-kit-ring"></circle>
-              <circle cx="0" cy="-4" r="9" class="pv-kit-fill"></circle>
-              <path d="M-4 -4 L-1 -1 L4.5 -7" class="pv-kit-tick"></path>
-              <text x="22" y="1" class="pv-kit-text">{k}</text>
+      {
+        step === 3 && (
+          <g>
+            {/* Your team, waiting on the right */}
+            <text x="512" y="118" text-anchor="middle" class="pv-kicker in" style={at(4.6)}>Your team</text>
+            {[0, 1, 2].map((k) => (
+              <g transform={`translate(512 ${150 + k * 44})`}>
+                <g class="pop" style={at(4.6 + k * 0.15)}>
+                  <circle r="15" class="pv-person"></circle>
+                  <text x="0" y="4.5" text-anchor="middle" class="pv-person-i">{['F', 'O', 'A'][k]}</text>
+                </g>
+                <circle r="15" class="pv-person-ring in" style={at(6.7 + k * 0.12)}></circle>
+              </g>
+            ))}
+
+            {/* The pass: put together, then handed across */}
+            <g data-move="-62 0 22 0 5.2 6.6">
+              <g class="pop" style={at(0.2)}>
+                <rect x="120" y="86" width="320" height="232" rx="20" class="pv-pass-shadow"></rect>
+                <rect x="120" y="86" width="320" height="232" rx="20" fill={`url(#pv-pass-3)`}></rect>
+                <rect x="120" y="86" width="320" height="232" rx="20" class="pv-tile-edge pv-pass-edge"></rect>
+              </g>
+              <g clip-path={`url(#pv-passclip-3)`}>
+                <g data-move="-160 0 520 0 6.7 7.9">
+                  <rect x="0" y="60" width="140" height="300" fill={`url(#pv-sheen-3)`} transform="skewX(-18)"></rect>
+                </g>
+              </g>
+              <g class="in" style={at(0.7)}>
+                <g transform="translate(150 118) scale(0.095)" class="pv-mark">
+                  <path d={upperPath}></path>
+                  <path d={lowerPath}></path>
+                </g>
+              </g>
+              <text x="168" y="123" class="pv-pass-brand inout" style={at(0.7, 6.4)}>Spockhart</text>
+              <text x="168" y="123" class="pv-pass-brand in" style={at(6.55)}>Your team</text>
+              <text x="412" y="123" text-anchor="end" class="pv-pass-kicker inout" style={at(0.8, 6.4)}>Handover kit</text>
+              <text x="412" y="123" text-anchor="end" class="pv-pass-kicker in" style={at(6.55)}>Handed over</text>
+              <line x1="144" y1="144" x2="416" y2="144" class="pv-pass-rule in" style={at(0.9)}></line>
+              {kit.map((k, i) => (
+                <g transform={`translate(150 ${172 + i * 30})`}>
+                  <g class="in" style={at(1.2 + i * 0.7)}>
+                    <circle cx="0" cy="-4" r="9" class="pv-kit-ring"></circle>
+                    <text x="22" y="1" class="pv-kit-text">{k}</text>
+                  </g>
+                  <circle cx="0" cy="-4" r="9" class="pv-kit-fill pop" style={at(1.6 + i * 0.7)}></circle>
+                  <path d="M-4 -4 L-1 -1 L4.5 -7" class="pv-kit-tick in" style={at(1.7 + i * 0.7)}></path>
+                </g>
+              ))}
+              <line x1="144" y1="284" x2="416" y2="284" class="pv-pass-rule in" style={at(4.2)}></line>
+              <text x="144" y="305" class="pv-pass-kicker in" style={at(4.3)}>Yours to run</text>
+              <circle cx="398" cy="299" r="15" fill={`url(#pv-glow-3)`} class="in" style={at(6.8)}></circle>
+              <g transform="translate(404 299)" class="pv-key in" style={at(4.5)}>
+                <circle cx="-6" cy="0" r="6"></circle>
+                <path d="M0 0 H14 M10 0 V5 M14 0 V4"></path>
+              </g>
             </g>
-          ))}
-          <line x1="144" y1="284" x2="416" y2="284" class="pv-pass-rule"></line>
-          <text x="144" y="305" class="pv-pass-kicker">Yours to run</text>
-          <g transform="translate(404 299)" class="pv-key">
-            <circle cx="-6" cy="0" r="6"></circle>
-            <path d="M0 0 H14 M10 0 V5 M14 0 V4"></path>
           </g>
-        </g>
-      )
-    }
+        )
+      }
+    </g>
   </svg>
 </div>
 
 <script>
-  // With reduced motion, every scene rests on a finished frame
-  function stillScenes() {
-    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    document.querySelectorAll<SVGSVGElement>('[data-pv] svg').forEach((s) => {
-      s.pauseAnimations();
-      s.setCurrentTime(2);
-    });
-  }
-  stillScenes();
-  document.addEventListener('spockhart:view', stillScenes);
+  import { initScenes } from '../scripts/scenes';
+  initScenes();
+  document.addEventListener('spockhart:view', initScenes);
 </script>
 
 <style>
@@ -340,119 +435,108 @@ const kit = ['Source code', 'Documentation', 'Admin access', 'Training notes'];
   .pv svg { display: block; width: 100%; height: 100%; max-height: 100%; overflow: visible; }
   .pv text { font-family: var(--font-body); }
 
+  /* ---------- The story's timing: --t is now, --a when a part comes in, --b when it leaves ---------- */
+  /* The whole picture fades at the end of each telling, before it starts again */
+  .pv-stage { opacity: clamp(0, (var(--L) - 0.35 - var(--t)) * 2.4, 1); }
+  .in { opacity: clamp(0, (var(--t) - var(--a, 0)) * 4, 1); }
+  .inout { opacity: calc(clamp(0, (var(--t) - var(--a, 0)) * 4, 1) * clamp(0, (var(--b, 99) - var(--t)) * 4, 1)); }
+  .pop {
+    opacity: clamp(0, (var(--t) - var(--a, 0)) * 5, 1);
+    scale: calc(0.86 + 0.14 * clamp(0, (var(--t) - var(--a, 0)) * 4, 1));
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+  .draw { stroke-dasharray: 1; stroke-dashoffset: calc(1 - clamp(0, (var(--t) - var(--a, 0)) / var(--d, 0.45), 1)); }
+
   .pv-kicker { font-size: 11px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; fill: rgb(170 195 220 / 0.6); }
   .pv-title { font-size: 17px; font-weight: 600; fill: #eef3f8; }
   .pv-label { font-size: 13px; font-weight: 500; fill: rgb(220 232 244 / 0.82); }
   .pv-label-sm { font-size: 11.5px; fill: rgb(200 216 232 / 0.65); }
   .pv-hair { stroke: rgb(255 255 255 / 0.08); stroke-width: 1; }
   .pv-hair-soft { stroke: rgb(255 255 255 / 0.05); }
-
-  /* Lines of light */
-  .pv-track { stroke: rgb(142 192 230 / 0.22); stroke-width: 2; stroke-linecap: round; }
-  .pv-flow {
-    stroke: #3fd0ff;
-    stroke-width: 2.25;
-    stroke-linecap: round;
-    stroke-dasharray: 2 12;
-    filter: drop-shadow(0 0 3px rgb(63 208 255 / 0.8));
-    animation: pv-flow 1.6s linear infinite;
-    animation-delay: var(--d, 0s);
-  }
-  @keyframes pv-flow { to { stroke-dashoffset: -28; } }
   .pv-pulse { fill: #ffffff; filter: drop-shadow(0 0 4px #3fd0ff) drop-shadow(0 0 10px rgb(63 208 255 / 0.7)); }
 
-  /* 1. The process */
-  .pv-node { fill: #0c1a2a; stroke: rgb(142 192 230 / 0.7); stroke-width: 1.75; }
-  .pv-node-core { fill: #cfeeff; }
-  .pv-node-waste { stroke: #ff6b82; }
-  .pv-node-core-waste { fill: #ff8a9c; }
-  .pv-call { stroke: rgb(255 107 130 / 0.55); stroke-width: 1.25; stroke-dasharray: 3 4; }
-  .pv-tag-red { fill: rgb(255 77 106 / 0.12); stroke: rgb(255 107 130 / 0.5); stroke-width: 1; }
-  .pv-tag-red-text { font-size: 12.5px; font-weight: 600; fill: #ffb3bf; }
-  .pv-breathe { transform-box: fill-box; transform-origin: center; animation: pv-breathe 3.2s ease-in-out infinite; }
-  .pv-late { animation-delay: 0.6s; }
-  @keyframes pv-breathe { 50% { opacity: 0.45; scale: 0.86; } }
-
   /* 1. The map */
-  .pv-lanes { fill: rgb(255 255 255 / 0.025); stroke: rgb(255 255 255 / 0.12); stroke-width: 1; }
-  .pv-lane-rule { stroke: rgb(255 255 255 / 0.1); stroke-width: 1; }
+  .pv-lanes { fill: rgb(255 255 255 / 0.025); stroke: rgb(255 255 255 / 0.13); stroke-width: 1; }
+  .pv-lane-rule { fill: none; stroke: rgb(255 255 255 / 0.1); stroke-width: 1; }
   .pv-lane-name { font-size: 10.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; fill: rgb(170 195 220 / 0.65); }
-  .pv-task { fill: rgb(255 255 255 / 0.07); stroke: rgb(255 255 255 / 0.2); stroke-width: 1; }
-  .pv-task-waste { fill: rgb(255 77 106 / 0.12); stroke: #ff6b82; }
+  .pv-task { fill: #142538; stroke: rgb(255 255 255 / 0.2); stroke-width: 1; }
+  .pv-task-waste { fill: #3a1c2a; stroke: #ff6b82; }
   .pv-task-text { font-size: 11.5px; font-weight: 600; fill: #e6eff8; }
   .pv-task-text-waste { fill: #ffd2d9; }
-  .pv-waste-glow { fill: none; stroke: rgb(255 77 106 / 0.35); stroke-width: 10; filter: blur(9px); animation: pv-glow 3.2s ease-in-out infinite; }
-  @keyframes pv-glow { 50% { opacity: 0.35; } }
+  .pv-waste-glow { fill: none; stroke: rgb(255 77 106 / 0.4); stroke-width: 10; filter: blur(9px); }
   .pv-seq { fill: none; stroke: rgb(170 200 230 / 0.6); stroke-width: 1.4; }
+  .pv-head { fill: rgb(170 200 230 / 0.75); }
   .pv-msg { fill: none; stroke: rgb(170 200 230 / 0.5); stroke-width: 1.2; stroke-dasharray: 4 4; }
-  .pv-arrowhead { fill: rgb(170 200 230 / 0.75); }
-  .pv-openhead { fill: none; stroke: rgb(170 200 230 / 0.7); stroke-width: 1.4; stroke-linejoin: round; }
+  .pv-openhead { fill: none; stroke: rgb(170 200 230 / 0.7); stroke-width: 1.4; stroke-linejoin: round; stroke-linecap: round; }
   .pv-event { fill: rgb(63 208 255 / 0.16); stroke: #8fe3ff; stroke-width: 1.6; }
   .pv-event-end { fill: rgb(255 255 255 / 0.04); stroke: #eef3f8; stroke-width: 3; }
-  .pv-gate { fill: rgb(63 208 255 / 0.14); stroke: #6fd6ff; stroke-width: 1.4; }
+  .pv-gate { fill: #133247; stroke: #6fd6ff; stroke-width: 1.4; }
   .pv-gate-x { stroke: #bdeeff; stroke-width: 1.6; stroke-linecap: round; }
+  .pv-call { fill: none; stroke: rgb(255 107 130 / 0.55); stroke-width: 1.25; stroke-dasharray: 3 4; }
+  .pv-tag-red { fill: #3a1c2a; stroke: rgb(255 107 130 / 0.6); stroke-width: 1; }
+  .pv-tag-red-text { font-size: 12.5px; font-weight: 600; fill: #ffb3bf; }
 
   /* 2. The app */
   .pv-window { fill: #12233a; filter: drop-shadow(0 18px 30px rgb(0 0 0 / 0.45)); }
   .pv-window-edge, .pv-tile-edge { fill: none; stroke: rgb(255 255 255 / 0.09); stroke-width: 1; }
   .pv-dot { fill: rgb(255 255 255 / 0.16); }
   .pv-app-title { font-size: 15.5px; font-weight: 600; fill: #eef3f8; }
-  .pv-tag-cyan { fill: rgb(63 208 255 / 0.12); stroke: rgb(63 208 255 / 0.5); stroke-width: 1; }
-  .pv-tag-cyan-text { font-size: 12px; font-weight: 700; fill: #8fe3ff; }
+  .pv-tag-cyan { fill: rgb(63 208 255 / 0.1); stroke: rgb(63 208 255 / 0.4); stroke-width: 1; }
+  .pv-tag-cyan-on { fill: rgb(63 208 255 / 0.2); stroke: #6fd6ff; stroke-width: 1.2; filter: drop-shadow(0 0 8px rgb(63 208 255 / 0.6)); }
+  .pv-tag-cyan-text { font-size: 12px; font-weight: 700; fill: #8fe3ff; font-variant-numeric: tabular-nums; }
   .pv-col { font-size: 10.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; fill: rgb(170 195 220 / 0.5); }
   .pv-cell { font-size: 14px; fill: rgb(220 232 244 / 0.72); }
   .pv-cell-strong { font-weight: 600; fill: #eef3f8; }
   .pv-cell-num { font-variant-numeric: tabular-nums; fill: #eef3f8; }
-  .pv-focus { fill: rgb(63 208 255 / 0.07); stroke: rgb(63 208 255 / 0.22); stroke-width: 1; animation: pv-focus 4.4s steps(1, end) infinite; animation-delay: -1.5s; }
-  @keyframes pv-focus {
-    0% { translate: 0 0; }
-    25% { translate: 0 48px; }
-    50% { translate: 0 96px; }
-    75% { translate: 0 144px; }
-  }
+  .pv-skel { fill: rgb(255 255 255 / 0.1); }
+  .pv-skel-soft { fill: none; stroke: rgb(255 255 255 / 0.14); stroke-width: 1; stroke-dasharray: 3 3; }
+  .pv-focus { fill: rgb(63 208 255 / 0.07); stroke: rgb(63 208 255 / 0.25); stroke-width: 1; }
   .pv-pill-amber { fill: rgb(255 184 77 / 0.12); stroke: rgb(255 184 77 / 0.45); stroke-width: 1; }
   .pv-pill-amber-text { font-size: 11.5px; font-weight: 700; fill: #ffcf87; }
   .pv-pill-green { fill: rgb(52 211 153 / 0.14); stroke: rgb(52 211 153 / 0.5); stroke-width: 1; }
   .pv-pill-green-text { font-size: 11.5px; font-weight: 700; fill: #7ff0c3; }
-  .pv-pending { animation: pv-out 4.4s ease infinite; animation-delay: var(--d); }
-  .pv-approved { opacity: 0; animation: pv-in 4.4s ease infinite; animation-delay: var(--d); }
-  @keyframes pv-in { 0%, 18% { opacity: 0; } 24%, 92% { opacity: 1; } 100% { opacity: 0; } }
-  @keyframes pv-out { 0%, 18% { opacity: 1; } 24%, 92% { opacity: 0; } 100% { opacity: 1; } }
 
   /* 3. The hub */
-  .pv-tile { fill: rgb(255 255 255 / 0.06); filter: drop-shadow(0 10px 16px rgb(0 0 0 / 0.35)); }
+  .pv-track { fill: none; stroke: rgb(142 192 230 / 0.28); stroke-width: 2; stroke-linecap: round; }
+  .pv-flow {
+    fill: none;
+    stroke: #3fd0ff;
+    stroke-width: 2.25;
+    stroke-linecap: round;
+    stroke-dasharray: 2 12;
+    filter: drop-shadow(0 0 3px rgb(63 208 255 / 0.8));
+    animation: pv-flow 1.6s linear infinite;
+  }
+  @keyframes pv-flow { to { stroke-dashoffset: -28; } }
+  .pv-tile { fill: #142538; filter: drop-shadow(0 10px 16px rgb(0 0 0 / 0.35)); }
   .pv-glyph { fill: none; stroke: #dcecf8; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
   .pv-glyph-fill { fill: #dcecf8; stroke: none; }
   .pv-hub { filter: drop-shadow(0 14px 24px rgb(0 0 0 / 0.45)) drop-shadow(0 0 22px rgb(63 208 255 / 0.25)); }
   .pv-hub-edge { stroke: rgb(255 255 255 / 0.2); }
   .pv-mark { fill: #ffffff; }
-  .pv-person { fill: rgb(255 255 255 / 0.07); stroke: rgb(255 255 255 / 0.18); stroke-width: 1; }
+  /* The halves of the mark slide together */
+  .pv-half { opacity: clamp(0, (var(--t) - var(--a)) * 3, 1); }
+  .pv-half-up { translate: calc((1 - clamp(0, (var(--t) - var(--a)) * 1.8, 1)) * -90px) calc((1 - clamp(0, (var(--t) - var(--a)) * 1.8, 1)) * -110px); }
+  .pv-half-down { translate: calc((1 - clamp(0, (var(--t) - var(--a)) * 1.8, 1)) * 90px) calc((1 - clamp(0, (var(--t) - var(--a)) * 1.8, 1)) * 110px); }
+  .pv-live { fill: rgb(52 211 153 / 0.14); stroke: rgb(52 211 153 / 0.55); stroke-width: 1; }
+  .pv-live-dot { fill: #34d399; filter: drop-shadow(0 0 4px #34d399); }
+  .pv-live-text { font-size: 11.5px; font-weight: 700; fill: #7ff0c3; }
+  .pv-person { fill: #142538; stroke: rgb(255 255 255 / 0.2); stroke-width: 1; }
   .pv-person-i { font-size: 13px; font-weight: 700; fill: #dcecf8; }
-  .pv-badge { opacity: 0; animation: pv-badge 4.6s ease infinite; animation-delay: var(--d); }
+  .pv-person-ring { fill: none; stroke: #34d399; stroke-width: 1.5; filter: drop-shadow(0 0 5px rgb(52 211 153 / 0.6)); }
   .pv-badge-dot { fill: #34d399; stroke: #0d1b2b; stroke-width: 2; }
   .pv-badge-tick { fill: none; stroke: #06281c; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-  @keyframes pv-badge { 0%, 10% { opacity: 0; scale: 0.6; } 18%, 88% { opacity: 1; scale: 1; } 100% { opacity: 0; } }
-  .pv-badge { transform-box: fill-box; transform-origin: center; }
 
   /* 4. The pass */
-  .pv-pass-back { fill: #1a3550; opacity: 0.75; }
   .pv-pass-shadow { fill: #000; opacity: 0.35; filter: blur(14px); transform: translateY(14px); }
   .pv-pass-edge { stroke: rgb(255 255 255 / 0.22); }
-  .pv-sheen { animation: pv-sheen 5.5s ease-in-out infinite; }
-  @keyframes pv-sheen { 0%, 35% { translate: 0 0; } 75%, 100% { translate: 620px 0; } }
   .pv-pass-brand { font-size: 13px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; fill: #ffffff; }
-  .pv-pass-kicker { font-size: 10.5px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; fill: rgb(220 236 250 / 0.7); }
+  .pv-pass-kicker { font-size: 10.5px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; fill: rgb(220 236 250 / 0.75); }
   .pv-pass-rule { stroke: rgb(255 255 255 / 0.16); stroke-width: 1; }
   .pv-kit-ring { fill: none; stroke: rgb(255 255 255 / 0.4); stroke-width: 1.5; }
-  .pv-kit-fill { fill: #ffffff; opacity: 0; animation: pv-kit 4.8s ease infinite; animation-delay: var(--d); transform-box: fill-box; transform-origin: center; }
-  .pv-kit-tick { fill: none; stroke: #1f4d6f; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; opacity: 0; animation: pv-kit 4.8s ease infinite; animation-delay: var(--d); }
+  .pv-kit-fill { fill: #ffffff; }
+  .pv-kit-tick { fill: none; stroke: #1f4d6f; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
   .pv-kit-text { font-size: 14px; font-weight: 500; fill: #eef6fd; }
-  @keyframes pv-kit { 0%, 8% { opacity: 0; scale: 0.6; } 16%, 90% { opacity: 1; scale: 1; } 100% { opacity: 0; } }
   .pv-key { fill: none; stroke: #ffffff; stroke-width: 1.75; stroke-linecap: round; }
-
-  @media (prefers-reduced-motion: reduce) {
-    .pv * { animation: none !important; }
-    .pv-approved, .pv-badge, .pv-kit-fill, .pv-kit-tick { opacity: 1; }
-    .pv-pending { opacity: 0; }
-  }
 </style>
