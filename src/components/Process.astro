@@ -1,0 +1,321 @@
+---
+/**
+ * Approach: one process, four steps, whether the problem is inside a client's operation or in
+ * front of their customers. Each step is a large card, one to a screen: as the page scrolls, the
+ * next card slides up over the last, which steps back a little, its top edge still showing, so
+ * the steps stack like a deck. A line of light beside the deck lights each step as it arrives.
+ *
+ * Each card: its timing and name, one line of what we do, then what that step means inside your
+ * operation and for your customers, with the step's live graphic beside it (PhaseGraphic.astro,
+ * played by scripts/scenes.ts).
+ *
+ * Phones, short screens, and reduced motion change nothing about the content: on phones and short
+ * screens the cards simply follow one another down the page.
+ */
+import { site } from '../config/site';
+import PhaseGraphic from './PhaseGraphic.astro';
+
+const steps = [
+  {
+    n: '01',
+    when: 'Weeks 1 to 2',
+    name: 'Diagnose',
+    body: 'We map how the work gets done and where it stalls, and uncover the opportunities worth acting on.',
+    inside: 'Your workflows and the bottlenecks in them.',
+    customers: 'Your customers, your market, and your capabilities.',
+  },
+  {
+    n: '02',
+    when: `By day ${site.offer.prototypeDays}`,
+    name: 'Prototype',
+    body: 'We design and build a working prototype of the strongest idea, around your team’s needs.',
+    inside: 'Built around your team’s needs and requirements.',
+    customers: 'The opportunities weighed, and the strongest concept made real.',
+  },
+  {
+    n: '03',
+    when: `Months 2 to ${site.offer.minimumMonths}`,
+    name: 'Build and embed',
+    body: 'We develop the solution, prove it where it will be used, and refine it.',
+    inside: 'Integrated with your systems, and your team ready to use it.',
+    customers: 'Tested with real customers, demand measured, the offering refined.',
+  },
+  {
+    n: '04',
+    when: `Month ${site.offer.minimumMonths}`,
+    name: 'Hand over',
+    body: 'We hand it over fully documented, for your team to own and run.',
+    inside: 'A documented solution your team owns and operates.',
+    customers: 'Brought to market, with your team equipped to run and grow it.',
+  },
+];
+---
+
+<section class="proc" aria-labelledby="proc-title" data-proc>
+  <div class="wrap proc-head">
+    <p class="proc-label">How we work</p>
+    <h2 id="proc-title">One process, inside your operation or in front of your customers.</h2>
+  </div>
+
+  <div class="wrap proc-wrap">
+    <!-- The line of light beside the deck: it fills as the steps arrive -->
+    <div class="proc-rail" aria-hidden="true">
+      <div class="proc-rail-inner">
+        <span class="proc-rail-line"><span class="proc-rail-lit"></span></span>
+        {steps.map((_, i) => <span class="proc-rail-node" data-proc-node style={`--i:${i}`}></span>)}
+      </div>
+    </div>
+
+    <ol class="proc-steps" data-rate="0.54">
+      {
+        steps.map((s, i) => (
+          <li class={`proc-step proc-step-${i + 1}`} style={`--i:${i}`} data-proc-step>
+            <article
+              class="proc-card"
+              data-tilt="3"
+              data-tilt-depth="2400"
+              data-scene
+              data-loop="6.5"
+              data-still="6.2"
+              style="--loop:6.5;--still:6.2"
+            >
+              <div class="proc-text">
+                <p class="proc-meta">
+                  <span class="tabular">{s.n}</span>
+                  <span aria-hidden="true">·</span>
+                  {s.when}
+                </p>
+                <h3>{s.name}</h3>
+                <p class="proc-body">{s.body}</p>
+                <dl class="proc-pair">
+                  <div>
+                    <dt>Inside your operation</dt>
+                    <dd>{s.inside}</dd>
+                  </div>
+                  <div>
+                    <dt>For your customers</dt>
+                    <dd>{s.customers}</dd>
+                  </div>
+                </dl>
+              </div>
+              <div class="proc-visual">
+                <PhaseGraphic phase={i as 0 | 1 | 2 | 3} />
+              </div>
+            </article>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<script>
+  import { initScenes } from '../scripts/scenes';
+  initScenes();
+  document.addEventListener('spockhart:view', initScenes);
+
+  const clamp = (v: number) => Math.max(0, Math.min(1, v));
+
+  function initProcess() {
+    const root = document.querySelector<HTMLElement>('[data-proc]');
+    if (!root || root.dataset.ready) return;
+    root.dataset.ready = '1';
+    const steps = Array.from(root.querySelectorAll<HTMLElement>('[data-proc-step]'));
+    const nodes = Array.from(root.querySelectorAll<HTMLElement>('[data-proc-node]'));
+    const stacked = window.matchMedia('(min-width: 901px) and (min-height: 620px)');
+    let ticking = false;
+
+    const update = () => {
+      ticking = false;
+      if (!stacked.matches) {
+        steps.forEach((s) => s.style.removeProperty('--cover'));
+        return;
+      }
+      const tops = steps.map((s) => s.getBoundingClientRect().top);
+      const h = steps[0].getBoundingClientRect().height;
+      // How far each card is covered by the one after it, 0 to 1: it steps back as it goes under
+      const cover = steps.map((_, i) => (i + 1 < steps.length ? clamp(1 - (tops[i + 1] - tops[i]) / h) : 0));
+      steps.forEach((s, i) => s.style.setProperty('--cover', cover[i].toFixed(3)));
+      // The step that has arrived: the last card to reach its place in the deck
+      let active = -1;
+      steps.forEach((s, i) => {
+        if (tops[i] <= parseFloat(getComputedStyle(s).top) + 1) active = i;
+      });
+      const progress = active < 0 ? 0 : clamp((active + cover[active]) / (steps.length - 1));
+      root.style.setProperty('--prog', progress.toFixed(3));
+      nodes.forEach((n, i) => n.classList.toggle('is-on', i <= active));
+    };
+    const queue = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener('scroll', queue, { passive: true });
+    window.addEventListener('resize', queue, { passive: true });
+  }
+  initProcess();
+  document.addEventListener('spockhart:view', initProcess);
+</script>
+
+<style>
+  .proc {
+    --stick: 92px;
+    --offset: 18px;
+    --card-h: min(600px, calc(100svh - var(--stick) - 3 * var(--offset) - 40px));
+    --prog: 0;
+    padding-top: clamp(3rem, 2rem + 3vw, 5rem);
+    padding-bottom: clamp(4rem, 3rem + 4vw, 7rem);
+  }
+  .proc-head { display: grid; gap: 0.6rem; margin-bottom: clamp(2rem, 1rem + 2vw, 3rem); }
+  .proc-label {
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .proc-head h2 { font-size: var(--step-3); max-width: 24ch; }
+
+  .proc-wrap { position: relative; }
+  .proc-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-5); }
+
+  /* ---------- Each step: a large card, its words on the step's colour, its graphic beside ---------- */
+  .proc-card {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    min-height: 100%;
+    border-radius: 24px;
+    overflow: hidden;
+    background: #ffffff;
+    box-shadow: var(--lift);
+    transform-origin: 50% 0;
+    scale: calc(1 - var(--cover, 0) * 0.05);
+  }
+  /* Stepping back under the next card, it falls a little into shadow */
+  .proc-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: rgb(12 26 41 / calc(var(--cover, 0) * 0.14));
+    pointer-events: none;
+  }
+  .proc-step-1 { --seg: var(--mist-1); --seg-ink: var(--navy); --seg-ink-2: #2f4760; --seg-meta: var(--brand); --seg-rule: rgb(27 42 61 / 0.16); }
+  .proc-step-2 { --seg: var(--accent); --seg-ink: #fff; --seg-ink-2: rgb(255 255 255 / 0.86); --seg-meta: rgb(255 255 255 / 0.72); --seg-rule: rgb(255 255 255 / 0.2); }
+  .proc-step-3 { --seg: var(--brand); --seg-ink: #fff; --seg-ink-2: rgb(255 255 255 / 0.86); --seg-meta: rgb(255 255 255 / 0.72); --seg-rule: rgb(255 255 255 / 0.2); }
+  .proc-step-4 { --seg: #142a40; --seg-ink: #fff; --seg-ink-2: rgb(255 255 255 / 0.86); --seg-meta: rgb(255 255 255 / 0.72); --seg-rule: rgb(255 255 255 / 0.16); }
+
+  .proc-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.9rem;
+    padding: clamp(1.75rem, 1rem + 2.4vw, 3.25rem);
+    background: var(--seg);
+    color: var(--seg-ink);
+  }
+  .proc-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--seg-meta);
+  }
+  .proc-text h3 { font-size: clamp(2.25rem, 1.4rem + 2.2vw, 3.5rem); line-height: 1.04; letter-spacing: -0.02em; color: var(--seg-ink); }
+  .proc-body { max-width: 30ch; font-size: clamp(1.0625rem, 0.95rem + 0.35vw, 1.25rem); line-height: 1.5; color: var(--seg-ink-2); }
+  .proc-pair {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem;
+    margin-top: 0.6rem;
+    padding-top: 1.1rem;
+    border-top: 1px solid var(--seg-rule);
+  }
+  .proc-pair dt {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--seg-meta);
+  }
+  .proc-pair dd { margin: 0.35rem 0 0; font-size: 0.9375rem; line-height: 1.45; color: var(--seg-ink-2); }
+
+  .proc-visual {
+    display: grid;
+    place-items: center;
+    padding: clamp(1.5rem, 1rem + 2vw, 3rem);
+    background: linear-gradient(180deg, #f8fafc 0%, #eef2f6 100%);
+  }
+  .proc-visual :global(.pg) { width: 100%; margin: 0; padding: 0; }
+  .proc-visual :global(.pg svg) { max-height: none; background: transparent; border: 0; padding: 0; }
+
+  /* ---------- Laptops: one card to a screen, each sliding up over the last ---------- */
+  @media (min-width: 901px) and (min-height: 620px) {
+    .proc-steps { gap: 26vh; padding-bottom: 14vh; }
+    .proc-step { position: sticky; top: calc(var(--stick) + var(--i) * var(--offset)); height: var(--card-h); }
+    .proc-card { height: 100%; }
+  }
+
+  /* The line of light beside the deck: a faint track, lit as far as the steps have come, with a
+     point for each step that lights as it arrives */
+  .proc-rail { display: none; }
+  @media (min-width: 1100px) and (min-height: 620px) {
+    .proc-rail {
+      display: block;
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: calc(var(--gutter) - 34px);
+      width: 14px;
+      pointer-events: none;
+    }
+    .proc-rail-inner { position: sticky; top: var(--stick); height: var(--card-h); }
+    .proc-rail-line {
+      position: absolute;
+      left: 6px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      border-radius: 2px;
+      background: rgb(27 42 61 / 0.12);
+    }
+    .proc-rail-lit {
+      position: absolute;
+      inset: 0 0 auto;
+      height: calc(var(--prog) * 100%);
+      border-radius: 2px;
+      background: #2a74b8;
+      box-shadow: 0 0 3px rgb(63 208 255 / 0.9), 0 0 10px rgb(63 208 255 / 0.4);
+    }
+    .proc-rail-node {
+      position: absolute;
+      left: 7px;
+      top: calc(var(--i) / 3 * 100%);
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      translate: -50% -50%;
+      background: #eef2f6;
+      border: 1.5px solid rgb(27 42 61 / 0.25);
+      transition: background-color 400ms var(--ease), border-color 400ms var(--ease), box-shadow 400ms var(--ease);
+    }
+    .proc-rail-node.is-on { background: #fff; border: 2px solid #2a74b8; box-shadow: 0 0 6px rgb(63 208 255 / 0.85); }
+  }
+
+  /* ---------- Tablets and phones: the cards follow one another down the page ---------- */
+  @media (max-width: 900px) {
+    .proc-card { grid-template-columns: minmax(0, 1fr); border-radius: 20px; }
+    .proc-visual { padding: 1.25rem 1.25rem 1.5rem; }
+  }
+  @media (max-width: 640px) {
+    .proc-head h2 { font-size: clamp(1.75rem, 1.2rem + 2.4vw, 2.25rem); }
+    .proc-text { padding: 1.4rem 1.25rem 1.5rem; gap: 0.7rem; }
+    .proc-pair { grid-template-columns: minmax(0, 1fr); gap: 0.9rem; }
+    .proc-card { border-radius: 16px; }
+  }
+</style>

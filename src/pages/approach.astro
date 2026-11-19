@@ -1,8 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
-import Timeline from '../components/Timeline.astro';
+import Process from '../components/Process.astro';
 import ClosingCTA from '../components/ClosingCTA.astro';
-import Path from '../components/Path.astro';
 import { site } from '../config/site';
 ---
 
@@ -11,10 +10,10 @@ import { site } from '../config/site';
   description={`How Spockhart works: embedded with your team, a working prototype in ${site.offer.prototypeDays} days, and systems you own.`}
   lightHero
 >
-  <!-- One light room. It opens on the process itself: the phases climb above a line of light
-       that runs down the page and on into the closing card (Path.astro). -->
+  <!-- One light room. It opens on the title, then one process in four steps, each a large card
+       that slides up over the last as the page scrolls (Process.astro) -->
   <div class="page-body body-approach room-light" data-body>
-    <Path />
+    <div class="ap-dots" aria-hidden="true"></div>
 
     <section class="ap-top" aria-labelledby="ap-title">
       <div class="wrap ap-head">
@@ -22,25 +21,7 @@ import { site } from '../config/site';
       </div>
     </section>
 
-    <section class="section engagement engagement-fix" aria-labelledby="engagement-title">
-      <div class="wrap">
-        <div class="section-head load-in" style="--i:3">
-          <p class="track-label">Operations Efficiency</p>
-          <h2 id="engagement-title">How We Optimize Existing Operations:</h2>
-        </div>
-        <Timeline path />
-      </div>
-    </section>
-
-    <section class="section engagement engagement-grow" aria-labelledby="growth-title">
-      <div class="wrap">
-        <div class="section-head" data-reveal>
-          <p class="track-label">Revenue Development</p>
-          <h2 id="growth-title">How We Create New Opportunities for Growth:</h2>
-        </div>
-        <Timeline track="grow" path />
-      </div>
-    </section>
+    <Process />
 
     <ClosingCTA
       terse
@@ -51,36 +32,26 @@ import { site } from '../config/site';
 </Base>
 
 <style>
-  /* Everything sits above the line of light and its dots */
+  /* Everything sits above the grid of dots */
   .body-approach > :is(section, :global(.closing)) { position: relative; z-index: 1; }
+  /* A light grid of dots behind it all, like engineering paper, fading as the page goes on */
+  .ap-dots {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image: radial-gradient(circle, rgb(27 42 61 / 0.09) 1px, transparent 1.4px);
+    background-size: 28px 28px;
+    background-position: 14px 6px;
+    -webkit-mask-image: linear-gradient(180deg, #000 0, rgb(0 0 0 / 0.55) 30%, rgb(0 0 0 / 0.3) 80%, transparent 100%);
+    mask-image: linear-gradient(180deg, #000 0, rgb(0 0 0 / 0.55) 30%, rgb(0 0 0 / 0.3) 80%, transparent 100%);
+  }
 
   /* The opening: the title, on one line */
   .ap-top { padding-top: clamp(7rem, 5.5rem + 3.5vw, 9.5rem); }
   .ap-head { display: grid; }
   .ap-head h1 { font-size: clamp(2.75rem, 1.4rem + 3.6vw, 5rem); max-width: none; letter-spacing: -0.03em; }
-
-  /* Each set: its label and title, then the phases climbing above the line */
-  .engagement .track-label {
-    font-size: 0.8125rem;
-    font-weight: 700;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--accent);
-  }
-  .engagement .section-head { gap: 0.6rem; max-width: none; }
-  .engagement .section-head h2 { font-size: var(--step-3); max-width: none; }
-  .engagement-fix { padding-top: clamp(3rem, 2rem + 3vw, 5rem); padding-bottom: clamp(5rem, 3rem + 6vw, 9rem); }
-  .engagement-grow { padding-top: 0; padding-bottom: clamp(4rem, 3rem + 4vw, 7rem); }
-  @media (min-width: 901px) {
-    .engagement .section-head { margin-bottom: clamp(2rem, 1rem + 2vw, 3rem); }
-  }
-  @media (max-width: 900px) {
-    .ap-head { grid-template-columns: minmax(0, 1fr); gap: var(--s-4); }
-  }
   @media (max-width: 640px) {
     .ap-top { padding-top: 5.5rem; }
-    .engagement { padding-bottom: 0; }
-    .engagement-grow { padding-top: 4.5rem; padding-bottom: 3rem; }
-    .engagement .section-head { margin-bottom: 0.25rem; }
   }
 </style>
