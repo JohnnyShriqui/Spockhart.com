@@ -534,6 +534,9 @@ const sectionsOf = (body = '') =>
   .cs-panel-inner > .wrap { padding-block: 2.25rem 4.5rem; }
   .cs-panel.is-settled .cs-panel-inner { overflow: visible; }
   .cs-card {
+    /* Always in front of the visual above it, so that card's shadow falls behind it, never on it */
+    position: relative;
+    z-index: 1;
     margin-top: 0;
     border: 1px solid rgb(27 42 61 / 0.06);
     border-radius: 20px;
