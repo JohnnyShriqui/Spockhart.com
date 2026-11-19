@@ -13,8 +13,6 @@ import { site } from '../config/site';
   <!-- One light room. It opens straight on the process: four steps, each a large card, descending
        to the right as a staircase (Process.astro), then the closing card -->
   <div class="page-body body-approach room-light" data-body>
-    <div class="ap-dots" aria-hidden="true"></div>
-
     <!-- The page opens straight on the first step; its title is there for screen readers and search -->
     <h1 class="visually-hidden">Approach: how we work, in four steps</h1>
 
@@ -29,21 +27,6 @@ import { site } from '../config/site';
 </Base>
 
 <style>
-  /* Everything sits above the grid of dots */
-  .body-approach > :is(section, :global(.closing)) { position: relative; z-index: 1; }
-  /* A light grid of dots behind it all, like engineering paper, fading as the page goes on */
-  .ap-dots {
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
-    background-image: radial-gradient(circle, rgb(27 42 61 / 0.09) 1px, transparent 1.4px);
-    background-size: 28px 28px;
-    background-position: 14px 6px;
-    -webkit-mask-image: linear-gradient(180deg, #000 0, rgb(0 0 0 / 0.55) 30%, rgb(0 0 0 / 0.3) 80%, transparent 100%);
-    mask-image: linear-gradient(180deg, #000 0, rgb(0 0 0 / 0.55) 30%, rgb(0 0 0 / 0.3) 80%, transparent 100%);
-  }
-
   /* The page opens straight on the first step, just under the header */
   .body-approach :global(.proc) { padding-top: clamp(8.5rem, 7rem + 3vw, 10.5rem); }
   @media (max-width: 640px) {
