@@ -10,8 +10,11 @@ interface Props {
   /** Scale and phase names only, for the home page. */
   compact?: boolean;
   track?: 'fix' | 'grow';
+  /** Approach: the phases climb like a staircase above the line of light (Path.astro), each a
+      raised card that steps forward as the line reaches it, and leans under the pointer */
+  path?: boolean;
 }
-const { compact = false, track = 'fix' } = Astro.props;
+const { compact = false, track = 'fix', path = false } = Astro.props;
 
 const SCALE = 120; // days covered by the scale (the four-month minimum)
 const fixPhases = [
@@ -104,7 +107,15 @@ const spans = [
 ---
 
 <div class:list={['timeline', { compact }]} data-timeline>
-  <ol class="phases" data-scene-group data-always data-gap="600" data-rate="0.54" data-phases={track}>
+  <ol
+    class:list={['phases', { 'phases-path': path }]}
+    data-scene-group
+    data-always
+    data-gap="600"
+    data-rate="0.54"
+    data-phases={path ? undefined : track}
+    data-path-steps={path ? track : undefined}
+  >
     {
       phases.map((p, i) => (
         <li
@@ -116,6 +127,8 @@ const spans = [
           data-to={spans[i][1]}
           data-tail={i === 3 ? '1' : undefined}
           style={`--loop:6.5;--still:6.2;--n:${i}`}
+          data-tilt={path ? '4' : undefined}
+          data-tilt-depth={path ? '1500' : undefined}
         >
           <div class="phase-head">
             <p class="phase-meta">
@@ -251,6 +264,32 @@ const spans = [
      colour names, set dark here; each heading block keeps its own tint, from the lightest in
      phase 1 to the deepest in phase 3.
      ========================================================================== */
+
+  /* ==========================================================================
+     The path (Approach): each phase a raised white card, standing in the room. On laptops they
+     climb like a staircase, a step higher each phase, above the line of light (Path.astro). Each
+     waits a step back, dimmed, until the line reaches it, then steps forward and stays.
+     ========================================================================== */
+  .phases-path .phase {
+    border: 0;
+    border-radius: 20px;
+    background: var(--surface, #fff);
+    box-shadow: var(--lift);
+    transition: scale 800ms var(--ease-out), translate 800ms var(--ease-out), opacity 600ms var(--ease), filter 600ms var(--ease);
+  }
+  :global(.path-ready) .phases-path .phase:not(.is-on) {
+    scale: 0.95;
+    translate: 0 14px;
+    opacity: 0.55;
+    filter: saturate(0.65);
+  }
+  @media (min-width: 901px) {
+    .phases-path { --rise: 2rem; align-items: start; gap: var(--s-5); }
+    .phases-path .phase { margin-top: calc((3 - var(--n)) * var(--rise)); }
+  }
+  @media (max-width: 640px) {
+    .phases-path .phase { border-radius: 16px; }
+  }
 </style>
 
 <script>

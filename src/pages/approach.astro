@@ -1,66 +1,97 @@
 ---
 import Base from '../layouts/Base.astro';
-import PageHero from '../components/PageHero.astro';
 import Timeline from '../components/Timeline.astro';
 import ClosingCTA from '../components/ClosingCTA.astro';
-import Traces from '../components/Traces.astro';
+import Path from '../components/Path.astro';
 import { site } from '../config/site';
 ---
 
 <Base
   title="Approach"
   description={`How Spockhart works: embedded with your team, a working prototype in ${site.offer.prototypeDays} days, and systems you own.`}
+  lightHero
 >
-  <PageHero
-    theme="approach"
-    title="Embedded from day one."
-    lead={`We work alongside your team to help you save time and money and uncover new revenue opportunities, then build the systems to make it happen. Within ${site.offer.prototypeDays} days, you’ll have a working first version.`}
-  />
+  <!-- One light room. It opens on the process itself: the phases climb above a line of light
+       that runs down the page and on into the closing card (Path.astro). -->
+  <div class="page-body body-approach room-light" data-body>
+    <Path />
 
-  <div class="page-body body-approach" data-body>
-  <Traces />
-  <section class="section band-recessed engagement engagement-fix" aria-labelledby="engagement-title">
-    <div class="wrap">
-      <div class="section-head" data-reveal>
-        <p class="eyebrow">Operations Efficiency</p>
-        <h2 id="engagement-title">How We Optimize Existing Operations:</h2>
+    <section class="ap-top" aria-labelledby="ap-title">
+      <div class="wrap ap-head">
+        <h1 id="ap-title" class="load-in" style="--i:1">Embedded from day one.</h1>
+        <p class="lead load-in" style="--i:2">
+          We work alongside your team to help you save time and money and uncover new revenue opportunities, then build the
+          systems to make it happen. Within {site.offer.prototypeDays} days, you’ll have a working first version.
+        </p>
       </div>
-      <Timeline />
-    </div>
-  </section>
+    </section>
 
-  <section class="section band-recessed engagement engagement-grow" aria-labelledby="growth-title">
-    <div class="wrap">
-      <div class="section-head" data-reveal>
-        <p class="eyebrow">Revenue Development</p>
-        <h2 id="growth-title">How We Create New Opportunities for Growth:</h2>
+    <section class="section engagement engagement-fix" aria-labelledby="engagement-title">
+      <div class="wrap">
+        <div class="section-head load-in" style="--i:3">
+          <p class="track-label">Operations Efficiency</p>
+          <h2 id="engagement-title">How We Optimize Existing Operations:</h2>
+        </div>
+        <Timeline path />
       </div>
-      <Timeline track="grow" />
-    </div>
-  </section>
+    </section>
 
-  <ClosingCTA
-    terse
-    title="Results in 30 days starts here."
-    primary={{ label: 'Plan the first 30 days', href: '/contact/' }}
-  />
+    <section class="section engagement engagement-grow" aria-labelledby="growth-title">
+      <div class="wrap">
+        <div class="section-head" data-reveal>
+          <p class="track-label">Revenue Development</p>
+          <h2 id="growth-title">How We Create New Opportunities for Growth:</h2>
+        </div>
+        <Timeline track="grow" path />
+      </div>
+    </section>
+
+    <ClosingCTA
+      terse
+      title="Results in 30 days starts here."
+      primary={{ label: 'Plan the first 30 days', href: '/contact/' }}
+    />
   </div>
 </Base>
 
 <style>
-  /* Laptops: room under each title before its phases, and more again before the next track */
-  @media (min-width: 901px) {
-    .engagement .section-head { gap: var(--s-2); margin-bottom: 5rem; max-width: none; }
-    .engagement .section-head h2 { font-size: var(--step-3); max-width: none; }
+  /* Everything sits above the line of light and its dots */
+  .body-approach > :is(section, :global(.closing)) { position: relative; z-index: 1; }
+
+  /* The opening: the title on one line, the promise beside it */
+  .ap-top { padding-top: clamp(7rem, 5.5rem + 3.5vw, 9.5rem); }
+  .ap-head {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+    gap: var(--s-7);
+    align-items: end;
   }
-  /* The two tracks run on one band, one straight after the other */
-  .engagement-fix { padding-bottom: var(--s-10); }
-  .engagement-grow { padding-top: 0; }
-  /* Phones: the bar sits right under the title; the phases run to the bottom of the section, with
-     clear room before the second track begins */
+  .ap-head h1 { font-size: clamp(2.75rem, 1.4rem + 3.6vw, 5rem); max-width: none; letter-spacing: -0.03em; }
+  .ap-head .lead { max-width: 30rem; justify-self: end; font-size: 1.0625rem; line-height: 1.6; color: var(--ink-2); }
+
+  /* Each set: its label and title, then the phases climbing above the line */
+  .engagement .track-label {
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .engagement .section-head { gap: 0.6rem; max-width: none; }
+  .engagement .section-head h2 { font-size: var(--step-3); max-width: none; }
+  .engagement-fix { padding-top: clamp(3rem, 2rem + 3vw, 5rem); padding-bottom: clamp(5rem, 3rem + 6vw, 9rem); }
+  .engagement-grow { padding-top: 0; padding-bottom: clamp(4rem, 3rem + 4vw, 7rem); }
+  @media (min-width: 901px) {
+    .engagement .section-head { margin-bottom: clamp(2rem, 1rem + 2vw, 3rem); }
+  }
+  @media (max-width: 900px) {
+    .ap-head { grid-template-columns: minmax(0, 1fr); gap: var(--s-4); }
+    .ap-head .lead { justify-self: start; }
+  }
   @media (max-width: 640px) {
+    .ap-top { padding-top: 5.5rem; }
     .engagement { padding-bottom: 0; }
-    .engagement-grow { padding-top: 4.5rem; }
+    .engagement-grow { padding-top: 4.5rem; padding-bottom: 3rem; }
     .engagement .section-head { margin-bottom: 0.25rem; }
   }
 </style>

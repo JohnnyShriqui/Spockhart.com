@@ -1,0 +1,271 @@
+---
+/**
+ * Approach: the path. One line of light runs down the left of the page. At each set of phases it
+ * turns and climbs beneath them like a staircase, a step up for each phase, and after the last set
+ * it carries on down to the closing card.
+ *
+ * Laptops and desktops: the first set draws itself when the page opens, each phase stepping
+ * forward as the line reaches it; the rest of the line draws as you scroll, its bright tip keeping
+ * pace a little below the middle of the screen. Phones: no line; each phase steps forward as it
+ * comes into view. With reduced motion, or without JavaScript, everything is simply there.
+ *
+ * The phases it reads are the [data-path-steps] lists (Timeline.astro with `path`); the closing
+ * card is .closing-panel. Decorative, behind the content.
+ */
+---
+
+<div class="path" aria-hidden="true" data-path>
+  <svg><g data-path-draw></g></svg>
+</div>
+
+<script>
+  const NS = 'http://www.w3.org/2000/svg';
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const wide = window.matchMedia('(min-width: 901px)');
+  // The line's tip keeps pace this far down the screen
+  const ANCHOR = 0.62;
+  // The opening draw, in ms: a short wait, then the whole of the first set
+  const INTRO_WAIT = 350;
+  const INTRO_DUR = 2600;
+
+  type Node = { at: number; dot: SVGCircleElement; card?: HTMLElement };
+  type Seg = {
+    lit: SVGPathElement;
+    head: SVGCircleElement;
+    len: number;
+    nodes: Node[];
+    intro: boolean;
+    startY: number;
+    turnY: number;
+    turnLen: number;
+    tail: number;
+  };
+
+  let segs: Seg[] = [];
+  let cards: HTMLElement[] = [];
+  let introStart = 0;
+  let introDone = false;
+  let hostTop = 0;
+  let ticking = false;
+
+  const el = <K extends keyof SVGElementTagNameMap>(name: K, attrs: Record<string, string | number>) => {
+    const n = document.createElementNS(NS, name);
+    for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, String(v));
+    return n as SVGElementTagNameMap[K];
+  };
+  const clamp = (v: number, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+  const ease = (p: number) => (p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2);
+
+  /* Where along a path a point first sits at or past x, on the line at height y */
+  const lengthAt = (path: SVGPathElement, total: number, x: number, y: number) => {
+    for (let l = 0; l <= total; l += 2) {
+      const p = path.getPointAtLength(l);
+      if (Math.abs(p.y - y) < 0.75 && p.x >= x) return l;
+    }
+    return total;
+  };
+
+  function build() {
+    const host = document.querySelector<HTMLElement>('[data-path]');
+    const g = host?.querySelector<SVGGElement>('[data-path-draw]');
+    if (!host || !g) return;
+    const svg = g.ownerSVGElement!;
+    g.replaceChildren();
+    segs = [];
+    const lists = Array.from(document.querySelectorAll<HTMLElement>('[data-path-steps]'));
+    cards = lists.flatMap((l) => Array.from(l.children) as HTMLElement[]);
+    if (reduce.matches) {
+      cards.forEach((c) => c.classList.add('is-on'));
+      return;
+    }
+    host.closest('.page-body')?.classList.add('path-ready');
+    if (!wide.matches || !lists.length) {
+      queue();
+      return;
+    }
+
+    const box = host.getBoundingClientRect();
+    hostTop = box.top + window.scrollY;
+    svg.setAttribute('viewBox', `0 0 ${box.width.toFixed(0)} ${box.height.toFixed(0)}`);
+    const X = (x: number) => +(x - box.left).toFixed(1);
+    const Y = (y: number) => +(y - box.top).toFixed(1);
+
+    // Each card where it sits in the layout (from the list, which never moves), so a card still
+    // stepped back or leaning is measured where it will settle
+    const sets = lists.map((list) => {
+      const lr = list.getBoundingClientRect();
+      const items = (Array.from(list.children) as HTMLElement[]).map((card) => {
+        const left = lr.left + card.offsetLeft - list.offsetLeft;
+        const top = lr.top + card.offsetTop - list.offsetTop;
+        return { card, left: X(left), right: X(left + card.offsetWidth), bottom: Y(top + card.offsetHeight) };
+      });
+      const head = list.closest('section')?.querySelector<HTMLElement>('.section-head')?.getBoundingClientRect();
+      return { items, headTop: head ? Y(head.top) : items[0].bottom - 200, floors: items.map((c) => +(c.bottom + 26).toFixed(1)) };
+    });
+    const sx = Math.max(16, sets[0].items[0].left - 46);
+
+    // A staircase beneath a set: from the bottom of the line down the left, along the floor of
+    // each phase, up a step between phases, and out past the last
+    const stairs = (fromY: number, s: (typeof sets)[number]) => {
+      const f = s.floors;
+      const r = Math.min(14, (f[0] - f[1]) / 2 || 14);
+      const d = [`M${sx} ${fromY}`, `V${f[0] - r}`, `Q${sx} ${f[0]} ${sx + r} ${f[0]}`];
+      for (let k = 0; k < s.items.length - 1; k++) {
+        const gx = +((s.items[k].right + s.items[k + 1].left) / 2).toFixed(1);
+        d.push(`H${gx - r}`, `Q${gx} ${f[k]} ${gx} ${f[k] - r}`, `V${f[k + 1] + r}`, `Q${gx} ${f[k + 1]} ${gx + r} ${f[k + 1]}`);
+      }
+      d.push(`H${s.items[s.items.length - 1].right + 30}`);
+      return d.join(' ');
+    };
+
+    const add = (d: string, intro: boolean, startY: number, turnY: number, tail: number, points: { x: number; y: number; card?: HTMLElement }[], end = false) => {
+      g.append(el('path', { d, class: 'pa-guide' }));
+      const lit = el('path', { d, class: 'pa-lit' });
+      g.append(lit);
+      const len = lit.getTotalLength();
+      lit.style.strokeDasharray = `${len} ${len}`;
+      lit.style.strokeDashoffset = String(len);
+      const nodes: Node[] = points.map((pt) => {
+        const dot = el('circle', { cx: pt.x, cy: pt.y, r: 4.5, class: 'pa-node' });
+        g.append(dot);
+        return { at: lengthAt(lit, len, pt.x, pt.y), dot, card: pt.card };
+      });
+      if (end) nodes[nodes.length - 1].at = len;
+      const head = el('circle', { cx: 0, cy: 0, r: 5, class: 'pa-head' });
+      g.append(head);
+      segs.push({ lit, head, len, nodes, intro, startY, turnY, turnLen: Math.max(0, turnY - startY), tail });
+    };
+    const vh = window.innerHeight;
+
+    // The first set: from beside its heading, drawn on opening
+    const s0 = sets[0];
+    const start0 = s0.headTop + 8;
+    g.append(el('circle', { cx: sx, cy: start0, r: 6.5, class: 'pa-source' }));
+    add(stairs(start0, s0), true, start0, s0.floors[0], vh * 0.45, s0.items.map((c, k) => ({ x: c.left + 26, y: s0.floors[k], card: c.card })));
+
+    // Every set after it: on down the left from the turn above, drawn as you scroll
+    let fromY = s0.floors[0] - 14;
+    sets.slice(1).forEach((s) => {
+      add(stairs(fromY, s), false, fromY, s.floors[0], vh * 0.45, s.items.map((c, k) => ({ x: c.left + 26, y: s.floors[k], card: c.card })));
+      fromY = s.floors[0] - 14;
+    });
+
+    // And on down to the closing card, turning in to meet it
+    const panel = document.querySelector<HTMLElement>('.closing-panel');
+    if (panel) {
+      const pr = panel.getBoundingClientRect();
+      const cy = Y(pr.top + pr.height / 2);
+      const px = X(pr.left);
+      add(`M${sx} ${fromY} V${cy - 14} Q${sx} ${cy} ${sx + 14} ${cy} H${px}`, false, fromY, cy, vh * 0.12, [{ x: px, y: cy }], true);
+    }
+    queue();
+  }
+
+  function render() {
+    ticking = false;
+    if (reduce.matches) return;
+    const vh = window.innerHeight;
+    if (!wide.matches || !segs.length) {
+      // Phones: each phase steps forward as it comes into view
+      cards.forEach((c) => {
+        if (c.getBoundingClientRect().top < vh * 0.86) c.classList.add('is-on');
+      });
+      return;
+    }
+    const anchor = window.scrollY + vh * ANCHOR - hostTop;
+    const introP = introDone ? 1 : clamp((performance.now() - introStart - INTRO_WAIT) / INTRO_DUR);
+    for (const s of segs) {
+      let len: number;
+      if (s.intro) len = s.len * ease(introP);
+      else if (anchor < s.turnY) len = clamp(anchor - s.startY, 0, s.turnLen);
+      else len = s.turnLen + clamp((anchor - s.turnY) / s.tail) * (s.len - s.turnLen);
+      s.lit.style.strokeDashoffset = (s.len - len).toFixed(1);
+      if (len > 0.5 && len < s.len - 0.5) {
+        const p = s.lit.getPointAtLength(len);
+        s.head.setAttribute('cx', p.x.toFixed(1));
+        s.head.setAttribute('cy', p.y.toFixed(1));
+        s.head.classList.add('is-on');
+      } else s.head.classList.remove('is-on');
+      for (const n of s.nodes) {
+        const on = len >= n.at - 1;
+        n.dot.classList.toggle('is-on', on);
+        // Once a phase has stepped forward it stays forward
+        if (on) n.card?.classList.add('is-on');
+      }
+    }
+    if (!introDone && introP < 1) queue();
+    else introDone = true;
+  }
+
+  function queue() {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(render);
+  }
+
+  function initPath() {
+    const host = document.querySelector<HTMLElement>('[data-path]');
+    if (!host || host.dataset.ready) return;
+    host.dataset.ready = '1';
+    introStart = performance.now();
+    introDone = false;
+    let raf = 0;
+    const soon = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(build);
+    };
+    build();
+    document.fonts?.ready.then(soon);
+    if ('ResizeObserver' in window) new ResizeObserver(soon).observe(host);
+    window.addEventListener('resize', soon, { passive: true });
+    window.addEventListener('scroll', queue, { passive: true });
+  }
+  initPath();
+  document.addEventListener('spockhart:view', initPath);
+</script>
+
+<style>
+  .path {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+    --pa-line: #2a74b8;
+    --pa-glow: 63 208 255;
+  }
+  /* A light grid of dots behind it all, like engineering paper, fading as the page goes on */
+  .path::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, rgb(27 42 61 / 0.09) 1px, transparent 1.4px);
+    background-size: 28px 28px;
+    background-position: 14px 6px;
+    -webkit-mask-image: linear-gradient(180deg, #000 0, rgb(0 0 0 / 0.55) 30%, rgb(0 0 0 / 0.3) 80%, transparent 100%);
+    mask-image: linear-gradient(180deg, #000 0, rgb(0 0 0 / 0.55) 30%, rgb(0 0 0 / 0.3) 80%, transparent 100%);
+  }
+  .path svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  /* Where the line will go: a faint dotted guide */
+  .path :global(.pa-guide) { fill: none; stroke: rgb(27 42 61 / 0.16); stroke-width: 1.5; stroke-linecap: round; stroke-dasharray: 1.5 6; }
+  /* The line itself: a bright blue core with a soft glow, like the lightsabers on the home page */
+  .path :global(.pa-lit) {
+    fill: none;
+    stroke: var(--pa-line);
+    stroke-width: 2.25;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    filter: drop-shadow(0 0 2.5px rgb(var(--pa-glow) / 0.9)) drop-shadow(0 0 9px rgb(var(--pa-glow) / 0.35));
+  }
+  .path :global(.pa-node) {
+    fill: #eef2f6;
+    stroke: rgb(27 42 61 / 0.22);
+    stroke-width: 1.5;
+    transition: fill 400ms var(--ease), stroke 400ms var(--ease);
+  }
+  .path :global(.pa-node.is-on) { fill: #fff; stroke: var(--pa-line); stroke-width: 2; filter: drop-shadow(0 0 5px rgb(var(--pa-glow) / 0.8)); }
+  .path :global(.pa-source) { fill: #fff; stroke: var(--pa-line); stroke-width: 2.25; filter: drop-shadow(0 0 6px rgb(var(--pa-glow) / 0.8)); }
+  /* The bright tip, as it draws */
+  .path :global(.pa-head) { fill: #fff; stroke: rgb(var(--pa-glow)); stroke-width: 2; opacity: 0; filter: drop-shadow(0 0 6px rgb(var(--pa-glow))) drop-shadow(0 0 14px rgb(var(--pa-glow) / 0.6)); }
+  .path :global(.pa-head.is-on) { opacity: 1; }
+</style>
