@@ -36,6 +36,8 @@ function initHeader() {
     };
     // A hero that fades into the light page is only dark down to the middle of its fade
     const underDark = (el: HTMLElement) => {
+      // A section can turn light as it scrolls (the Nonprofits horizon reaching day)
+      if (!el.hasAttribute('data-hero-dark') && !el.hasAttribute('data-dark-page')) return false;
       const r = el.getBoundingClientRect();
       const fade = el.querySelector<HTMLElement>('[data-hero-fade]')?.getBoundingClientRect();
       const bottom = fade ? fade.top + fade.height * 0.5 : r.bottom;
@@ -77,6 +79,8 @@ function initHeader() {
     { passive: true },
   );
   window.addEventListener('resize', update, { passive: true });
+  // A section changed between dark and light
+  window.addEventListener('spockhart:header', update);
 }
 
 /* ---------- Mobile menu ---------- */

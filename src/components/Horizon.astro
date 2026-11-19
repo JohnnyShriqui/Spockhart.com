@@ -159,9 +159,13 @@ import Mist from './Mist.astro';
       hz.style.setProperty('--sky-top', top);
       hz.style.setProperty('--sky-mid', mid);
       hz.style.setProperty('--sky-low', low);
-      // Light enough that the header reads dark on it
-      if (ps > 0.5) hz.removeAttribute('data-hero-dark');
-      else hz.setAttribute('data-hero-dark', '');
+      // As soon as the sky behind it is past the middle of its brightening, the header turns
+      // to its light glass, as on every other page
+      const day = p > 0.54;
+      if (day === hz.hasAttribute('data-hero-dark')) {
+        hz.toggleAttribute('data-hero-dark', !day);
+        window.dispatchEvent(new Event('spockhart:header'));
+      }
 
       const d = mix(demand0, demand1, pl);
       const s = mix(res0, res1, pl);
