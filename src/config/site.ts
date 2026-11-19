@@ -47,7 +47,7 @@ export type NavItem = { label: string; href: string };
 /* Who, what, how, why */
 export const primaryNav: NavItem[] = [
   { label: 'Team', href: '/team/' },
-  { label: 'Our work', href: '/work/' },
+  { label: 'Our Work', href: '/work/' },
   { label: 'Approach', href: '/approach/' },
   { label: 'Nonprofits', href: '/nonprofits/' },
 ];
