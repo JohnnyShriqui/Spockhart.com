@@ -61,9 +61,6 @@ const steps = [
         {
           steps.map((s, i) => (
             <li class="proc-step" style={`--i:${i}`} data-proc-step>
-              <p class="proc-when">
-                <span class="proc-n tabular">0{i + 1}</span>
-              </p>
               <article class="proc-card" data-tilt="3" data-tilt-depth="2200">
                 <div class="proc-text">
                   <h3>{s.name}</h3>
@@ -139,15 +136,16 @@ const steps = [
         const t = getComputedStyle(s).translate;
         const dy = t && t !== 'none' ? parseFloat(t.split(' ')[1] || '0') : 0;
         const c = s.querySelector('.proc-card')!.getBoundingClientRect();
-        const w = s.querySelector('.proc-when')!.getBoundingClientRect();
-        return { x: c.left - box.left, mid: (c.top + c.bottom) / 2 - box.top - dy, label: (w.top + w.bottom) / 2 - box.top - dy };
+        return { x: c.left - box.left, top: c.top - box.top - dy, bottom: c.bottom - box.top - dy, mid: (c.top + c.bottom) / 2 - box.top - dy };
       });
       const rx = cards.map((c) => c.x - G);
-      let d = `M${rx[0]} ${cards[0].label}`;
+      // It begins level with the first card's top corner
+      const y0 = cards[0].top + 18;
+      let d = `M${rx[0]} ${y0}`;
       for (let i = 0; i < cards.length; i++) {
         if (i < cards.length - 1) {
-          // Across at the height of the next step's timing, just short of it
-          const y = cards[i + 1].label;
+          // Across in the gap between this card and the next
+          const y = (cards[i].bottom + cards[i + 1].top) / 2;
           d += ` V${y - R} Q${rx[i]} ${y} ${rx[i] + R} ${y} H${rx[i + 1] - R} Q${rx[i + 1]} ${y} ${rx[i + 1]} ${y + R}`;
         } else {
           d += ` V${cards[i].mid}`;
@@ -159,7 +157,7 @@ const steps = [
       // Where the line begins
       const start = document.createElementNS(NS, 'circle');
       start.setAttribute('cx', String(rx[0]));
-      start.setAttribute('cy', String(cards[0].label));
+      start.setAttribute('cy', String(y0));
       start.setAttribute('r', '4');
       start.setAttribute('class', 'proc-node proc-node-start');
       start.style.setProperty('--n', '0');
@@ -223,26 +221,6 @@ const steps = [
   .proc-line { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; z-index: 0; }
   .proc-steps { position: relative; z-index: 1; list-style: none; margin: 0; padding: 0; display: grid; gap: clamp(1.5rem, 1rem + 1.5vw, 2.5rem); }
   .proc-step { width: var(--card-w); margin-left: calc(var(--i) * var(--step)); }
-
-  /* The timing, sitting on the tread above its card */
-  .proc-when {
-    display: flex;
-    align-items: baseline;
-    gap: 0.6rem;
-    margin-bottom: 1.75rem;
-    font-size: 0.8125rem;
-    font-weight: 700;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: #5b6e83;
-  }
-  .proc-n {
-    font-weight: 700;
-    background: linear-gradient(90deg, #2c5f8a, #2a8fc4);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
 
   /* The line of light: a faint track, and the light drawn along it */
   .proc-line :global(.proc-col) { stroke: rgb(27 42 61 / 0.07); stroke-width: 1; stroke-dasharray: 2 6; }
@@ -362,17 +340,12 @@ const steps = [
   /* The cards are wide, and most of each is its display, so the story inside is seen up close */
   @media (min-width: 1001px) {
     .proc-stair { --card-w: 84%; --step: calc((100% - var(--card-w)) / 3); }
-    /* The timing sits just right of where its bar begins, clear of the line coming down */
-    .proc-when { padding-left: 1.4rem; }
   }
   @media (min-width: 1240px) {
     .proc-stair { --card-w: 78%; }
   }
 
   /* ---------- Tablets and phones: the cards follow one another down the page ---------- */
-  @media (max-width: 1000px) {
-    .proc-when { margin-bottom: 0.9rem; }
-  }
   @media (max-width: 760px) {
     .proc-card { --r: 22px; --inset: 8px; grid-template-columns: minmax(0, 1fr); }
     .proc-display { min-height: 0; aspect-ratio: 7 / 5; }
