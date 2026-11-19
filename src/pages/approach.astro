@@ -19,10 +19,6 @@ import { site } from '../config/site';
     <section class="ap-top" aria-labelledby="ap-title">
       <div class="wrap ap-head">
         <h1 id="ap-title" class="load-in" style="--i:1">Embedded from day one.</h1>
-        <p class="lead load-in" style="--i:2">
-          We work alongside your team to help you save time and money and uncover new revenue opportunities, then build the
-          systems to make it happen. Within {site.offer.prototypeDays} days, you’ll have a working first version.
-        </p>
       </div>
     </section>
 
@@ -58,16 +54,10 @@ import { site } from '../config/site';
   /* Everything sits above the line of light and its dots */
   .body-approach > :is(section, :global(.closing)) { position: relative; z-index: 1; }
 
-  /* The opening: the title on one line, the promise beside it */
+  /* The opening: the title, on one line */
   .ap-top { padding-top: clamp(7rem, 5.5rem + 3.5vw, 9.5rem); }
-  .ap-head {
-    display: grid;
-    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
-    gap: var(--s-7);
-    align-items: end;
-  }
+  .ap-head { display: grid; }
   .ap-head h1 { font-size: clamp(2.75rem, 1.4rem + 3.6vw, 5rem); max-width: none; letter-spacing: -0.03em; }
-  .ap-head .lead { max-width: 30rem; justify-self: end; font-size: 1.0625rem; line-height: 1.6; color: var(--ink-2); }
 
   /* Each set: its label and title, then the phases climbing above the line */
   .engagement .track-label {
@@ -86,7 +76,6 @@ import { site } from '../config/site';
   }
   @media (max-width: 900px) {
     .ap-head { grid-template-columns: minmax(0, 1fr); gap: var(--s-4); }
-    .ap-head .lead { justify-self: start; }
   }
   @media (max-width: 640px) {
     .ap-top { padding-top: 5.5rem; }
