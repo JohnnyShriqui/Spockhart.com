@@ -8,6 +8,7 @@
  * Inline --a / --d / --i values are the moments things appear, leave, or start.
  * Without JavaScript, or with reduced motion, a scene rests on its finished frame.
  */
+import KitMatchVisual from './KitMatchVisual.astro';
 interface Props {
   id: string;
   class?: string;
@@ -826,6 +827,23 @@ const building = 'M-6 7V-4l6-4 6 4v11zM-3 -1h2M1 -1h2M-3 3h2M1 3h2';
           <div>
             <span class="rv-k">Scheduled go-live</span>
             <p class="rv-num rv-num-sm"><strong>January 2027</strong></p>
+          </div>
+        </div>
+      </>
+    )
+  }
+  {
+    id === 'kids-being-kids' && (
+      <>
+        <KitMatchVisual />
+        <div class="rv-split">
+          <div>
+            <span class="rv-k">Kids fully kitted, spring 2027</span>
+            <p class="rv-num"><strong>150</strong> <small>target</small></p>
+          </div>
+          <div>
+            <span class="rv-k">KitMatch prototype</span>
+            <p class="rv-num rv-num-sm"><strong>December 2026</strong></p>
           </div>
         </div>
       </>

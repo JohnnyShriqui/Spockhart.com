@@ -4,9 +4,26 @@ import Base from '../../layouts/Base.astro';
 import HeroLive from '../../components/HeroLive.astro';
 import ResultVisual from '../../components/ResultVisual.astro';
 import ClosingCTA from '../../components/ClosingCTA.astro';
+import KitMatchVisual from '../../components/KitMatchVisual.astro';
+import KbkLogo from '../../components/KbkLogo.astro';
 import { iconFor, headline, plainTitle as plain } from '../../lib/work';
 
 const all = (await getCollection('work')).sort((a, b) => a.data.order - b.data.order);
+/* The engagement we are in now leads the page, in its own card; our team's earlier projects follow */
+const feature = all.find((e) => e.data.kind === 'spockhart');
+const past = all.filter((e) => e.data.kind !== 'spockhart');
+
+/* Kids Being Kids: the plan, by month. `now` is the step under way, moved on by hand as the work
+   moves, so the page never claims a step that hasn't happened. */
+const plan = [
+  { name: 'Map and baseline', when: 'November 2026' },
+  { name: 'Build KitMatch', when: 'November to December' },
+  { name: 'Winter test', when: 'January to February' },
+  { name: 'Spring drives', when: 'March to April' },
+  { name: 'Kits handed off', when: 'April to May' },
+  { name: 'Results and handover', when: 'May 2027' },
+];
+const now = 0;
 
 
 /**
@@ -39,7 +56,7 @@ const sectionsOf = (body = '') =>
 
 <Base
   title="Our Work"
-  description="What the people behind Spockhart have delivered: platforms, marketplaces, sales systems, production floors and engineering prototypes. Client names withheld."
+  description="Kids Being Kids, the engagement we are in now, and what the people behind Spockhart have delivered before: platforms, sales systems, production floors and engineering prototypes."
   lightHero
 >
 
@@ -65,7 +82,124 @@ const sectionsOf = (body = '') =>
 
   <section class="projects" aria-label="Projects" data-projects>
     {
-      all.map((entry, i) => {
+      feature && (
+        <article id={feature.id} class="kbk" aria-labelledby="kbk-title" data-project>
+          <div class="kbk-wide stand" data-reveal>
+            <div class="kbk-card" data-tilt="2" data-tilt-depth="3000">
+              <div class="kbk-text">
+                <p class="kbk-status">
+                  <span class="kbk-live" aria-hidden="true" />
+                  {feature.data.origin}
+                  <span class="kbk-sep" aria-hidden="true" />
+                  <span class="kbk-status-l">Spockhart engagement</span>
+                </p>
+                <div class="kbk-client">
+                  <span class="kbk-mark">
+                    <KbkLogo />
+                  </span>
+                  <span class="kbk-who">
+                    <span class="kbk-name">{feature.data.client}</span>
+                    <span class="kbk-where">
+                      {feature.data.sector} · {feature.data.location}
+                    </span>
+                  </span>
+                </div>
+                <h2 id="kbk-title">
+                  {headline(feature.data.title).map((part, k) => (k % 2 ? <span class="hl">{part}</span> : part))}
+                </h2>
+                <p class="kbk-lead">{feature.data.summary}</p>
+                <ul class="kbk-facts">
+                  <li>
+                    <span class="kbk-f-v">KitMatch</span>
+                    <span class="kbk-f-l">What we’re building</span>
+                  </li>
+                  <li>
+                    <span class="kbk-f-v">Every sport</span>
+                    <span class="kbk-f-l">Not just shoes, and every partner program</span>
+                  </li>
+                  <li>
+                    <span class="kbk-f-v">150 kids</span>
+                    <span class="kbk-f-l">Fully kitted in the first season, our target</span>
+                  </li>
+                </ul>
+                <button class="cs-toggle kbk-toggle" type="button" aria-expanded="false" aria-controls={`${feature.id}-details`} data-toggle>
+                  <span data-label>See the details</span>
+                  <svg viewBox="0 0 16 16" aria-hidden="true">
+                    <path d="M3.5 6l4.5 4.5L12.5 6" />
+                  </svg>
+                </button>
+              </div>
+              <div class="kbk-display">
+                <KitMatchVisual chapters />
+              </div>
+              <div class="kbk-plan">
+                <div class="kbk-plan-head">
+                  <h3>The plan</h3>
+                  <p>Built over the winter, proven over one season.</p>
+                </div>
+                <ol class="kbk-rail" style={`--now:${now}`}>
+                  {plan.map((p, i) => (
+                    <li class:list={[{ 'is-now': i === now, 'is-done': i < now }]} aria-current={i === now ? 'step' : undefined}>
+                      <span class="kbk-node" aria-hidden="true" />
+                      {i === now && <span class="kbk-now">Now</span>}
+                      <span class="kbk-p-name">{p.name}</span>
+                      <span class="kbk-p-when">{p.when}</span>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            </div>
+          </div>
+
+          <div class="cs-panel" id={`${feature.id}-details`} data-panel data-open="false" role="region" aria-label={`${feature.data.client} details`}>
+            <div class="cs-panel-inner">
+              <div class="kbk-wide kbk-sheet-wrap">
+                <div class="cs-card kbk-sheet" data-tilt="3" data-tilt-depth="2600">
+                  <p class="kbk-sheet-head">
+                    <span class="kbk-sheet-title">The scorecard</span>
+                    <span class="kbk-sheet-note">Targets for the first season, spring 2027</span>
+                  </p>
+                  <ul class="cs-metrics">
+                    {feature.data.metrics.map((m) => (
+                      <li>
+                        <span class="cs-m-value">{m.value}</span>
+                        <span class="cs-m-label">{m.label}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <div class="cs-cols">
+                    {sectionsOf(feature.body).map((s) => (
+                      <div class="cs-col">
+                        <h3>{s.heading}</h3>
+                        <div class="cs-text">
+                          {s.blocks.map((b) =>
+                            b.list ? (
+                              <ul class="cs-list">
+                                {b.items.map((item) => (
+                                  <li>{item}</li>
+                                ))}
+                              </ul>
+                            ) : (
+                              <p>{b.text}</p>
+                            ),
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <p class="cs-foot">
+                    <span>Every figure here is a target until the pilot reports its results in May 2027.</span>
+                    <span class="cs-scope">Scope: {feature.data.scope}</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+      )
+    }
+    {
+      past.map((entry, i) => {
         const d = entry.data;
         const panelId = `${entry.id}-details`;
         return (
@@ -548,5 +682,242 @@ const sectionsOf = (body = '') =>
     .cs-card { border-radius: 16px; }
     .rv-stage::after { bottom: -26px; height: 40px; }
     .cs-panel-inner > .wrap { padding-block: 1.5rem 3rem; }
+  }
+  /* ==========================================================================
+     The engagement we are in now: Kids Being Kids. It leads the page in its own card, as wide as
+     the opening card above it: white and deeply rounded like the Approach cards, its words on the
+     left, KitMatch's story in an inset dark display on the right, and the plan along the bottom
+     with the step under way lit.
+     ========================================================================== */
+  .kbk {
+    padding: clamp(1rem, 0.5rem + 1.5vw, 2.25rem) max(var(--gutter), env(safe-area-inset-left, 0px)) clamp(3rem, 2rem + 3.5vw, 5.5rem);
+    scroll-margin-top: 72px;
+  }
+  .kbk-wide { max-width: var(--max); margin-inline: auto; }
+  @media (min-width: 1100px) {
+    .kbk-wide {
+      --reach: clamp(0px, max(var(--gutter), (100vw - var(--max)) / 2) - 2.5rem, 4rem);
+      max-width: calc(var(--max) + var(--reach));
+    }
+  }
+  .kbk-card {
+    --r: 30px;
+    --inset: 12px;
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    grid-template-areas: 'text display' 'plan plan';
+    padding: var(--inset);
+    border-radius: var(--r);
+    background: linear-gradient(180deg, #ffffff 0%, #fbfcfd 100%);
+    box-shadow:
+      inset 0 1px 0 #ffffff,
+      0 0 0 1px rgb(12 26 41 / 0.04),
+      0 2px 4px rgb(12 26 41 / 0.04),
+      0 18px 34px -16px rgb(12 26 41 / 0.2),
+      0 60px 90px -40px rgb(12 26 41 / 0.3);
+  }
+  .kbk-text {
+    grid-area: text;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: clamp(1rem, 0.8rem + 0.6vw, 1.5rem);
+    padding: clamp(1.5rem, 0.75rem + 2vw, 3rem) clamp(1.25rem, 0.5rem + 1.9vw, 3rem);
+  }
+
+  /* In progress: a live point, breathing */
+  .kbk-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.4rem 0.95rem 0.4rem 0.75rem;
+    border: 1px solid rgb(27 42 61 / 0.1);
+    border-radius: 999px;
+    background: linear-gradient(180deg, #ffffff, #f3f6f9);
+    box-shadow: var(--lift-soft);
+    font-size: 0.8125rem;
+    font-weight: 650;
+    line-height: 1.3;
+    color: #1b2a3d;
+  }
+  .kbk-status-l { font-weight: 500; color: #5f6f80; }
+  .kbk-sep { width: 3px; height: 3px; border-radius: 50%; background: #9aa9b8; }
+  .kbk-live { position: relative; flex: none; width: 8px; height: 8px; border-radius: 50%; background: #2a8fc4; box-shadow: 0 0 6px rgb(63 208 255 / 0.8); }
+  .kbk-live::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    border: 1.5px solid rgb(42 143 196 / 0.6);
+    opacity: 0;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .kbk-live::after { animation: kbk-ping 2.6s cubic-bezier(0.2, 0.7, 0.3, 1) infinite; }
+  }
+  @keyframes kbk-ping {
+    0% { transform: scale(0.5); opacity: 0.9; }
+    80%, 100% { transform: scale(2.1); opacity: 0; }
+  }
+
+  /* The client, named, with their own mark in a raised tile */
+  .kbk-client { display: flex; align-items: center; gap: 1.1rem; }
+  .kbk-mark {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: clamp(72px, 60px + 1.6vw, 92px);
+    aspect-ratio: 1;
+    border-radius: 24%;
+    color: #0b0d10;
+    background: linear-gradient(180deg, #ffffff, #f3f5f7);
+    box-shadow:
+      inset 0 1px 0 #ffffff,
+      0 0 0 1px rgb(12 26 41 / 0.07),
+      0 2px 4px rgb(12 26 41 / 0.05),
+      0 14px 24px -14px rgb(12 26 41 / 0.4);
+  }
+  .kbk-mark :global(svg) { width: 66%; height: auto; }
+  .kbk-who { display: grid; gap: 0.25rem; }
+  .kbk-name { font-family: var(--font-display); font-size: clamp(1.5rem, 1.2rem + 0.8vw, 2rem); line-height: 1.1; letter-spacing: -0.01em; color: #14202e; }
+  .kbk-where { font-size: 0.875rem; color: #5f6f80; }
+
+  .kbk h2 { max-width: 17ch; font-size: var(--step-3); line-height: 1.1; color: #14202e; text-wrap: balance; }
+  .kbk h2 .hl { color: var(--accent); }
+  .kbk-lead { max-width: 46ch; font-size: clamp(1rem, 0.95rem + 0.2vw, 1.0938rem); line-height: 1.55; color: #5f6f80; text-wrap: pretty; }
+
+  /* Three facts, ruled like the case study sheets */
+  .kbk-facts { list-style: none; margin: 0.25rem 0 0; padding: 0; width: 100%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 clamp(0.9rem, 0.5rem + 1vw, 1.5rem); }
+  .kbk-facts li { display: grid; align-content: start; gap: 0.3rem; padding-top: 0.7rem; border-top: 2px solid #14202e; }
+  .kbk-f-v { font-family: var(--font-display); font-size: clamp(1.1875rem, 1rem + 0.5vw, 1.4375rem); line-height: 1.1; letter-spacing: -0.01em; color: #14202e; }
+  .kbk-f-l { font-size: 0.8125rem; line-height: 1.38; color: #5f6f80; }
+  .kbk-toggle { margin-top: 0.25rem; }
+
+  /* KitMatch, playing in an inset dark display, as on the Approach cards */
+  .kbk-display {
+    grid-area: display;
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    place-items: center stretch;
+    padding: clamp(0.75rem, 0.35rem + 1.2vw, 1.75rem);
+    border-radius: calc(var(--r) - var(--inset));
+    overflow: hidden;
+    background:
+      radial-gradient(70% 55% at 0% 0%, rgb(46 104 152 / 0.42), transparent 70%),
+      radial-gradient(50% 50% at 100% 100%, rgb(38 96 142 / 0.18), transparent 72%),
+      linear-gradient(165deg, #0f2236 0%, #0a1625 100%);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.08), inset 0 0 0 1px rgb(255 255 255 / 0.04);
+  }
+  .kbk-display::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-image: var(--grain);
+    background-size: 200px;
+    opacity: 0.08;
+    mix-blend-mode: overlay;
+    pointer-events: none;
+  }
+
+  /* ---------- The plan, along the bottom of the card ---------- */
+  .kbk-plan {
+    grid-area: plan;
+    margin-top: var(--inset);
+    padding: clamp(1.25rem, 0.9rem + 1vw, 2rem) clamp(1.25rem, 0.5rem + 1.9vw, 3rem) clamp(1.25rem, 0.9rem + 0.9vw, 1.9rem);
+    border-top: 1px solid rgb(12 26 41 / 0.07);
+  }
+  .kbk-plan-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.4rem 1.5rem; margin-bottom: clamp(1.25rem, 1rem + 0.6vw, 1.6rem); }
+  .kbk-plan-head h3 { font-family: var(--font-body); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); }
+  .kbk-plan-head p { font-size: 0.875rem; color: #6b7a8a; }
+  .kbk-rail {
+    --g: clamp(0.9rem, 0.5rem + 1vw, 1.5rem);
+    --col: calc((100% - 5 * var(--g)) / 6);
+    position: relative;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: var(--g);
+  }
+  /* The way ahead, dotted; the way so far, lit up to the step under way and a little past it */
+  .kbk-rail::before,
+  .kbk-rail::after { content: ''; position: absolute; top: 6px; left: 7px; height: 2px; border-radius: 1px; }
+  .kbk-rail::before { right: calc(var(--col) - 7px); background: repeating-linear-gradient(90deg, rgb(27 42 61 / 0.2) 0 4px, transparent 4px 9px); }
+  .kbk-rail::after {
+    width: calc((var(--col) + var(--g)) * var(--now) + 3rem);
+    background: linear-gradient(90deg, #2a74b8, #3fb4f0 calc(100% - 3rem), rgb(63 180 240 / 0));
+    filter: drop-shadow(0 0 3px rgb(63 208 255 / 0.6));
+  }
+  .kbk-rail li { position: relative; display: grid; align-content: start; gap: 0.2rem; }
+  .kbk-node {
+    position: relative;
+    z-index: 1;
+    width: 14px;
+    height: 14px;
+    margin-bottom: 0.8rem;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 2px solid rgb(27 42 61 / 0.22);
+  }
+  .is-done .kbk-node { background: #2a74b8; border-color: #2a74b8; }
+  .is-now .kbk-node { background: #2a74b8; border-color: #ffffff; box-shadow: 0 0 0 2px #2a74b8, 0 0 14px rgb(63 208 255 / 0.85); }
+  .is-now .kbk-node::after { content: ''; position: absolute; inset: -6px; border-radius: 50%; border: 1.5px solid rgb(42 143 196 / 0.6); opacity: 0; }
+  @media (prefers-reduced-motion: no-preference) {
+    .is-now .kbk-node::after { animation: kbk-ping 2.6s cubic-bezier(0.2, 0.7, 0.3, 1) infinite; }
+  }
+  .kbk-now {
+    position: absolute;
+    top: -3px;
+    left: 24px;
+    padding: 0.12rem 0.5rem;
+    border-radius: 999px;
+    background: #e9f2fa;
+    box-shadow: 0 0 0 4px #ffffff;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #2a74b8;
+  }
+  .kbk-p-name { font-size: 0.9375rem; font-weight: 600; line-height: 1.3; color: #1b2a3d; }
+  .kbk-p-when { font-size: 0.8125rem; line-height: 1.35; color: #6b7a8a; }
+
+  /* ---------- Its details: the scorecard and the story, on the same sheet as the others ---------- */
+  .cs-panel-inner > .kbk-sheet-wrap { padding-block: 2.25rem 0.5rem; }
+  .kbk-sheet-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.3rem 1.5rem; }
+  .kbk-sheet-title { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); }
+  .kbk-sheet-note { font-size: 0.8125rem; color: var(--ink-3); }
+  .kbk-sheet .cs-metrics { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
+
+  /* Tablets: the words, then the display, then the plan */
+  @media (max-width: 1099px) {
+    .kbk-card { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'text' 'display' 'plan'; }
+    .kbk-text { padding-bottom: clamp(1.5rem, 1rem + 1.5vw, 2.25rem); }
+    .kbk h2 { max-width: 22ch; }
+  }
+  /* Phones: tighter, and the plan runs down the card */
+  @media (max-width: 760px) {
+    .kbk-card { --r: 22px; --inset: 8px; }
+    .kbk-text { padding: 1.25rem 0.9rem 1.5rem; gap: 1rem; }
+    .kbk-client { gap: 0.85rem; }
+    .kbk h2 { font-size: 1.5rem; }
+    .kbk-lead { font-size: 0.9688rem; }
+    .kbk-facts { grid-template-columns: minmax(0, 1fr); gap: 0.85rem; }
+    .kbk-facts li { grid-template-columns: 7.5rem minmax(0, 1fr); align-items: baseline; gap: 0.75rem; padding-top: 0.6rem; border-top-width: 1.5px; }
+    .kbk-display { padding: 0.5rem; }
+    .kbk-plan { padding: 1.25rem 0.9rem 1.4rem; }
+    .kbk-rail { grid-template-columns: minmax(0, 1fr); gap: 1.1rem; }
+    .kbk-rail::before,
+    .kbk-rail::after { top: 7px; left: 6px; width: 2px; height: auto; }
+    .kbk-rail::before { right: auto; bottom: 1.6rem; background: repeating-linear-gradient(180deg, rgb(27 42 61 / 0.2) 0 4px, transparent 4px 9px); }
+    .kbk-rail::after { bottom: auto; height: calc(var(--now) * 3.5rem + 2.5rem); background: linear-gradient(180deg, #2a74b8, #3fb4f0 calc(100% - 2.5rem), rgb(63 180 240 / 0)); }
+    .kbk-rail li { grid-template-columns: 14px minmax(0, 1fr); column-gap: 0.9rem; row-gap: 0.1rem; }
+    .kbk-node { grid-row: span 2; margin: 0.2rem 0 0; }
+    .kbk-now { position: static; justify-self: start; grid-column: 2; grid-row: 1; margin-left: 0; box-shadow: none; display: none; }
+    .is-now .kbk-p-name::after { content: 'Now'; margin-left: 0.55rem; padding: 0.1rem 0.45rem; border-radius: 999px; background: #e9f2fa; font-size: 0.625rem; font-weight: 700; letter-spacing: 0.14em; vertical-align: 0.12em; color: #2a74b8; }
   }
 </style>

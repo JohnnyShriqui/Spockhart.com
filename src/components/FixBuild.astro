@@ -15,6 +15,7 @@
 import { getCollection } from 'astro:content';
 import ResultVisual from './ResultVisual.astro';
 import ExamplesStrip from './ExamplesStrip.astro';
+import KbkLogo from './KbkLogo.astro';
 import { iconFor, headline } from '../lib/work';
 
 // The client line and headline from each case study on Our Work, shown when one is opened
@@ -34,11 +35,13 @@ interface Item {
 const build: Item[] = [
   { k: 'A', id: 'sales-performance-system', value: '+$316K a month', rest: ' with a new sales intelligence system' },
   { k: 'B', id: 'survival-sports-platform', value: '6x paying users', rest: ' on a redesigned online gaming platform', brief: 'An online gaming platform' },
+  { k: 'C', id: 'kids-being-kids', value: 'Company-sponsored seasons', rest: ' for a youth sports gear bank', brief: 'Kids Being Kids, in progress' },
 ];
 const fix: Item[] = [
   { k: '1', id: 'commission-automation', value: '80% less time', rest: ' processing commissions for a $1.2B manufacturer', brief: 'Commissions at a $1.2B manufacturer' },
   { k: '2', id: 'receiving-labels', value: '2 hours → minutes', rest: ' waiting on incoming material', brief: 'Receiving at a manufacturer' },
   { k: '3', id: 'momentum-exchange-prototype', value: '83% greater fuel efficiency', rest: ' with a new momentum-transfer system' },
+  { k: '4', id: 'kids-being-kids', value: '3 hours a week', rest: ' to run a gear bank that ran on its founders', brief: 'Kids Being Kids, in progress' },
 ];
 
 /* Chart geometry. The same chart is drawn twice: tall beside the list of case studies on laptops
@@ -104,7 +107,7 @@ const sets = [
   <div class="fb-band" id="experience">
   <div class="wrap">
     <h3 class="fb-built fb-built-narrow" data-reveal>Our Team’s Experience</h3>
-    <p class="fb-built-note fb-built-narrow" data-reveal>Projects our team led or worked on outside Spockhart. Client names withheld.</p>
+    <p class="fb-built-note fb-built-narrow" data-reveal>Kids Being Kids, our engagement in progress, and projects our team led or worked on before Spockhart, with client names withheld.</p>
 
     <div class="fb-stage lit" data-fb-stage>
       <svg class="fb-links" aria-hidden="true" data-fb-links></svg>
@@ -220,7 +223,7 @@ const sets = [
       <!-- The case studies, grouped the way they sit on the chart -->
       <div class="fb-cards" data-fb-cards>
         <h3 class="fb-built fb-built-wide">Our Team’s Experience</h3>
-        <p class="fb-built-note fb-built-wide">Projects our team led or worked on outside Spockhart. Client names withheld.</p>
+        <p class="fb-built-note fb-built-wide">Kids Being Kids, our engagement in progress, and projects our team led or worked on before Spockhart, with client names withheld.</p>
         {
           sets.map((set) => (
             <div class:list={['fb-set', `fb-set-${set.key}`]}>
@@ -238,9 +241,9 @@ const sets = [
                         </div>
                       </div>
                       <div class="fb-body">
-                        <span class="fb-note"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 8a5.5 5.5 0 1 0 1.6-3.9 M2.4 2.6v2.6H5 M8 5.2V8l2 1.3" /></svg>{work[it.id]?.origin}</span>
+                        <span class="fb-note">{work[it.id]?.kind === 'spockhart' ? <span class="fb-livedot" aria-hidden="true" /> : <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 8a5.5 5.5 0 1 0 1.6-3.9 M2.4 2.6v2.6H5 M8 5.2V8l2 1.3" /></svg>}{work[it.id]?.origin}</span>
                         <span class="fb-text">
-                          <span class="fb-line"><span class="fb-v">{it.value}</span><span class="fb-l">{it.rest}</span></span>
+                          <span class="fb-line"><span class="fb-v">{it.value}</span><span class="fb-l">{it.rest}</span>{work[it.id]?.kind === 'spockhart' && <span class="fb-wip">In progress</span>}</span>
                         </span>
                       </div>
                       <span class="fb-caret" aria-hidden="true">
@@ -252,14 +255,20 @@ const sets = [
                     <div class="fb-panel" id={`fb-panel-${it.k}`} data-panel>
                       <div class="fb-panel-inner">
                         <div class="fb-panel-body">
-                          <span class="fb-pnote"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 8a5.5 5.5 0 1 0 1.6-3.9 M2.4 2.6v2.6H5 M8 5.2V8l2 1.3" /></svg>{work[it.id]?.origin}</span>
+                          <span class="fb-pnote">{work[it.id]?.kind === 'spockhart' ? <span class="fb-livedot" aria-hidden="true" /> : <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 8a5.5 5.5 0 1 0 1.6-3.9 M2.4 2.6v2.6H5 M8 5.2V8l2 1.3" /></svg>}{work[it.id]?.kind === 'spockhart' ? `${work[it.id]?.origin}, a Spockhart engagement` : work[it.id]?.origin}</span>
                           <div class="fb-cs">
                             <p class="fb-client">
-                              <span class="fb-client-mark" aria-hidden="true">
-                                <svg viewBox="0 0 24 24">
-                                  <path d={iconFor(it.id)} />
-                                </svg>
-                              </span>
+                              {work[it.id]?.kind === 'spockhart' ? (
+                                <span class="fb-client-logo" aria-hidden="true">
+                                  <KbkLogo />
+                                </span>
+                              ) : (
+                                <span class="fb-client-mark" aria-hidden="true">
+                                  <svg viewBox="0 0 24 24">
+                                    <path d={iconFor(it.id)} />
+                                  </svg>
+                                </span>
+                              )}
                               {work[it.id]?.client}
                             </p>
                             <p class="fb-headline">
@@ -1296,4 +1305,34 @@ const sets = [
       margin-inline: calc(var(--reach) * -0.5);
     }
   }
+  /* Kids Being Kids: a Spockhart engagement, in progress. A live point in place of the clock, a
+     small tag on its line, and their own logo in place of an industry mark. */
+  .fb-livedot { position: relative; display: inline-block; flex: none; width: 7px; height: 7px; margin-inline: 3.5px; border-radius: 50%; background: #2a8fc4; box-shadow: 0 0 6px rgb(63 208 255 / 0.8); }
+  .fb-wip {
+    display: inline-block;
+    margin-left: 0.6rem;
+    padding: 0.1rem 0.5rem;
+    border-radius: 999px;
+    background: #e9f2fa;
+    font-family: var(--font-body);
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    vertical-align: 0.2em;
+    white-space: nowrap;
+    color: #2a74b8;
+  }
+  .fb-client-logo {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    color: #0b0d10;
+    background: #ffffff;
+    box-shadow: 0 0 0 1px rgb(12 26 41 / 0.08), 0 6px 12px -8px rgb(12 26 41 / 0.4);
+  }
+  .fb-client-logo :global(svg) { width: 68%; height: auto; }
 </style>

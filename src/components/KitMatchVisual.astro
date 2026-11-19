@@ -1,0 +1,532 @@
+---
+/**
+ * KitMatch, the system we are building with Kids Being Kids, told as one kit's story in a dark
+ * window, in the same style as the Approach displays. An illustration of how it will work, not
+ * client data.
+ *
+ *   1  A partner refers a kid: a first name, a sport, a start date and four things to wear.
+ *   2  The nightly match sweeps the gear on hand. Three are found; the glove in her size is not
+ *      (the 12 inch glove on the shelf is the wrong size).
+ *   3  The glove goes on the gap list and a targeted drive asks for exactly that. Gloves come in,
+ *      one is logged on the shelf, and it is matched too.
+ *   4  The four items are packed into one kit with her name on it, and picked up.
+ *   5  The donor hears where their glove went.
+ *
+ * Timed by the scene engine (scripts/scenes.ts), which writes the story's time to --t. Each part
+ * comes in at its moment (--a) and some leave at another (--b). With reduced motion, or before
+ * the script runs, it rests on the finished picture.
+ */
+interface Props {
+  class?: string;
+  /** Under the window, the story's five chapters, each lit while it plays (the Our Work card) */
+  chapters?: boolean;
+}
+const { class: className = '', chapters = false } = Astro.props;
+
+const LOOP = 16;
+const STILL = 14.6;
+const at = (a: number, b?: number, d?: number) => `--a:${a}${b !== undefined ? `;--b:${b}` : ''}${d !== undefined ? `;--d:${d}` : ''}`;
+
+/* What she needs, and when each is found */
+const needs = [
+  { item: 'Helmet', size: 'S', glyph: 'helmet', y: 126, pill: 2.7 },
+  { item: 'Cleats', size: '3', glyph: 'cleat', y: 152, pill: 3.05 },
+  { item: 'Bat', size: '27 in', glyph: 'bat', y: 178, pill: 3.4 },
+  { item: 'Glove', size: '10 in', glyph: 'glove', y: 204, pill: 7.7, gap: 3.8 },
+];
+const glyphs: Record<string, string> = {
+  helmet: 'M2 12.5C2 7 5 3.5 8.6 3.5c3.5 0 5.9 2.6 5.9 6.2v2.8zM9.5 12.5h5.8M5.5 7.5c1-1.4 2.2-2 3.4-2',
+  cleat: 'M1.5 5.5h4.2l1.5 3.2h4.6c2 0 3.7 1.2 3.7 2.8v1H1.5zM3.5 12.5v1.8M7.5 12.5v1.8M11.5 12.5v1.8',
+  bat: 'M2.6 13.4l1.6-1.6M5.4 10.6l7.6-7.6c.9-.9 2.3-.4 2.1.9-.1.5-.4.9-.8 1.3l-7.6 7.6',
+  glove: 'M4 14.5V8.2C4 6.8 5.4 6.4 6 7.1V3.9c0-1.1 1.5-1.1 1.5 0v2.6V3.3c0-1.1 1.5-1.1 1.5 0v3.2V3.8c0-1.1 1.5-1.1 1.5 0V8.6l1.6-1.4c.8-.7 2 .1 1.5 1.1l-2.2 3.9c-.6 1-.9 1.6-.9 2.3z',
+};
+
+/* The gear on hand: three across, four down. Four of these end up in her kit; the last slot is
+   empty until the drive brings in a glove in her size. */
+const shelf = [
+  { item: 'Helmet', sub: 'Baseball · S', m: 0 },
+  { item: 'Skates', sub: 'Hockey · 4' },
+  { item: 'Glove', sub: 'Baseball · 12 in', near: true },
+  { item: 'Shin pads', sub: 'Soccer · M' },
+  { item: 'Cleats', sub: 'Baseball · 3', m: 1 },
+  { item: 'Stick', sub: 'Hockey · Junior' },
+  { item: 'Helmet', sub: 'Hockey · M' },
+  { item: 'Ball', sub: 'Soccer · 4' },
+  { item: 'Bat', sub: 'Baseball · 27 in', m: 2 },
+  { item: 'Cleats', sub: 'Soccer · 5' },
+  { item: 'Skates', sub: 'Hockey · 6' },
+  { item: 'Glove', sub: 'Baseball · 10 in', m: 3, arrives: true },
+].map((s, k) => ({ ...s, k, x: 240 + (k % 3) * 104, y: 44 + Math.floor(k / 3) * 40 }));
+/* When the sweep passes each match, and when each leaves the shelf for the kit */
+const lit = [2.15, 2.5, 2.85, 7.15];
+const leave = [8.4, 8.55, 8.7, 8.85];
+const BAG = { x: 314, y: 303 };
+
+/* Phones: the window is too small to read whole, so a camera follows the story, close on each
+   part as it plays, and pulls back to the whole picture at the end. Each move eases between two
+   holds; where the camera is at any moment is its first hold plus each move's share of the way. */
+const holds = [
+  { x: 117, y: 122, s: 1.6 }, // the referral
+  { x: 349, y: 125, s: 1.38 }, // the match
+  { x: 150, y: 284, s: 1.5 }, // the gap
+  { x: 280, y: 181, s: 1 }, // the drive brings gloves to the shelf
+  { x: 180, y: 232, s: 1.45 }, // the glove is found
+  { x: 280, y: 181, s: 1 }, // packing
+  { x: 314, y: 290, s: 1.75 }, // the kit, picked up
+  { x: 472, y: 292, s: 1.7 }, // the donor note
+  { x: 280, y: 181, s: 1 }, // the whole picture
+];
+const moves = [[1.5, 2.0], [3.9, 4.4], [5.3, 5.9], [7.15, 7.5], [8.1, 8.4], [9.65, 10.05], [10.75, 11.15], [12.8, 13.5]];
+const sum = (k: 'x' | 'y' | 's') =>
+  `calc(${holds[0][k]}${moves.map((_, i) => ` + var(--e${i}) * ${+(holds[i + 1][k] - holds[i][k]).toFixed(3)}`).join('')})`;
+const cam = [
+  ...moves.map(([a, b], i) => `--x${i}:clamp(0, (var(--t) - ${a}) / ${+(b - a).toFixed(3)}, 1)`),
+  ...moves.map((_, i) => `--e${i}:calc(var(--x${i}) * var(--x${i}) * (3 - 2 * var(--x${i})))`),
+  `--S:${sum('s')}`,
+  `--cx:${sum('x')}`,
+  `--cy:${sum('y')}`,
+].join(';');
+const parts = [
+  { name: 'Referral', a: 0, b: 1.6 },
+  { name: 'Nightly match', a: 1.6, b: 4.1 },
+  { name: 'Gap and drive', a: 4.1, b: 7.9 },
+  { name: 'Packed', a: 7.9, b: 10.7 },
+  { name: 'Donor note', a: 10.7, b: 15.6 },
+];
+---
+
+<div class:list={['km', className]} aria-hidden="true" data-scene data-loop={LOOP} data-still={STILL} data-rate="0.66" style={`--t:${STILL};--L:${LOOP}`}>
+  <div class="km-win">
+    <div class="km-bar">
+      <span class="km-dots"><i></i><i></i><i></i></span>
+      <span class="km-bar-title">KitMatch</span>
+      <span class="km-bar-tag">Preview</span>
+    </div>
+    <div class="km-body">
+      <svg viewBox="0 0 560 362" preserveAspectRatio="xMidYMid meet">
+        <defs>
+          <pattern id="km-dots" width="22" height="22" patternUnits="userSpaceOnUse">
+            <circle cx="1" cy="1" r="1" fill="rgb(255 255 255 / 0.05)"></circle>
+          </pattern>
+          <linearGradient id="km-beam" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stop-color="#3fd0ff" stop-opacity="0"></stop>
+            <stop offset="0.5" stop-color="#3fd0ff" stop-opacity="0.2"></stop>
+            <stop offset="1" stop-color="#3fd0ff" stop-opacity="0"></stop>
+          </linearGradient>
+          <linearGradient id="km-bag" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#3b82c4"></stop>
+            <stop offset="1" stop-color="#173a5a"></stop>
+          </linearGradient>
+          <radialGradient id="km-glow">
+            <stop offset="0" stop-color="#3fd0ff" stop-opacity="0.32"></stop>
+            <stop offset="1" stop-color="#3fd0ff" stop-opacity="0"></stop>
+          </radialGradient>
+          <clipPath id="km-shelf-clip"><rect x="236" y="40" width="312" height="162" rx="10"></rect></clipPath>
+          {needs.map((n, i) => (
+            <path id={`km-back-${i}`} d={[`M240 61 C224 61 224 ${n.y - 4} 206 ${n.y - 4}`, `M344 101 C300 101 250 ${n.y - 4} 206 ${n.y - 4}`, `M448 141 C360 141 260 ${n.y - 4} 206 ${n.y - 4}`, `M448 181 C360 181 260 ${n.y - 4} 206 ${n.y - 4}`][i]} fill="none"></path>
+          ))}
+          <path id="km-in" d="M220 292 C340 292 496 272 496 181" fill="none"></path>
+        </defs>
+
+        <g class="km-cam" style={cam}>
+        <rect width="560" height="362" fill="url(#km-dots)"></rect>
+
+        <g class="km-stage">
+          {/* ---------- 1. The referral ---------- */}
+          <g class="pop" style={at(0.2)}>
+            <rect x="14" y="14" width="206" height="216" rx="14" class="km-card"></rect>
+          </g>
+          <g class="in" style={at(0.35)}>
+            <text x="30" y="40" class="km-kicker">Referral</text>
+          </g>
+          <g transform="translate(204 36)">
+            <g class="inout" style={at(0.45, 10.4)}>
+              <rect x="-44" y="-10" width="44" height="20" rx="10" class="km-pill km-pill-cyan"></rect>
+              <text x="-22" y="3.6" text-anchor="middle" class="km-pill-text km-pill-cyan-text">Open</text>
+            </g>
+            <g class="pop" style={at(10.4)}>
+              <rect x="-54" y="-10" width="54" height="20" rx="10" class="km-pill km-pill-green"></rect>
+              <text x="-27" y="3.6" text-anchor="middle" class="km-pill-text km-pill-green-text">Kitted</text>
+            </g>
+          </g>
+          <g class="in" style={at(0.45)}>
+            <circle cx="46" cy="72" r="16" class="km-person"></circle>
+            <text x="46" y="76.5" text-anchor="middle" class="km-person-i">M</text>
+            <text x="72" y="69" class="km-name">Maya</text>
+            <text x="72" y="86" class="km-sub">Baseball · Starts May 2</text>
+          </g>
+          <line x1="28" y1="102" x2="206" y2="102" class="km-hair in" style={at(0.6)}></line>
+          {needs.map((n, i) => (
+            <g>
+              <g class="in" style={at(0.7 + i * 0.15)}>
+                <g transform={`translate(27 ${n.y - 13})`}>
+                  <path d={glyphs[n.glyph]} class="km-glyph"></path>
+                </g>
+                <text x="52" y={n.y} class="km-row">{n.item}</text>
+                <text x="102" y={n.y} class="km-row-size">{n.size}</text>
+              </g>
+              <g transform={`translate(179 ${n.y - 4})`}>
+                {n.gap && (
+                  <g class="inout" style={at(n.gap, n.pill)}>
+                    <g class="pop" style={at(n.gap)}>
+                      <rect x="-27" y="-10" width="54" height="20" rx="10" class="km-pill km-pill-amber"></rect>
+                      <text x="0" y="3.6" text-anchor="middle" class="km-pill-text km-pill-amber-text">Gap</text>
+                    </g>
+                  </g>
+                )}
+                <g class="pop" style={at(n.pill)}>
+                  <rect x="-27" y="-10" width="54" height="20" rx="10" class="km-pill km-pill-green"></rect>
+                  <text x="0" y="3.6" text-anchor="middle" class="km-pill-text km-pill-green-text">In stock</text>
+                </g>
+              </g>
+            </g>
+          ))}
+
+          {/* ---------- 2. The gear on hand, and the nightly match ---------- */}
+          <g class="in" style={at(0.5)}>
+            <text x="240" y="30" class="km-kicker">Gear on hand</text>
+            <text x="544" y="30" text-anchor="end" class="km-note">Logged by sport and size</text>
+          </g>
+          {shelf.map((s) => {
+            const tile = (
+              <g>
+                <rect x={s.x} y={s.y} width="96" height="34" rx="8" class="km-tile"></rect>
+                <text x={s.x + 10} y={s.y + 15} class="km-tile-item">{s.item}</text>
+                <text x={s.x + 10} y={s.y + 27.5} class="km-tile-sub">{s.sub}</text>
+              </g>
+            );
+            if (s.m === undefined) {
+              return (
+                <g>
+                  <g class="pop" style={at(0.6 + s.k * 0.04)}>{tile}</g>
+                  {s.near && <rect x={s.x} y={s.y} width="96" height="34" rx="8" class="km-tile-near inout" style={at(2.85, 3.55)}></rect>}
+                </g>
+              );
+            }
+            const m = s.m;
+            const enter = s.arrives ? 6.95 : 0.6 + s.k * 0.04;
+            return (
+              <g>
+                {/* Before the drive, an empty place for it */}
+                {s.arrives && (
+                  <g class="inout" style={at(enter - 6.35, enter)}>
+                    <rect x={s.x + 0.5} y={s.y + 0.5} width="95" height="33" rx="7.5" class="km-slot"></rect>
+                    <path d={`M${s.x + 48} ${s.y + 12} v10 M${s.x + 43} ${s.y + 17} h10`} class="km-slot-plus"></path>
+                  </g>
+                )}
+                <g class="inout" style={at(enter, leave[m])}>
+                  <g class="pop" style={at(enter)}>{tile}</g>
+                </g>
+                {/* Found: lit, until it leaves for the kit */}
+                <rect x={s.x} y={s.y} width="96" height="34" rx="8" class="km-tile-lit inout" style={at(lit[m], leave[m])}></rect>
+                {/* Gone into the kit */}
+                <g class="in" style={at(leave[m])}>
+                  <rect x={s.x + 0.5} y={s.y + 0.5} width="95" height="33" rx="7.5" class="km-slot"></rect>
+                  <text x={s.x + 10} y={s.y + 15} class="km-tile-item km-tile-gone">{s.item}</text>
+                  <text x={s.x + 10} y={s.y + 27.5} class="km-tile-sub km-tile-gone">In Maya’s kit</text>
+                </g>
+              </g>
+            );
+          })}
+          {/* The sweep */}
+          <g clip-path="url(#km-shelf-clip)">
+            <g data-move="214 0 566 0 1.6 3.4">
+              <g class="inout" style={at(1.55, 3.45)}>
+                <rect x="-34" y="40" width="68" height="162" fill="url(#km-beam)"></rect>
+                <line x1="0" y1="40" x2="0" y2="202" class="km-beam-line"></line>
+              </g>
+            </g>
+          </g>
+          {/* Each find is marked on her referral */}
+          {needs.map((n, i) => (
+            <g data-along={`#km-back-${i}`} data-keys={`${lit[i] + 0.05} 0, ${lit[i] + 0.5} 1`}>
+              <g class="inout" style={at(lit[i] + 0.05, lit[i] + 0.55)}>
+                <circle r="11" fill="url(#km-glow)"></circle>
+                <circle r="3.6" class="km-pulse"></circle>
+              </g>
+            </g>
+          ))}
+
+          {/* ---------- 3. The gap, and the drive that fills it ---------- */}
+          <g class="pop" style={at(4.1)}>
+            <rect x="14" y="244" width="206" height="104" rx="14" class="km-card"></rect>
+          </g>
+          <g class="in" style={at(4.3)}>
+            <text x="30" y="268" class="km-kicker">Gap list</text>
+            <text x="46" y="293" class="km-row">Youth glove · 10 in</text>
+            <text x="46" y="309" class="km-sub">Needed by Apr 24</text>
+            <rect x="30" y="320" width="174" height="5" rx="2.5" class="km-track"></rect>
+          </g>
+          <circle cx="34" cy="289" r="4" class="km-dot-amber inout" style={at(4.3, 7.7)}></circle>
+          <g class="pop" style={at(7.7)}>
+            <circle cx="34" cy="289" r="6.5" class="km-check-dot"></circle>
+            <path d="M31 289.2 L33.2 291.4 L37.2 287" class="km-check"></path>
+          </g>
+          <rect x="30" y="320" width="174" height="5" rx="2.5" class="km-fill" style={at(5.3, 6.8)}></rect>
+          <text x="30" y="341" class="km-sub km-count in" style={at(5.3)} data-count="5.3 0, 6.8 14" data-fmt="{} of 14 in">14 of 14 in</text>
+          <g transform="translate(204 262)">
+            <g class="pop" style={at(4.9)}>
+              <rect x="-82" y="-10" width="82" height="20" rx="10" class="km-pill km-pill-cyan"></rect>
+              <text x="-41" y="3.6" text-anchor="middle" class="km-pill-text km-pill-cyan-text">Drive posted</text>
+            </g>
+          </g>
+          {/* Gloves come in; one in her size goes on the shelf */}
+          {[0, 0.3, 0.55].map((d) => (
+            <g data-along="#km-in" data-keys={`${5.4 + d} 0, ${6.4 + d * 0.9} 1`}>
+              <g class="inout" style={at(5.4 + d, 6.45 + d * 0.9)}>
+                <circle r="13" fill="url(#km-glow)"></circle>
+                <circle r="9" class="km-token"></circle>
+                <g transform="translate(-6.4 -6.8) scale(0.8)">
+                  <path d={glyphs.glove} class="km-token-glyph"></path>
+                </g>
+              </g>
+            </g>
+          ))}
+
+          {/* ---------- 4. Packed, with her name on it, and picked up ---------- */}
+          <g class="pop" style={at(8.0)}>
+            <rect x="240" y="244" width="148" height="104" rx="14" class="km-card"></rect>
+          </g>
+          <g class="in" style={at(8.15)}>
+            <text x="256" y="268" class="km-kicker">Kit</text>
+          </g>
+          <circle cx={BAG.x} cy={BAG.y} r="34" fill="url(#km-glow)" class="in" style={at(9.6)}></circle>
+          <g class="pop" style={at(8.2)}>
+            <path d="M303 291 C303 280 325 280 325 291" class="km-handle"></path>
+            <rect x="285" y="289" width="58" height="30" rx="14" fill="url(#km-bag)" class="km-bag"></rect>
+            <rect x="285" y="289" width="58" height="30" rx="14" class="km-edge"></rect>
+            <path d="M292 297.5 H336" class="km-bag-seam"></path>
+            <circle cx="292" cy="304" r="2.2" class="km-bag-cap"></circle>
+            <circle cx="336" cy="304" r="2.2" class="km-bag-cap"></circle>
+          </g>
+          <g class="pop" style={at(9.65)}>
+            <path d="M338 296 L347 303" class="km-string"></path>
+            <rect x="345" y="300" width="36" height="17" rx="4.5" class="km-tag"></rect>
+            <text x="363" y="312" text-anchor="middle" class="km-tag-text">Maya</text>
+          </g>
+          <text x="256" y="341" class="km-sub in" style={at(8.3)} data-count="9.05 0, 9.6 4" data-fmt="{} of 4 packed">4 of 4 packed</text>
+          <g transform="translate(372 262)">
+            <g class="inout" style={at(9.7, 10.3)}>
+              <g class="pop" style={at(9.7)}>
+                <rect x="-56" y="-10" width="56" height="20" rx="10" class="km-pill km-pill-cyan"></rect>
+                <text x="-28" y="3.6" text-anchor="middle" class="km-pill-text km-pill-cyan-text">Packed</text>
+              </g>
+            </g>
+            <g class="pop" style={at(10.3)}>
+              <rect x="-66" y="-10" width="66" height="20" rx="10" class="km-pill km-pill-green"></rect>
+              <text x="-33" y="3.6" text-anchor="middle" class="km-pill-text km-pill-green-text">Picked up</text>
+            </g>
+          </g>
+          {/* Each item leaves the shelf for the bag */}
+          {[0, 4, 8, 11].map((k, m) => (
+            <g data-move={`${shelf[k].x + 48} ${shelf[k].y + 17} ${BAG.x} ${BAG.y} ${leave[m]} ${leave[m] + 0.7}`}>
+              <g class="inout" style={at(leave[m] - 0.05, leave[m] + 0.72)}>
+                <circle r="11" fill="url(#km-glow)"></circle>
+                <circle r="4" class="km-pulse"></circle>
+              </g>
+            </g>
+          ))}
+
+          {/* ---------- 5. The donor hears where it went ---------- */}
+          <g class="pop" style={at(10.8)}>
+            <rect x="398" y="244" width="148" height="104" rx="14" class="km-card km-card-note"></rect>
+          </g>
+          <g class="in" style={at(11.0)}>
+            <text x="414" y="268" class="km-kicker">Donor note</text>
+            <text x="414" y="294" class="km-note-text">Your glove went to</text>
+            <text x="414" y="311" class="km-note-text">Maya. She starts</text>
+            <text x="414" y="328" class="km-note-text">baseball May 2.</text>
+          </g>
+          <g transform="translate(530 264)">
+            <g class="pop" style={at(11.2)}>
+              <path d="M0 4.6 L-5.4 -0.8 A3.1 3.1 0 0 1 0 -5.2 A3.1 3.1 0 0 1 5.4 -0.8 Z" class="km-heart"></path>
+            </g>
+          </g>
+        </g>
+        </g>
+      </svg>
+    </div>
+  </div>
+  {
+    chapters && (
+      <ol class="km-chapters">
+        {parts.map((c, i) => (
+          <li class="km-ch" style={at(c.a, c.b)}>
+            <span class="km-ch-n">{i + 1}</span>
+            <span class="km-ch-name">{c.name}</span>
+            <span class="km-ch-track"><span class="km-ch-fill" /></span>
+          </li>
+        ))}
+      </ol>
+    )
+  }
+</div>
+
+<script>
+  import { initScenes } from '../scripts/scenes';
+  initScenes();
+  document.addEventListener('spockhart:view', initScenes);
+</script>
+
+<style>
+  .km { position: relative; width: 100%; }
+  .km svg { display: block; width: 100%; height: auto; overflow: visible; }
+
+  /* ---------- The window: lit along its top, standing off the dark card ---------- */
+  .km-win {
+    display: flex;
+    flex-direction: column;
+    border-radius: 14px;
+    background: #14293f;
+    border: 1px solid rgb(255 255 255 / 0.1);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06), 0 24px 44px -24px rgb(0 0 0 / 0.75), 0 2px 6px rgb(0 0 0 / 0.2);
+    overflow: hidden;
+  }
+  .km-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 0.9rem;
+    background: #112338;
+    border-bottom: 1px solid rgb(255 255 255 / 0.08);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: #9fb6cb;
+  }
+  .km-dots { display: flex; gap: 5px; }
+  .km-dots i { width: 8px; height: 8px; border-radius: 50%; background: rgb(255 255 255 / 0.18); }
+  .km-bar-title { color: #c9d8e6; }
+  .km-bar-tag { margin-left: auto; font-size: 0.66rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: rgb(170 195 220 / 0.6); }
+  .km-body { padding: clamp(0.35rem, 0.2rem + 0.5vw, 0.75rem); overflow: hidden; }
+  .km text { font-family: var(--font-body); }
+
+  /* ---------- The story's timing: --t is now, --a when a part comes in, --b when it leaves ---------- */
+  .km-stage { opacity: clamp(0, (var(--L) - 0.35 - var(--t)) * 2.4, 1); }
+  .in { opacity: clamp(0, (var(--t) - var(--a, 0)) * 4, 1); }
+  .inout { opacity: calc(clamp(0, (var(--t) - var(--a, 0)) * 4, 1) * clamp(0, (var(--b, 99) - var(--t)) * 4, 1)); }
+  .pop {
+    opacity: clamp(0, (var(--t) - var(--a, 0)) * 5, 1);
+    scale: calc(0.86 + 0.14 * clamp(0, (var(--t) - var(--a, 0)) * 4, 1));
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  /* ---------- The pieces ---------- */
+  .km-card { fill: #12233a; stroke: rgb(255 255 255 / 0.1); stroke-width: 1; filter: drop-shadow(0 14px 22px rgb(0 0 0 / 0.38)); }
+  .km-card-note { fill: #132a43; stroke: rgb(143 227 255 / 0.22); }
+  .km-kicker { font-size: 10.5px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; fill: rgb(170 195 220 / 0.62); }
+  .km-note { font-size: 10.5px; font-weight: 500; fill: rgb(170 195 220 / 0.5); }
+  .km-name { font-size: 15px; font-weight: 600; fill: #eef3f8; }
+  .km-sub { font-size: 11px; fill: rgb(200 216 232 / 0.62); font-variant-numeric: tabular-nums; }
+  .km-hair { stroke: rgb(255 255 255 / 0.08); stroke-width: 1; }
+  .km-person { fill: #1c3a58; stroke: rgb(143 227 255 / 0.4); stroke-width: 1; }
+  .km-person-i { font-size: 13px; font-weight: 700; fill: #dcecf8; }
+  .km-glyph { fill: none; stroke: #b9d6ee; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+  .km-row { font-size: 12.5px; font-weight: 600; fill: #e6eff8; }
+  .km-row-size { font-size: 11.5px; fill: rgb(200 216 232 / 0.6); font-variant-numeric: tabular-nums; }
+
+  .km-pill { stroke-width: 1; }
+  .km-pill-text { font-size: 10.5px; font-weight: 700; }
+  .km-pill-cyan { fill: rgb(63 208 255 / 0.1); stroke: rgb(63 208 255 / 0.42); }
+  .km-pill-cyan-text { fill: #8fe3ff; }
+  .km-pill-green { fill: rgb(52 211 153 / 0.14); stroke: rgb(52 211 153 / 0.5); }
+  .km-pill-green-text { fill: #7ff0c3; }
+  .km-pill-amber { fill: rgb(255 184 77 / 0.12); stroke: rgb(255 184 77 / 0.5); }
+  .km-pill-amber-text { fill: #ffcf87; }
+
+  .km-tile { fill: #142538; stroke: rgb(255 255 255 / 0.12); stroke-width: 1; }
+  .km-tile-item { font-size: 11.5px; font-weight: 600; fill: #e6eff8; }
+  .km-tile-sub { font-size: 9.5px; fill: rgb(200 216 232 / 0.55); font-variant-numeric: tabular-nums; }
+  .km-tile-gone { opacity: 0.4; }
+  .km-tile-lit { fill: rgb(63 208 255 / 0.1); stroke: #6fd6ff; stroke-width: 1.4; filter: drop-shadow(0 0 7px rgb(63 208 255 / 0.55)); }
+  .km-tile-near { fill: rgb(255 184 77 / 0.06); stroke: rgb(255 184 77 / 0.7); stroke-width: 1.2; }
+  .km-slot { fill: none; stroke: rgb(255 255 255 / 0.16); stroke-width: 1; stroke-dasharray: 3 3; }
+  .km-slot-plus { stroke: rgb(255 255 255 / 0.22); stroke-width: 1.4; stroke-linecap: round; }
+  .km-beam-line { stroke: rgb(143 227 255 / 0.7); stroke-width: 1; filter: drop-shadow(0 0 4px #3fd0ff); }
+  .km-pulse { fill: #ffffff; filter: drop-shadow(0 0 4px #3fd0ff) drop-shadow(0 0 10px rgb(63 208 255 / 0.7)); }
+
+  .km-dot-amber { fill: #ffb84d; filter: drop-shadow(0 0 4px rgb(255 184 77 / 0.6)); }
+  .km-check-dot { fill: #34d399; }
+  .km-check { fill: none; stroke: #06281c; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+  .km-track { fill: rgb(255 255 255 / 0.08); }
+  .km-fill {
+    fill: #3fd0ff;
+    filter: drop-shadow(0 0 4px rgb(63 208 255 / 0.6));
+    transform: scaleX(clamp(0, (var(--t) - var(--a)) / (var(--b) - var(--a)), 1));
+    transform-box: fill-box;
+    transform-origin: left center;
+  }
+  .km-token { fill: #eaf6ff; filter: drop-shadow(0 0 6px rgb(63 208 255 / 0.8)); }
+  .km-token-glyph { fill: none; stroke: #173a5a; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+
+  .km-handle { fill: none; stroke: #8fc3ea; stroke-width: 2.4; stroke-linecap: round; }
+  .km-bag { filter: drop-shadow(0 10px 14px rgb(0 0 0 / 0.4)); }
+  .km-edge { fill: none; stroke: rgb(255 255 255 / 0.22); stroke-width: 1; }
+  .km-bag-seam { stroke: rgb(255 255 255 / 0.2); stroke-width: 1; stroke-dasharray: 2 3; }
+  .km-string { stroke: rgb(220 236 250 / 0.6); stroke-width: 1; }
+  .km-tag { fill: #f4f8fc; filter: drop-shadow(0 4px 6px rgb(0 0 0 / 0.35)); }
+  .km-tag-text { font-size: 10px; font-weight: 700; fill: #14324d; }
+
+  .km-bag-cap { fill: rgb(255 255 255 / 0.28); }
+
+  /* Phones: the camera (see `holds` above). Thumbnails rest on the finished picture, where the
+     camera has pulled back to the whole. */
+  @media (max-width: 760px) {
+    .km-cam {
+      transform-box: view-box;
+      transform-origin: 0 0;
+      transform: translate(calc((280 - var(--S) * var(--cx)) * 1px), calc((181 - var(--S) * var(--cy)) * 1px)) scale(var(--S));
+    }
+  }
+
+  /* ---------- The chapters, under the window: the one playing is lit and fills as it plays ---------- */
+  .km-chapters {
+    list-style: none;
+    margin: clamp(0.9rem, 0.6rem + 0.8vw, 1.4rem) 0 0;
+    padding: 0 0.15rem;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: clamp(0.5rem, 0.3rem + 0.6vw, 0.9rem);
+  }
+  .km-ch {
+    --on: calc(clamp(0, (var(--t) - var(--a)) * 4, 1) * clamp(0, (var(--b) - var(--t)) * 4, 1));
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    column-gap: 0.45rem;
+    row-gap: 0.45rem;
+    opacity: calc(0.42 + 0.58 * var(--on));
+  }
+  .km-ch-n {
+    display: grid;
+    place-items: center;
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 50%;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    color: #dcecf8;
+    background: rgb(255 255 255 / 0.08);
+    box-shadow: inset 0 0 0 1px rgb(143 227 255 / calc(0.15 + 0.5 * var(--on)));
+  }
+  .km-ch-name { font-size: 0.75rem; font-weight: 600; line-height: 1.2; color: #c9d8e6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .km-ch-track { grid-column: 1 / -1; position: relative; height: 2px; border-radius: 1px; background: rgb(255 255 255 / 0.1); overflow: hidden; }
+  .km-ch-fill {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: #3fd0ff;
+    box-shadow: 0 0 6px rgb(63 208 255 / 0.8);
+    transform-origin: left center;
+    transform: scaleX(clamp(0, (var(--t) - var(--a)) / (var(--b) - var(--a)), 1));
+    opacity: var(--on);
+  }
+  @media (max-width: 760px) {
+    .km-ch { grid-template-columns: minmax(0, 1fr); justify-items: center; }
+    .km-ch-name { display: none; }
+  }
+
+  .km-note-text { font-size: 12px; font-weight: 500; fill: #e6eff8; }
+  .km-heart { fill: #ff8fa3; filter: drop-shadow(0 0 5px rgb(255 143 163 / 0.55)); }
+</style>
