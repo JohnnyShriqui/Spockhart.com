@@ -49,11 +49,7 @@ const steps = [
 ];
 ---
 
-<section class="proc" aria-labelledby="proc-title" data-proc>
-  <div class="wrap proc-head">
-    <p class="proc-label">How we work</p>
-    <h2 id="proc-title">One process, inside your operation or in front of your customers.</h2>
-  </div>
+<section class="proc" aria-label="How we work: four steps" data-proc>
 
   <div class="wrap">
     <div class="proc-stair" data-proc-stair>
@@ -214,12 +210,9 @@ const steps = [
 
 <style>
   .proc {
-    padding-top: clamp(3.5rem, 2rem + 4vw, 6rem);
+    padding-top: clamp(2.5rem, 1.5rem + 3vw, 4.5rem);
     padding-bottom: clamp(4rem, 3rem + 4vw, 7rem);
   }
-  .proc-head { display: grid; gap: 0.75rem; margin-bottom: clamp(2.5rem, 1.5rem + 2.5vw, 4rem); }
-  .proc-label { font-size: 0.8125rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); }
-  .proc-head h2 { font-size: clamp(2rem, 1.3rem + 2vw, 3.25rem); line-height: 1.06; letter-spacing: -0.02em; max-width: 20ch; }
 
   /* ---------- The staircase ---------- */
   .proc-stair {
