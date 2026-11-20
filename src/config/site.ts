@@ -47,7 +47,7 @@ export type NavItem = { label: string; href: string };
 /* Who, what, how, why */
 export const primaryNav: NavItem[] = [
   { label: 'Team', href: '/team/' },
-  { label: 'Our Experience', href: '/work/' },
+  { label: 'Our Work', href: '/work/' },
   { label: 'Approach', href: '/approach/' },
   { label: 'Nonprofits', href: '/nonprofits/' },
 ];
@@ -58,7 +58,7 @@ export const footerNav: { heading: string; items: NavItem[] }[] = [
     items: [
       { label: 'Approach', href: '/approach/' },
       { label: 'Calculator', href: '/#calculator' },
-      { label: 'Our Experience', href: '/work/' },
+      { label: 'Our Work', href: '/work/' },
     ],
   },
   {
